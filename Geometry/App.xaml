@@ -1,0 +1,9 @@
+﻿<Application x:Class="DiGi.Geometry.Test.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DiGi.Geometry.Test"
+             StartupUri="Windows/MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
