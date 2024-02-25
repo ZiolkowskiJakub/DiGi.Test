@@ -21,6 +21,14 @@ namespace DiGi.Geometry.Test
 
             List<Vector2D> vector2Ds = DiGi.Core.Convert.ToDiGi<Vector2D>(json);
 
+            List<Point2D> point2Ds = new List<Point2D>() { new Point2D(0, 0), new Point2D(0, 5), new Point2D(5, 5), new Point2D(5, 0) };
+
+            Point2D point2D = new Point2D(0, 5);
+
+            double parameter = Planar.Query.Parameter(point2Ds, point2D, out Point2D point2D_Closest, out double distance);
+
+            Point2D point2D_Temp = Planar.Query.Point(point2Ds, parameter);
+
             //JsonNode jsonNode = JsonNode.Parse(json);
 
 
