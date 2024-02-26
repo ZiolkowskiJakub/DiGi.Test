@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using DiGi.Core;
 using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.Test
@@ -15,19 +16,22 @@ namespace DiGi.Geometry.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            Vector2D vector2D = new Vector2D(10, 11);
+            IntersectionResult2D intersectionResult2D = Geometry.Planar.Create.IntersectionResult2D(new Line2D(new Point2D(0, 0), new Vector2D(0, 1)), new Line2D(new Point2D(1, 0), new Vector2D(0, 1)));
 
-            string json = DiGi.Core.Convert.ToString(new List<Vector2D> { vector2D, vector2D });
 
-            List<Vector2D> vector2Ds = DiGi.Core.Convert.ToDiGi<Vector2D>(json);
+            //Vector2D vector2D = new Vector2D(10, 11);
 
-            List<Point2D> point2Ds = new List<Point2D>() { new Point2D(0, 0), new Point2D(0, 5), new Point2D(5, 5), new Point2D(5, 0) };
+            //string json = DiGi.Core.Convert.ToString(new List<Vector2D> { vector2D, vector2D });
 
-            Point2D point2D = new Point2D(0, 5);
+            //List<Vector2D> vector2Ds = DiGi.Core.Convert.ToDiGi<Vector2D>(json);
 
-            double parameter = Planar.Query.Parameter(point2Ds, point2D, out Point2D point2D_Closest, out double distance);
+            //List<Point2D> point2Ds = new List<Point2D>() { new Point2D(0, 0), new Point2D(0, 5), new Point2D(5, 5), new Point2D(5, 0) };
 
-            Point2D point2D_Temp = Planar.Query.Point(point2Ds, parameter);
+            //Point2D point2D = new Point2D(0, 5);
+
+            //double parameter = Planar.Query.Parameter(point2Ds, point2D, out Point2D point2D_Closest, out double distance);
+
+            //Point2D point2D_Temp = Planar.Query.Point(point2Ds, parameter);
 
             //JsonNode jsonNode = JsonNode.Parse(json);
 
