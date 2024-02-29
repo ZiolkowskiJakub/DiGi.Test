@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using DiGi.Core;
 using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.Test
@@ -17,6 +16,14 @@ namespace DiGi.Geometry.Test
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
             IntersectionResult2D intersectionResult2D = Geometry.Planar.Create.IntersectionResult2D(new Line2D(new Point2D(0, 0), new Vector2D(0, 1)), new Line2D(new Point2D(1, 0), new Vector2D(0, 1)));
+
+            Vector2D vector2D_1 = new Vector2D(0, 1);
+
+            Vector2D vector2D_2 = new Vector2D(0, -6);
+
+            
+
+            bool collinear = (new Line2D(new Point2D(0, 0), vector2D_1)).Collinear(new Line2D(new Point2D(2, 2), vector2D_2));
 
 
             //Vector2D vector2D = new Vector2D(10, 11);
