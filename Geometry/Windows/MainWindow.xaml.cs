@@ -22,6 +22,29 @@ namespace DiGi.Geometry.Test
 
             Vector2D vector2D_2 = new Vector2D(0, -6);
 
+
+            List<KeyValuePair<double, double>> values = new List<KeyValuePair<double, double>>();
+            values.Add(new KeyValuePair<double, double>(1, 2));
+            values.Add(new KeyValuePair<double, double>(3, 5));
+
+            JsonValue jsonValue_Temp = JsonValue.Create(values);
+
+            List<KeyValuePair<double, double>> values_Temp = jsonValue_Temp.GetValue<List<KeyValuePair<double, double>>>();
+
+
+
+            Point2D point2D = new Point2D(1, 1);
+            Vector2D vector2D_3 = new Vector2D(0, 1);
+            Transform2D transform2D = Transform2D.GetRotation(Math.PI);
+
+            point2D.Transform(transform2D);
+            vector2D_3.Transform(transform2D);
+
+
+
+
+
+
             List<int[]> indexes = new List<int[]>() { new int[] {1, 2, 3 }, new int[] { 2, 2, 3 } };
 
             JsonValue jsonValue = JsonValue.Create(indexes);
