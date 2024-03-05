@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Text.Json.Nodes;
+using System.Windows;
 using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.Test
@@ -21,7 +22,11 @@ namespace DiGi.Geometry.Test
 
             Vector2D vector2D_2 = new Vector2D(0, -6);
 
-            
+            List<int[]> indexes = new List<int[]>() { new int[] {1, 2, 3 }, new int[] { 2, 2, 3 } };
+
+            JsonValue jsonValue = JsonValue.Create(indexes);
+
+            List<int[]> indexes_Temp = jsonValue.GetValue<List<int[]>>();
 
             bool collinear = (new Line2D(new Point2D(0, 0), vector2D_1)).Collinear(new Line2D(new Point2D(2, 2), vector2D_2));
 
