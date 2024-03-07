@@ -1,7 +1,6 @@
-﻿using System.Text.Json.Nodes;
-using System.Windows;
-using DiGi.Core;
-using DiGi.Core.Interfaces;
+﻿using System.Windows;
+using DiGi.Geometry.Core.Enums;
+using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.Test
@@ -18,10 +17,12 @@ namespace DiGi.Geometry.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            Rectangle2D rectangle2D = new Rectangle2D(new Point2D(1, 1), 20, 10);
+            Rectangle2D rectangle2D = new Rectangle2D(new Point2D(0, 0), 5, 8);
 
-            Polyline2D polyline2D = new Polyline2D(new List<Point2D>() 
-            { 
+            Point2D point2D = rectangle2D.GetCentroid();
+
+            Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
+            {
                 new Point2D(0, 0) ,
                 new Point2D(10, 0),
                 new Point2D(10, 10),
@@ -29,18 +30,61 @@ namespace DiGi.Geometry.Test
                  new Point2D(5, -10),
             });
 
-            List<Polygon2D> polygon2Ds = DiGi.Geometry.Planar.Create.Polygon2Ds(polyline2D);
+            List<Segment2D> segment2Ds = rectangle2D.AdjacentSegments(polyline2D);
+
+            int count = segment2Ds.Count;
+
+            //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
+            //{
+            //    new Point2D(0, 0) ,
+            //    new Point2D(10, 0),
+            //    new Point2D(10, 10),
+            //    new Point2D(5, 10),
+            //     new Point2D(5, -10),
+            //});
+
+            //List<Segment2D> segment2Ds = new List<Segment2D>()
+            //{
+            //    new Segment2D(0,0, 10, 0),
+            //    new Segment2D(0,0, 10, 0),
+            //    new Segment2D(10,10, 10, 0),
+            //    new Segment2D(10,10, 0, 10),
+            //};
+
+            //int count = 8;
+
+            //double factor = (2 * Math.PI) / count;
+
+            //double angle = 0;
+            //List<Vector2D> vector2Ds = new List<Vector2D>();
+            //for(int i=0; i < count; i++)
+            //{
+            //    vector2Ds.Add(Create.Vector2D(angle));
+            //    angle += factor;
+            //}
+
+            //Vector2D vector2D = Create.Vector2D(Math.PI);
+
+            //List<Polyline2D> polyline2Ds = Create.Polyline2Ds(segment2Ds, new Point2D(0, 0));
+
+            //List<Polygon2D> polygon2Ds = Planar.Create.Polygon2Ds(polyline2D);
+
+            //bool selfIntersect = Planar.Query.SelfIntersect(polygon2Ds[0]);
+            //Orientation orientation = polygon2Ds[0].Orientation();
+            //polygon2Ds[0].Orient(Orientation.CounterClockwise);
+
+            //selfIntersect = Planar.Query.SelfIntersect(polyline2D);
 
 
-            Vector2D widthDirection = rectangle2D.WidthDirection;
-            Vector2D heightDirection = rectangle2D.HeightDirection;
+            //Vector2D widthDirection = rectangle2D.WidthDirection;
+            //Vector2D heightDirection = rectangle2D.HeightDirection;
 
-            List<Point2D> point2Ds_1 = rectangle2D.GetPoints();
-            rectangle2D.Inverse();
+            //List<Point2D> point2Ds_1 = rectangle2D.GetPoints();
+            //rectangle2D.Inverse();
 
-            List<Point2D> point2Ds_2 = rectangle2D.GetPoints();
+            //List<Point2D> point2Ds_2 = rectangle2D.GetPoints();
 
-            double s = 0;
+            //double s = 0;
 
             //GeometryCollection2D geometryCollection2D = new GeometryCollection2D();
             //geometryCollection2D.Add(new Segment2D(0,0, 0, 1));
