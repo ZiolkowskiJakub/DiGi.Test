@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using DiGi.Geometry.Core.Enums;
 using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
 
