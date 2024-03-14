@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Planar.Interfaces;
 
 namespace DiGi.Geometry.Test
 {
@@ -14,24 +15,51 @@ namespace DiGi.Geometry.Test
             InitializeComponent();
         }
 
-        private void Button_Test1_Click(object sender, RoutedEventArgs e)
+        private static void OffsetTest()
         {
-            Rectangle2D rectangle2D = new Rectangle2D(new Point2D(0, 0), 5, 8);
+            //Rectangle2D rectangle2D = new Rectangle2D(new Point2D(0, 0), 5, 5);
+            //Polygon2D polygon2D = new Polygon2D(rectangle2D.GetPoints());
 
-            Point2D point2D = rectangle2D.GetCentroid();
-
-            Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
             {
                 new Point2D(0, 0) ,
                 new Point2D(10, 0),
                 new Point2D(10, 10),
-                new Point2D(5, 10),
-                 new Point2D(5, -10),
+                new Point2D(11, 10),
+                new Point2D(11, 0),
+                new Point2D(11, 0),
+                new Point2D(20, 0),
+                new Point2D(20, 11),
+                new Point2D(0, 11),
             });
 
-            List<Segment2D> segment2Ds = rectangle2D.AdjacentSegments(polyline2D);
 
-            int count = segment2Ds.Count;
+            List<Polygon2D> polygon2Ds_Offset = Query.Offset(polygon2D, -1);
+        }
+
+        private void Button_Test1_Click(object sender, RoutedEventArgs e)
+        {
+            OffsetTest();
+
+            //Rectangle2D rectangle2D = new Rectangle2D(new Point2D(8, 8), 5, 5);
+
+            //Point2D point2D = rectangle2D.GetCentroid();
+
+            //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
+            //{
+            //    new Point2D(0, 0) ,
+            //    new Point2D(10, 0),
+            //    new Point2D(10, 10),
+            //    new Point2D(5, 10),
+            //     new Point2D(5, -10),
+            //});
+
+
+            //List<Point2D> point2Ds = Query.LongestPath(new ISegmentable2D[] { rectangle2D, polyline2D }, new Point2D(5, -10));
+
+            //List<Segment2D> segment2Ds = rectangle2D.AdjacentSegments(polyline2D);
+
+            //int count = segment2Ds.Count;
 
             //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
             //{
