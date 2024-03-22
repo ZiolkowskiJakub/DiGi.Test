@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
-using DiGi.Geometry.Planar.Interfaces;
 
 namespace DiGi.Geometry.Test
 {
