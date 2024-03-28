@@ -1,6 +1,8 @@
 ﻿using System.Windows;
-using DiGi.Geometry.Planar;
+using DiGi.Core;
 using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Spatial.Classes;
+using NetTopologySuite.Operation.Distance3D;
 
 namespace DiGi.Geometry.Test
 {
@@ -33,12 +35,63 @@ namespace DiGi.Geometry.Test
             });
 
 
-            List<Polygon2D> polygon2Ds_Offset = Query.Offset(polygon2D, -1);
+            List<Polygon2D> polygon2Ds_Offset = Planar.Query.Offset(polygon2D, -1);
+        }
+
+        private static void VolatileObjectTest()
+        {
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
+            {
+                new Point2D(0, 0) ,
+                new Point2D(10, 0),
+                new Point2D(10, 10),
+                new Point2D(0, 10)
+            });
+
+            PolygonalFace2D polygonalFace2D = Planar.Create.PolygonalFace2D(polygon2D);
+
+            PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, polygonalFace2D);
+
+            string json = DiGi.Core.Convert.ToString(polygonalFace2D);
+
+            VolatilePolygonalFace3D volatilePolygonalFace3D = new VolatilePolygonalFace3D(polygonalFace3D);
+
+            string json_Volatile = DiGi.Core.Convert.ToString(polygonalFace2D);
+
+            bool equals = json == json_Volatile;
+        }
+
+        private static void InetrsectionTest()
+        {
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
+            {
+                new Point2D(0, 0) ,
+                new Point2D(10, 0),
+                new Point2D(10, 10),
+                new Point2D(0, 10)
+            });
+
+            PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
+
+            PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(polygonalFace3D, new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
+        }
+
+        private static void RangeTest()
+        {
+            BoundingBox3D boundingBox3D = new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
+
+            Point3D point3D = new Point3D(5, 5, 5);
+
+            bool inRange = boundingBox3D.InRange(point3D);
+            bool on = boundingBox3D.On(point3D);
+            bool inside = boundingBox3D.Inside(point3D);
         }
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            OffsetTest();
+            InetrsectionTest();
+
+            //VolatileObjectTest();
 
             //Rectangle2D rectangle2D = new Rectangle2D(new Point2D(8, 8), 5, 5);
 

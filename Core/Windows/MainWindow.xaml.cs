@@ -32,7 +32,7 @@ namespace DiGi.Core.Test
             TestObject testObject_2 = new TestObject("BBB");
             json = Convert.ToString(testObject_2);
 
-            JsonObject jsonObject = JsonObject.Parse(json).AsObject();
+            JsonObject jsonObject = JsonNode.Parse(json).AsObject();
 
             TestObject testObject_3 = Create.SerializableObject<TestObject>(jsonObject);
 
