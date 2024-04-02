@@ -1,7 +1,9 @@
 ﻿using System.Windows;
 using DiGi.Core;
 using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
+using DiGi.Geometry.Spatial.Interfaces;
 using NetTopologySuite.Operation.Distance3D;
 
 namespace DiGi.Geometry.Test
@@ -61,7 +63,7 @@ namespace DiGi.Geometry.Test
             bool equals = json == json_Volatile;
         }
 
-        private static void InetrsectionTest()
+        private static void IntersectionTest()
         {
             Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
             {
@@ -73,7 +75,77 @@ namespace DiGi.Geometry.Test
 
             PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
 
-            PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(polygonalFace3D, new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
+            PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(polygonalFace3D, (ILinear3D)new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
+        }
+
+        private static void PlanarIntersectionTest() 
+        {
+            DateTime dateTime = DateTime.Now;
+
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
+            {
+                new Point2D(0, 0) ,
+                new Point2D(10, 0),
+                new Point2D(10, 10),
+                new Point2D(0, 10)
+            });
+
+            PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
+
+            Vector3D vector3D = new Vector3D(0, 0, 10);
+
+            Polyhedron polyhedron = Spatial.Create.Polyhedron(polygonalFace3D, vector3D);
+
+            VolatilePolyhedron volatilePolyhedron = polyhedron;
+
+            for (int i = 0; i < 10000; i++)
+            {
+                PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(new Plane(new Point3D(0, 0, 0), Spatial.Constans.Vector3D.WorldZ), volatilePolyhedron);
+            }
+
+            double seconds = (DateTime.Now - dateTime).TotalSeconds;
+
+            MessageBox.Show(seconds.ToString());
+
+        }
+
+        private static void PolyhedronTest() 
+        {
+
+            DateTime dateTime = DateTime.Now;
+
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
+                {
+                    new Point2D(0, 0) ,
+                    new Point2D(10, 0),
+                    new Point2D(10, 10),
+                    new Point2D(0, 10)
+                });
+
+            PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
+
+            Vector3D vector3D = new Vector3D(0, 0, 10);
+
+            Polyhedron polyhedron = Spatial.Create.Polyhedron(polygonalFace3D, vector3D);
+
+            VolatilePolyhedron volatilePolyhedron = polyhedron;
+
+            List<bool> @bools = new List<bool>();
+            for (int i = 0; i < 10000; i++)
+            {
+                IntersectionResult3D intersectionResult3D = Spatial.Create.IntersectionResult3D(volatilePolyhedron, new Segment3D(-1, 5, 5, 11, 5, 5));
+
+                //string text = DiGi.Core.Convert.ToString(polyhedron);
+
+                //Polyhedron polyhedron_1 = DiGi.Core.Convert.ToDiGi<Polyhedron>(text)?.FirstOrDefault();
+
+
+                //@bools.Add(text == DiGi.Core.Convert.ToString(polyhedron));
+            }
+
+            double seconds = (DateTime.Now - dateTime).TotalSeconds;
+
+            MessageBox.Show(seconds.ToString());
         }
 
         private static void RangeTest()
@@ -89,7 +161,9 @@ namespace DiGi.Geometry.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            InetrsectionTest();
+
+            PlanarIntersectionTest();
+            //PolyhedronTest();
 
             //VolatileObjectTest();
 
