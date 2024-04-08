@@ -1,10 +1,7 @@
 ﻿using System.Windows;
-using DiGi.Core;
 using DiGi.Geometry.Planar.Classes;
-using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
-using NetTopologySuite.Operation.Distance3D;
 
 namespace DiGi.Geometry.Test
 {
@@ -78,7 +75,7 @@ namespace DiGi.Geometry.Test
             PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(polygonalFace3D, (ILinear3D)new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
         }
 
-        private static void PlanarIntersectionTest() 
+        private static void PlanarIntersectionTest_1() 
         {
             DateTime dateTime = DateTime.Now;
 
@@ -100,7 +97,66 @@ namespace DiGi.Geometry.Test
 
             for (int i = 0; i < 10000; i++)
             {
-                PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(new Plane(new Point3D(0, 0, 0), Spatial.Constans.Vector3D.WorldZ), volatilePolyhedron);
+                PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult(new Plane(new Point3D(0, 0, 1), Spatial.Constans.Vector3D.WorldZ), volatilePolyhedron);
+            }
+
+            double seconds = (DateTime.Now - dateTime).TotalSeconds;
+
+            MessageBox.Show(seconds.ToString());
+
+        }
+
+        private static void PlanarIntersectionTest_2()
+        {
+            DateTime dateTime = DateTime.Now;
+
+            Polygon2D polygon2D = null;
+
+            polygon2D = new Polygon2D(new List<Point2D>()
+            {
+                new Point2D(0, 0) ,
+                new Point2D(10, 0),
+                new Point2D(10, 10),
+                new Point2D(0, 10)
+            });
+
+            PolygonalFace3D polygonalFace3D_1 = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
+
+            polygon2D = new Polygon2D(new List<Point2D>()
+            {
+                new Point2D(5, 5) ,
+                new Point2D(20, 5),
+                new Point2D(20, 20),
+                new Point2D(5, 20)
+            });
+
+            Polygon3D polygon3D = Spatial.Create.Polygon3D(new List<Point3D>() 
+            {
+                new Point3D(2, 5, -1),
+                new Point3D(2, 20, -1),
+                new Point3D(2, 20, 1),
+                new Point3D(2, 5, 1)
+            });
+
+            PolygonalFace3D polygonalFace3D_2 = Spatial.Create.PolygonalFace3D(polygon3D);
+
+             polygon3D = Spatial.Create.Polygon3D(new List<Point3D>()
+            {
+                new Point3D(2, 5, -1),
+                new Point3D(2, 5, 1),
+                new Point3D(10, 5, 1),
+                new Point3D(10, 5, -1)
+            });
+
+            PolygonalFace3D polygonalFace3D_3 = Spatial.Create.PolygonalFace3D(polygon3D);
+
+            for (int i = 0; i < 10000; i++)
+            {
+                //PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult((VolatilePolygonalFace3D)polygonalFace3D_1, new VolatilePolygonalFace3D[] { polygonalFace3D_2, polygonalFace3D_3 });
+
+                List<VolatilePolygonalFace3D> volatilePolygonalFace3Ds = Spatial.Query.Split(polygonalFace3D_1, new VolatilePolygonalFace3D[] { polygonalFace3D_2, polygonalFace3D_3 });
+
+                //List<IGeometry3D> geometry3Ds = planarIntersectionResult.GetGeometry3Ds<IGeometry3D>();
             }
 
             double seconds = (DateTime.Now - dateTime).TotalSeconds;
@@ -159,10 +215,15 @@ namespace DiGi.Geometry.Test
             bool inside = boundingBox3D.Inside(point3D);
         }
 
+        private static void RandomPolygon2DTest()
+        {
+            Polygon2D polygon2D = DiGi.Geometry.Planar.Random.Create.Polygon2D(new BoundingBox2D(new Point2D(0, 0), new Point2D(10, 10)), 4);
+        }
+
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-
-            PlanarIntersectionTest();
+            RandomPolygon2DTest();
+            //PlanarIntersectionTest_2();
             //PolyhedronTest();
 
             //VolatileObjectTest();

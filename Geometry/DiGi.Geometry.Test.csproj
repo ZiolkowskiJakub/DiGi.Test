@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\..\DiGi.Geometry.Random\DiGi.Geometry.Random\DiGi.Geometry.Random.csproj" />
+    <ProjectReference Include="..\..\DiGi.Geometry.Visual\DiGi.Geometry.Visual\DiGi.Geometry.Visual.csproj" />
     <ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
   </ItemGroup>
 
