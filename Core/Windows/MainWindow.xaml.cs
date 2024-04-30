@@ -2,6 +2,7 @@
 using System.Windows;
 using DiGi.Core.Classes;
 using DiGi.Core.Parameters;
+using DiGi.Core.Parameters.Classes;
 using DiGi.Core.Test.Classes;
 
 namespace DiGi.Core.Test
@@ -36,7 +37,7 @@ namespace DiGi.Core.Test
 
             JsonObject jsonObject = JsonNode.Parse(json).AsObject();
 
-            TestObject testObject_3 = Core.Create.SerializableObject<TestObject>(jsonObject);
+            TestObject testObject_3 = Create.SerializableObject<TestObject>(jsonObject);
 
             TestObject testObject_4 = testObject_3.Clone<TestObject>();
 
@@ -99,12 +100,40 @@ namespace DiGi.Core.Test
             json = Convert.ToString(externalParameterDefinition);
 
             ExternalParameterDefinition externalParameterDefinition_Temp = Convert.ToDiGi<ExternalParameterDefinition>(json)?.FirstOrDefault();
+        }
 
+        public void ParametrizedObjectTest()
+        {
+            string json = null;
+
+            ParametrizedObject parametrizedObject = new ParametrizedObject();
+            parametrizedObject.SetValue("Test", "Some Text", new SetValueSettings() { CheckAccessType = false });
+
+            ExternalParameterDefinition externalParameterDefinition = Parameters.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test 2", "Test description", Parameters.Enums.ParameterType.Double, typeof(ParametrizedObject), nullable: false);
+            parametrizedObject.SetValue(externalParameterDefinition, 20);
+
+            json = Convert.ToString(parametrizedObject);
+
+            ParametrizedObject parametrizedObject_Temp = Convert.ToDiGi<ParametrizedObject>(json)?.FirstOrDefault();
+
+            bool result = json == Convert.ToString(parametrizedObject_Temp);
+
+        }
+
+        private void ParameterTest_2()
+        {
+            string json_1 = Convert.ToString(Parameters.Create.Parameter("Test", "Some Text"));
+
+            Parameter parameter = Convert.ToDiGi<Parameter>(json_1)?.FirstOrDefault();
+
+            string json_2= Convert.ToString(parameter);
+
+            bool result = json_1 == json_2;
         }
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            AssociatedTypesTest();
+            ParametrizedObjectTest();
         }
     }
 }

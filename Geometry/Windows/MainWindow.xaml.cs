@@ -242,10 +242,31 @@ namespace DiGi.Geometry.Test
             bool valid = DiGi.Core.Convert.ToString(line3D) == DiGi.Core.Convert.ToString(line3D_Temp);
         }
 
+        public static void SaveTest()
+        {
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
+                {
+                    new Point2D(0, 0) ,
+                    new Point2D(10, 0),
+                    new Point2D(10, 10),
+                    new Point2D(0, 10)
+                });
+
+            PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
+
+            Vector3D vector3D = new Vector3D(0, 0, 10);
+
+            Polyhedron polyhedron = Create.Polyhedron(polygonalFace3D, vector3D);
+
+            DiGi.Core.Convert.ToFile(polyhedron, @"C:\Users\jakub\Nextcloud\DiGi\Polyhedron.json");
+
+
+        }
+
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
 
-            ConversionTest();
+            SaveTest();
             //RandomPolyhedronTest();
             //PlanarIntersectionTest_2();
             //PolyhedronTest();
