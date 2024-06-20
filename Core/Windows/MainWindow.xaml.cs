@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.IO;
+using System.Text;
+using System.Text.Json.Nodes;
 using System.Windows;
 using DiGi.Core.Classes;
-using DiGi.Core.Parameters;
-using DiGi.Core.Parameters.Classes;
+using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Test.Classes;
 
 namespace DiGi.Core.Test
@@ -15,6 +16,41 @@ namespace DiGi.Core.Test
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+
+        private void BinaryReadWriteTest()
+        {
+            string directory = @"C:\Users\jakub\Nextcloud\Work\DigiProject\DiGi\";
+
+            string filePath = System.IO.Path.Combine(directory, "Test.dgb");
+
+            TestObject testObject_1 = new TestObject("BBB");
+            string json = Convert.ToString(testObject_1);
+
+            File.WriteAllText(System.IO.Path.Combine(directory, "Test.json"), json);
+
+            using (var stream = File.Open(filePath, FileMode.Create))
+            {
+                using (BinaryWriter binaryWriter = new BinaryWriter(stream, Encoding.UTF8, false))
+                {
+                    binaryWriter.Write(json);
+                    binaryWriter.Write(filePath);
+                }
+            }
+
+            json = null;
+
+            using (var stream = File.Open(filePath, FileMode.Open))
+            {
+                using (BinaryReader binaryReader = new BinaryReader(stream, Encoding.UTF8, false))
+                {
+                    json = binaryReader.ReadString();
+                }
+            }
+
+            TestObject testObject_2 = Convert.ToDiGi<TestObject>(json)?.FirstOrDefault();
+
         }
 
         private void ObjectTest()
@@ -50,7 +86,7 @@ namespace DiGi.Core.Test
 
         public void PathTest()
         {
-            Path path = @"Z:\DiGi\Line3Da.txt";
+            Core.Classes.Path path = @"Z:\DiGi\Line3Da.txt";
 
             //Path path = @"Z:\DiGi";
 
@@ -58,7 +94,7 @@ namespace DiGi.Core.Test
 
             bool valid = path.IsValid();
 
-            System.IO.FileInfo fileInfo = path.GetFileInfo();
+            FileInfo fileInfo = path.GetFileInfo();
         }
 
         public void ParameterTest()
@@ -89,13 +125,13 @@ namespace DiGi.Core.Test
 
 
 
-            AssociatedTypes associatedTypes = new AssociatedTypes(typeof(Path));
+            AssociatedTypes associatedTypes = new AssociatedTypes(typeof(Core.Classes.Path));
 
             json = Convert.ToString(associatedTypes);
 
             AssociatedTypes associatedTypes_Temp = Convert.ToDiGi<AssociatedTypes>(json)?.FirstOrDefault();
 
-            ExternalParameterDefinition externalParameterDefinition = Parameters.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test", "Test description", Parameters.Enums.ParameterType.Double, typeof(Color), nullable: false);
+            ExternalParameterDefinition externalParameterDefinition = Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test", "Test description", Parameter.Enums.ParameterType.Double, typeof(Color), nullable: false);
 
             json = Convert.ToString(externalParameterDefinition);
 
@@ -109,7 +145,7 @@ namespace DiGi.Core.Test
             ParametrizedObject parametrizedObject = new ParametrizedObject();
             parametrizedObject.SetValue("Test", "Some Text", new SetValueSettings() { CheckAccessType = false });
 
-            ExternalParameterDefinition externalParameterDefinition = Parameters.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test 2", "Test description", Parameters.Enums.ParameterType.Double, typeof(ParametrizedObject), nullable: false);
+            ExternalParameterDefinition externalParameterDefinition = Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test 2", "Test description", Parameter.Enums.ParameterType.Double, typeof(ParametrizedObject), nullable: false);
             parametrizedObject.SetValue(externalParameterDefinition, 20);
 
             json = Convert.ToString(parametrizedObject);
@@ -122,9 +158,9 @@ namespace DiGi.Core.Test
 
         private void ParameterTest_2()
         {
-            string json_1 = Convert.ToString(Parameters.Create.Parameter("Test", "Some Text"));
+            string json_1 = Convert.ToString(Parameter.Create.Parameter("Test", "Some Text"));
 
-            Parameter parameter = Convert.ToDiGi<Parameter>(json_1)?.FirstOrDefault();
+            Parameter.Classes.Parameter parameter = Convert.ToDiGi<Parameter.Classes.Parameter>(json_1)?.FirstOrDefault();
 
             string json_2= Convert.ToString(parameter);
 
@@ -133,7 +169,8 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            ParametrizedObjectTest();
+            BinaryReadWriteTest();
         }
+
     }
 }

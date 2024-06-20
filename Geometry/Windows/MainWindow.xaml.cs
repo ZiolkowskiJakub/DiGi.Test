@@ -3,6 +3,8 @@ using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
+using DiGi.Geometry.Visual.Planar.Classes;
+using DiGi.Geometry.Visual.Core.Classes;
 
 namespace DiGi.Geometry.Test
 {
@@ -263,10 +265,23 @@ namespace DiGi.Geometry.Test
 
         }
 
+        public static void VisualTest()
+        {
+            VisualPoint2D visualPoint2D_1 = new VisualPoint2D(new Point2D(0, 0), new PointAppearance(System.Drawing.Color.Blue, 10));
+
+            string json_1 = DiGi.Core.Convert.ToString(visualPoint2D_1);
+
+            VisualPoint2D visualPoint2D_2 = DiGi.Core.Convert.ToDiGi<VisualPoint2D>(json_1)?.FirstOrDefault();
+            string json_2 = DiGi.Core.Convert.ToString(visualPoint2D_2);
+
+            bool result = json_1 == json_2;
+        }
+
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
+            VisualTest();
 
-            SaveTest();
+            //SaveTest();
             //RandomPolyhedronTest();
             //PlanarIntersectionTest_2();
             //PolyhedronTest();

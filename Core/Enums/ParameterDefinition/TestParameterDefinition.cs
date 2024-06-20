@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using DiGi.Core.Interfaces;
-using DiGi.Core.Parameters;
+using DiGi.Core.Parameter.Classes;
 
 namespace DiGi.Core.Test.Enums
 {
