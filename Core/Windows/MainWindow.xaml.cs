@@ -2,7 +2,10 @@
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Windows;
+using System.Windows.Shapes;
+using System.Xml.Schema;
 using DiGi.Core.Classes;
+using DiGi.Core.Interfaces;
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Test.Classes;
 
@@ -28,9 +31,9 @@ namespace DiGi.Core.Test
             TestObject testObject_1 = new TestObject("BBB");
             string json = Convert.ToString(testObject_1);
 
-            File.WriteAllText(System.IO.Path.Combine(directory, "Test.json"), json);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "Test.json"), json);
 
-            using (var stream = File.Open(filePath, FileMode.Create))
+            using (var stream = System.IO.File.Open(filePath, FileMode.Create))
             {
                 using (BinaryWriter binaryWriter = new BinaryWriter(stream, Encoding.UTF8, false))
                 {
@@ -41,7 +44,7 @@ namespace DiGi.Core.Test
 
             json = null;
 
-            using (var stream = File.Open(filePath, FileMode.Open))
+            using (var stream = System.IO.File.Open(filePath, FileMode.Open))
             {
                 using (BinaryReader binaryReader = new BinaryReader(stream, Encoding.UTF8, false))
                 {
@@ -169,7 +172,73 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            BinaryReadWriteTest();
+            TagTest();
+        }
+
+        private void EscapeTest()
+        {
+            string text = "aaa\n aaa";
+
+            string escape = System.Text.RegularExpressions.Regex.Escape(text);
+            string unescape = System.Text.RegularExpressions.Regex.Unescape(escape);
+        }
+
+
+        private void TagTest()
+        {
+            Tag tag = new Tag(new Tag(10.1));
+
+            JsonObject jsonObject = tag.ToJsonObject();
+
+            tag = Convert.ToDiGi<Tag>(jsonObject.ToString()).FirstOrDefault();
+
+
+        }
+
+        private void FileTest()
+        {
+
+            string path_ZIP = @"C:\Users\jakub\Downloads\FileTest.zip";
+            string path_JSON = @"C:\Users\jakub\Downloads\FileTest.json";
+
+            SerializableObjectCollection serializableObjectCollection = new SerializableObjectCollection();
+            for (int i = 0; i < 10000; i++)
+            {
+                serializableObjectCollection.Add(new TestObject(i.ToString()));
+            }
+
+            Convert.ToFile((ISerializableObject)serializableObjectCollection, path_JSON);
+
+            using (File.Classes.File file_1 = new File.Classes.File(path_ZIP))
+            {
+                file_1.AddRange(serializableObjectCollection);
+                file_1.Save();
+            }
+
+            using (File.Classes.File file_2 = new File.Classes.File(path_ZIP))
+            {
+                file_2.Open();
+
+                SerializableObjectCollection serializableObjectCollection_3 = file_2.Value;
+            }
+        }
+
+        private void CollectionTest()
+        {
+            TestObject testObject_1 = new TestObject("BBB");
+
+            TestObject testObject_2 = new TestObject("AAA");
+
+
+            SerializableObjectCollection serializableObjectCollection_1 = new SerializableObjectCollection(new Interfaces.ISerializableObject[] { testObject_1 , testObject_2});
+            string json_1 = Convert.ToString((Interfaces.ISerializableObject)serializableObjectCollection_1);
+
+            SerializableObjectCollection serializableObjectCollection_2 = Convert.ToDiGi<SerializableObjectCollection>(json_1)?.FirstOrDefault();
+            string json_2 = Convert.ToString((Interfaces.ISerializableObject)serializableObjectCollection_2);
+
+            bool result = json_1 == json_2;
+
+
         }
 
     }
