@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.2" />
+    <PackageReference Include="System.Text.Json" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +17,12 @@
     <ProjectReference Include="..\..\DiGi.Geometry.Random\DiGi.Geometry.Random\DiGi.Geometry.Random.csproj" />
     <ProjectReference Include="..\..\DiGi.Geometry.Visual\DiGi.Geometry.Visual\DiGi.Geometry.Visual.csproj" />
     <ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiGi.Geometry.Object">
+      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

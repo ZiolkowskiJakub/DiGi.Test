@@ -2,8 +2,6 @@
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Windows;
-using System.Windows.Shapes;
-using System.Xml.Schema;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Core.Parameter.Classes;
