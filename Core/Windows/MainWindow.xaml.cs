@@ -170,7 +170,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            TagTest();
+            NameTest();
         }
 
         private void EscapeTest()
@@ -179,6 +179,11 @@ namespace DiGi.Core.Test
 
             string escape = System.Text.RegularExpressions.Regex.Escape(text);
             string unescape = System.Text.RegularExpressions.Regex.Unescape(escape);
+        }
+
+        private void NameTest()
+        {
+            string name = nameof(Enums.TestParameterDefinition.Test);
         }
 
 
