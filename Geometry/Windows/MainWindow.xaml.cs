@@ -5,6 +5,7 @@ using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.Geometry.Visual.Planar.Classes;
 using DiGi.Geometry.Visual.Core.Classes;
+using DiGi.Geometry.Core.Classes;
 
 namespace DiGi.Geometry.Test
 {
@@ -277,9 +278,45 @@ namespace DiGi.Geometry.Test
             bool result = json_1 == json_2;
         }
 
+        public static void Point3DsTest()
+        {
+            //Type type = typeof(Dictionary<Point3D, int>);
+            //IDictionary dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(new[] { type.GenericTypeArguments[0], type.GenericTypeArguments[1] }));
+
+
+            //Dictionary<string, int> ttt = new Dictionary<string, int>();
+            //ttt.Add("AAAA a", 1);
+
+            //string text = JsonValue.Create(ttt).ToString();
+
+            //if (dictionary is IEnumerable)
+            //{
+            //    int index = -1;
+            //}
+
+
+            List<Point3D> point3Ds = new List<Point3D>();
+            point3Ds.Add(0, 0, 0);
+            point3Ds.Add(0.000001, 0, 0);
+            point3Ds.Add(10, 10, 10);
+            point3Ds.Add(10, 10.000001, 10);
+            point3Ds.Add(1, 1, 1);
+
+            DensityBasedSpatialClusteringResult<Point3D> densityBasedSpatialClusteringResult = Core.Create.DensityBasedSpatialClusteringResult(point3Ds, 0.001, 1);
+
+
+            string json = DiGi.Core.Convert.ToString(densityBasedSpatialClusteringResult);
+
+            DensityBasedSpatialClusteringResult<Point3D> densityBasedSpatialClusteringResult_Temp = DiGi.Core.Convert.ToDiGi<DensityBasedSpatialClusteringResult<Point3D>>(json)?.FirstOrDefault();
+
+            Point3D point3D = densityBasedSpatialClusteringResult_Temp.GetPoint(1, Query.Average);
+        }
+
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            VisualTest();
+            Point3DsTest();
+
+            //VisualTest();
 
             //SaveTest();
             //RandomPolyhedronTest();
