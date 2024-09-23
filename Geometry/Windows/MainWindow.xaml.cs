@@ -294,6 +294,8 @@ namespace DiGi.Geometry.Test
             //    int index = -1;
             //}
 
+            int count = DiGi.Core.Query.DecimalPlacesCount(0.0001);
+
 
             List<Point3D> point3Ds = new List<Point3D>();
             point3Ds.Add(0, 0, 0);
