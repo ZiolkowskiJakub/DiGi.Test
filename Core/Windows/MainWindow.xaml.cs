@@ -170,7 +170,17 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            NameTest();
+            CategoryTest();
+        }
+
+        private void CategoryTest()
+        {
+            Category category = new Category("AAA");
+            Category subCategory = category.Add("BBB");
+
+            Category category_Temp = category.Clone<Category>();
+
+            bool equals = category.Equals(category_Temp);
         }
 
         private void EscapeTest()
