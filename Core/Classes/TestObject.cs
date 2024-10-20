@@ -1,4 +1,5 @@
 ﻿using DiGi.Core.Classes;
+using DiGi.Core.Test.Enums;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -23,6 +24,10 @@ namespace DiGi.Core.Test.Classes
 
         [JsonInclude, JsonPropertyName("IndexedDoubles")]
         private IndexedObjects<double> indexedDoubles = null;
+
+        [JsonInclude, JsonPropertyName("TestEnum")]
+        private TestEnum? testEnum = null;
+
 
         public TestObject(string name)
             : base()
@@ -74,6 +79,20 @@ namespace DiGi.Core.Test.Classes
             get
             {
                 return uniqueReference;
+            }
+        }
+
+        [JsonIgnore]
+        public TestEnum? TestEnum
+        {
+            get
+            {
+                return testEnum;
+            }
+
+            set
+            {
+                testEnum = value;
             }
         }
     }

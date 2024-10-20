@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using DiGi.Core.Interfaces;
-using DiGi.Core.Parameter.Classes;
 
 namespace DiGi.Core.Test.Enums
 {
-    [AssociatedTypes(typeof(ISerializableObject)), Description("Test Parameter Definition")]
-    public enum TestParameterDefinition
+    public enum TestEnum
     {
-        [ParameterProperties("fc738c9c-49f8-41f7-ab63-c56bb2417836" , "Test", "Test"), DoubleParameterValue()] Test,
+        [Description("Test 1")] Test1,
+        [Description("Test 2")] Test2,
     }
 }

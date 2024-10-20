@@ -19,6 +19,11 @@ namespace DiGi.Core.Test
             InitializeComponent();
         }
 
+        private void Button_Test1_Click(object sender, RoutedEventArgs e)
+        {
+            EscapeTest();
+        }
+
 
         private void BinaryReadWriteTest()
         {
@@ -54,11 +59,42 @@ namespace DiGi.Core.Test
 
         }
 
+        private void NullableObjectTest()
+        {
+            TestObject testObject_1 = new TestObject("CC", 10, 12);
+            testObject_1.TestEnum = Enums.TestEnum.Test1;
+            string json_1 = Convert.ToString(testObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+
+            TestObject testObject_2 = Convert.ToDiGi<TestObject>(json_1)?.FirstOrDefault();
+            string json_2 = Convert.ToString(testObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+
+            bool similar = json_1 == json_2;
+        }
+
+        private void EnumTest()
+        {
+            EnumObject enumObject_1 = new EnumObject() 
+            {
+                TestEnum = Enums.TestEnum.Test1, 
+                TestEnums_1 = new List<Enums.TestEnum?>() { Enums.TestEnum.Test1 },
+                TestEnums_2 = new HashSet<Enums.TestEnum?>() { Enums.TestEnum.Test2 },
+                TestEnums_3 = new HashSet<Enums.TestEnum>() { Enums.TestEnum.Test1, Enums.TestEnum.Test2 },
+            };
+
+            string json_1 = Convert.ToString(enumObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+
+            EnumObject enumObject_2 = Convert.ToDiGi<EnumObject>(json_1)?.FirstOrDefault();
+            string json_2 = Convert.ToString(enumObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+
+            bool similar = json_1 == json_2;
+        }
+
         private void ObjectTest()
         {
             TestObject testObject_5 = new TestObject("CC", 10, 12);
             TestObject testObject_6 = testObject_5.Clone<TestObject>();
             string json = Convert.ToString(testObject_5, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            
 
 
             //TestObject testObject = new TestObject("AAA");
@@ -168,11 +204,6 @@ namespace DiGi.Core.Test
             bool result = json_1 == json_2;
         }
 
-        private void Button_Test1_Click(object sender, RoutedEventArgs e)
-        {
-            CategoryTest();
-        }
-
         private void CategoryTest()
         {
             Category category = new Category("AAA");
@@ -187,6 +218,8 @@ namespace DiGi.Core.Test
         {
             string text = "aaa\n aaa";
 
+            text = "<>:\"|\\?*";
+
             string escape = System.Text.RegularExpressions.Regex.Escape(text);
             string unescape = System.Text.RegularExpressions.Regex.Unescape(escape);
         }
@@ -195,7 +228,6 @@ namespace DiGi.Core.Test
         {
             string name = nameof(Enums.TestParameterDefinition.Test);
         }
-
 
         private void TagTest()
         {
@@ -243,11 +275,11 @@ namespace DiGi.Core.Test
             TestObject testObject_2 = new TestObject("AAA");
 
 
-            SerializableObjectCollection serializableObjectCollection_1 = new SerializableObjectCollection(new Interfaces.ISerializableObject[] { testObject_1 , testObject_2});
-            string json_1 = Convert.ToString((Interfaces.ISerializableObject)serializableObjectCollection_1);
+            SerializableObjectCollection serializableObjectCollection_1 = new SerializableObjectCollection(new ISerializableObject[] { testObject_1 , testObject_2});
+            string json_1 = Convert.ToString((ISerializableObject)serializableObjectCollection_1);
 
             SerializableObjectCollection serializableObjectCollection_2 = Convert.ToDiGi<SerializableObjectCollection>(json_1)?.FirstOrDefault();
-            string json_2 = Convert.ToString((Interfaces.ISerializableObject)serializableObjectCollection_2);
+            string json_2 = Convert.ToString((ISerializableObject)serializableObjectCollection_2);
 
             bool result = json_1 == json_2;
 
