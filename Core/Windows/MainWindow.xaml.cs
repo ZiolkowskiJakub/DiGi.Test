@@ -5,6 +5,8 @@ using System.Windows;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Core.Parameter.Classes;
+using DiGi.Core.Relation.Classes;
+using DiGi.Core.Relation.Interfaces;
 using DiGi.Core.Test.Classes;
 
 namespace DiGi.Core.Test
@@ -21,9 +23,27 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            EscapeTest();
+            ClusterTest();
         }
 
+        private void ClusterTest()
+        {
+            TestObject testObject_1 = new TestObject("AAA");
+            TestObject testObject_2 = new TestObject("BBB");
+
+            OneToOneBidirectionalRelation oneToOneBidirectionalRelation = new OneToOneBidirectionalRelation((IUniqueObject)testObject_1, testObject_2);
+
+            UniqueObjectRelationCluster<IUniqueObject, IRelation> uniqueObjectRelationCluster = new UniqueObjectRelationCluster<IUniqueObject, IRelation>();
+            uniqueObjectRelationCluster.Add(testObject_1);
+            uniqueObjectRelationCluster.Add(testObject_2);
+
+            uniqueObjectRelationCluster.AddRelation(oneToOneBidirectionalRelation);
+
+            List<IRelation> relations = uniqueObjectRelationCluster.GetRelations<IRelation>(testObject_1);
+
+            List<TestObject> testObjects = uniqueObjectRelationCluster.GetValues<TestObject>(oneToOneBidirectionalRelation);
+            uniqueObjectRelationCluster.Remove(testObject_1);
+        }
 
         private void BinaryReadWriteTest()
         {
