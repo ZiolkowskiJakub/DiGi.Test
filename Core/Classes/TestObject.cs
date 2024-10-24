@@ -33,7 +33,7 @@ namespace DiGi.Core.Test.Classes
             : base()
         {
             this.name = name;
-            uniqueReference = new UniqueReference(this);
+            uniqueReference = new GuidReference(this);
         }
 
 
@@ -41,7 +41,7 @@ namespace DiGi.Core.Test.Classes
             : base()
         {
             this.name = name;
-            uniqueReference = new UniqueReference(this);
+            uniqueReference = new GuidReference(this);
             range = new Range<double>(min, max);
             dateTime = DateTime.Now;
             color = System.Drawing.Color.Blue;
@@ -55,7 +55,7 @@ namespace DiGi.Core.Test.Classes
             : base(guid)
         {
             this.name = name;
-            uniqueReference = new UniqueReference(this);
+            uniqueReference = new GuidReference(this);
         }
 
         public TestObject(JsonObject jsonObject)

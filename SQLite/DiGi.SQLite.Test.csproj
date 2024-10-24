@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.File\DiGi.Core.File.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Parameter\DiGi.Core.Parameter.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Relation\DiGi.Core.Relation.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\..\DiGi.SQLite\DiGi.SQLite\DiGi.SQLite.csproj" />
+  </ItemGroup>
+
+</Project>
