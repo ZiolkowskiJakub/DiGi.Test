@@ -8,6 +8,7 @@ using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
 using DiGi.Core.Test.Classes;
+using DiGi.Core.IO.File.Classes;
 
 namespace DiGi.Core.Test
 {
@@ -151,7 +152,7 @@ namespace DiGi.Core.Test
 
             bool valid = path.IsValid();
 
-            FileInfo fileInfo = path.GetFileInfo();
+            System.IO.FileInfo fileInfo = path.GetFileInfo();
         }
 
         public void ParameterTest()
@@ -274,13 +275,13 @@ namespace DiGi.Core.Test
 
             Convert.ToFile((ISerializableObject)serializableObjectCollection, path_JSON);
 
-            using (File.Classes.File file_1 = new File.Classes.File(path_ZIP))
+            using (IO.File.Classes.File file_1 = new IO.File.Classes.File(path_ZIP))
             {
                 file_1.AddRange(serializableObjectCollection);
                 file_1.Save();
             }
 
-            using (File.Classes.File file_2 = new File.Classes.File(path_ZIP))
+            using (IO.File.Classes.File file_2 = new IO.File.Classes.File(path_ZIP))
             {
                 file_2.Open();
 
