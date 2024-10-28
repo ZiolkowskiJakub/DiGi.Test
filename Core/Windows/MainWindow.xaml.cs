@@ -24,7 +24,36 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            ClusterTest();
+            JsonValueTest();
+        }
+
+        private void JsonValueTest()
+        {
+            int value_1;
+            double value_2;
+            object value_3;
+
+            JsonValue jsonValue_1 = JsonValue.Create(2.0);
+            if (!jsonValue_1.TryGetValue(out value_1))
+            {
+                jsonValue_1.TryGetValue(out value_2);
+            }
+
+            if (!jsonValue_1.TryGetValue(out value_3))
+            {
+
+            }
+
+            JsonValue jsonValue_2 = JsonValue.Create(2);
+            if (!jsonValue_2.TryGetValue(out value_1))
+            {
+                jsonValue_2.TryGetValue(out value_2);
+            }
+
+            if (!jsonValue_2.TryGetValue(out value_3))
+            {
+
+            }
         }
 
         private void ClusterTest()
@@ -32,7 +61,7 @@ namespace DiGi.Core.Test
             TestObject testObject_1 = new TestObject("AAA");
             TestObject testObject_2 = new TestObject("BBB");
 
-            OneToOneBidirectionalRelation oneToOneBidirectionalRelation = new OneToOneBidirectionalRelation((IUniqueObject)testObject_1, testObject_2);
+            OneToOneBidirectionalRelation oneToOneBidirectionalRelation = new OneToOneBidirectionalRelation(testObject_1, testObject_2);
 
             UniqueObjectRelationCluster<IUniqueObject, IRelation> uniqueObjectRelationCluster = new UniqueObjectRelationCluster<IUniqueObject, IRelation>();
             uniqueObjectRelationCluster.Add(testObject_1);
