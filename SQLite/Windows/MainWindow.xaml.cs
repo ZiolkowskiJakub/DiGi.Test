@@ -59,7 +59,7 @@ namespace DiGi.SQLite.Test
             uniqueReferences.AddRange(testClass3s.ConvertAll(x => new GuidReference(x)));
             uniqueReferences.RemoveAt(0);
 
-            uniqueReferences.Add(new UniqueIdReference(uniqueReferences[0].FullTypeName, Core.Query.UniqueId(testClass3s[0].Guid)));
+            uniqueReferences.Add(new UniqueIdReference(uniqueReferences[0].TypeReference.FullTypeName, Core.Query.UniqueId(testClass3s[0].Guid)));
 
             uniqueReferences.Remove(uniqueReferences[0]);
 

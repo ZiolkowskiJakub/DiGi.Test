@@ -66,7 +66,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.Rhino.Geometry", "..\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.Core.Parameter", "..\DiGi.Core\DiGi.Core.Parameter\DiGi.Core.Parameter.csproj", "{A9CDCAB4-9642-4418-A162-19CBE778135D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.Core.IO", "..\DiGi.Core\DiGi.Core.File\DiGi.Core.IO.csproj", "{2367F8B9-DAC8-4DE5-BB6C-15DF2C175B73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.Core.IO", "..\DiGi.Core\DiGi.Core.IO\DiGi.Core.IO.csproj", "{2367F8B9-DAC8-4DE5-BB6C-15DF2C175B73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analytical", "Analytical", "{C4ED909F-C12E-47F8-B8E8-356EE245946F}"
 EndProject
