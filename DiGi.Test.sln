@@ -94,10 +94,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQLite", "SQLite", "{B5BE0A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.SQLite", "..\DiGi.SQLite\DiGi.SQLite\DiGi.SQLite.csproj", "{8D8445EA-1830-4E02-90AA-0190EFE43620}"
 	ProjectSection(ProjectDependencies) = postProject
+		{2367F8B9-DAC8-4DE5-BB6C-15DF2C175B73} = {2367F8B9-DAC8-4DE5-BB6C-15DF2C175B73}
 		{3EBD4647-98B2-4FCE-9737-934663291BF2} = {3EBD4647-98B2-4FCE-9737-934663291BF2}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.SQLite.Test", "SQLite\DiGi.SQLite.Test.csproj", "{D837A837-717D-4155-B641-86EE62642BA5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2367F8B9-DAC8-4DE5-BB6C-15DF2C175B73} = {2367F8B9-DAC8-4DE5-BB6C-15DF2C175B73}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

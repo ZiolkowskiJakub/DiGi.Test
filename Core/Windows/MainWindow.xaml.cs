@@ -4,14 +4,11 @@ using System.Text.Json.Nodes;
 using System.Windows;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
+using DiGi.Core.IO.Wrapper.Classes;
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
 using DiGi.Core.Test.Classes;
-using DiGi.Core.IO.Database_OLD.Classes;
-using DiGi.Core.IO.Database_OLD.Interfaces;
-using DiGi.Core.IO.Wrapper.Classes;
-using DiGi.Core.IO.Wrapper.Interfaces;
 
 namespace DiGi.Core.Test
 {
@@ -32,6 +29,8 @@ namespace DiGi.Core.Test
 
         private void WrapperTest()
         {
+            //DiGi.Core.IO.Wrapper.Classes.
+
             TestObject testObject_1 = new TestObject("CC", 10, 12);
             //TestObject testObject_2 = new TestObject("CC", 100, 12);
 
@@ -343,7 +342,7 @@ namespace DiGi.Core.Test
             TestObject testObject_2 = new TestObject("AAA");
 
 
-            SerializableObjectCollection serializableObjectCollection_1 = new SerializableObjectCollection(new ISerializableObject[] { testObject_1 , testObject_2});
+            SerializableObjectCollection serializableObjectCollection_1 = new SerializableObjectCollection(new ISerializableObject[] { testObject_1, testObject_2 });
             string json_1 = Convert.ToString((ISerializableObject)serializableObjectCollection_1);
 
             SerializableObjectCollection serializableObjectCollection_2 = Convert.ToDiGi<SerializableObjectCollection>(json_1)?.FirstOrDefault();
@@ -352,27 +351,6 @@ namespace DiGi.Core.Test
             bool result = json_1 == json_2;
 
 
-        }
-
-        private void DataBaseTest()
-        {
-            TestObject testObject_5 = new TestObject("CC", 10, 12);
-            TestObject testObject_6 = testObject_5.Clone<TestObject>();
-            TestObject testObject_7 = new TestObject("CC", 100, 12);
-
-            List<object> objects = new List<object>();
-            objects.Add(testObject_5);
-            objects.Add(testObject_6);
-            objects.Add(testObject_7);
-
-
-            Database database =  IO.Database_OLD.Convert.ToDiGi(objects, new DatabaseConvertOptions() { DatabaseName = "AAA" });
-
-            List<IData> datas = IO.Database_OLD.Convert.ToDiGi<IData>(database);
-
-            string uniqueId = new DatabaseTypeRelatedSerializableReferenceItem(new TypeReference(typeof(DatabaseTypeRelatedSerializableReferenceItem))).UniqueId;
-
-            Table table = database.GetTable(uniqueId);
         }
 
     }
