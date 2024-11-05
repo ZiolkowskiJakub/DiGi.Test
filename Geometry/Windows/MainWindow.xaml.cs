@@ -261,7 +261,7 @@ namespace DiGi.Geometry.Test
 
             Polyhedron polyhedron = Create.Polyhedron(polygonalFace3D, vector3D);
 
-            DiGi.Core.Convert.ToFile(polyhedron, @"C:\Users\jakub\Nextcloud\DiGi\Polyhedron.json");
+            DiGi.Core.Convert.ToFileInfo(polyhedron, @"C:\Users\jakub\Nextcloud\DiGi\Polyhedron.json");
 
 
         }

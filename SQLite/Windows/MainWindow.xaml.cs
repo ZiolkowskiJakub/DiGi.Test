@@ -37,7 +37,7 @@ namespace DiGi.SQLite.Test
             TestClass2 testClass2_1 = new TestClass2() { Parameter1 = 10, TestClass1 = testClass1 };
             TestClass2 testClass2_2 = new TestClass2() { Parameter1 = 11, Parent = testClass2_1 };
 
-            TestClass3 testClass3 = new TestClass3() { Parent = testClass2_2 };
+            TestClass3 testClass3 = new TestClass3(Guid.Parse("eafaf6d0-3fd3-4d4d-ae39-d84bc28002f7")) { Parent = testClass2_2 };
             testClass3.TestClasses = new List<TestClass1>() { testClass1 , testClass1 };
 
             List<ISerializableObject> serializableObjects = new List<ISerializableObject>
@@ -54,31 +54,34 @@ namespace DiGi.SQLite.Test
                 dictionary[Create.UniqueReference(serializableObject)] = serializableObject;
             }
 
-
             using (SQLiteWrapper sQLiteWrapper = new SQLiteWrapper())
             {
                 sQLiteWrapper.ConnectionString = Query.ConnectionString(path);
 
-                foreach(ISerializableObject serializableObject in dictionary.Values)
-                {
-                    sQLiteWrapper.Add(serializableObject);
-                }
-                
-                sQLiteWrapper.Write(dictionary.Keys);
+                sQLiteWrapper.AddRange(dictionary.Values);
 
-                sQLiteWrapper.Clear();
+                sQLiteWrapper.Write();
+            }
 
-                List<ISerializableObject> serializableObjects_Temp = sQLiteWrapper.Read<ISerializableObject>(dictionary.Keys);
-                if (serializableObjects_Temp != null && serializableObjects_Temp.Count != 0)
+            List<ISerializableObject> serializableObjects_Temp = null;
+            using (SQLiteWrapper sQLiteWrapper = new SQLiteWrapper())
+            {
+                sQLiteWrapper.ConnectionString = Query.ConnectionString(path);
+
+                sQLiteWrapper.Read();
+
+                serializableObjects_Temp = sQLiteWrapper.GetSerializableObjects();
+            }
+
+            if (serializableObjects_Temp != null && serializableObjects_Temp.Count != 0)
+            {
+                foreach (ISerializableObject serializableObject_Temp in serializableObjects_Temp)
                 {
-                    foreach(ISerializableObject serializableObject_Temp in serializableObjects_Temp)
+                    ISerializableObject serializableObject = dictionary[Create.UniqueReference(serializableObject_Temp)];
+
+                    if (Core.Convert.ToString(serializableObject) != Core.Convert.ToString(serializableObject_Temp))
                     {
-                        ISerializableObject serializableObject = dictionary[Create.UniqueReference(serializableObject_Temp)];
-
-                        if(Core.Convert.ToString(serializableObject) != Core.Convert.ToString(serializableObject_Temp))
-                        {
-                            throw new Exception();
-                        }
+                        throw new Exception();
                     }
                 }
             }

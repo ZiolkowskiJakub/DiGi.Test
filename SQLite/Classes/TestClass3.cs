@@ -18,6 +18,12 @@ namespace DiGi.SQLite.Test.Classes
 
         }
 
+        public TestClass3(Guid guid)
+            : base(guid)
+        {
+
+        }
+
         public TestClass3(JsonObject jsonObject)
             : base(jsonObject)
         {

@@ -319,7 +319,7 @@ namespace DiGi.Core.Test
                 serializableObjectCollection.Add(new TestObject(i.ToString()));
             }
 
-            Convert.ToFile((ISerializableObject)serializableObjectCollection, path_JSON);
+            Convert.ToFileInfo((ISerializableObject)serializableObjectCollection, path_JSON);
 
             using (IO.File.Classes.File file_1 = new IO.File.Classes.File(path_ZIP))
             {
