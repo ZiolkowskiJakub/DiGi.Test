@@ -4,7 +4,6 @@ using System.Text.Json.Nodes;
 using System.Windows;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
-using DiGi.Core.IO.Wrapper.Classes;
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
@@ -24,11 +23,18 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            WrapperTest();
+            ThinnesRatioTest();
         }
 
-        private void WrapperTest()
+        private void ThinnesRatioTest()
         {
+            double area = 2;
+            double perimeter = 10;
+
+            double thinnessRatio = 4 * Math.Sqrt(area) / perimeter;
+
+
+
             //DiGi.Core.IO.Wrapper.Classes.
 
             //TestObject testObject_1 = new TestObject("CC", 10, 12);
