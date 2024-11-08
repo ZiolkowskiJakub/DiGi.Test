@@ -19,10 +19,50 @@ namespace DiGi.SQLite.Test
 
         private void Button_Test_1_Click(object sender, RoutedEventArgs e)
         {
-            SQLiteWrapperTest();
+            MaxLengthTest();
         }
 
-        private void SQLiteWrapperTest()
+        private void MaxLengthTest()
+        {
+            string path = @"C:\Users\jakub\Downloads\SQLite\maxLength.sqlite";
+
+            using (SQLiteWrapper sQLiteWrapper = new SQLiteWrapper())
+            {
+                sQLiteWrapper.ConnectionString = Query.ConnectionString(path);
+                sQLiteWrapper.Read();
+            }
+
+            //List<ISerializableObject> serializableObjects = new List<ISerializableObject>();
+            //for(int i =0; i <= 1001; i++)
+            //{
+            //    TestClass1 testClass1 = new TestClass1() { Parameter1 = i.ToString() };
+            //    serializableObjects.Add(testClass1);
+            //}
+
+            //using (SQLiteWrapper sQLiteWrapper = new SQLiteWrapper())
+            //{
+            //    sQLiteWrapper.ConnectionString = Query.ConnectionString(path);
+
+            //    sQLiteWrapper.AddRange(serializableObjects);
+            //    sQLiteWrapper.Write();
+            //}
+        }
+
+        private void SQLiteWrapperTest_2()
+        {
+            string path = @"C:\Users\jakub\Downloads\SQLite\test_2.sqlite";
+            using (SQLiteWrapper sQLiteWrapper = new SQLiteWrapper())
+            {
+                sQLiteWrapper.ConnectionString = Query.ConnectionString(path);
+
+                sQLiteWrapper.Add("TEST");
+                sQLiteWrapper.Add(10);
+
+                sQLiteWrapper.Write();
+            }
+        }
+
+        private void SQLiteWrapperTest_1()
         {
             UniqueIdReference uniqueIdReference = new UniqueIdReference(new TypeReference(typeof(IEnumerable<TestClass1>)), "BBB");
             GuidReference guidReference = new GuidReference("AAA", Guid.NewGuid());
@@ -30,8 +70,7 @@ namespace DiGi.SQLite.Test
             string string_1 = uniqueIdReference.ToString();
             string string_2 = guidReference.ToString();
 
-
-            string path = @"C:\Users\jakub\Downloads\SQLite\test.sqlite";
+            string path = @"C:\Users\jakub\Downloads\SQLite\test_1.sqlite";
 
             TestClass1 testClass1 = new TestClass1() { Parameter1 = "AAA" };
             TestClass2 testClass2_1 = new TestClass2() { Parameter1 = 10, TestClass1 = testClass1 };

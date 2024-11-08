@@ -31,7 +31,7 @@ namespace DiGi.Core.Test
         {
             //DiGi.Core.IO.Wrapper.Classes.
 
-            TestObject testObject_1 = new TestObject("CC", 10, 12);
+            //TestObject testObject_1 = new TestObject("CC", 10, 12);
             //TestObject testObject_2 = new TestObject("CC", 100, 12);
 
             //WrapperNodeCluster wrapperNodeCluster = new WrapperNodeCluster();
