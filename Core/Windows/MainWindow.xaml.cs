@@ -23,7 +23,36 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            ThinnesRatioTest();
+            BytesTest();
+        }
+
+        private void BytesTest()
+        {
+            BytesObject bytesObject_1 = new BytesObject(new byte[] { 72, 101, 108, 108, 111 });
+
+            JsonObject jsonObject = bytesObject_1.ToJson();
+
+            string json_1 = Convert.ToString(bytesObject_1);
+
+            BytesObject bytesObject_2 = Convert.ToDiGi<BytesObject>(json_1)?.FirstOrDefault();
+
+            bool result = Convert.ToString(bytesObject_2) == json_1;
+        }
+
+        private void ReferenceTest()
+        {
+            GuidReference guidReference = new GuidReference(new TypeReference(typeof(TestObject)), Guid.NewGuid());
+            string source = "AAA";
+
+            InstanceRelatedExternalReference instanceRelatedExternalReference = new InstanceRelatedExternalReference(source, guidReference);
+
+            string reference = instanceRelatedExternalReference.ToString();
+
+            if(Query.TryParse(guidReference.ToString(), out IReference reference_Temp))
+            {
+
+            }
+
         }
 
         private void ThinnesRatioTest()
