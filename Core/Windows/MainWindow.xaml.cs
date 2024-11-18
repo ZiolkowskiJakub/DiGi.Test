@@ -4,6 +4,8 @@ using System.Text.Json.Nodes;
 using System.Windows;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
+using DiGi.Core.IO.File.Classes;
+using DiGi.Core.IO.Interfaces;
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
@@ -23,7 +25,79 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            BytesTest();
+            RelativePathTest();
+        }
+
+        private void RelativePathTest()
+        {
+            string relativePath = Query.RelativePath(@"C:\Users\jakub", @"C:\Users\jakub\Downloads\GIS Test");
+
+
+        }
+
+        private void RangeTest()
+        {
+            Range<int> range = new Range<int>(0, 10);
+
+            List<int> values = range.ToList(1);
+        }
+
+        private void ValueFileTest()
+        {
+            BytesObject bytesObject_1 = new BytesObject(new byte[] { 72, 101, 108, 108, 111 });
+
+            string path = @"C:\Users\jakub\Downloads\GIS Test\teststoragefile.dgs";
+
+
+            //using (ValueFile valueFile = new ValueFile(path))
+            //{
+            //    valueFile.Value = bytesObject_1;
+            //    valueFile.Save();
+            //}
+
+            //BytesObject bytesObject_2 = null;
+
+            //using (ValueFile valueFile = new ValueFile(path))
+            //{
+            //    valueFile.Open();
+            //    bytesObject_2 = valueFile.Value as BytesObject;
+            //}
+
+            //bool result = Convert.ToString(bytesObject_1) == Convert.ToString(bytesObject_2);
+
+            using (ValuesFile valuesFile = new ValuesFile(path))
+            {
+                valuesFile.Values = new List<ISerializableObject>() { bytesObject_1, bytesObject_1 };
+                valuesFile.SetMetadata(new TestMetadata("AAA"));
+                valuesFile.Save();
+            }
+
+            BytesObject bytesObject_3 = null;
+
+            using (ValuesFile valueFile = new ValuesFile(path))
+            {
+                valueFile.Open();
+                IEnumerable<ISerializableObject> serializableObjects= valueFile.Values;
+
+                IMetadata metadata = valueFile.GetMetadata<TestMetadata>();
+            }
+
+            UniqueReference uniqueReference = null;
+
+            path = @"C:\Users\jakub\Downloads\GIS Test\teststoragefile_2.dgs";
+            using (StorageFile storageFile = new StorageFile(path))
+            {
+                storageFile.Open();
+                uniqueReference = storageFile.AddValue(bytesObject_1);
+                storageFile.Save();
+            }
+
+
+            using (StorageFile storageFile = new StorageFile(path))
+            {
+                storageFile.Open();
+                BytesObject bytesObject_Temp = storageFile.GetValue<BytesObject>(uniqueReference);
+            }
         }
 
         private void BytesTest()
@@ -356,18 +430,18 @@ namespace DiGi.Core.Test
 
             Convert.ToFileInfo((ISerializableObject)serializableObjectCollection, path_JSON);
 
-            using (IO.File.Classes.File file_1 = new IO.File.Classes.File(path_ZIP))
-            {
-                file_1.AddRange(serializableObjectCollection);
-                file_1.Save();
-            }
+            //using (IO.File.Classes.File file_1 = new IO.File.Classes.File(path_ZIP))
+            //{
+            //    file_1.AddRange(serializableObjectCollection);
+            //    file_1.Save();
+            //}
 
-            using (IO.File.Classes.File file_2 = new IO.File.Classes.File(path_ZIP))
-            {
-                file_2.Open();
+            //using (IO.File.Classes.File file_2 = new IO.File.Classes.File(path_ZIP))
+            //{
+            //    file_2.Open();
 
-                SerializableObjectCollection serializableObjectCollection_3 = file_2.Value;
-            }
+            //    SerializableObjectCollection serializableObjectCollection_3 = file_2.Value;
+            //}
         }
 
         private void CollectionTest()
