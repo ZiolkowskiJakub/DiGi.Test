@@ -118,7 +118,7 @@ namespace DiGi.SQLite.Test
                 {
                     ISerializableObject serializableObject = dictionary[Create.UniqueReference(serializableObject_Temp)];
 
-                    if (Core.Convert.ToString(serializableObject) != Core.Convert.ToString(serializableObject_Temp))
+                    if (Core.Convert.ToSystem_String(serializableObject) != Core.Convert.ToSystem_String(serializableObject_Temp))
                     {
                         throw new Exception();
                     }

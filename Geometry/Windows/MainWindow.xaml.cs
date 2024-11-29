@@ -19,6 +19,174 @@ namespace DiGi.Geometry.Test
             InitializeComponent();
         }
 
+        private void Button_Test1_Click(object sender, RoutedEventArgs e)
+        {
+            Mesh2DTest();
+
+            //Point3DsTest();
+
+            //VisualTest();
+
+            //SaveTest();
+            //RandomPolyhedronTest();
+            //PlanarIntersectionTest_2();
+            //PolyhedronTest();
+
+            //VolatileObjectTest();
+
+            //Rectangle2D rectangle2D = new Rectangle2D(new Point2D(8, 8), 5, 5);
+
+            //Point2D point2D = rectangle2D.GetCentroid();
+
+            //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
+            //{
+            //    new Point2D(0, 0) ,
+            //    new Point2D(10, 0),
+            //    new Point2D(10, 10),
+            //    new Point2D(5, 10),
+            //     new Point2D(5, -10),
+            //});
+
+
+            //List<Point2D> point2Ds = Query.LongestPath(new ISegmentable2D[] { rectangle2D, polyline2D }, new Point2D(5, -10));
+
+            //List<Segment2D> segment2Ds = rectangle2D.AdjacentSegments(polyline2D);
+
+            //int count = segment2Ds.Count;
+
+            //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
+            //{
+            //    new Point2D(0, 0) ,
+            //    new Point2D(10, 0),
+            //    new Point2D(10, 10),
+            //    new Point2D(5, 10),
+            //     new Point2D(5, -10),
+            //});
+
+            //List<Segment2D> segment2Ds = new List<Segment2D>()
+            //{
+            //    new Segment2D(0,0, 10, 0),
+            //    new Segment2D(0,0, 10, 0),
+            //    new Segment2D(10,10, 10, 0),
+            //    new Segment2D(10,10, 0, 10),
+            //};
+
+            //int count = 8;
+
+            //double factor = (2 * Math.PI) / count;
+
+            //double angle = 0;
+            //List<Vector2D> vector2Ds = new List<Vector2D>();
+            //for(int i=0; i < count; i++)
+            //{
+            //    vector2Ds.Add(Create.Vector2D(angle));
+            //    angle += factor;
+            //}
+
+            //Vector2D vector2D = Create.Vector2D(Math.PI);
+
+            //List<Polyline2D> polyline2Ds = Create.Polyline2Ds(segment2Ds, new Point2D(0, 0));
+
+            //List<Polygon2D> polygon2Ds = Planar.Create.Polygon2Ds(polyline2D);
+
+            //bool selfIntersect = Planar.Query.SelfIntersect(polygon2Ds[0]);
+            //Orientation orientation = polygon2Ds[0].Orientation();
+            //polygon2Ds[0].Orient(Orientation.CounterClockwise);
+
+            //selfIntersect = Planar.Query.SelfIntersect(polyline2D);
+
+
+            //Vector2D widthDirection = rectangle2D.WidthDirection;
+            //Vector2D heightDirection = rectangle2D.HeightDirection;
+
+            //List<Point2D> point2Ds_1 = rectangle2D.GetPoints();
+            //rectangle2D.Inverse();
+
+            //List<Point2D> point2Ds_2 = rectangle2D.GetPoints();
+
+            //double s = 0;
+
+            //GeometryCollection2D geometryCollection2D = new GeometryCollection2D();
+            //geometryCollection2D.Add(new Segment2D(0,0, 0, 1));
+            //geometryCollection2D.Add(new Point2D(0, 0));
+
+            //GeometryCollection2D geometryCollection2D_Temp = new GeometryCollection2D();
+            //geometryCollection2D_Temp.Add(new Segment2D(0, 0, 1, 3));
+            //geometryCollection2D.Add(geometryCollection2D_Temp);
+
+            //geometryCollection2D.Transform(Transform2D.GetTranslation(1, 1));
+
+
+            //string json = DiGi.Core.Convert.ToString((ISerializableObject)geometryCollection2D);
+
+            //GeometryCollection2D? geometryCollection2D_Converted = DiGi.Core.Convert.ToDiGi<GeometryCollection2D>(json)?.FirstOrDefault();
+
+
+
+            //double s = 1;
+
+            //IntersectionResult2D intersectionResult2D = Geometry.Planar.Create.IntersectionResult2D(new Line2D(new Point2D(0, 0), new Vector2D(0, 1)), new Line2D(new Point2D(1, 0), new Vector2D(0, 1)));
+
+            //Vector2D vector2D_1 = new Vector2D(0, 1);
+
+            //Vector2D vector2D_2 = new Vector2D(0, -6);
+
+
+            //List<KeyValuePair<double, double>> values = new List<KeyValuePair<double, double>>();
+            //values.Add(new KeyValuePair<double, double>(1, 2));
+            //values.Add(new KeyValuePair<double, double>(3, 5));
+
+            //JsonValue jsonValue_Temp = JsonValue.Create(values);
+
+            //List<KeyValuePair<double, double>> values_Temp = jsonValue_Temp.GetValue<List<KeyValuePair<double, double>>>();
+
+
+
+            //Point2D point2D = new Point2D(1, 1);
+            //Vector2D vector2D_3 = new Vector2D(0, 1);
+            //Transform2D transform2D = Transform2D.GetRotation(Math.PI);
+            ////transform2D = Transform2D.GetTranslation(1, 1);
+
+            //Segment2D segment2D = new Segment2D(new Point2D(0, 0), new Point2D(0, 1));
+            //segment2D.Transform(transform2D);
+
+            //point2D.Transform(transform2D);
+            //vector2D_3.Transform(transform2D);
+
+            //CoordinateSystem2D coordinateSystem2D = new CoordinateSystem2D();
+
+
+
+
+            //List<int[]> indexes = new List<int[]>() { new int[] {1, 2, 3 }, new int[] { 2, 2, 3 } };
+
+            //JsonValue jsonValue = JsonValue.Create(indexes);
+
+            //List<int[]> indexes_Temp = jsonValue.GetValue<List<int[]>>();
+
+            //bool collinear = (new Line2D(new Point2D(0, 0), vector2D_1)).Collinear(new Line2D(new Point2D(2, 2), vector2D_2));
+
+
+            //Vector2D vector2D = new Vector2D(10, 11);
+
+            //string json = DiGi.Core.Convert.ToString(new List<Vector2D> { vector2D, vector2D });
+
+            //List<Vector2D> vector2Ds = DiGi.Core.Convert.ToDiGi<Vector2D>(json);
+
+            //List<Point2D> point2Ds = new List<Point2D>() { new Point2D(0, 0), new Point2D(0, 5), new Point2D(5, 5), new Point2D(5, 0) };
+
+            //Point2D point2D = new Point2D(0, 5);
+
+            //double parameter = Planar.Query.Parameter(point2Ds, point2D, out Point2D point2D_Closest, out double distance);
+
+            //Point2D point2D_Temp = Planar.Query.Point(point2Ds, parameter);
+
+            //JsonNode jsonNode = JsonNode.Parse(json);
+
+
+            //ISerializableObject serializableObject = Create.SerializableObject<ISerializableObject>(jsonNode.AsObject());
+        }
+
         private static void OffsetTest()
         {
             //Rectangle2D rectangle2D = new Rectangle2D(new Point2D(0, 0), 5, 5);
@@ -55,11 +223,11 @@ namespace DiGi.Geometry.Test
 
             PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, polygonalFace2D);
 
-            string json = DiGi.Core.Convert.ToString(polygonalFace2D);
+            string json = DiGi.Core.Convert.ToSystem_String(polygonalFace2D);
 
             VolatilePolygonalFace3D volatilePolygonalFace3D = new VolatilePolygonalFace3D(polygonalFace3D);
 
-            string json_Volatile = DiGi.Core.Convert.ToString(polygonalFace2D);
+            string json_Volatile = DiGi.Core.Convert.ToSystem_String(polygonalFace2D);
 
             bool equals = json == json_Volatile;
         }
@@ -233,7 +401,7 @@ namespace DiGi.Geometry.Test
             Polyhedron polyhedron = Spatial.Random.Create.Polyhedron(new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 10)), 4, seed);
         }
 
-        public static void ConversionTest()
+        private static void ConversionTest()
         {
             Plane? plane = DiGi.Core.Convert.ToDiGi<Plane>(System.IO.File.ReadAllText(@"Z:\DiGi\Plane.txt"))?.FirstOrDefault();
             Line3D? line3D = DiGi.Core.Convert.ToDiGi<Line3D>(System.IO.File.ReadAllText(@"Z:\DiGi\Line3D.txt"))?.FirstOrDefault();
@@ -242,10 +410,10 @@ namespace DiGi.Geometry.Test
 
             Line3D line3D_Temp = plane.Convert(line2D);
 
-            bool valid = DiGi.Core.Convert.ToString(line3D) == DiGi.Core.Convert.ToString(line3D_Temp);
+            bool valid = DiGi.Core.Convert.ToSystem_String(line3D) == DiGi.Core.Convert.ToSystem_String(line3D_Temp);
         }
 
-        public static void SaveTest()
+        private static void SaveTest()
         {
             Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
                 {
@@ -261,24 +429,24 @@ namespace DiGi.Geometry.Test
 
             Polyhedron polyhedron = Create.Polyhedron(polygonalFace3D, vector3D);
 
-            DiGi.Core.Convert.ToFileInfo(polyhedron, @"C:\Users\jakub\Nextcloud\DiGi\Polyhedron.json");
+            DiGi.Core.Convert.ToSystem_FileInfo(polyhedron, @"C:\Users\jakub\Nextcloud\DiGi\Polyhedron.json");
 
 
         }
 
-        public static void VisualTest()
+        private static void VisualTest()
         {
             VisualPoint2D visualPoint2D_1 = new VisualPoint2D(new Point2D(0, 0), new PointAppearance(System.Drawing.Color.Blue, 10));
 
-            string json_1 = DiGi.Core.Convert.ToString(visualPoint2D_1);
+            string json_1 = DiGi.Core.Convert.ToSystem_String(visualPoint2D_1);
 
             VisualPoint2D visualPoint2D_2 = DiGi.Core.Convert.ToDiGi<VisualPoint2D>(json_1)?.FirstOrDefault();
-            string json_2 = DiGi.Core.Convert.ToString(visualPoint2D_2);
+            string json_2 = DiGi.Core.Convert.ToSystem_String(visualPoint2D_2);
 
             bool result = json_1 == json_2;
         }
 
-        public static void Point3DsTest()
+        private static void Point3DsTest()
         {
             //Type type = typeof(Dictionary<Point3D, int>);
             //IDictionary dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(new[] { type.GenericTypeArguments[0], type.GenericTypeArguments[1] }));
@@ -307,177 +475,31 @@ namespace DiGi.Geometry.Test
             DensityBasedSpatialClusteringResult<Point3D> densityBasedSpatialClusteringResult = Core.Create.DensityBasedSpatialClusteringResult(point3Ds, 0.001, 1);
 
 
-            string json = DiGi.Core.Convert.ToString(densityBasedSpatialClusteringResult);
+            string json = DiGi.Core.Convert.ToSystem_String(densityBasedSpatialClusteringResult);
 
             DensityBasedSpatialClusteringResult<Point3D> densityBasedSpatialClusteringResult_Temp = DiGi.Core.Convert.ToDiGi<DensityBasedSpatialClusteringResult<Point3D>>(json)?.FirstOrDefault();
 
             Point3D point3D = densityBasedSpatialClusteringResult_Temp.GetPoint(1, Query.Average);
         }
 
-        private void Button_Test1_Click(object sender, RoutedEventArgs e)
+        private static void Mesh2DTest()
         {
-            Point3DsTest();
-
-            //VisualTest();
-
-            //SaveTest();
-            //RandomPolyhedronTest();
-            //PlanarIntersectionTest_2();
-            //PolyhedronTest();
-
-            //VolatileObjectTest();
-
-            //Rectangle2D rectangle2D = new Rectangle2D(new Point2D(8, 8), 5, 5);
-
-            //Point2D point2D = rectangle2D.GetCentroid();
-
-            //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
-            //{
-            //    new Point2D(0, 0) ,
-            //    new Point2D(10, 0),
-            //    new Point2D(10, 10),
-            //    new Point2D(5, 10),
-            //     new Point2D(5, -10),
-            //});
-
-
-            //List<Point2D> point2Ds = Query.LongestPath(new ISegmentable2D[] { rectangle2D, polyline2D }, new Point2D(5, -10));
-
-            //List<Segment2D> segment2Ds = rectangle2D.AdjacentSegments(polyline2D);
-
-            //int count = segment2Ds.Count;
-
-            //Polyline2D polyline2D = new Polyline2D(new List<Point2D>()
-            //{
-            //    new Point2D(0, 0) ,
-            //    new Point2D(10, 0),
-            //    new Point2D(10, 10),
-            //    new Point2D(5, 10),
-            //     new Point2D(5, -10),
-            //});
-
-            //List<Segment2D> segment2Ds = new List<Segment2D>()
-            //{
-            //    new Segment2D(0,0, 10, 0),
-            //    new Segment2D(0,0, 10, 0),
-            //    new Segment2D(10,10, 10, 0),
-            //    new Segment2D(10,10, 0, 10),
-            //};
-
-            //int count = 8;
-
-            //double factor = (2 * Math.PI) / count;
-
-            //double angle = 0;
-            //List<Vector2D> vector2Ds = new List<Vector2D>();
-            //for(int i=0; i < count; i++)
-            //{
-            //    vector2Ds.Add(Create.Vector2D(angle));
-            //    angle += factor;
-            //}
-
-            //Vector2D vector2D = Create.Vector2D(Math.PI);
-
-            //List<Polyline2D> polyline2Ds = Create.Polyline2Ds(segment2Ds, new Point2D(0, 0));
-
-            //List<Polygon2D> polygon2Ds = Planar.Create.Polygon2Ds(polyline2D);
-
-            //bool selfIntersect = Planar.Query.SelfIntersect(polygon2Ds[0]);
-            //Orientation orientation = polygon2Ds[0].Orientation();
-            //polygon2Ds[0].Orient(Orientation.CounterClockwise);
-
-            //selfIntersect = Planar.Query.SelfIntersect(polyline2D);
-
-
-            //Vector2D widthDirection = rectangle2D.WidthDirection;
-            //Vector2D heightDirection = rectangle2D.HeightDirection;
-
-            //List<Point2D> point2Ds_1 = rectangle2D.GetPoints();
-            //rectangle2D.Inverse();
-
-            //List<Point2D> point2Ds_2 = rectangle2D.GetPoints();
-
-            //double s = 0;
-
-            //GeometryCollection2D geometryCollection2D = new GeometryCollection2D();
-            //geometryCollection2D.Add(new Segment2D(0,0, 0, 1));
-            //geometryCollection2D.Add(new Point2D(0, 0));
-
-            //GeometryCollection2D geometryCollection2D_Temp = new GeometryCollection2D();
-            //geometryCollection2D_Temp.Add(new Segment2D(0, 0, 1, 3));
-            //geometryCollection2D.Add(geometryCollection2D_Temp);
-
-            //geometryCollection2D.Transform(Transform2D.GetTranslation(1, 1));
-
-
-            //string json = DiGi.Core.Convert.ToString((ISerializableObject)geometryCollection2D);
-
-            //GeometryCollection2D? geometryCollection2D_Converted = DiGi.Core.Convert.ToDiGi<GeometryCollection2D>(json)?.FirstOrDefault();
-
-
-
-            //double s = 1;
-
-            //IntersectionResult2D intersectionResult2D = Geometry.Planar.Create.IntersectionResult2D(new Line2D(new Point2D(0, 0), new Vector2D(0, 1)), new Line2D(new Point2D(1, 0), new Vector2D(0, 1)));
-
-            //Vector2D vector2D_1 = new Vector2D(0, 1);
-
-            //Vector2D vector2D_2 = new Vector2D(0, -6);
-
-
-            //List<KeyValuePair<double, double>> values = new List<KeyValuePair<double, double>>();
-            //values.Add(new KeyValuePair<double, double>(1, 2));
-            //values.Add(new KeyValuePair<double, double>(3, 5));
-
-            //JsonValue jsonValue_Temp = JsonValue.Create(values);
-
-            //List<KeyValuePair<double, double>> values_Temp = jsonValue_Temp.GetValue<List<KeyValuePair<double, double>>>();
-
-
-
-            //Point2D point2D = new Point2D(1, 1);
-            //Vector2D vector2D_3 = new Vector2D(0, 1);
-            //Transform2D transform2D = Transform2D.GetRotation(Math.PI);
-            ////transform2D = Transform2D.GetTranslation(1, 1);
-
-            //Segment2D segment2D = new Segment2D(new Point2D(0, 0), new Point2D(0, 1));
-            //segment2D.Transform(transform2D);
-
-            //point2D.Transform(transform2D);
-            //vector2D_3.Transform(transform2D);
-
-            //CoordinateSystem2D coordinateSystem2D = new CoordinateSystem2D();
-
-
-
-
-            //List<int[]> indexes = new List<int[]>() { new int[] {1, 2, 3 }, new int[] { 2, 2, 3 } };
-
-            //JsonValue jsonValue = JsonValue.Create(indexes);
-
-            //List<int[]> indexes_Temp = jsonValue.GetValue<List<int[]>>();
-
-            //bool collinear = (new Line2D(new Point2D(0, 0), vector2D_1)).Collinear(new Line2D(new Point2D(2, 2), vector2D_2));
-
-
-            //Vector2D vector2D = new Vector2D(10, 11);
-
-            //string json = DiGi.Core.Convert.ToString(new List<Vector2D> { vector2D, vector2D });
-
-            //List<Vector2D> vector2Ds = DiGi.Core.Convert.ToDiGi<Vector2D>(json);
-
-            //List<Point2D> point2Ds = new List<Point2D>() { new Point2D(0, 0), new Point2D(0, 5), new Point2D(5, 5), new Point2D(5, 0) };
-
-            //Point2D point2D = new Point2D(0, 5);
-
-            //double parameter = Planar.Query.Parameter(point2Ds, point2D, out Point2D point2D_Closest, out double distance);
-
-            //Point2D point2D_Temp = Planar.Query.Point(point2Ds, parameter);
-
-            //JsonNode jsonNode = JsonNode.Parse(json);
-
-
-            //ISerializableObject serializableObject = Create.SerializableObject<ISerializableObject>(jsonNode.AsObject());
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
+            {
+                new Point2D(0, 0) ,
+                new Point2D(10, 0),
+                new Point2D(10, 10),
+                new Point2D(11, 10),
+                new Point2D(11, 0),
+                new Point2D(11, 0),
+                new Point2D(20, 0),
+                new Point2D(20, 11),
+                new Point2D(0, 11),
+            });
+
+            PolygonalFace2D polygonalFace2D = Planar.Create.PolygonalFace2D(polygon2D);
+
+            Mesh2D mesh2D = Planar.Create.Mesh2D(polygonalFace2D);
         }
     }
 }

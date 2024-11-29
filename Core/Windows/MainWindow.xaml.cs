@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Web;
 using System.Windows;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
@@ -25,12 +26,50 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            RelativePathTest();
+            StorageFileTest();
+        }
+
+        private void StorageFileTest()
+        {
+
+            string reference = "DiGi.GIS.Classes.OrtoDatas,DiGi.GIS::7094b4255ada4bc69b047987ed1c0e9c";
+
+            Query.TryParse(reference, out UniqueReference uniqueReference);
+
+            string encode = IO.File.Query.Encode(uniqueReference);
+
+            UniqueReference uniqueReference_Temp = IO.File.Query.Decode(encode);
+
+            bool equals = uniqueReference.Equals(uniqueReference_Temp);
+            equals = uniqueReference == uniqueReference_Temp;
+
+            string reference_Encode = HttpUtility.UrlEncode(reference);
+            string reference_Decode = HttpUtility.UrlDecode(reference);
+
+            byte[] bytes = HttpUtility.UrlEncodeToBytes(reference);
+            string reference_Temp = HttpUtility.UrlDecode(bytes, Encoding.UTF8);
+
+            using (StorageFile storageFile = new StorageFile(@"C:\Users\jakub\Downloads\GIS Test\3262_GML.odf"))
+            {
+                int count = storageFile.Count;
+
+                ISerializableObject serializableObject = storageFile.GetValue(count - 1);
+            }
         }
 
         private void RelativePathTest()
         {
-            string relativePath = Query.RelativePath(@"C:\Users\jakub", @"C:\Users\jakub\Downloads\GIS Test");
+            string relativePath = IO.Query.RelativePath(@"C:\Users\jakub\", @"C:\Users\jakub\Downloads\GIS Test\Test.txt");
+
+            string relativePath_2 = System.IO.Path.GetRelativePath(@"C:\Users\jakub\", @"C:\Users\jakub\Downloads\GIS Test\Test.txt");
+
+            bool bool_1 = IO.Query.IsPathFullyQualified(relativePath_2);
+
+            string absolutePath = IO.Query.AbsolutePath(@"C:\Users\jakub", relativePath);
+
+            //string text = System.IO.File.ReadAllText(absolutePath);
+
+
 
 
         }
@@ -39,7 +78,7 @@ namespace DiGi.Core.Test
         {
             Range<int> range = new Range<int>(0, 10);
 
-            List<int> values = range.ToList(1);
+            List<int> values = range.ToSystem(1);
         }
 
         private void ValueFileTest()
@@ -106,11 +145,11 @@ namespace DiGi.Core.Test
 
             JsonObject jsonObject = bytesObject_1.ToJson();
 
-            string json_1 = Convert.ToString(bytesObject_1);
+            string json_1 = Convert.ToSystem_String(bytesObject_1);
 
             BytesObject bytesObject_2 = Convert.ToDiGi<BytesObject>(json_1)?.FirstOrDefault();
 
-            bool result = Convert.ToString(bytesObject_2) == json_1;
+            bool result = Convert.ToSystem_String(bytesObject_2) == json_1;
         }
 
         private void ReferenceTest()
@@ -206,7 +245,7 @@ namespace DiGi.Core.Test
             string filePath = System.IO.Path.Combine(directory, "Test.dgb");
 
             TestObject testObject_1 = new TestObject("BBB");
-            string json = Convert.ToString(testObject_1);
+            string json = Convert.ToSystem_String(testObject_1);
 
             System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "Test.json"), json);
 
@@ -237,10 +276,10 @@ namespace DiGi.Core.Test
         {
             TestObject testObject_1 = new TestObject("CC", 10, 12);
             testObject_1.TestEnum = Enums.TestEnum.Test1;
-            string json_1 = Convert.ToString(testObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_1 = Convert.ToSystem_String(testObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
 
             TestObject testObject_2 = Convert.ToDiGi<TestObject>(json_1)?.FirstOrDefault();
-            string json_2 = Convert.ToString(testObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_2 = Convert.ToSystem_String(testObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
 
             bool similar = json_1 == json_2;
         }
@@ -255,10 +294,10 @@ namespace DiGi.Core.Test
                 TestEnums_3 = new HashSet<Enums.TestEnum>() { Enums.TestEnum.Test1, Enums.TestEnum.Test2 },
             };
 
-            string json_1 = Convert.ToString(enumObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_1 = Convert.ToSystem_String(enumObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
 
             EnumObject enumObject_2 = Convert.ToDiGi<EnumObject>(json_1)?.FirstOrDefault();
-            string json_2 = Convert.ToString(enumObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_2 = Convert.ToSystem_String(enumObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
 
             bool similar = json_1 == json_2;
         }
@@ -267,7 +306,7 @@ namespace DiGi.Core.Test
         {
             TestObject testObject_5 = new TestObject("CC", 10, 12);
             TestObject testObject_6 = testObject_5.Clone<TestObject>();
-            string json = Convert.ToString(testObject_5, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json = Convert.ToSystem_String(testObject_5, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
             
 
 
@@ -280,7 +319,7 @@ namespace DiGi.Core.Test
             //TestObject testObject_3 = Create.SerializableObject<TestObject>(jsonObject);
 
             TestObject testObject_2 = new TestObject("BBB");
-            json = Convert.ToString(testObject_2);
+            json = Convert.ToSystem_String(testObject_2);
 
             JsonObject jsonObject = JsonNode.Parse(json).AsObject();
 
@@ -314,13 +353,13 @@ namespace DiGi.Core.Test
 
             SimpleParameterDefinition simpleParameterDefinition = new SimpleParameterDefinition("Test");
 
-            json = Convert.ToString(simpleParameterDefinition);
+            json = Convert.ToSystem_String(simpleParameterDefinition);
 
             SimpleParameterDefinition simpleParameterDefinition_Temp = Convert.ToDiGi<SimpleParameterDefinition>(json)?.FirstOrDefault();
 
 
             EnumParameterDefinition enumParameterDefinition = new EnumParameterDefinition(Enums.TestParameterDefinition.Test);
-            json = Convert.ToString(enumParameterDefinition);
+            json = Convert.ToSystem_String(enumParameterDefinition);
 
             EnumParameterDefinition enumParameterDefinition_Temp = Convert.ToDiGi<EnumParameterDefinition>(json)?.FirstOrDefault();
         }
@@ -330,7 +369,7 @@ namespace DiGi.Core.Test
             string json;
             ParameterValue parameterValue = new DoubleParameterValue();
 
-            json = Convert.ToString(parameterValue);
+            json = Convert.ToSystem_String(parameterValue);
 
             ParameterValue parameterValue_Temp = Convert.ToDiGi<ParameterValue>(json)?.FirstOrDefault();
 
@@ -338,13 +377,13 @@ namespace DiGi.Core.Test
 
             AssociatedTypes associatedTypes = new AssociatedTypes(typeof(Core.Classes.Path));
 
-            json = Convert.ToString(associatedTypes);
+            json = Convert.ToSystem_String(associatedTypes);
 
             AssociatedTypes associatedTypes_Temp = Convert.ToDiGi<AssociatedTypes>(json)?.FirstOrDefault();
 
             ExternalParameterDefinition externalParameterDefinition = Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test", "Test description", Parameter.Enums.ParameterType.Double, typeof(Color), nullable: false);
 
-            json = Convert.ToString(externalParameterDefinition);
+            json = Convert.ToSystem_String(externalParameterDefinition);
 
             ExternalParameterDefinition externalParameterDefinition_Temp = Convert.ToDiGi<ExternalParameterDefinition>(json)?.FirstOrDefault();
         }
@@ -359,21 +398,21 @@ namespace DiGi.Core.Test
             ExternalParameterDefinition externalParameterDefinition = Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test 2", "Test description", Parameter.Enums.ParameterType.Double, typeof(ParametrizedObject), nullable: false);
             parametrizedObject.SetValue(externalParameterDefinition, 20);
 
-            json = Convert.ToString(parametrizedObject);
+            json = Convert.ToSystem_String(parametrizedObject);
 
             ParametrizedObject parametrizedObject_Temp = Convert.ToDiGi<ParametrizedObject>(json)?.FirstOrDefault();
 
-            bool result = json == Convert.ToString(parametrizedObject_Temp);
+            bool result = json == Convert.ToSystem_String(parametrizedObject_Temp);
 
         }
 
         private void ParameterTest_2()
         {
-            string json_1 = Convert.ToString(Parameter.Create.Parameter("Test", "Some Text"));
+            string json_1 = Convert.ToSystem_String(Parameter.Create.Parameter("Test", "Some Text"));
 
             Parameter.Classes.Parameter parameter = Convert.ToDiGi<Parameter.Classes.Parameter>(json_1)?.FirstOrDefault();
 
-            string json_2= Convert.ToString(parameter);
+            string json_2= Convert.ToSystem_String(parameter);
 
             bool result = json_1 == json_2;
         }
@@ -428,7 +467,7 @@ namespace DiGi.Core.Test
                 serializableObjectCollection.Add(new TestObject(i.ToString()));
             }
 
-            Convert.ToFileInfo((ISerializableObject)serializableObjectCollection, path_JSON);
+            Convert.ToSystem_FileInfo((ISerializableObject)serializableObjectCollection, path_JSON);
 
             //using (IO.File.Classes.File file_1 = new IO.File.Classes.File(path_ZIP))
             //{
@@ -452,10 +491,10 @@ namespace DiGi.Core.Test
 
 
             SerializableObjectCollection serializableObjectCollection_1 = new SerializableObjectCollection(new ISerializableObject[] { testObject_1, testObject_2 });
-            string json_1 = Convert.ToString((ISerializableObject)serializableObjectCollection_1);
+            string json_1 = Convert.ToSystem_String((ISerializableObject)serializableObjectCollection_1);
 
             SerializableObjectCollection serializableObjectCollection_2 = Convert.ToDiGi<SerializableObjectCollection>(json_1)?.FirstOrDefault();
-            string json_2 = Convert.ToString((ISerializableObject)serializableObjectCollection_2);
+            string json_2 = Convert.ToSystem_String((ISerializableObject)serializableObjectCollection_2);
 
             bool result = json_1 == json_2;
 
