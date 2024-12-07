@@ -26,7 +26,16 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            StorageFileTest();
+            TableTest();
+        }
+
+        private void TableTest()
+        {
+            string path = @"C:\Users\jakub\Downloads\DiGi Test\4.2.3.portfolio";
+
+            IO.Table.Classes.Table table = IO.DelimitedData.Create.Table(path, IO.DelimitedData.Enums.DelimitedDataSeparator.Tab);
+
+
         }
 
         private void StorageFileTest()
