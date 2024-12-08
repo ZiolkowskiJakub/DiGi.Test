@@ -9,6 +9,7 @@ using DiGi.Core.IO.File.Classes;
 using DiGi.Core.IO.Interfaces;
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Relation.Classes;
+using DiGi.Core.Relation.Enums;
 using DiGi.Core.Relation.Interfaces;
 using DiGi.Core.Test.Classes;
 
@@ -243,7 +244,7 @@ namespace DiGi.Core.Test
 
             List<IRelation> relations = uniqueObjectRelationCluster.GetRelations<IRelation>(testObject_1);
 
-            List<TestObject> testObjects = uniqueObjectRelationCluster.GetValues<TestObject>(oneToOneBidirectionalRelation);
+            List<TestObject> testObjects = uniqueObjectRelationCluster.GetValues<TestObject>(oneToOneBidirectionalRelation, RelationSide.Undefined);
             uniqueObjectRelationCluster.Remove(testObject_1);
         }
 
