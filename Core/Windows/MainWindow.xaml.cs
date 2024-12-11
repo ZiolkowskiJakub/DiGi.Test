@@ -27,7 +27,27 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            TableTest();
+            LowerLimitTest();
+        }
+
+        private void LowerLimitTest()
+        {
+            SortedDictionary<DateTime, int> sortedDictionary = new SortedDictionary<DateTime, int>();
+            sortedDictionary.Add(new DateTime(2018, 1, 10), -1);
+            sortedDictionary.Add(new DateTime(2021, 1, 10), 0);
+            sortedDictionary.Add(new DateTime(2023, 1, 10), 1);
+            sortedDictionary.Add(new DateTime(2025, 1, 10), 2);
+
+            int value;
+            bool result;
+
+            result = Query.TryGetLowerValue(sortedDictionary, new DateTime(2017, 1, 1), out value, false, false);
+
+            result = Query.TryGetLowerValue(sortedDictionary, new DateTime(2019, 1, 1), out value);
+
+            result = Query.TryGetLowerValue(sortedDictionary, new DateTime(2026, 1, 1), out value, false, false);
+
+            result = Query.TryGetLowerValue(sortedDictionary, new DateTime(2024, 1, 1), out value);
         }
 
         private void TableTest()
@@ -35,8 +55,15 @@ namespace DiGi.Core.Test
             string path = @"C:\Users\jakub\Downloads\DiGi Test\4.2.3.portfolio";
 
             IO.Table.Classes.Table table = IO.DelimitedData.Create.Table(path, IO.DelimitedData.Enums.DelimitedDataSeparator.Tab);
+        }
 
+        private void NaNSerializationTest()
+        {
+            NaNTestObject naNTestObject_1 = new NaNTestObject();
 
+            string json = naNTestObject_1.ToSystem_String();
+
+            NaNTestObject naNTestObject_2 = Convert.ToDiGi<NaNTestObject>(json)?.FirstOrDefault();
         }
 
         private void StorageFileTest()
