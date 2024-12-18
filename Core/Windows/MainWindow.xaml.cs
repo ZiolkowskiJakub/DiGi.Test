@@ -1,6 +1,8 @@
 ﻿using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Windows;
 using DiGi.Core.Classes;
@@ -27,7 +29,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            LowerLimitTest();
+            ObjectPathTest();
         }
 
         private void LowerLimitTest()
@@ -48,6 +50,36 @@ namespace DiGi.Core.Test
             result = Query.TryGetLowerValue(sortedDictionary, new DateTime(2026, 1, 1), out value, false, false);
 
             result = Query.TryGetLowerValue(sortedDictionary, new DateTime(2024, 1, 1), out value);
+        }
+
+        private void ObjectPathTest()
+        {
+            ObjectPath objectPath = new ObjectPath(new List<string>() { "AAA", "BBB", "CCC" });
+            string value = objectPath.ToString();
+
+            ObjectPath objectPath_2 = new ObjectPath(new List<string>() { "AAA", "BBB", "CCC" });
+
+
+            bool equals = objectPath_2.Equals(objectPath);
+
+
+            string value_2 = objectPath.ToJsonObject().ToString();
+
+            //            string csvContent = @"""Name"",""Comment""
+            //""John Doe"",""He said, """"Hello!"""" to everyone.""
+            //""Jane Doe"",""She replied, """"Hi there!""""""";
+
+
+
+            string input = "\"John Doe\",\"He said, \"\"Hello!\"\" to everyone.\",\"Another field\"";
+            List<string> values = Query.QuotedStrings(input);
+            CategoryPath categoryPath_1 = new CategoryPath(values);
+
+            input = categoryPath_1.ToString();
+
+            CategoryPath categoryPath_2 = Create.CategoryPath(input);
+
+            equals = categoryPath_2.Equals(categoryPath_1);
         }
 
         private void TableTest()
