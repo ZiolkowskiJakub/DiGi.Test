@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace DiGi.Core.Test.Classes
 {
-    public class TestObject : UniqueObject
+    public class TestObject : GuidObject
     {
         [JsonInclude, JsonPropertyName("Name")]
         private string name;

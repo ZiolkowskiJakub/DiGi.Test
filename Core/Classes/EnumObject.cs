@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace DiGi.Core.Test.Classes
 {
-    public class EnumObject : UniqueObject
+    public class EnumObject : GuidObject
     {
         [JsonInclude, JsonPropertyName("TestEnum")]
         public TestEnum? TestEnum { get; set; } = null;

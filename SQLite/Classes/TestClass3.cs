@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace DiGi.SQLite.Test.Classes
 {
-    public class TestClass3 : UniqueObject
+    public class TestClass3 : GuidObject
     {
         [JsonInclude, JsonPropertyName("Parent")]
         public TestClass2 Parent { get; set; }

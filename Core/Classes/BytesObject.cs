@@ -1,11 +1,10 @@
 ﻿using DiGi.Core.Classes;
-using DiGi.Core.Test.Enums;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace DiGi.Core.Test.Classes
 {
-    public class BytesObject : UniqueObject
+    public class BytesObject : GuidObject
     {
         [JsonInclude, JsonPropertyName("Bytes")]
         private byte[] bytes;
