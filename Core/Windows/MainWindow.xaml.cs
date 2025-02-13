@@ -29,7 +29,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            ObjectPathTest();
+            RelativePathTest();
         }
 
         private void LowerLimitTest()
@@ -128,19 +128,26 @@ namespace DiGi.Core.Test
 
         private void RelativePathTest()
         {
-            string relativePath = IO.Query.RelativePath(@"C:\Users\jakub\", @"C:\Users\jakub\Downloads\GIS Test\Test.txt");
+            string relativePath = IO.Query.RelativePath(@"C:\Users\jakub", @"C:\Users\jakub\Downloads\GIS Test\Test.txt");
 
             string relativePath_2 = System.IO.Path.GetRelativePath(@"C:\Users\jakub\", @"C:\Users\jakub\Downloads\GIS Test\Test.txt");
 
             bool bool_1 = IO.Query.IsPathFullyQualified(relativePath_2);
 
-            string absolutePath = IO.Query.AbsolutePath(@"C:\Users\jakub", relativePath);
+            string absolutePath_1 = IO.Query.AbsolutePath(@"C:\Users\jakub", relativePath);
 
             //string text = System.IO.File.ReadAllText(absolutePath);
 
+            string relativePath_3 = IO.Query.RelativePath(@"C:\Users\jakub", @"C:\Users\jakub\Downloads\GIS Test\Test.txt");
 
+            string relativePath_4 = IO.Query.RelativePath(@"C:\Users\jakub\Downloads\GIS Test", @"C:\Users\jakub\Test.txt");
 
+            string absolutePath_2 = IO.Query.AbsolutePath(@"C:\Users\jakub\Downloads\GIS Test", relativePath_4);
+        }
 
+        static string GetAbsolutePath(string basePath, string relativePath)
+        {
+            return System.IO.Path.GetFullPath(System.IO.Path.Combine(basePath, relativePath));
         }
 
         private void RangeTest()
