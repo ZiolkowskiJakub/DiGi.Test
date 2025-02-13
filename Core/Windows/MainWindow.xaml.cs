@@ -29,7 +29,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            RelativePathTest();
+            ReferenceTest();
         }
 
         private void LowerLimitTest()
@@ -230,17 +230,32 @@ namespace DiGi.Core.Test
 
         private void ReferenceTest()
         {
-            GuidReference guidReference = new GuidReference(new TypeReference(typeof(TestObject)), Guid.NewGuid());
-            string source = "AAA";
+            Guid guid = Guid.NewGuid();
 
-            InstanceRelatedExternalReference instanceRelatedExternalReference = new InstanceRelatedExternalReference(source, guidReference);
+            GuidReference guidReference_1 = new GuidReference(new TypeReference(typeof(TestObject)), guid);
 
-            string reference = instanceRelatedExternalReference.ToString();
+            GuidReference guidReference_2 = new GuidReference(new TypeReference(typeof(TestObject)), guid);
 
-            if(Query.TryParse(guidReference.ToString(), out IReference reference_Temp))
-            {
+            List<bool> results = new List<bool>();
 
-            }
+            results.Add(guidReference_1 == guidReference_2);
+            results.Add(guidReference_1 == (IUniqueReference)guidReference_2);
+            results.Add((IUniqueReference)guidReference_1 == guidReference_2);
+            results.Add((dynamic)guidReference_1 == (dynamic)guidReference_2);
+            results.Add(((IUniqueReference)guidReference_1).Equals((IUniqueReference)guidReference_2));
+            results.Add((IUniqueReference)guidReference_1 == (IUniqueReference)guidReference_2);
+
+            //GuidReference guidReference = new GuidReference(new TypeReference(typeof(TestObject)), Guid.NewGuid());
+            //string source = "AAA";
+
+            //InstanceRelatedExternalReference instanceRelatedExternalReference = new InstanceRelatedExternalReference(source, guidReference);
+
+            //string reference = instanceRelatedExternalReference.ToString();
+
+            //if(Query.TryParse(guidReference.ToString(), out IReference reference_Temp))
+            //{
+
+            //}
 
         }
 
