@@ -29,7 +29,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            ReferenceTest();
+            RemoveFromStorageFileTest();
         }
 
         private void LowerLimitTest()
@@ -100,7 +100,6 @@ namespace DiGi.Core.Test
 
         private void StorageFileTest()
         {
-
             string reference = "DiGi.GIS.Classes.OrtoDatas,DiGi.GIS::7094b4255ada4bc69b047987ed1c0e9c";
 
             Query.TryParse(reference, out UniqueReference uniqueReference);
@@ -124,6 +123,35 @@ namespace DiGi.Core.Test
 
                 ISerializableObject serializableObject = storageFile.GetValue(count - 1);
             }
+        }
+
+        private void RemoveFromStorageFileTest()
+        {
+            string path = @"C:\Users\jakub\Downloads\Test\StorageFile.odf";
+
+            List<TestObject> testObjects = new List<TestObject>();
+            testObjects.Add(new TestObject("AAA"));
+            testObjects.Add(new TestObject("BBB"));
+            testObjects.Add(new TestObject("CCC"));
+            testObjects.Add(new TestObject("AAA"));
+
+            using (StorageFile storageFile = new StorageFile(path))
+            {
+                testObjects.ForEach(x => storageFile.AddValue(x));
+                storageFile.Save();
+            }
+
+            using (StorageFile storageFile = new StorageFile(path))
+            {
+                storageFile.RemoveAll<TestObject>(x => x.Name == "AAA");
+                storageFile.Save();
+            }
+
+            using (StorageFile storageFile = new StorageFile(path))
+            {
+                IEnumerable<ISerializableObject> testObjects_Temp = storageFile.Values;
+            }
+
         }
 
         private void RelativePathTest()
