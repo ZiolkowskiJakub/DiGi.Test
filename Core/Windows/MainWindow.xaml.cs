@@ -29,7 +29,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            RemoveFromStorageFileTest();
+            TestObjectStorageFileTest();
         }
 
         private void LowerLimitTest()
@@ -123,6 +123,38 @@ namespace DiGi.Core.Test
 
                 ISerializableObject serializableObject = storageFile.GetValue(count - 1);
             }
+        }
+
+        private void TestObjectStorageFileTest()
+        {
+            string path = @"C:\Users\jakub\Downloads\Test\StorageFile.odf";
+
+            List<TestObject> testObjects = new List<TestObject>();
+            testObjects.Add(new TestObject("AAA"));
+            testObjects.Add(new TestObject("BBB"));
+            testObjects.Add(new TestObject("CCC"));
+            testObjects.Add(new TestObject("AAA"));
+
+            using (TestObjectStorageFile testObjectStorageFileTest = new TestObjectStorageFile(path))
+            {
+                testObjects.ForEach(x => testObjectStorageFileTest.AddValue(x));
+                testObjectStorageFileTest.Save();
+            }
+
+            using (TestObjectStorageFile testObjectStorageFileTest = new TestObjectStorageFile(path))
+            {
+                UniqueReference uniqueReference = testObjectStorageFileTest.GetUniqueReference(testObjects[0]);
+                testObjectStorageFileTest.Remove(uniqueReference);
+
+                IEnumerable<TestObject> testObjects_Temp = testObjectStorageFileTest.GetValues<TestObject>();
+            }
+
+            using (TestObjectStorageFile testObjectStorageFileTest = new TestObjectStorageFile(path))
+            {
+                IEnumerable<TestObject> testObjects_Temp = testObjectStorageFileTest.GetValues<TestObject>();
+            }
+
+
         }
 
         private void RemoveFromStorageFileTest()
