@@ -28,6 +28,15 @@ namespace DiGi.Core.Test.Classes
         [JsonInclude, JsonPropertyName("TestEnum")]
         private TestEnum? testEnum = null;
 
+        [JsonInclude, JsonPropertyName("KeyValuePair")]
+        private KeyValuePair<int, string> KeyValuePair = new KeyValuePair<int, string>(1, "AAA");
+
+        [JsonInclude, JsonPropertyName("Dictionary")]
+        public Dictionary<int, string> Dictionary = new Dictionary<int, string>();
+
+        [JsonInclude, JsonPropertyName("SortedDictionary")]
+        public SortedDictionary<int, string> SortedDictionary = new SortedDictionary<int, string>();
+
 
         public TestObject(string name)
             : base()

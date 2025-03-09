@@ -29,7 +29,16 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            TestObjectStorageFileTest();
+            KeyValueTest();
+        }
+
+        private static void KeyValueTest()
+        {
+            TestObject testObject = new TestObject("AAA");
+            testObject.Dictionary.Add(1, "AAA");
+            testObject.SortedDictionary.Add(1, "AAA");
+
+            string json = testObject.ToJson().ToString();
         }
 
         private void LowerLimitTest()
