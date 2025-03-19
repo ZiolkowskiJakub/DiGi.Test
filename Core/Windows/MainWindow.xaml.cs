@@ -29,7 +29,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            KeyValueTest();
+            NextEnumTest();
         }
 
         private static void KeyValueTest()
@@ -39,6 +39,13 @@ namespace DiGi.Core.Test
             testObject.SortedDictionary.Add(1, "AAA");
 
             string json = testObject.ToJson().ToString();
+        }
+
+        private static void NextEnumTest()
+        {
+            Core.Enums.CountryCode countryCode = Core.Enums.CountryCode.MQ;
+
+            Core.Enums.CountryCode countryCode_Next = Query.Next(countryCode);
         }
 
         private void LowerLimitTest()
