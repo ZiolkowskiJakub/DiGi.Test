@@ -9,6 +9,7 @@ using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Core.IO.File.Classes;
 using DiGi.Core.IO.Interfaces;
+using DiGi.Core.IO.Table.Classes;
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Enums;
@@ -29,7 +30,23 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            NextEnumTest();
+            DelimitedFileTest();
+        }
+
+        private static void DelimitedFileTest()
+        {
+            string path = @"C:\Users\jakub\Downloads\Test\Test.csv";
+
+           Table table = IO.DelimitedData.Create.Table(path, ',');
+
+            IO.DelimitedData.Modify.Append(path, table, ',');
+        }
+
+        private static void ReadLinesTest()
+        {
+            string path = @"C:\Users\jakub\Downloads\Test\Test.txt";
+
+            List<string> lines = IO.Query.Lines(path, 2);
         }
 
         private static void KeyValueTest()
