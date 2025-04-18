@@ -30,7 +30,7 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            DelimitedFileTest();
+            NaNTest();
         }
 
         private static void DelimitedFileTest()
@@ -665,6 +665,17 @@ namespace DiGi.Core.Test
 
             //    SerializableObjectCollection serializableObjectCollection_3 = file_2.Value;
             //}
+        }
+
+        private void NaNTest()
+        {
+            NaNTestObject naNTestObject = new NaNTestObject();
+
+            NaNTestObject naNTestObject_Temp = naNTestObject.Clone<NaNTestObject>();
+
+            string json = naNTestObject_Temp.ToJsonObject().ToString();
+
+            NaNTestObject naNTestObject_Temp_Temp = Convert.ToDiGi<NaNTestObject>(json)?.FirstOrDefault();
         }
 
         private void CollectionTest()
