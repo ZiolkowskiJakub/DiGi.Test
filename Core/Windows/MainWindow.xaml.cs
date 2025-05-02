@@ -1,8 +1,6 @@
 ﻿using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Windows;
 using DiGi.Core.Classes;
@@ -30,7 +28,28 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            NaNTest();
+            DirectoryTest();
+        }
+
+        private static void DirectoryTest()
+        {
+            string directory = @"C:\Users\jakub\Downloads\Test\AAA\BBB";
+
+            System.IO.Directory.CreateDirectory(directory);
+
+            List<string> values = new List<string>();
+
+            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+            values.Add(directoryInfo.ToString());
+
+            while(directoryInfo != null)
+            {
+                directoryInfo = directoryInfo.Parent;
+                if(directoryInfo != null)
+                {
+                    values.Add(directoryInfo.ToString());
+                }
+            }
         }
 
         private static void DelimitedFileTest()
