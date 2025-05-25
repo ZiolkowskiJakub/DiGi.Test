@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.IO\DiGi.Core.IO.csproj" />
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Parameter\DiGi.Core.Parameter.csproj" />
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Relation\DiGi.Core.Relation.csproj" />

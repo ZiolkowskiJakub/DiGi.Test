@@ -21,7 +21,9 @@ namespace DiGi.Geometry.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            Mesh2DTest();
+            Ellipse2DTest();
+
+            //Mesh2DTest();
 
             //Point3DsTest();
 
@@ -185,6 +187,35 @@ namespace DiGi.Geometry.Test
 
 
             //ISerializableObject serializableObject = Create.SerializableObject<ISerializableObject>(jsonNode.AsObject());
+        }
+
+        private static void Ellipse2DTest()
+        {
+            Ellipse2D ellipse2D = new Ellipse2D(new Point2D(0, 0), 5, 10);
+
+            Point2D point2D_1 = ellipse2D.Project(new Point2D(11, 0));
+
+            Point2D point2D_2 = ellipse2D.Project(new Point2D(5, 5));
+
+            Point2D point2D_3 = ellipse2D.Project(new Point2D(0, 11));
+
+            Point2D point2D = (10, 100);
+
+            BoundingBox2D boundingBox2D = new Ellipse2D(new Point2D(0, 0), 5, 10).GetBoundingBox();
+
+            List<Point2D> intersectionPoint2Ds = Planar.Query.IntersectionPoints(ellipse2D, ((0, -20), (0, 20)));
+
+            List<Point2D> point2Ds = new List<Point2D>();
+            point2Ds.Add(ellipse2D.GetPoint((1, 0)));
+            point2Ds.Add(ellipse2D.GetPoint((1, 1)));
+            point2Ds.Add(ellipse2D.GetPoint((0, 1)));
+            point2Ds.Add(ellipse2D.GetPoint((-1, 1)));
+            point2Ds.Add(ellipse2D.GetPoint((-1, 0)));
+            point2Ds.Add(ellipse2D.GetPoint((-1, -1)));
+            point2Ds.Add(ellipse2D.GetPoint((0, -1)));
+            point2Ds.Add(ellipse2D.GetPoint((1, -1)));
+
+
         }
 
         private static void OffsetTest()

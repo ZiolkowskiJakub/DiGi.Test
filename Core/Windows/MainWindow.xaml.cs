@@ -35,7 +35,7 @@ namespace DiGi.Core.Test
         {
             string directory = @"C:\Users\jakub\Downloads\Test\AAA\BBB";
 
-            System.IO.Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(directory);
 
             List<string> values = new List<string>();
 
