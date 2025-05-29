@@ -1,9 +1,4 @@
-﻿using System.IO;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Web;
-using System.Windows;
-using DiGi.Core.Classes;
+﻿using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Core.IO.File.Classes;
 using DiGi.Core.IO.Interfaces;
@@ -13,6 +8,13 @@ using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Enums;
 using DiGi.Core.Relation.Interfaces;
 using DiGi.Core.Test.Classes;
+using System.IO;
+using System.Runtime.InteropServices.JavaScript;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Web;
+using System.Windows;
 
 namespace DiGi.Core.Test
 {
@@ -28,7 +30,36 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            DirectoryTest();
+            DictionaryObjectTest();
+        }
+
+        private static void DictionaryObjectTest()
+        {
+            Dictionary<string, int> dictionary = new Dictionary<string, int>();
+            dictionary.Add("AAA", 1);
+            dictionary.Add("BBB", 2);
+
+            string json = JsonSerializer.Serialize(dictionary, new JsonSerializerOptions() { WriteIndented = true });
+
+
+            DictionaryObject dictionaryObject_1 = new DictionaryObject();
+            dictionaryObject_1.Add("AAAA");
+            dictionaryObject_1.Add("BBBB");
+
+            TestObject testObject = new TestObject("AAAA");
+
+            string json_TestObject_1 = Convert.ToSystem_String(testObject);
+            TestObject testObject_2 = Convert.ToDiGi<TestObject>(json_TestObject_1)?.FirstOrDefault();
+            string json_TestObject_2 = Convert.ToSystem_String(testObject_2);
+
+
+            string json_1 = Convert.ToSystem_String(dictionaryObject_1);
+
+            DictionaryObject dictionaryObject_2 = Convert.ToDiGi<DictionaryObject>(json_1)?.FirstOrDefault();
+
+            string json_2 = Convert.ToSystem_String(dictionaryObject_2);
+
+            bool result = json_1 == json_2;
         }
 
         private static void DirectoryTest()
@@ -478,7 +509,7 @@ namespace DiGi.Core.Test
         private void NullableObjectTest()
         {
             TestObject testObject_1 = new TestObject("CC", 10, 12);
-            testObject_1.TestEnum = Enums.TestEnum.Test1;
+           //testObject_1.TestEnum = Enums.TestEnum.Test1;
             string json_1 = Convert.ToSystem_String(testObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
 
             TestObject testObject_2 = Convert.ToDiGi<TestObject>(json_1)?.FirstOrDefault();
