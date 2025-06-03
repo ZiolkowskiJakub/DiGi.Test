@@ -1,6 +1,5 @@
 ﻿using DiGi.Core.Classes;
 using DiGi.Core.IO.Interfaces;
-using DiGi.Core.Test.Enums;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
