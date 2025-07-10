@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical.Building.HVAC\DiGi.Analytical.Building.HVAC.csproj" />
+    <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical.Building\DiGi.Analytical.Building.csproj" />
+    <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical\DiGi.Analytical.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Parameter\DiGi.Core.Parameter.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Relation\DiGi.Core.Relation.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
+  </ItemGroup>
+
+</Project>
