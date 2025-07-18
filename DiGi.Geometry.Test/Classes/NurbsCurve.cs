@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace DiGi.Geometry.Test.NurbsCurveTest
+﻿namespace DiGi.Geometry.Test.NurbsCurveTest
 {
     public struct Vector3D
     {

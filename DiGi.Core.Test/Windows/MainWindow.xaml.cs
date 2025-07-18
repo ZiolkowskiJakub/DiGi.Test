@@ -29,7 +29,14 @@ namespace DiGi.Core.Test
 
         private void Button_Test1_Click(object sender, RoutedEventArgs e)
         {
-            DictionaryObjectTest();
+            TryParseTest();
+        }
+
+        private static void TryParseTest()
+        {
+            string @string = "4.9999999999999996E-06";
+
+            Query.TryParseDouble(@string, out double result);
         }
 
         private static void DictionaryObjectTest()
@@ -168,7 +175,7 @@ namespace DiGi.Core.Test
         {
             string path = @"C:\Users\jakub\Downloads\DiGi Test\4.2.3.portfolio";
 
-            IO.Table.Classes.Table table = IO.DelimitedData.Create.Table(path, IO.DelimitedData.Enums.DelimitedDataSeparator.Tab);
+            Table table = IO.DelimitedData.Create.Table(path, IO.DelimitedData.Enums.DelimitedDataSeparator.Tab);
         }
 
         private void NaNSerializationTest()
@@ -509,10 +516,10 @@ namespace DiGi.Core.Test
         {
             TestObject testObject_1 = new TestObject("CC", 10, 12);
            //testObject_1.TestEnum = Enums.TestEnum.Test1;
-            string json_1 = Convert.ToSystem_String(testObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_1 = Convert.ToSystem_String(testObject_1, new JsonSerializerOptions() { WriteIndented = true });
 
             TestObject testObject_2 = Convert.ToDiGi<TestObject>(json_1)?.FirstOrDefault();
-            string json_2 = Convert.ToSystem_String(testObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_2 = Convert.ToSystem_String(testObject_2, new JsonSerializerOptions() { WriteIndented = true });
 
             bool similar = json_1 == json_2;
         }
@@ -527,10 +534,10 @@ namespace DiGi.Core.Test
                 TestEnums_3 = new HashSet<Enums.TestEnum>() { Enums.TestEnum.Test1, Enums.TestEnum.Test2 },
             };
 
-            string json_1 = Convert.ToSystem_String(enumObject_1, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_1 = Convert.ToSystem_String(enumObject_1, new JsonSerializerOptions() { WriteIndented = true });
 
             EnumObject enumObject_2 = Convert.ToDiGi<EnumObject>(json_1)?.FirstOrDefault();
-            string json_2 = Convert.ToSystem_String(enumObject_2, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json_2 = Convert.ToSystem_String(enumObject_2, new JsonSerializerOptions() { WriteIndented = true });
 
             bool similar = json_1 == json_2;
         }
@@ -539,7 +546,7 @@ namespace DiGi.Core.Test
         {
             TestObject testObject_5 = new TestObject("CC", 10, 12);
             TestObject testObject_6 = testObject_5.Clone<TestObject>();
-            string json = Convert.ToSystem_String(testObject_5, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
+            string json = Convert.ToSystem_String(testObject_5, new JsonSerializerOptions() { WriteIndented = true });
             
 
 
@@ -577,7 +584,7 @@ namespace DiGi.Core.Test
 
             bool valid = path.IsValid();
 
-            System.IO.FileInfo fileInfo = path.GetFileInfo();
+            FileInfo fileInfo = path.GetFileInfo();
         }
 
         public void ParameterTest()
