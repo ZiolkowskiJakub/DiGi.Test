@@ -1,5 +1,7 @@
 using DiGi.Analytical.Building.Classes;
 using DiGi.Analytical.Building.HVAC;
+using DiGi.Analytical.Building.HVAC.Enums;
+using DiGi.Core.Classes;
 
 namespace DiGi.Analytical.Test
 {
@@ -17,23 +19,32 @@ namespace DiGi.Analytical.Test
 
         private void ProfileTest()
         {
+            ProfileType profileType = ProfileType.EquipmentLatentGain;
+
+            Profile profile_1 = Create.Profile([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], profileType);
+
+            InternalCondition internalCondition_1 = new InternalCondition("Internal Condition 1") { Description = "Internal Condition 1" };
+            internalCondition_1.SetProfile(profile_1);
+
+            Profile profile_2 = Create.Profile([100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123], profileType);
+
+            InternalCondition internalCondition_2 = new InternalCondition("Internal Condition 2") { Description = "Internal Condition 2" };
+            internalCondition_2.SetProfile(profile_2);
+
+            Space space = new Space(new Geometry.Spatial.Classes.Point3D(0, 0, 0), "Space");
 
             BuildingModel buildingModel = new BuildingModel();
 
-            Profile profile = new Profile() { Name = "Profile 1", Description = "Test profile" };
+            buildingModel.Assign(space, internalCondition_1, new Range<int>(24, 47));
+            buildingModel.Assign(space, internalCondition_2, new Range<int>(48, 48 + 23));
 
-            InternalCondition internalCondition_1 = new InternalCondition("Internal Condition 1") { Description = "Test Internal Condition" };
-            InternalCondition internalCondition_2 = new InternalCondition("Internal Condition 2") { Description = "Test Internal Condition" };
+            IndexedDoubles indexDoubles = Building.Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), Core.Query.Description(profileType));
 
-            buildingModel.Assign(internalCondition_1, profile, Building.HVAC.Enums.ProfileType.Infiltration);
-            buildingModel.Assign(internalCondition_2, profile, Building.HVAC.Enums.ProfileType.Infiltration);
+            buildingModel = new BuildingModel();
 
-            List<Profile> profiles = buildingModel.GetProfiles<Profile>(internalCondition_1);
+            buildingModel.Assign(space, internalCondition_1);
 
-            List<InternalCondition> internalConditions = buildingModel.GetInternalConditions<InternalCondition>(profile);
-
-            Profile profile_1 = buildingModel.Profile<Profile>(internalCondition_1, Building.HVAC.Enums.ProfileType.Infiltration);
-
+            indexDoubles = Building.Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), Core.Query.Description(profileType));
         }
     }
 }

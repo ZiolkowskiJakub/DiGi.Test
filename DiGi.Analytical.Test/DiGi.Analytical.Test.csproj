@@ -18,4 +18,10 @@
     <ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DiGi.Geometry.Object">
+      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
