@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiGi.Tas\DiGi.Tas.Core\DiGi.Tas.Core.csproj" />
+    <ProjectReference Include="..\..\DiGi.Tas\DiGi.Tas.TBD\DiGi.Tas.TBD.csproj" />
+    <ProjectReference Include="..\..\DiGi.Tas\DiGi.Tas.TIC\DiGi.Tas.TIC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiGi.Core">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.TIC">
+      <HintPath>..\..\DiGi.Tas\references\Interop.TIC.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

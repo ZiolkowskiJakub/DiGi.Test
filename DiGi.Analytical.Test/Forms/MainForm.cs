@@ -1,6 +1,7 @@
 using DiGi.Analytical.Building.Classes;
 using DiGi.Analytical.Building.HVAC;
 using DiGi.Analytical.Building.HVAC.Enums;
+using DiGi.Analytical.Classes;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 
@@ -47,17 +48,17 @@ namespace DiGi.Analytical.Test
             buildingModel.Assign(space, internalCondition_1, new HourRange(24, 47));
             buildingModel.Assign(space, internalCondition_2, new HourRange(48, 48 + 23));
 
-            IndexedDoubles indexDoubles = Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), internalGainProfileType);
+            IndexedDoubles indexDoubles = Building.HVAC.Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), internalGainProfileType);
 
             buildingModel = new BuildingModel();
 
             buildingModel.Assign(space, internalCondition_1);
 
-            indexDoubles = Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), internalGainProfileType);
+            indexDoubles = Building.HVAC.Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), internalGainProfileType);
 
-            int hourIndex = Building.Query.FirstHourIndex(DayOfWeek.Monday, 2025);
+            int hourIndex = Query.FirstHourIndex(DayOfWeek.Monday, 2025);
 
-            DateTime dateTime = DiGi.Analytical.Building.Create.DateTime(2025, hourIndex + (5 * 24));
+            DateTime dateTime = Create.DateTime(2025, hourIndex + (5 * 24));
         }
     }
 }
