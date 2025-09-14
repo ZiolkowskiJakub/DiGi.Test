@@ -1,13 +1,14 @@
-﻿using DiGi.Core.Classes;
+using DiGi.Core.Classes;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace DiGi.Core.Test.Classes
+namespace DiGi.Core.xUnit
 {
-    public class DictionaryObject : GuidObject
+    internal class DictionaryObject : GuidObject
     {
         [JsonInclude, JsonPropertyName("Dictionary")]
-        private Dictionary<string, TestObject> dictionary;
+        private Dictionary<string, TestObject>? dictionary;
 
         public DictionaryObject()
             : base()
@@ -15,29 +16,34 @@ namespace DiGi.Core.Test.Classes
 
         }
 
-        public DictionaryObject(JsonObject jsonObject)
-            :base(jsonObject)
+        public DictionaryObject(JsonObject? jsonObject)
+            : base(jsonObject)
         {
 
         }
 
         [JsonIgnore]
-        public IEnumerable<string> Values
+        public IEnumerable<string>? Values
         {
             get
             {
-                return dictionary.Keys.ToList();
+                if (dictionary == null)
+                {
+                    return null;
+                }
+
+                return [.. dictionary.Keys];
             }
         }
 
         public bool Add(string name)
         {
-            if(name == null)
+            if (name == null)
             {
                 return false;
             }
 
-            if(dictionary == null)
+            if (dictionary == null)
             {
                 dictionary = new Dictionary<string, TestObject>();
             }

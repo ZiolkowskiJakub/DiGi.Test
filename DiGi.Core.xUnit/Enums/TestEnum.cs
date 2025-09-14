@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace DiGi.Core.Test.Enums
+namespace DiGi.Core.xUnit.Enums
 {
     public enum TestEnum
     {

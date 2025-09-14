@@ -18,6 +18,12 @@
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Core.IO">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Core.Parameter">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.Parameter.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.TIC">
       <HintPath>..\..\DiGi.Tas\references\Interop.TIC.dll</HintPath>
     </Reference>
