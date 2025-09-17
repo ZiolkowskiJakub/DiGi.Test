@@ -275,7 +275,7 @@ namespace DiGi.Geometry.Test
 
             PolygonalFace3D polygonalFace3D = new PolygonalFace3D(Spatial.Constans.Plane.WorldZ, Planar.Create.PolygonalFace2D(polygon2D));
 
-            PlanarIntersectionResult planarIntersectionResult = Create.PlanarIntersectionResult(polygonalFace3D, (ILinear3D)new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
+            PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(polygonalFace3D, new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
         }
 
         private static void PlanarIntersectionTest_1() 
