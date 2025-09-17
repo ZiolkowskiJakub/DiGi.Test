@@ -1,5 +1,3 @@
-using DiGi.Core.Enums;
-
 namespace DiGi.Core.xUnit
 {
     public partial class Query

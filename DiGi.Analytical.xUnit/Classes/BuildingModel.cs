@@ -3,7 +3,6 @@ using DiGi.Analytical.Building.HVAC;
 using DiGi.Analytical.Building.Interfaces;
 using DiGi.Analytical.Classes;
 using DiGi.Geometry.Spatial.Classes;
-using System.Reflection;
 
 namespace DiGi.Analytical.xUnit
 {
