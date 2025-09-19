@@ -22,7 +22,10 @@ namespace DiGi.Geometry.xUnit
 
             IPolygonalFace2D? polygonalFace2D = polygonalFace3D.Geometry2D;
 
-            PolygonalFace2DInternalPointSolver polygonalFace2DInternalPointSolver = new (100, polygonalFace2D);
+            PolygonalFace2DInternalPointSolver polygonalFace2DInternalPointSolver = new(100)
+            {
+                Input = polygonalFace2D
+            };
 
             List<Point2D> point2Ds = [];
             for (int i = 0; i < count; i++)
@@ -32,7 +35,7 @@ namespace DiGi.Geometry.xUnit
                     break;
                 }
 
-                if(polygonalFace2DInternalPointSolver.InternalPoint is not Point2D point2D)
+                if(polygonalFace2DInternalPointSolver.Output is not Point2D point2D)
                 {
                     break;
                 }
