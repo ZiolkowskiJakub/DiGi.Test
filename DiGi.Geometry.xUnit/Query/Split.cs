@@ -29,7 +29,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron = Create.Polyhedron(polygonalFaceExtrusion);
             Assert.NotNull(polyhedron);
 
-            List<Polyhedron>? polyhedrons = Spatial.Query.Split(new Plane(Create.Plane(1.0)), polyhedron);
+            Assert.True(Spatial.Query.TrySplit(new Plane(Create.Plane(1.0)), polyhedron, out List<Polyhedron>? polyhedrons));
 
             Assert.NotNull(polyhedrons);
             if(polyhedrons is null)

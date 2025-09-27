@@ -357,7 +357,7 @@ namespace DiGi.Geometry.Test
             {
                 //PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult((VolatilePolygonalFace3D)polygonalFace3D_1, new VolatilePolygonalFace3D[] { polygonalFace3D_2, polygonalFace3D_3 });
 
-                List<IPolygonalFace3D> polygonalFace3Ds = Query.Split(polygonalFace3D_1, [ polygonalFace3D_2, polygonalFace3D_3 ]);
+                Query.TrySplit(polygonalFace3D_1, [ polygonalFace3D_2, polygonalFace3D_3 ], out List<PolygonalFace3D> polygonalFace3Ds);
 
                 //List<IGeometry3D> geometry3Ds = planarIntersectionResult.GetGeometry3Ds<IGeometry3D>();
             }
