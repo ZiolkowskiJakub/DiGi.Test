@@ -25,7 +25,7 @@ namespace DiGi.Analytical.xUnit
 
             Space space = new(new Point3D(0, 0, 0), "Space 1");
 
-            Building.Classes.SpaceRelation spaceRelation = new (faceFloor, space);
+            SpaceRelation spaceRelation = new (faceFloor, space);
 
             Assert.NotNull(spaceRelation?.UniqueReferences);
 
