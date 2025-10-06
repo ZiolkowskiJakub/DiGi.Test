@@ -27,6 +27,8 @@ namespace DiGi.Core.xUnit
             check.Invoke(new Value(DateTime.Now));
             check.Invoke(new Value(new Address("street", "city", "postalCode", Core.Enums.CountryCode.PL)));
             check.Invoke(new Value(["10", "20"]));
+            check.Invoke(new Value(typeof(double)));
+            check.Invoke(new Value(typeof(Address)));
         }
     }
 }
