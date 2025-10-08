@@ -58,6 +58,9 @@ namespace DiGi.Typology.xUnit
 
             Assert.NotNull(typology?.GetTypology([3, 1]));
             Assert.NotNull(typology?.GetTypology([3, 2]));
+
+            Core.xUnit.Query.SerializationCheck(typology);
+            Core.xUnit.Query.SerializationCheck(subTypology);
         }
     }
 }

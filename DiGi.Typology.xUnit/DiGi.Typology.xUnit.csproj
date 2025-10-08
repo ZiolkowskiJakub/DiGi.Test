@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Typology\DiGi.Typology\DiGi.Typology.csproj" />
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

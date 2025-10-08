@@ -37,6 +37,8 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(jsonString_2);
 
             Assert.Equal(jsonString_1, jsonString_2);
+
+            Query.SerializationCheck(serializableObjectCollection_1);
         }
     }
 }

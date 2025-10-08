@@ -27,11 +27,11 @@ namespace DiGi.Core.xUnit
             Core.Classes.IndexedDoubles? indexDoubles_4 = Convert.ToDiGi<Core.Classes.IndexedDoubles>(string_2)?.FirstOrDefault();
             Assert.NotNull(indexDoubles_4);
 
-
             Assert.Equal(indexDoubles_3.ToSystem_String(), string_1);
 
             Assert.Equal(indexDoubles_4.ToSystem_String(), string_2);
 
+            Query.SerializationCheck(indexDoubles_1);
         }
     }
 }

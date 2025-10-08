@@ -23,6 +23,8 @@ namespace DiGi.Core.xUnit
 
             int count = jsonObject.Count;
             Assert.Equal(3, count);
+
+            Query.SerializationCheck(size);
         }
     }
 }

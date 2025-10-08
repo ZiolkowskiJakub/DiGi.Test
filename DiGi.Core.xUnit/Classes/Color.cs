@@ -7,7 +7,7 @@ namespace DiGi.Core.xUnit
         {
             System.Drawing.Color drawingColor_1 = System.Drawing.Color.Aqua;
 
-            Core.Classes.Color color_1 = new Core.Classes.Color(drawingColor_1);
+            Core.Classes.Color color_1 = new(drawingColor_1);
 
             string? string_1 = color_1.ToSystem_String();
 
@@ -33,6 +33,8 @@ namespace DiGi.Core.xUnit
             Assert.Equal(drawingColor_1.R, drawingColor_2.R);
             Assert.Equal(drawingColor_1.G, drawingColor_2.G);
             Assert.Equal(drawingColor_1.B, drawingColor_2.B);
+
+            Query.SerializationCheck(color_1);
         }
     }
 }
