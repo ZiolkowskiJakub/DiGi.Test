@@ -57,10 +57,10 @@ namespace DiGi.Geometry.xUnit
                     continue;
                 }
 
-                Vector3D? normal_Internal = polyhedron.GetNormal(i, Spatial.Enums.Side.Internal);
+                Vector3D? normal_Internal = polyhedron.GetNormal(i, Core.Enums.Side.Internal);
                 Assert.NotNull(normal_Internal);
 
-                Vector3D? normal_External = polyhedron.GetNormal(i, Spatial.Enums.Side.External);
+                Vector3D? normal_External = polyhedron.GetNormal(i, Core.Enums.Side.External);
                 Assert.NotNull(normal_External);
 
                 if (normal_External is null)
