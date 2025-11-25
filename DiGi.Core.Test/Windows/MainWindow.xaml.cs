@@ -698,7 +698,7 @@ namespace DiGi.Core.Test
         private void FileTest()
         {
 
-            string path_ZIP = @"C:\Users\jakub\Downloads\FileTest.zip";
+            //string path_ZIP = @"C:\Users\jakub\Downloads\FileTest.zip";
             string path_JSON = @"C:\Users\jakub\Downloads\FileTest.json";
 
             SerializableObjectCollection serializableObjectCollection = new SerializableObjectCollection();
