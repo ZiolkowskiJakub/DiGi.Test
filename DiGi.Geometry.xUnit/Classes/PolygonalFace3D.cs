@@ -1,4 +1,3 @@
-using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Core;

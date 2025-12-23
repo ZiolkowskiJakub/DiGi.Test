@@ -2,7 +2,6 @@
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
-using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.Geometry.Visual.Planar.Classes;
 using DiGi.Geometry.Visual.Core.Classes;
 using DiGi.Geometry.Core.Classes;

@@ -1,10 +1,4 @@
-﻿using DiGi.Geometry.Core;
-using DiGi.Geometry.Core.Enums;
-using DiGi.Geometry.Planar;
-using DiGi.Geometry.Planar.Classes;
-using DiGi.Geometry.Spatial;
-using DiGi.Geometry.Spatial.Classes;
-using DiGi.Geometry.Spatial.Interfaces;
+﻿using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.xUnit
 {
