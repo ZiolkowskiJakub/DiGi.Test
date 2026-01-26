@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiGi.Core.Test", "DiGi.Core.Test\DiGi.Core.Test.csproj", "{9D50156E-EA2D-4D4F-A310-9809AAEBE4C4}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -195,6 +195,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiGi.Scripting.Python.xUnit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiGi.Scripting.CSharp.xUnit", "DiGi.Scripting.CSharp.xUnit\DiGi.Scripting.CSharp.xUnit.csproj", "{27B4184F-FEBF-46B2-A241-D6637EB7DB2F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PostgreSQL", "PostgreSQL", "{20469156-98CB-4DC0-9377-A2246C4B4190}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiGi.PostgreSQL", "..\DiGi.PostgreSQL\DiGi.PostgreSQL\DiGi.PostgreSQL.csproj", "{F4A94A43-8062-F6CE-8E27-4CF3B26C4CEB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3EBD4647-98B2-4FCE-9737-934663291BF2} = {3EBD4647-98B2-4FCE-9737-934663291BF2}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiGi.PostgreSQL.xUnit", "DiGi.PostgreSQL.xUnit\DiGi.PostgreSQL.xUnit.csproj", "{66263FC0-626E-4BC8-800F-EF0835A2F178}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -341,6 +350,14 @@ Global
 		{27B4184F-FEBF-46B2-A241-D6637EB7DB2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27B4184F-FEBF-46B2-A241-D6637EB7DB2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27B4184F-FEBF-46B2-A241-D6637EB7DB2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4A94A43-8062-F6CE-8E27-4CF3B26C4CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4A94A43-8062-F6CE-8E27-4CF3B26C4CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4A94A43-8062-F6CE-8E27-4CF3B26C4CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4A94A43-8062-F6CE-8E27-4CF3B26C4CEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66263FC0-626E-4BC8-800F-EF0835A2F178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66263FC0-626E-4BC8-800F-EF0835A2F178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66263FC0-626E-4BC8-800F-EF0835A2F178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66263FC0-626E-4BC8-800F-EF0835A2F178}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -381,6 +398,8 @@ Global
 		{8A4C7AB9-4701-1A8E-6E11-B26D3D04AB64} = {8FB2B64F-01C0-4865-8DBE-33AF0D361C2B}
 		{176CA6C3-9A61-4110-84CB-F547FCE2DAA3} = {8FB2B64F-01C0-4865-8DBE-33AF0D361C2B}
 		{27B4184F-FEBF-46B2-A241-D6637EB7DB2F} = {8FB2B64F-01C0-4865-8DBE-33AF0D361C2B}
+		{F4A94A43-8062-F6CE-8E27-4CF3B26C4CEB} = {20469156-98CB-4DC0-9377-A2246C4B4190}
+		{66263FC0-626E-4BC8-800F-EF0835A2F178} = {20469156-98CB-4DC0-9377-A2246C4B4190}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3CEE9D6A-E4F0-4945-98E9-811D58B6BA37}

@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="DiGi.Analytical">
+      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Analytical.Building">
+      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
