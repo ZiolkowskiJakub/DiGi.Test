@@ -1,4 +1,3 @@
-using DiGi.PostgreSQL;
 using DiGi.PostgreSQL.Classes;
 
 namespace DiGi.PostgreSQL.xUnit
@@ -8,7 +7,7 @@ namespace DiGi.PostgreSQL.xUnit
         [Fact]
         public void Round()
         {
-            ConnectionData connectionData = new ConnectionData();
+            //ConnectionData connectionData = new ConnectionData();
             
             Assert.Equal(0.0, 0.0);
         }
