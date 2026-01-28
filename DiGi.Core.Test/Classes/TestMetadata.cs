@@ -10,7 +10,6 @@ namespace DiGi.Core.Test.Classes
         [JsonInclude, JsonPropertyName("Name")]
         private string name;
 
-
         public TestMetadata(string name)
             : base()
         {
@@ -18,9 +17,8 @@ namespace DiGi.Core.Test.Classes
         }
 
         public TestMetadata(JsonObject jsonObject)
-            :base(jsonObject)
+            : base(jsonObject)
         {
-
         }
 
         [JsonIgnore]

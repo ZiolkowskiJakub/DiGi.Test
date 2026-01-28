@@ -13,7 +13,7 @@ namespace DiGi.Geometry.xUnit
             PolygonalFace3D? polygonalFace3D = Create.PolygonalFace3D(Spatial.Constans.Plane.WorldZ, new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0));
             Assert.NotNull(polygonalFace3D);
 
-            if(polygonalFace3D is null)
+            if (polygonalFace3D is null)
             {
                 return;
             }
@@ -30,12 +30,12 @@ namespace DiGi.Geometry.xUnit
             List<Point2D> point2Ds = [];
             for (int i = 0; i < count; i++)
             {
-                if(!polygonalFace2DInternalPointSolver.Solve())
+                if (!polygonalFace2DInternalPointSolver.Solve())
                 {
                     break;
                 }
 
-                if(polygonalFace2DInternalPointSolver.Output is not Point2D point2D)
+                if (polygonalFace2DInternalPointSolver.Output is not Point2D point2D)
                 {
                     break;
                 }
@@ -44,7 +44,6 @@ namespace DiGi.Geometry.xUnit
 
                 Assert.True(polygonalFace2D.Inside(point2D));
             }
-
         }
     }
 }

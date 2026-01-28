@@ -45,4 +45,3 @@ namespace DiGi.Geometry.xUnit
         }
     }
 }
-

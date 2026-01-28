@@ -2,7 +2,6 @@ using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 
-
 namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
@@ -14,16 +13,16 @@ namespace DiGi.Geometry.xUnit
 
             Assert.NotNull(polygonalFace3D);
 
-            if(polygonalFace3D is null)
+            if (polygonalFace3D is null)
             {
                 return;
             }
 
-            PolygonalFaceExtrusion polygonalFaceExtrusion = new (polygonalFace3D, Spatial.Constans.Vector3D.WorldZ * 10);
+            PolygonalFaceExtrusion polygonalFaceExtrusion = new(polygonalFace3D, Spatial.Constans.Vector3D.WorldZ * 10);
 
             Assert.NotNull(polygonalFaceExtrusion);
 
-            if(polygonalFaceExtrusion is null)
+            if (polygonalFaceExtrusion is null)
             {
                 return;
             }
@@ -31,7 +30,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron = Create.Polyhedron(polygonalFaceExtrusion);
             Assert.NotNull(polyhedron);
 
-            if(polyhedron is null)
+            if (polyhedron is null)
             {
                 return;
             }
@@ -39,12 +38,12 @@ namespace DiGi.Geometry.xUnit
             Point3D? internalPoint = polyhedron.GetInternalPoint();
             Assert.NotNull(internalPoint);
 
-            for (int i =0; i < polyhedron.Count; i++)
+            for (int i = 0; i < polyhedron.Count; i++)
             {
                 IPolygonalFace3D? polygonalFace3D_Polyhedron = polyhedron[i];
                 Assert.NotNull(polygonalFace3D_Polyhedron);
 
-                if(polygonalFace3D_Polyhedron is null)
+                if (polygonalFace3D_Polyhedron is null)
                 {
                     continue;
                 }
@@ -52,7 +51,7 @@ namespace DiGi.Geometry.xUnit
                 Point3D? internalPoint_PolygonalFace3D = polygonalFace3D_Polyhedron.GetInternalPoint();
                 Assert.NotNull(internalPoint_PolygonalFace3D);
 
-                if(internalPoint_PolygonalFace3D is null)
+                if (internalPoint_PolygonalFace3D is null)
                 {
                     continue;
                 }
@@ -77,7 +76,6 @@ namespace DiGi.Geometry.xUnit
 
                 Assert.True(!polyhedron.Inside(point3D));
             }
-
         }
     }
 }

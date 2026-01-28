@@ -14,7 +14,7 @@ namespace DiGi.Geometry.xUnit
 
             Assert.NotNull(polygonal2D);
 
-            if(polygonal2D is null)
+            if (polygonal2D is null)
             {
                 return;
             }

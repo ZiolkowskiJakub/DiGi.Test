@@ -12,13 +12,11 @@ namespace DiGi.Core.Test.Classes
         public DictionaryObject()
             : base()
         {
-
         }
 
         public DictionaryObject(JsonObject jsonObject)
-            :base(jsonObject)
+            : base(jsonObject)
         {
-
         }
 
         [JsonIgnore]
@@ -32,12 +30,12 @@ namespace DiGi.Core.Test.Classes
 
         public bool Add(string name)
         {
-            if(name == null)
+            if (name == null)
             {
                 return false;
             }
 
-            if(dictionary == null)
+            if (dictionary == null)
             {
                 dictionary = new Dictionary<string, TestObject>();
             }

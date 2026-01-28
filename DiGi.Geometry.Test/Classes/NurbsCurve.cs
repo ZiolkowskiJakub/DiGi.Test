@@ -14,11 +14,17 @@
         }
 
         public static Vector3D operator +(Vector3D v1, Vector3D v2) => new Vector3D(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
+
         public static Vector3D operator -(Vector3D v1, Vector3D v2) => new Vector3D(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+
         public static Vector3D operator *(Vector3D v, double scalar) => new Vector3D(v.X * scalar, v.Y * scalar, v.Z * scalar);
+
         public static Vector3D operator /(Vector3D v, double scalar) => new Vector3D(v.X / scalar, v.Y / scalar, v.Z / scalar);
+
         public double LengthSquared() => X * X + Y * Y + Z * Z;
+
         public double Length() => Math.Sqrt(LengthSquared());
+
         public static double Dot(Vector3D v1, Vector3D v2) => v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
 
         public override string ToString() => $"({X:F4}, {Y:F4}, {Z:F4})";
@@ -28,6 +34,7 @@
     {
         // (Previous properties and constructor from previous response, copy-paste here)
         public List<Vector3D> ControlPoints { get; private set; }
+
         public List<double> Weights { get; private set; }
         public List<double> KnotVector { get; private set; }
         public int Degree { get; private set; }
@@ -238,7 +245,6 @@
             return ND;
         }
 
-
         /// <summary>
         /// Evaluates the curve's derivative at a given parameter 'u'.
         /// Returns both the curve point and its first derivative (tangent).
@@ -326,10 +332,8 @@
             // C''(u) = (S''(u)W(u) - S(u)W''(u) - 2 * W'(u) * C'(u)) / W(u)
             Vector3D C_double_prime_u = (S_double_prime * W - S * W_double_prime - C_prime_u * (2 * W_prime)) / W;
 
-
             return (C_u, C_prime_u); // We only need C_u and C_prime_u for the closest point
         }
-
 
         /// <summary>
         /// Finds the parameter 'u' on the curve that is closest to a given query point.

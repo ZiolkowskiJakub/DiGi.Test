@@ -13,7 +13,6 @@
             Assert.True(multiUpdater.Update());
 
             Assert.Equal(13, multiUpdater.Value);
-
         }
     }
 }

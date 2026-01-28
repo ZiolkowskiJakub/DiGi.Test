@@ -20,17 +20,16 @@ namespace DiGi.Geometry.xUnit
                 Assert.Equal(intersect, intersect_Temp);
 
                 List<Point2D>? point2Ds = Planar.Query.IntersectionPoints(x, y);
-                if(intersect)
+                if (intersect)
                 {
                     Assert.NotNull(point2Ds);
                     Assert.NotEmpty(point2Ds);
                 }
-                else 
+                else
                 {
                     Assert.True(point2Ds == null || point2Ds.Count == 0);
                 }
             });
-
 
             json_1 = "{\"_type\":\"DiGi.Geometry.Planar.Classes.Polygon2D,DiGi.Geometry\",\"Points\":[{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.178687,\"Y\":267377.063008},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.18,\"Y\":267376.94},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.24,\"Y\":267371.32},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.29,\"Y\":267370},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.3,\"Y\":267369.72},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494483.06,\"Y\":267369.64},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494483.08,\"Y\":267370.21},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494482.61,\"Y\":267370.26},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494482.528093,\"Y\":267377.030945}]}";
             json_2 = "{\"_type\":\"DiGi.Geometry.Planar.Classes.Segment2D,DiGi.Geometry\",\"Start\":{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494483.73936444987,\"Y\":267359.57192031393},\"Vector\":{\"_type\":\"DiGi.Geometry.Planar.Classes.Vector2D,DiGi.Geometry\",\"X\":-0.19924830744275823,\"Y\":16.471193411620334}}";
@@ -42,7 +41,6 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(segmentable2D_2);
 
             check.Invoke(segmentable2D_1, segmentable2D_2, true);
-
 
             json_1 = "{\"_type\":\"DiGi.Geometry.Planar.Classes.Segment2D,DiGi.Geometry\",\"Start\":{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494483.73936444987,\"Y\":267359.57192031393},\"Vector\":{\"_type\":\"DiGi.Geometry.Planar.Classes.Vector2D,DiGi.Geometry\",\"X\":-0.19924830744275823,\"Y\":16.471193411620334}}";
             json_2 = "{\"_type\":\"DiGi.Geometry.Planar.Classes.Polygon2D,DiGi.Geometry\",\"Points\":[{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.178687,\"Y\":267377.063008},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.18,\"Y\":267376.94},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.24,\"Y\":267371.32},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.29,\"Y\":267370},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494485.3,\"Y\":267369.72},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494483.06,\"Y\":267369.64},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494483.08,\"Y\":267370.21},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494482.61,\"Y\":267370.26},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":494482.528093,\"Y\":267377.030945}]}";

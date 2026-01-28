@@ -1,6 +1,6 @@
-using DiGi.Geometry.Spatial.Classes;
-using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Core;
+using DiGi.Geometry.Spatial;
+using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 
 namespace DiGi.Geometry.xUnit
@@ -15,8 +15,8 @@ namespace DiGi.Geometry.xUnit
             Plane plane = Spatial.Constans.Plane.WorldZ;
 
             point3Ds = [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(10, 10, 0), new Point3D(0, 10, 0)];
-            
-            Polygon3D externalEdge = new (plane, point3Ds.ConvertAll(plane.Convert)!);
+
+            Polygon3D externalEdge = new(plane, point3Ds.ConvertAll(plane.Convert)!);
 
             Assert.True(Core.Enums.Orientation.CounterClockwise == externalEdge.Orientation());
 
@@ -29,7 +29,7 @@ namespace DiGi.Geometry.xUnit
             PolygonalFace3D? polygonalFace3D = Spatial.Create.PolygonalFace3D(externalEdge, [internalEdge]);
             Assert.NotNull(polygonalFace3D);
 
-            if(polygonalFace3D is null)
+            if (polygonalFace3D is null)
             {
                 return;
             }
@@ -51,10 +51,8 @@ namespace DiGi.Geometry.xUnit
 
             polygonalFace3D.Orient(externalEdge.Orientation().Opposite(), internalEdge.Orientation().Opposite());
 
-
             Assert.True(polygonalFace3D.ExternalEdge.Orientation() == externalEdge.Orientation().Opposite());
             Assert.True(polygonalFace3D.InternalEdges?[0]?.Orientation() == internalEdge.Orientation().Opposite());
-
         }
     }
 }

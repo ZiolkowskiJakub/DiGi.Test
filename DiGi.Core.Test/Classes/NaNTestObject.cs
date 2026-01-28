@@ -23,13 +23,11 @@ namespace DiGi.Core.Test.Classes
         public NaNTestObject(JsonObject jsonObject)
             : base(jsonObject)
         {
-
         }
 
         public NaNTestObject(NaNTestObject naNTestObject)
             : base(naNTestObject)
         {
-
         }
     }
 }

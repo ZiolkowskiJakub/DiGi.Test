@@ -12,13 +12,11 @@ namespace DiGi.Core.xUnit
         public DictionaryObject()
             : base()
         {
-
         }
 
         public DictionaryObject(JsonObject? jsonObject)
             : base(jsonObject)
         {
-
         }
 
         [JsonIgnore]

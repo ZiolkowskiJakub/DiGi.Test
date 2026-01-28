@@ -38,10 +38,9 @@ namespace DiGi.Core.xUnit
         [JsonInclude, JsonPropertyName("SortedDictionary")]
         public SortedDictionary<int, string>? SortedDictionary = [];
 
-
         public TestObject()
         {
-            Random random = new ();
+            Random random = new();
 
             name = Guid.NewGuid().ToString();
             uniqueReference = new GuidReference(new TypeReference(typeof(TestObject)), Guid.NewGuid());
@@ -104,7 +103,6 @@ namespace DiGi.Core.xUnit
         public TestObject(JsonObject? jsonObject)
             : base(jsonObject)
         {
-
         }
 
         [JsonIgnore]

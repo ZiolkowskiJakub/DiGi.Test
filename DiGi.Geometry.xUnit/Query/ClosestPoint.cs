@@ -17,7 +17,7 @@ namespace DiGi.Geometry.xUnit
             point2D_Closest = Planar.Query.ClosestPoint(point2D_1, point2D_2, point2D_3, true);
             Assert.NotNull(point2D_Closest);
 
-            if(point2D_Closest is not null)
+            if (point2D_Closest is not null)
             {
                 Assert.Equal(point2D_Closest, new Point2D(0, 9));
             }

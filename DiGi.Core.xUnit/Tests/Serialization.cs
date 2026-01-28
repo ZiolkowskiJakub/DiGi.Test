@@ -5,12 +5,9 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Serialization()
         {
-            TestObject testObject = new ();
+            TestObject testObject = new();
 
             Query.SerializationCheck(testObject);
         }
     }
-
-
-
 }

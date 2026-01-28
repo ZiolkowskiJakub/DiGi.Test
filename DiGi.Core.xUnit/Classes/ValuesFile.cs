@@ -1,7 +1,6 @@
 using DiGi.Core.Enums;
 using DiGi.Core.Interfaces;
 
-
 namespace DiGi.Core.xUnit
 {
     public partial class Classes
@@ -14,7 +13,7 @@ namespace DiGi.Core.xUnit
             List<ISerializableObject> values_1 = [];
             List<ISerializableObject>? values_2 = [];
 
-            Core.Classes.Address address_1 = new ("Street 1", "City 1", "Code 1", CountryCode.PL);
+            Core.Classes.Address address_1 = new("Street 1", "City 1", "Code 1", CountryCode.PL);
             values_1.Add(address_1);
 
             Core.Classes.Address address_2 = new("Street 2", "City 2", "Code 2", CountryCode.PL);
@@ -53,16 +52,15 @@ namespace DiGi.Core.xUnit
             }
             catch
             {
-
             }
 
             Assert.NotNull(values_1);
             Assert.NotNull(values_2);
 
-            if(values_1 is not null && values_2 is not null)
+            if (values_1 is not null && values_2 is not null)
             {
                 Assert.Equal(values_1.Count, values_2.Count);
-                if(values_1.Count == values_2.Count)
+                if (values_1.Count == values_2.Count)
                 {
                     List<string?> jsons_1 = values_1.ConvertAll(x => x.ToSystem_String());
                     List<string?> jsons_2 = values_2.ConvertAll(x => x.ToSystem_String());
@@ -72,9 +70,9 @@ namespace DiGi.Core.xUnit
                     Assert.Equal(index_1, index_2);
                     Assert.Equal(-1, index_1);
 
-                    if(index_1 == -1 && index_1 == index_2)
+                    if (index_1 == -1 && index_1 == index_2)
                     {
-                        List<string?> district = [..jsons_1];
+                        List<string?> district = [.. jsons_1];
 
                         foreach (string? json in district)
                         {

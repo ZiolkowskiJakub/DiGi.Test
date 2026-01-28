@@ -11,7 +11,6 @@ namespace DiGi.Analytical.xUnit
         [Fact]
         public void ConstructionRelationCluster()
         {
-
             IMaterial material_1 = new OpaqueMaterial("Opaque Material 1")
             {
                 Emissivity = new SurfaceValue(0.9, 0.8)
@@ -19,10 +18,10 @@ namespace DiGi.Analytical.xUnit
 
             IMaterial material_2 = new OpaqueMaterial("Opaque Material 2")
             {
-                Conductivity = 0.1 
+                Conductivity = 0.1
             };
 
-            WallConstruction wallConstruction = new () { Name = "Sample wall construction" };
+            WallConstruction wallConstruction = new() { Name = "Sample wall construction" };
 
             ConstructionRelationCluster constructionRelationCluster = [];
             constructionRelationCluster.Add(wallConstruction);
@@ -44,7 +43,7 @@ namespace DiGi.Analytical.xUnit
                 return;
             }
 
-           IMaterial? mateial_Temp = constructionRelationCluster.GetMaterial(structureLayer_1);
+            IMaterial? mateial_Temp = constructionRelationCluster.GetMaterial(structureLayer_1);
 
             Assert.NotNull(mateial_Temp);
 
@@ -57,18 +56,16 @@ namespace DiGi.Analytical.xUnit
 
             Assert.NotNull(structureLayers);
 
-            if(structureLayers is not null)
+            if (structureLayers is not null)
             {
                 Assert.NotEmpty(structureLayers);
-                if(structureLayers.Count != 0)
+                if (structureLayers.Count != 0)
                 {
                     Assert.Equal(2, structureLayers.Count);
 
                     Assert.Equal(structureLayer_1.Thickness, structureLayers[0].Thickness);
                 }
             }
-
-
         }
     }
 }

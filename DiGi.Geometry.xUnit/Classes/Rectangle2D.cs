@@ -11,7 +11,7 @@ namespace DiGi.Geometry.xUnit
             string json_Direction = "{\"_type\":\"DiGi.Geometry.Planar.Classes.Vector2D,DiGi.Geometry\",\"X\":0.7100000000209548,\"Y\":3.6900000000023283}";
 
             List<Point2D>? point2Ds = DiGi.Core.Convert.ToDiGi<Point2D>(json_Point2Ds);
-            
+
             Assert.NotNull(point2Ds);
             Assert.NotEmpty(point2Ds);
 
@@ -23,12 +23,12 @@ namespace DiGi.Geometry.xUnit
 
             Assert.NotNull(direction);
 
-            if(rectangle2D is null)
+            if (rectangle2D is null)
             {
                 return;
             }
 
-            foreach(Point2D point2D in point2Ds)
+            foreach (Point2D point2D in point2Ds)
             {
                 Assert.True(rectangle2D.InRange(point2D));
             }

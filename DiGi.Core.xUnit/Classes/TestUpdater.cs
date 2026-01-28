@@ -8,7 +8,7 @@ namespace DiGi.Core.xUnit
 
         public double Value { get; set; }
 
-        public TestUpdater(double addend) 
+        public TestUpdater(double addend)
         {
             Addend = addend;
         }

@@ -5,7 +5,6 @@ namespace DiGi.Scripting.Python.xUnit.Classes
         [Fact]
         public void AAA()
         {
-
         }
     }
 }

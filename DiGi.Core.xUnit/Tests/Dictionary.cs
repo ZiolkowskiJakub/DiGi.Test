@@ -19,7 +19,6 @@ namespace DiGi.Core.xUnit
 
             Assert.NotNull(json);
 
-
             DictionaryObject dictionaryObject_1 = new();
             dictionaryObject_1.Add("AAAA");
             dictionaryObject_1.Add("BBBB");
@@ -47,7 +46,4 @@ namespace DiGi.Core.xUnit
             Assert.Equal(json_1, json_2);
         }
     }
-
-
-
 }

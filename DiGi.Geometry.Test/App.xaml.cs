@@ -8,5 +8,4 @@ namespace DiGi.Geometry.Test
     public partial class App : Application
     {
     }
-
 }

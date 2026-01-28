@@ -6,7 +6,7 @@ namespace DiGi.Core.xUnit
         public void IndexDoubles()
         {
             Core.Classes.IndexedDoubles indexDoubles_1 = [];
-            
+
             Random random = new();
 
             while (random.NextDouble() < 0.4)

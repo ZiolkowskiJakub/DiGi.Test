@@ -19,9 +19,8 @@ namespace DiGi.Core.Test.Classes
         }
 
         public TestSerializableObject(JsonObject jsonObject)
-            :base(jsonObject)
+            : base(jsonObject)
         {
-
         }
     }
 }

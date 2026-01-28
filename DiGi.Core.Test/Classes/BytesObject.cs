@@ -9,7 +9,6 @@ namespace DiGi.Core.Test.Classes
         [JsonInclude, JsonPropertyName("Bytes")]
         private byte[] bytes;
 
-
         public BytesObject(byte[] bytes)
             : base()
         {
@@ -17,9 +16,8 @@ namespace DiGi.Core.Test.Classes
         }
 
         public BytesObject(JsonObject jsonObject)
-            :base(jsonObject)
+            : base(jsonObject)
         {
-
         }
 
         [JsonIgnore]

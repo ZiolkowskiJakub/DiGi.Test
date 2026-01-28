@@ -1,6 +1,6 @@
 using DiGi.Analytical.Building.Classes;
-using DiGi.Geometry.Spatial.Classes;
 using DiGi.Core.Interfaces;
+using DiGi.Geometry.Spatial.Classes;
 
 namespace DiGi.Analytical.xUnit
 {
@@ -11,7 +11,7 @@ namespace DiGi.Analytical.xUnit
         {
             Plane? plane = Geometry.Spatial.Create.Plane(0.0);
 
-            PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane, 
+            PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane,
             [
                 new Geometry.Planar.Classes.Point2D(0, 0),
                 new Geometry.Planar.Classes.Point2D(0, 10),
@@ -19,33 +19,31 @@ namespace DiGi.Analytical.xUnit
                 new Geometry.Planar.Classes.Point2D(10, 10)
             ]);
 
-            FaceFloor faceFloor = new (polygonalFace3D);
+            FaceFloor faceFloor = new(polygonalFace3D);
 
             Assert.NotNull(faceFloor?.Geometry);
 
             Space space = new(new Point3D(0, 0, 0), "Space 1");
 
-            SpaceRelation spaceRelation = new (faceFloor, space);
+            SpaceRelation spaceRelation = new(faceFloor, space);
 
             Assert.NotNull(spaceRelation?.UniqueReferences);
 
-            if(spaceRelation.UniqueReferences is List<IUniqueReference> uniqueReferences)
+            if (spaceRelation.UniqueReferences is List<IUniqueReference> uniqueReferences)
             {
                 return;
             }
 
             Assert.Equal(2, spaceRelation.UniqueReferences.Count);
 
-            if(spaceRelation.UniqueReferences.Count != 2)
-            {  
-                return; 
+            if (spaceRelation.UniqueReferences.Count != 2)
+            {
+                return;
             }
 
             IUniqueReference? uniqueReference = Core.Create.UniqueReference(faceFloor);
 
             Assert.True(spaceRelation.UniqueReferences.Contains(uniqueReference));
-
-
         }
     }
 }

@@ -15,14 +15,13 @@ namespace DiGi.Geometry.xUnit
         {
             Polygon2D polygon2D;
 
-            polygon2D = new ([new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10)]);
+            polygon2D = new([new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10)]);
 
             Assert.True(Core.Enums.Orientation.CounterClockwise == polygon2D.Orientation());
 
             polygon2D = new([new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0)]);
 
             Assert.True(Core.Enums.Orientation.Clockwise == polygon2D.Orientation());
-
 
             PolygonalFace3D? polygonalFace3D_1;
             PolygonalFace3D? polygonalFace3D_2;
@@ -33,14 +32,13 @@ namespace DiGi.Geometry.xUnit
             Orientation orientation_1;
             Orientation orientation_2;
 
-
             //Case 1
             polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0));
 
             polygonal3D_1 = polygonalFace3D_1?.ExternalEdge;
 
             Assert.NotNull(polygonal3D_1);
-            if(polygonal3D_1 is null)
+            if (polygonal3D_1 is null)
             {
                 return;
             }
@@ -59,7 +57,6 @@ namespace DiGi.Geometry.xUnit
             orientation_2 = polygonal3D_2.Orientation();
 
             Assert.True(orientation_1.Opposite() == orientation_2);
-
 
             //Case 2
             polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0));
@@ -120,8 +117,6 @@ namespace DiGi.Geometry.xUnit
             orientation_2 = polygonal3D_2.Orientation();
 
             Assert.True(orientation_1.Opposite() == orientation_2);
-
-
         }
     }
 }

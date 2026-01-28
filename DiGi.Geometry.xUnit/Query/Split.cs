@@ -32,17 +32,17 @@ namespace DiGi.Geometry.xUnit
             Assert.True(Spatial.Query.TrySplit(new Plane(Create.Plane(1.0)), polyhedron, out List<Polyhedron>? polyhedrons));
 
             Assert.NotNull(polyhedrons);
-            if(polyhedrons is null)
+            if (polyhedrons is null)
             {
                 return;
             }
 
-            foreach(Polyhedron polyhedron_Split in polyhedrons)
+            foreach (Polyhedron polyhedron_Split in polyhedrons)
             {
                 Point3D? internalPoint = polyhedron_Split?.GetInternalPoint();
                 Assert.NotNull(internalPoint);
 
-                if(internalPoint is null)
+                if (internalPoint is null)
                 {
                     continue;
                 }

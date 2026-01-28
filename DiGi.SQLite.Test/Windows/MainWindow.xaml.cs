@@ -77,7 +77,7 @@ namespace DiGi.SQLite.Test
             TestClass2 testClass2_2 = new TestClass2() { Parameter1 = 11, Parent = testClass2_1 };
 
             TestClass3 testClass3 = new TestClass3(Guid.Parse("eafaf6d0-3fd3-4d4d-ae39-d84bc28002f7")) { Parent = testClass2_2 };
-            testClass3.TestClasses = new List<TestClass1>() { testClass1 , testClass1 };
+            testClass3.TestClasses = new List<TestClass1>() { testClass1, testClass1 };
 
             List<ISerializableObject> serializableObjects = new List<ISerializableObject>
             {
@@ -88,7 +88,7 @@ namespace DiGi.SQLite.Test
             };
 
             Dictionary<UniqueReference, ISerializableObject> dictionary = new Dictionary<UniqueReference, ISerializableObject>();
-            foreach(ISerializableObject serializableObject in serializableObjects)
+            foreach (ISerializableObject serializableObject in serializableObjects)
             {
                 dictionary[Create.UniqueReference(serializableObject)] = serializableObject;
             }
@@ -128,7 +128,7 @@ namespace DiGi.SQLite.Test
 
         private void ReferenceTest()
         {
-            List<TestClass3> testClass3s = new List<TestClass3>() { new TestClass3() , new TestClass3() , new TestClass3() };
+            List<TestClass3> testClass3s = new List<TestClass3>() { new TestClass3(), new TestClass3(), new TestClass3() };
 
             List<UniqueReference> uniqueReferences = new List<UniqueReference>();
             uniqueReferences.AddRange(testClass3s.ConvertAll(x => new GuidReference(x)));
@@ -137,7 +137,6 @@ namespace DiGi.SQLite.Test
             uniqueReferences.Add(new UniqueIdReference(uniqueReferences[0].TypeReference.FullTypeName, Core.Query.UniqueId(testClass3s[0].Guid)));
 
             uniqueReferences.Remove(uniqueReferences[0]);
-
         }
     }
 }

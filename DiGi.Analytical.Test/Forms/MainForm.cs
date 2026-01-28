@@ -39,7 +39,7 @@ namespace DiGi.Analytical.Test
             Profile profile_2 = new Profile([100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123]);
 
             InternalCondition internalCondition_2 = new InternalCondition("Internal Condition 2") { Description = "Internal Condition 2" };
-            internalCondition_2.SetProfile(internalGainProfileType,profile_2);
+            internalCondition_2.SetProfile(internalGainProfileType, profile_2);
 
             Space space = new Space(new Geometry.Spatial.Classes.Point3D(0, 0, 0), "Space");
 

@@ -11,13 +11,11 @@ namespace DiGi.SQLite.Test.Classes
 
         public TestClass1()
         {
-
         }
 
         public TestClass1(JsonObject jsonObject)
             : base(jsonObject)
         {
-
         }
     }
 }

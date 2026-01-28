@@ -38,31 +38,30 @@ namespace DiGi.Tas.Test
             string path_TIC = @"C:\Users\Public\Documents\Tas Data\Databases\InternalConditions.tic";
 
             List<InternalCondition>? internalConditions = null;
-            using (TIC.Classes.Document document_1 = new (path_TIC))
+            using (TIC.Classes.Document document_1 = new(path_TIC))
             {
                 internalConditions = document_1.InternalConditions();
             }
 
-            if(internalConditions is null)
+            if (internalConditions is null)
             {
                 return;
             }
 
             string path_ICF = @"C:\Users\jakub\Downloads\InternalConditions.icf";
 
-            if(File.Exists(path_ICF))
+            if (File.Exists(path_ICF))
             {
                 File.Delete(path_ICF);
             }
 
-            using (InternalConditionsFile internalConditionFile = new (path_ICF))
+            using (InternalConditionsFile internalConditionFile = new(path_ICF))
             {
                 internalConditionFile.Open();
 
                 internalConditionFile.Values = internalConditions;
                 internalConditionFile.Save();
             }
-
         }
     }
 }

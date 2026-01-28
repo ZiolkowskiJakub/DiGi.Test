@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         Title="DiGi Core" Height="450" Width="800">
     <Grid>
-        <Button x:Name="Button_Test1" Content="Test 1" HorizontalAlignment="Left" Margin="220,97,0,0" VerticalAlignment="Top" Click="Button_Test1_Click"/>
-
+        <Button x:Name="Button_Test1" Content="Test 1" HorizontalAlignment="Left" Margin="220,97,0,0" VerticalAlignment="Top" Click="Button_Test1_Click" />
     </Grid>
 </Window>

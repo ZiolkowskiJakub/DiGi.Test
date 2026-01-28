@@ -1,10 +1,10 @@
-﻿using System.Windows;
+﻿using DiGi.Geometry.Core.Classes;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
-using DiGi.Geometry.Visual.Planar.Classes;
 using DiGi.Geometry.Visual.Core.Classes;
-using DiGi.Geometry.Core.Classes;
+using DiGi.Geometry.Visual.Planar.Classes;
+using System.Windows;
 
 namespace DiGi.Geometry.Test
 {
@@ -47,7 +47,6 @@ namespace DiGi.Geometry.Test
             //    new Point2D(5, 10),
             //     new Point2D(5, -10),
             //});
-
 
             //List<Point2D> point2Ds = Query.LongestPath(new ISegmentable2D[] { rectangle2D, polyline2D }, new Point2D(5, -10));
 
@@ -96,7 +95,6 @@ namespace DiGi.Geometry.Test
 
             //selfIntersect = Planar.Query.SelfIntersect(polyline2D);
 
-
             //Vector2D widthDirection = rectangle2D.WidthDirection;
             //Vector2D heightDirection = rectangle2D.HeightDirection;
 
@@ -117,12 +115,9 @@ namespace DiGi.Geometry.Test
 
             //geometryCollection2D.Transform(Transform2D.GetTranslation(1, 1));
 
-
             //string json = DiGi.Core.Convert.ToString((ISerializableObject)geometryCollection2D);
 
             //GeometryCollection2D? geometryCollection2D_Converted = DiGi.Core.Convert.ToDiGi<GeometryCollection2D>(json)?.FirstOrDefault();
-
-
 
             //double s = 1;
 
@@ -132,7 +127,6 @@ namespace DiGi.Geometry.Test
 
             //Vector2D vector2D_2 = new Vector2D(0, -6);
 
-
             //List<KeyValuePair<double, double>> values = new List<KeyValuePair<double, double>>();
             //values.Add(new KeyValuePair<double, double>(1, 2));
             //values.Add(new KeyValuePair<double, double>(3, 5));
@@ -140,8 +134,6 @@ namespace DiGi.Geometry.Test
             //JsonValue jsonValue_Temp = JsonValue.Create(values);
 
             //List<KeyValuePair<double, double>> values_Temp = jsonValue_Temp.GetValue<List<KeyValuePair<double, double>>>();
-
-
 
             //Point2D point2D = new Point2D(1, 1);
             //Vector2D vector2D_3 = new Vector2D(0, 1);
@@ -156,9 +148,6 @@ namespace DiGi.Geometry.Test
 
             //CoordinateSystem2D coordinateSystem2D = new CoordinateSystem2D();
 
-
-
-
             //List<int[]> indexes = new List<int[]>() { new int[] {1, 2, 3 }, new int[] { 2, 2, 3 } };
 
             //JsonValue jsonValue = JsonValue.Create(indexes);
@@ -166,7 +155,6 @@ namespace DiGi.Geometry.Test
             //List<int[]> indexes_Temp = jsonValue.GetValue<List<int[]>>();
 
             //bool collinear = (new Line2D(new Point2D(0, 0), vector2D_1)).Collinear(new Line2D(new Point2D(2, 2), vector2D_2));
-
 
             //Vector2D vector2D = new Vector2D(10, 11);
 
@@ -183,7 +171,6 @@ namespace DiGi.Geometry.Test
             //Point2D point2D_Temp = Planar.Query.Point(point2Ds, parameter);
 
             //JsonNode jsonNode = JsonNode.Parse(json);
-
 
             //ISerializableObject serializableObject = Create.SerializableObject<ISerializableObject>(jsonNode.AsObject());
         }
@@ -213,8 +200,6 @@ namespace DiGi.Geometry.Test
             point2Ds.Add(ellipse2D.GetPoint((-1, -1)));
             point2Ds.Add(ellipse2D.GetPoint((0, -1)));
             point2Ds.Add(ellipse2D.GetPoint((1, -1)));
-
-
         }
 
         private static void OffsetTest()
@@ -234,7 +219,6 @@ namespace DiGi.Geometry.Test
                 new Point2D(20, 11),
                 new Point2D(0, 11),
             });
-
 
             List<Polygon2D> polygon2Ds_Offset = Planar.Query.Offset(polygon2D, -1);
         }
@@ -277,7 +261,7 @@ namespace DiGi.Geometry.Test
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(polygonalFace3D, new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
         }
 
-        private static void PlanarIntersectionTest_1() 
+        private static void PlanarIntersectionTest_1()
         {
             DateTime dateTime = DateTime.Now;
 
@@ -305,7 +289,6 @@ namespace DiGi.Geometry.Test
             double seconds = (DateTime.Now - dateTime).TotalSeconds;
 
             MessageBox.Show(seconds.ToString());
-
         }
 
         private static void PlanarIntersectionTest_2()
@@ -332,7 +315,7 @@ namespace DiGi.Geometry.Test
                 new Point2D(5, 20)
             });
 
-            Polygon3D polygon3D = Create.Polygon3D(new List<Point3D>() 
+            Polygon3D polygon3D = Create.Polygon3D(new List<Point3D>()
             {
                 new Point3D(2, 5, -1),
                 new Point3D(2, 20, -1),
@@ -342,7 +325,7 @@ namespace DiGi.Geometry.Test
 
             PolygonalFace3D polygonalFace3D_2 = Create.PolygonalFace3D(polygon3D);
 
-             polygon3D = Create.Polygon3D(new List<Point3D>()
+            polygon3D = Create.Polygon3D(new List<Point3D>()
             {
                 new Point3D(2, 5, -1),
                 new Point3D(2, 5, 1),
@@ -356,7 +339,7 @@ namespace DiGi.Geometry.Test
             {
                 //PlanarIntersectionResult planarIntersectionResult = Spatial.Create.PlanarIntersectionResult((VolatilePolygonalFace3D)polygonalFace3D_1, new VolatilePolygonalFace3D[] { polygonalFace3D_2, polygonalFace3D_3 });
 
-                Query.TrySplit(polygonalFace3D_1, [ polygonalFace3D_2, polygonalFace3D_3 ], out List<PolygonalFace3D> polygonalFace3Ds);
+                Query.TrySplit(polygonalFace3D_1, [polygonalFace3D_2, polygonalFace3D_3], out List<PolygonalFace3D> polygonalFace3Ds);
 
                 //List<IGeometry3D> geometry3Ds = planarIntersectionResult.GetGeometry3Ds<IGeometry3D>();
             }
@@ -364,12 +347,10 @@ namespace DiGi.Geometry.Test
             double seconds = (DateTime.Now - dateTime).TotalSeconds;
 
             MessageBox.Show(seconds.ToString());
-
         }
 
-        private static void PolyhedronTest() 
+        private static void PolyhedronTest()
         {
-
             DateTime dateTime = DateTime.Now;
 
             Polygon2D polygon2D = new Polygon2D(new List<Point2D>()
@@ -398,7 +379,6 @@ namespace DiGi.Geometry.Test
                 //string text = DiGi.Core.Convert.ToString(polyhedron);
 
                 //Polyhedron polyhedron_1 = DiGi.Core.Convert.ToDiGi<Polyhedron>(text)?.FirstOrDefault();
-
 
                 //@bools.Add(text == DiGi.Core.Convert.ToString(polyhedron));
             }
@@ -460,8 +440,6 @@ namespace DiGi.Geometry.Test
             Polyhedron polyhedron = Create.Polyhedron(polygonalFace3D, vector3D);
 
             DiGi.Core.Convert.ToSystem_FileInfo(polyhedron, @"C:\Users\jakub\Nextcloud\DiGi\Polyhedron.json");
-
-
         }
 
         private static void VisualTest()
@@ -481,7 +459,6 @@ namespace DiGi.Geometry.Test
             //Type type = typeof(Dictionary<Point3D, int>);
             //IDictionary dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(new[] { type.GenericTypeArguments[0], type.GenericTypeArguments[1] }));
 
-
             //Dictionary<string, int> ttt = new Dictionary<string, int>();
             //ttt.Add("AAAA a", 1);
 
@@ -494,7 +471,6 @@ namespace DiGi.Geometry.Test
 
             int count = DiGi.Core.Query.DecimalPlacesCount(0.0001);
 
-
             List<Point3D> point3Ds = new List<Point3D>();
             point3Ds.Add(0, 0, 0);
             point3Ds.Add(0.000001, 0, 0);
@@ -503,7 +479,6 @@ namespace DiGi.Geometry.Test
             point3Ds.Add(1, 1, 1);
 
             DensityBasedSpatialClusteringResult<Point3D> densityBasedSpatialClusteringResult = Core.Create.DensityBasedSpatialClusteringResult(point3Ds, 0.001, 1);
-
 
             string json = DiGi.Core.Convert.ToSystem_String(densityBasedSpatialClusteringResult);
 

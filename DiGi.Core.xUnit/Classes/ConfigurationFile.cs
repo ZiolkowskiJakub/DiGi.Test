@@ -9,8 +9,8 @@ namespace DiGi.Core.xUnit
         {
             ConfigurationFile? configurationFile;
 
-            configurationFile = new ();
-            
+            configurationFile = new();
+
             object? value;
 
             configurationFile.Add("SOME_PROPERTY 1", "VALUE");

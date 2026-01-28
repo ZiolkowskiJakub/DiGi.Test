@@ -38,7 +38,7 @@ namespace DiGi.Analytical.xUnit
 
             GuidReference guidReference = new GuidReference(faceFloor);
 
-            Analytical.Classes.Face face = new (guidReference, polygonalFace3D_New);
+            Analytical.Classes.Face face = new(guidReference, polygonalFace3D_New);
 
             BuildingModelFaceUpdater buildingModelFaceUpdater = new(buildingModel)
             {
@@ -55,13 +55,12 @@ namespace DiGi.Analytical.xUnit
 
             Assert.NotNull(polygonalFace3D_Component);
 
-            if(polygonalFace3D_Component is null)
+            if (polygonalFace3D_Component is null)
             {
                 return;
             }
 
             Assert.True(Core.Query.AlmostEquals(25, polygonalFace3D_Component.GetArea()));
-
         }
     }
 }

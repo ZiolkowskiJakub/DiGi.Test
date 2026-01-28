@@ -7,7 +7,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Offset()
         {
-            Rectangle2D rectangle2D = new (10, 10);
+            Rectangle2D rectangle2D = new(10, 10);
 
             Rectangle2D? rectangle2D_Offset_1 = Planar.Query.Offset(rectangle2D, 2);
             Assert.NotNull(rectangle2D_Offset_1);
@@ -21,7 +21,7 @@ namespace DiGi.Geometry.xUnit
 
             Assert.True(rectangle2D_Offset_1.GetArea() > rectangle2D_Offset_2.GetArea());
 
-            Polygon2D polygon2D = new (rectangle2D);
+            Polygon2D polygon2D = new(rectangle2D);
 
             Polygon2D? polygon2D_Offset_1 = Planar.Query.Offset(polygon2D, 2)?.FirstOrDefault();
             Assert.NotNull(polygon2D_Offset_1);

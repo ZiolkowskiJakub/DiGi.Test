@@ -13,21 +13,18 @@ namespace DiGi.SQLite.Test.Classes
         public List<TestClass1> TestClasses { get; set; }
 
         public TestClass3()
-            :base()
+            : base()
         {
-
         }
 
         public TestClass3(Guid guid)
             : base(guid)
         {
-
         }
 
         public TestClass3(JsonObject jsonObject)
             : base(jsonObject)
         {
-
         }
     }
 }

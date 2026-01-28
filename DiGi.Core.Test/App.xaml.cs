@@ -8,5 +8,4 @@ namespace DiGi.Core.Test
     public partial class App : Application
     {
     }
-
 }

@@ -13,7 +13,7 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(json_Expected);
 
             //Conversion
-            
+
             List<TSerializableObject>? serializableObjects_Actual = Convert.ToDiGi<TSerializableObject>(json_Expected);
 
             Assert.NotNull(serializableObjects_Actual);

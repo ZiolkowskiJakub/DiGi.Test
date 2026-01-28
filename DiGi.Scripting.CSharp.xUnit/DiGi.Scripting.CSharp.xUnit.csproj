@@ -1,38 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <PropertyGroup>
+	    <TargetFramework>net8.0</TargetFramework>
 
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+	    <LangVersion>latest</LangVersion>
+	    <OutputPath>..\bin\</OutputPath>
+	    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	    <Nullable>enable</Nullable>
 
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.0.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="System.Text.Json" Version="10.0.2" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	    <ImplicitUsings>enable</ImplicitUsings>
+	    <IsPackable>false</IsPackable>
+	    <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
-    <ProjectReference Include="..\..\DiGi.Scripting\DiGi.Scripting.CSharp\DiGi.Scripting.CSharp.csproj" />
-    <ProjectReference Include="..\..\DiGi.Scripting\DiGi.Scripting\DiGi.Scripting.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	<PackageReference Include="coverlet.collector" Version="6.0.4">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.0.0" />
+	<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+	<PackageReference Include="System.Text.Json" Version="10.0.2" />
+	<PackageReference Include="xunit" Version="2.9.3" />
+	<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
+	<ItemGroup>
+	<ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+	<ProjectReference Include="..\..\DiGi.Scripting\DiGi.Scripting.CSharp\DiGi.Scripting.CSharp.csproj" />
+	<ProjectReference Include="..\..\DiGi.Scripting\DiGi.Scripting\DiGi.Scripting.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	<Using Include="Xunit" />
+	</ItemGroup>
 
 </Project>

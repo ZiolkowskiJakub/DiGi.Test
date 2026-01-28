@@ -8,5 +8,4 @@ namespace DiGi.SQLite.Test
     public partial class App : Application
     {
     }
-
 }

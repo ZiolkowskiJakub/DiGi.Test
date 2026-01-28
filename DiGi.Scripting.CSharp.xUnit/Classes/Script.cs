@@ -20,7 +20,7 @@ namespace DiGi.Scripting.CSharp.xUnit
             script.References = references;
             Dictionary<string, object> dictionary = [];
             dictionary["a"] = 10;
-            
+
             Response? response = script.Execute(new Data(dictionary));
 
             Assert.NotNull(response);
@@ -28,7 +28,6 @@ namespace DiGi.Scripting.CSharp.xUnit
             Assert.Null(response.Exception);
 
             Assert.True(response.Succeeded);
-
         }
     }
 }

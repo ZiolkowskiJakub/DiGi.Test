@@ -37,14 +37,12 @@ namespace DiGi.Core.Test.Classes
         [JsonInclude, JsonPropertyName("SortedDictionary")]
         public SortedDictionary<int, string> SortedDictionary = new SortedDictionary<int, string>();
 
-
         public TestObject(string name)
             : base()
         {
             this.name = name;
             uniqueReference = new GuidReference(this);
         }
-
 
         public TestObject(string name, double min, double max)
             : base()
@@ -68,9 +66,8 @@ namespace DiGi.Core.Test.Classes
         }
 
         public TestObject(JsonObject jsonObject)
-            :base(jsonObject)
+            : base(jsonObject)
         {
-
         }
 
         [JsonIgnore]

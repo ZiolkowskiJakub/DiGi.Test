@@ -25,9 +25,8 @@ namespace DiGi.Core.Test.Classes
         }
 
         public EnumObject(JsonObject jsonObject)
-            :base(jsonObject)
+            : base(jsonObject)
         {
-
         }
     }
 }

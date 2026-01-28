@@ -2,7 +2,6 @@ using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 
-
 namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
@@ -40,7 +39,7 @@ namespace DiGi.Geometry.xUnit
 
             planarIntersectionResult = Create.PlanarIntersectionResult(plane, point3D_1, point3D_2, true, true);
             Assert.NotNull(planarIntersectionResult);
-            if(planarIntersectionResult is not null)
+            if (planarIntersectionResult is not null)
             {
                 Assert.True(planarIntersectionResult.Intersect);
 
@@ -109,8 +108,6 @@ namespace DiGi.Geometry.xUnit
                     Assert.True(linear3D.On(point3D_2));
                 }
             }
-
-
         }
     }
 }
