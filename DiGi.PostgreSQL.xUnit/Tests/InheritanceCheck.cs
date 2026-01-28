@@ -1,5 +1,5 @@
-using DiGi.Core;
 using DiGi.Core.Classes;
+using DiGi.Core.Interfaces;
 using DiGi.PostgreSQL.Classes;
 using System.Reflection;
 using Xunit.Sdk;
@@ -9,7 +9,7 @@ namespace DiGi.PostgreSQL.xUnit
     public partial class Tests
     {
         [Fact]
-        public async Task InsertData()
+        public async Task InheritanceCheck()
         {
             string? directory = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.NotNull(directory);
@@ -32,18 +32,23 @@ namespace DiGi.PostgreSQL.xUnit
             PostgreSQLConverter postgreSQLConverter = new (connectionData);
 
             Address address_1 = new("123 Main St", "Anytown", "CA", Core.Enums.CountryCode.Undefined);
+            Address address_3 = new("1234 Main St", "Anytown", "CA", Core.Enums.CountryCode.Undefined);
 
-            UniqueReference? uniqueReference_1 = await postgreSQLConverter.UpdateAsync(address_1);
-            Assert.NotNull(uniqueReference_1);
+            Size size_1 = new() { Height = 10.0, Width = 5.0 };
+            Size size_2 = new() { Height = 20.0, Width = 15.0 };
 
-            Address? address_2 = await postgreSQLConverter.GetSerializableObjects<Address>(uniqueReference_1);
-            Assert.NotNull(uniqueReference_1);
+            List<UniqueReference>? uniqueReferences_1 = await postgreSQLConverter.UpdateAsync([(ISerializableObject)address_1, address_3, size_1, size_2]);
+            Assert.NotNull(uniqueReferences_1);
 
-            Assert.Equal(address_1.ToSystem_String(), address_2.ToSystem_String());
+            List<ISerializableObject>? serializableObjects = await postgreSQLConverter.GetSerializableObjects<ISerializableObject>();
+            Assert.NotNull(serializableObjects);
 
-            UniqueReference? uniqueReference_2 = await postgreSQLConverter.RemoveAsync(uniqueReference_1);
+            Assert.Equal(uniqueReferences_1.Count, serializableObjects.Count);
 
-            Assert.Equal(uniqueReference_1.ToSystem_String(), uniqueReference_2.ToSystem_String());
+            List<UniqueReference>? uniqueReferences_2 = await postgreSQLConverter.RemoveAsync(uniqueReferences_1);
+            Assert.NotNull(uniqueReferences_2);
+
+            Assert.Equal(uniqueReferences_2.Count, uniqueReferences_1.Count);
         }
     }
 }
