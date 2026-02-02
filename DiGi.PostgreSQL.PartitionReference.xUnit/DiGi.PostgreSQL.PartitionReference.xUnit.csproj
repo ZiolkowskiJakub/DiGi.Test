@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+
+		<LangVersion>latest</LangVersion>
+		<OutputPath>..\bin\</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<Nullable>enable</Nullable>
+
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="6.0.4">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Xunit.SkippableFact" Version="1.5.61" />
+	</ItemGroup>
+
+	<Target Name="CopyFiles" AfterTargets="Build">
+		<!-- List files to copy -->
+		<ItemGroup Condition="Exists('$(ProjectDir)..\user files\PostgreSQL_PartitionReference.conf')">
+			<Files Include="$(ProjectDir)..\user files\PostgreSQL_PartitionReference.conf" />
+		</ItemGroup>
+
+		<!-- Copy them to bin directory -->
+		<Copy SourceFiles="@(Files)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+	</Target>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+		<ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL.PartitionReference\DiGi.PostgreSQL.PartitionReference.csproj" />
+		<ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL\DiGi.PostgreSQL.csproj" />
+		<ProjectReference Include="..\DiGi.PostgreSQL.xUnit\DiGi.PostgreSQL.xUnit.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Xunit" />
+	</ItemGroup>
+
+</Project>

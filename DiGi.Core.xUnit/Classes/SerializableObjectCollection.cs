@@ -21,7 +21,7 @@ namespace DiGi.Core.xUnit
             JsonObject? jsonObject = JsonNode.Parse(jsonString_1) as JsonObject;
             Assert.NotNull(jsonObject);
 
-            Core.Classes.SerializableObjectCollection? serializableObjectCollection_2 = Core.Create.SerializableObject<Core.Classes.SerializableObjectCollection>(jsonObject);
+            Core.Classes.SerializableObjectCollection? serializableObjectCollection_2 = Create.SerializableObject<Core.Classes.SerializableObjectCollection>(jsonObject);
             Assert.NotNull(serializableObjectCollection_2);
 
             for (int i = 0; i < count; i++)

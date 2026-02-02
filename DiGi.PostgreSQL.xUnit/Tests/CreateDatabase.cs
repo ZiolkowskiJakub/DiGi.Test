@@ -7,7 +7,13 @@ namespace DiGi.PostgreSQL.xUnit
         [Fact]
         public async Task CreateDatabase()
         {
-            ConnectionData connectionData = Create.ConnectionData();
+            ConnectionData connectionData;
+
+            connectionData = Create.ConnectionData(Enums.StorageMethod.PartitionReference);
+
+            Assert.True(await PostgreSQL.Create.Database(connectionData));
+
+            connectionData = Create.ConnectionData(Enums.StorageMethod.UniqueReference);
 
             Assert.True(await PostgreSQL.Create.Database(connectionData));
         }

@@ -1,14 +1,15 @@
 using DiGi.Core.Classes;
 using DiGi.PostgreSQL.Classes;
+using DiGi.PostgreSQL.UniqueReference.Classes;
 
-namespace DiGi.PostgreSQL.xUnit
+namespace DiGi.PostgreSQL.UniqueReference.xUnit
 {
     public partial class Tests
     {
         [SkippableFact]
         public async Task MultipleUpdateAsyncCheck()
         {
-            ConnectionData connectionData = Create.ConnectionData();
+            ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(Enums.StorageMethod.UniqueReference);
 
             PostgreSQLConverter postgreSQLConverter = new(connectionData);
 
@@ -26,7 +27,7 @@ namespace DiGi.PostgreSQL.xUnit
 
             count++;
 
-            HashSet<UniqueReference>? uniqueReferences_1 = await postgreSQLConverter.UpdateAsync(addresses);
+            HashSet<Core.Classes.UniqueReference>? uniqueReferences_1 = await postgreSQLConverter.UpdateAsync(addresses);
             Assert.NotNull(uniqueReferences_1);
 
             long count_Temp = await postgreSQLConverter.CountAsync<Address>();
