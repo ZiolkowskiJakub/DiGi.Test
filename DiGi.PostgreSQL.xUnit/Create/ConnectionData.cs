@@ -1,5 +1,4 @@
 using DiGi.PostgreSQL.Classes;
-using System.Globalization;
 using System.Reflection;
 
 namespace DiGi.PostgreSQL.xUnit
@@ -14,7 +13,7 @@ namespace DiGi.PostgreSQL.xUnit
             Assert.NotNull(directory);
 
             string? fileName = null;
-            switch(storageMethod)
+            switch (storageMethod)
             {
                 case Enums.StorageMethod.UniqueReference:
                     fileName = "PostgreSQL_UniqueReference.conf";

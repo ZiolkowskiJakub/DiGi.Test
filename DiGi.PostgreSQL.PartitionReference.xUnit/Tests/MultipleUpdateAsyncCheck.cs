@@ -11,8 +11,8 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
         {
             ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(Enums.StorageMethod.PartitionReference);
 
-            PostgreSQLConverter postgreSQLConverter = new(connectionData);
-            postgreSQLConverter.PartitionReferenceGenerating += PostgreSQLConverter_PartitionReferenceGenerating;
+            PartitionReferencePostgreSQLConverter partitionReferencePostgreSQLConverter = new(connectionData);
+            partitionReferencePostgreSQLConverter.PartitionReferenceGenerating += PartitionReferencePostgreSQLConverter_PartitionReferenceGenerating;
 
             List<Address> addresses = [];
 
@@ -28,7 +28,7 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 
             count++;
 
-            HashSet<Classes.PartitionReference>? uniqueReferences_1 = await postgreSQLConverter.UpdateAsync(addresses);
+            HashSet<Classes.PartitionReference>? uniqueReferences_1 = await partitionReferencePostgreSQLConverter.UpdateAsync(addresses);
             Assert.NotNull(uniqueReferences_1);
 
             Assert.NotEmpty(uniqueReferences_1);
@@ -36,20 +36,20 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
             string? name = uniqueReferences_1.ElementAt(0).Name;
             Assert.False(string.IsNullOrEmpty(name));
 
-            long count_Temp = await postgreSQLConverter.CountAsync(name);
+            long count_Temp = await partitionReferencePostgreSQLConverter.CountAsync(name);
             Assert.Equal(count, count_Temp);
 
-            bool removed = await postgreSQLConverter.RemoveAsync(name);
+            bool removed = await partitionReferencePostgreSQLConverter.RemoveAsync(name);
 
             Assert.True(removed);
 
-            List<Address>? addresses_Temp = await postgreSQLConverter.GetSerializableObjects<Address>(name);
+            List<Address>? addresses_Temp = await partitionReferencePostgreSQLConverter.GetSerializableObjects<Address>(name);
             Assert.True(addresses_Temp is not null && addresses_Temp.Count == 0);
         }
 
-        private void PostgreSQLConverter_PartitionReferenceGenerating(object sender, PartitionReferenceGeneratingEventArgs e)
+        private void PartitionReferencePostgreSQLConverter_PartitionReferenceGenerating(object sender, PartitionReferenceGeneratingEventArgs e)
         {
-            if(e.Item is not Core.Interfaces.ISerializableObject serializableObject)
+            if (e.Item is not Core.Interfaces.ISerializableObject serializableObject)
             {
                 e.PartitionReference = null;
                 return;

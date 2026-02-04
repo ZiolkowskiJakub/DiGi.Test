@@ -1,4 +1,6 @@
 using DiGi.Core.Classes;
+using System.Collections.Generic;
+using System.IO;
 
 namespace DiGi.Core.xUnit
 {

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace DiGi.Core.xUnit
 {
     public partial class Classes

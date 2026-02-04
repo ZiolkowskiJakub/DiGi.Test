@@ -1,5 +1,7 @@
 using DiGi.Core.Enums;
 using DiGi.Core.Interfaces;
+using System.Collections.Generic;
+using System.IO;
 
 namespace DiGi.Core.xUnit
 {

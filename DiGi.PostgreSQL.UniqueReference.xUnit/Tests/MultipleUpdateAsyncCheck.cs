@@ -11,7 +11,7 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
         {
             ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(Enums.StorageMethod.UniqueReference);
 
-            PostgreSQLConverter postgreSQLConverter = new(connectionData);
+            UniqueReferencePostgreSQLConverter uniqueReferencePostgreSQLConverter = new(connectionData);
 
             List<Address> addresses = [];
 
@@ -27,17 +27,17 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 
             count++;
 
-            HashSet<Core.Classes.UniqueReference>? uniqueReferences_1 = await postgreSQLConverter.UpdateAsync(addresses);
+            HashSet<Core.Classes.UniqueReference>? uniqueReferences_1 = await uniqueReferencePostgreSQLConverter.UpdateAsync(addresses);
             Assert.NotNull(uniqueReferences_1);
 
-            long count_Temp = await postgreSQLConverter.CountAsync<Address>();
+            long count_Temp = await uniqueReferencePostgreSQLConverter.CountAsync<Address>();
             Assert.Equal(count, count_Temp);
 
-            bool removed = await postgreSQLConverter.RemoveAsync<Address>(false);
+            bool removed = await uniqueReferencePostgreSQLConverter.RemoveAsync<Address>(false);
 
             Assert.True(removed);
 
-            List<Address>? addresses_Temp = await postgreSQLConverter.GetSerializableObjects<Address>();
+            List<Address>? addresses_Temp = await uniqueReferencePostgreSQLConverter.GetSerializableObjects<Address>();
             Assert.True(addresses_Temp is not null && addresses_Temp.Count == 0);
         }
     }

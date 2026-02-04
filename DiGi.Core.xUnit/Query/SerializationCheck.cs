@@ -1,4 +1,6 @@
 using DiGi.Core.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DiGi.Core.xUnit
 {

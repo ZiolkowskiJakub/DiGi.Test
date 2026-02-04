@@ -1,4 +1,5 @@
 using DiGi.Core.Classes;
+using System;
 
 namespace DiGi.Core.xUnit
 {
