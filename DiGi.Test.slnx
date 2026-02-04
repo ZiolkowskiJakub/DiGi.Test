@@ -1,0 +1,156 @@
+<Solution>
+  <Folder Name="/Analytical/">
+    <Project Path="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj" />
+    <Project Path="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
+    <Project Path="DiGi.Analytical.Test/DiGi.Analytical.Test.csproj" />
+    <Project Path="DiGi.Analytical.xUnit/DiGi.Analytical.xUnit.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="../DiGi.Core/DiGi.Core.Drawing/DiGi.Core.Drawing.csproj" />
+    <Project Path="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+    <Project Path="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+    <Project Path="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
+    <Project Path="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    <Project Path="DiGi.Core.Test/DiGi.Core.Test.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+    </Project>
+    <Project Path="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+  </Folder>
+  <Folder Name="/Geometry/">
+    <Project Path="../DiGi.Geometry.Random/DiGi.Geometry.Random/DiGi.Geometry.Random.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Math/DiGi.Math/DiGi.Math.csproj" />
+    </Project>
+    <Project Path="../DiGi.Geometry.Visual/DiGi.Geometry.Visual/DiGi.Geometry.Visual.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Math/DiGi.Math/DiGi.Math.csproj" />
+    </Project>
+    <Project Path="../DiGi.Geometry/DiGi.Geometry.Drawing/DiGi.Geometry.Drawing.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Drawing/DiGi.Core.Drawing.csproj" />
+    </Project>
+    <Project Path="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+    <Project Path="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Math/DiGi.Math/DiGi.Math.csproj" />
+    </Project>
+    <Project Path="DiGi.Geometry.Test/DiGi.Geometry.Test.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
+    <Project Path="DiGi.Geometry.xUnit/DiGi.Geometry.xUnit.csproj" />
+  </Folder>
+  <Folder Name="/GIS/">
+    <Project Path="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
+    <Project Path="DiGi.GIS.xUnit/DiGi.GIS.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/Math/">
+    <Project Path="../DiGi.Math/DiGi.Math/DiGi.Math.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/PostgreSQL/">
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.PartitionReference/DiGi.PostgreSQL.PartitionReference.csproj" />
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.UniqueReference/DiGi.PostgreSQL.UniqueReference.csproj" />
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL/DiGi.PostgreSQL.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.PostgreSQL.PartitionReference.xUnit/DiGi.PostgreSQL.PartitionReference.xUnit.csproj" />
+    <Project Path="DiGi.PostgreSQL.UniqueReference.xUnit/DiGi.PostgreSQL.UniqueReference.xUnit.csproj" />
+    <Project Path="DiGi.PostgreSQL.xUnit/DiGi.PostgreSQL.xUnit.csproj" />
+  </Folder>
+  <Folder Name="/Rhino/">
+    <Project Path="../DiGi.Rhino/DiGi.Rhino.Core/DiGi.Rhino.Core.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="../DiGi.Rhino/DiGi.Rhino.Geometry/DiGi.Rhino.Geometry.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry.Random/DiGi.Geometry.Random/DiGi.Geometry.Random.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Math/DiGi.Math/DiGi.Math.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/Scripting/">
+    <Project Path="../DiGi.Scripting/DiGi.Scripting.CSharp/DiGi.Scripting.CSharp.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="../DiGi.Scripting/DiGi.Scripting.Python/DiGi.Scripting.Python.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="../DiGi.Scripting/DiGi.Scripting/DiGi.Scripting.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.Scripting.CSharp.xUnit/DiGi.Scripting.CSharp.xUnit.csproj" />
+    <Project Path="DiGi.Scripting.Python.xUnit/DiGi.Scripting.Python.xUnit.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Folder Name="/SQLite/">
+    <Project Path="../DiGi.SQLite/DiGi.SQLite/DiGi.SQLite.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.SQLite.Test/DiGi.SQLite.Test.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/Tas/">
+    <Project Path="../DiGi.Tas/DiGi.Tas.Core/DiGi.Tas.Core.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
+      <BuildDependency Project="DiGi.Analytical.Test/DiGi.Analytical.Test.csproj" />
+    </Project>
+    <Project Path="../DiGi.Tas/DiGi.Tas.TBD/DiGi.Tas.TBD.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
+      <BuildDependency Project="DiGi.Analytical.Test/DiGi.Analytical.Test.csproj" />
+    </Project>
+    <Project Path="../DiGi.Tas/DiGi.Tas.TIC/DiGi.Tas.TIC.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
+      <BuildDependency Project="DiGi.Analytical.Test/DiGi.Analytical.Test.csproj" />
+    </Project>
+    <Project Path="DiGi.Tas.Test/DiGi.Tas.Test.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
+      <BuildDependency Project="DiGi.Analytical.Test/DiGi.Analytical.Test.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/Typology/">
+    <Project Path="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.Typology.xUnit/DiGi.Typology.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+  </Folder>
+</Solution>
