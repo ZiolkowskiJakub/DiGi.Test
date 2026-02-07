@@ -15,16 +15,16 @@ namespace DiGi.Geometry.xUnit
             BoundingBox2D? boundingBox2D_Fit = boundingBox2D.Fit(boundingBox2D_Temp);
             Assert.NotNull(boundingBox2D_Fit);
 
-            Assert.True(boundingBox2D.Min.Distance(boundingBox2D_Fit.Min) < DiGi.Core.Constans.Tolerance.Distance);
-            Assert.True(boundingBox2D.Max.Distance(boundingBox2D_Fit.Max) < DiGi.Core.Constans.Tolerance.Distance);
+            Assert.True(boundingBox2D.Min.Distance(boundingBox2D_Fit.Min) < DiGi.Core.Constants.Tolerance.Distance);
+            Assert.True(boundingBox2D.Max.Distance(boundingBox2D_Fit.Max) < DiGi.Core.Constants.Tolerance.Distance);
 
             Segment2D segment2D = new(new Point2D(-1, -1), new Point2D(11, 11));
 
             Segment2D? segment2D_Fit = boundingBox2D.Fit(segment2D);
             Assert.NotNull(segment2D_Fit);
 
-            Assert.True(boundingBox2D.Min.Distance(segment2D_Fit[0]) < DiGi.Core.Constans.Tolerance.Distance);
-            Assert.True(boundingBox2D.Max.Distance(segment2D_Fit[1]) < DiGi.Core.Constans.Tolerance.Distance);
+            Assert.True(boundingBox2D.Min.Distance(segment2D_Fit[0]) < DiGi.Core.Constants.Tolerance.Distance);
+            Assert.True(boundingBox2D.Max.Distance(segment2D_Fit[1]) < DiGi.Core.Constants.Tolerance.Distance);
         }
     }
 }

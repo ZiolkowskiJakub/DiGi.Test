@@ -9,7 +9,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PlanarIntersectionResult()
         {
-            Plane plane = Spatial.Constans.Plane.WorldZ;
+            Plane plane = Spatial.Constants.Plane.WorldZ;
 
             PlanarIntersectionResult? planarIntersectionResult;
             Point3D point3D_1;

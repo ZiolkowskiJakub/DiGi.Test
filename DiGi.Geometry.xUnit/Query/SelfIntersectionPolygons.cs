@@ -27,7 +27,7 @@ namespace DiGi.Geometry.xUnit
 
             Assert.Equal(4, polygon2Ds.Count);
 
-            Assert.Equal(polygonal2D.GetArea(), polygon2Ds.ConvertAll(x => x.GetArea()).Sum(), DiGi.Core.Constans.Tolerance.MacroDistance);
+            Assert.Equal(polygonal2D.GetArea(), polygon2Ds.ConvertAll(x => x.GetArea()).Sum(), DiGi.Core.Constants.Tolerance.MacroDistance);
         }
     }
 }

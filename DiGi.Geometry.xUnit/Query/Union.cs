@@ -14,7 +14,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(polygon2Ds);
             Assert.True(polygon2Ds.Count == 1);
 
-            Assert.True(DiGi.Core.Query.AlmostEquals(polygon2Ds[0].GetArea(), triangle2D_1.GetArea() + triangle2D_2.GetArea(), DiGi.Core.Constans.Tolerance.MacroDistance));
+            Assert.True(DiGi.Core.Query.AlmostEquals(polygon2Ds[0].GetArea(), triangle2D_1.GetArea() + triangle2D_2.GetArea(), DiGi.Core.Constants.Tolerance.MacroDistance));
         }
     }
 }
