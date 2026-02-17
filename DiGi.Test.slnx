@@ -60,6 +60,7 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
     </Project>
     <Project Path="DiGi.GIS.xUnit/DiGi.GIS.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
@@ -71,14 +72,27 @@
     </Project>
   </Folder>
   <Folder Name="/PostgreSQL/">
-    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.PartitionReference/DiGi.PostgreSQL.PartitionReference.csproj" />
-    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.UniqueReference/DiGi.PostgreSQL.UniqueReference.csproj" />
-    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL/DiGi.PostgreSQL.csproj">
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.PartitionReference/DiGi.PostgreSQL.PartitionReference.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
     </Project>
-    <Project Path="DiGi.PostgreSQL.PartitionReference.xUnit/DiGi.PostgreSQL.PartitionReference.xUnit.csproj" />
-    <Project Path="DiGi.PostgreSQL.UniqueReference.xUnit/DiGi.PostgreSQL.UniqueReference.xUnit.csproj" />
-    <Project Path="DiGi.PostgreSQL.xUnit/DiGi.PostgreSQL.xUnit.csproj" />
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.UniqueReference/DiGi.PostgreSQL.UniqueReference.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL/DiGi.PostgreSQL.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.PostgreSQL.PartitionReference.xUnit/DiGi.PostgreSQL.PartitionReference.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+    </Project>
+    <Project Path="DiGi.PostgreSQL.UniqueReference.xUnit/DiGi.PostgreSQL.UniqueReference.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+    </Project>
+    <Project Path="DiGi.PostgreSQL.xUnit/DiGi.PostgreSQL.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+    </Project>
   </Folder>
   <Folder Name="/Rhino/">
     <Project Path="../DiGi.Rhino/DiGi.Rhino.Core/DiGi.Rhino.Core.csproj">

@@ -28,7 +28,7 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 
             count++;
 
-            HashSet<Classes.PartitionReference>? uniqueReferences_1 = await partitionReferencePostgreSQLConverter.UpdateAsync(addresses);
+            HashSet<PartitionReference.Classes.PartitionReference>? uniqueReferences_1 = await partitionReferencePostgreSQLConverter.UpdateAsync(addresses);
             Assert.NotNull(uniqueReferences_1);
 
             Assert.NotEmpty(uniqueReferences_1);
@@ -55,7 +55,7 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
                 return;
             }
 
-            e.PartitionReference = new Classes.PartitionReference(serializableObject.GetType().Name, Core.Query.UniqueId(serializableObject));
+            e.PartitionReference = new PartitionReference.Classes.PartitionReference(serializableObject.GetType().Name, Core.Query.UniqueId(serializableObject));
         }
     }
 }

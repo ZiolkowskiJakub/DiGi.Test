@@ -15,6 +15,8 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 
             List<Address> addresses = [];
 
+            await uniqueReferencePostgreSQLConverter.RemoveAsync<Address>();
+
             int count = 1000;
 
             for (int i = 0; i < count; i++)
