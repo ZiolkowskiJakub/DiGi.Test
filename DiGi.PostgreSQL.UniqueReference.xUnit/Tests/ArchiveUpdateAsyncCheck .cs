@@ -25,7 +25,7 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
             IUniqueReference? uniqueReference_1 = await archivePostgreSQLConverter.UpdateAsync(address_1);
             Assert.NotNull(uniqueReference_1);
 
-            Address? address_2 = await archivePostgreSQLConverter.GetSerializableObject<Address>(uniqueReference_1);
+            Address? address_2 = await archivePostgreSQLConverter.GetSerializableObjectAsync<Address>(uniqueReference_1);
             Assert.NotNull(uniqueReference_1);
 
             Assert.Equal(address_1.ToSystem_String(), address_2.ToSystem_String());
@@ -34,6 +34,5 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 
             Assert.Equal(uniqueReference_1.ToSystem_String(), uniqueReference_2.ToSystem_String());
         }
-
     }
 }

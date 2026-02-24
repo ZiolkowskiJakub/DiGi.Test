@@ -26,7 +26,9 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
     </Project>
-    <Project Path="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    <Project Path="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+    </Project>
   </Folder>
   <Folder Name="/Geometry/">
     <Project Path="../DiGi.Geometry.Random/DiGi.Geometry.Random/DiGi.Geometry.Random.csproj">

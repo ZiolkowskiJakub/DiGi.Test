@@ -39,7 +39,7 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 
             Assert.True(removed);
 
-            List<Address>? addresses_Temp = await uniqueReferencePostgreSQLConverter.GetSerializableObjects<Address>();
+            List<Address>? addresses_Temp = await uniqueReferencePostgreSQLConverter.GetSerializableObjectsAsync<Address>();
             Assert.True(addresses_Temp is not null && addresses_Temp.Count == 0);
         }
     }

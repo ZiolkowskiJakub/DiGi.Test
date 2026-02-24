@@ -16,10 +16,10 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 
             Address address_1 = new("123 Main St", "Anytown", "CA", Core.Enums.CountryCode.Undefined);
 
-            PartitionReference.Classes.PartitionReference ? partitionReference_1 = await partitionReferencePostgreSQLConverter.UpdateAsync(address_1);
+            PartitionReference.Classes.PartitionReference? partitionReference_1 = await partitionReferencePostgreSQLConverter.UpdateAsync(address_1);
             Assert.NotNull(partitionReference_1);
 
-            Address? address_2 = await partitionReferencePostgreSQLConverter.GetSerializableObject<Address>(partitionReference_1);
+            Address? address_2 = await partitionReferencePostgreSQLConverter.GetSerializableObjectAsync<Address>(partitionReference_1);
             Assert.NotNull(partitionReference_1);
 
             Assert.Equal(address_1.ToSystem_String(), address_2.ToSystem_String());

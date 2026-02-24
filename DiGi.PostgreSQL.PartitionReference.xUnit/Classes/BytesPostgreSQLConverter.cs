@@ -9,7 +9,6 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit.Classes
         public BytesPostgreSQLConverter(ConnectionData connectionData)
             : base(connectionData)
         {
-
         }
 
         public override DataType GetDataType(string? name)

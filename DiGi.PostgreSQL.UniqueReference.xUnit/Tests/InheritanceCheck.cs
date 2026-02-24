@@ -23,7 +23,7 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
             HashSet<Core.Classes.UniqueReference>? uniqueReferences_1 = await uniqueReferencePostgreSQLConverter.UpdateAsync([(ISerializableObject)address_1, address_3, size_1, size_2]);
             Assert.NotNull(uniqueReferences_1);
 
-            List<ISerializableObject>? serializableObjects = await uniqueReferencePostgreSQLConverter.GetSerializableObjects<ISerializableObject>();
+            List<ISerializableObject>? serializableObjects = await uniqueReferencePostgreSQLConverter.GetSerializableObjectsAsync<ISerializableObject>();
             Assert.NotNull(serializableObjects);
 
             Assert.Equal(uniqueReferences_1.Count, serializableObjects.Count);

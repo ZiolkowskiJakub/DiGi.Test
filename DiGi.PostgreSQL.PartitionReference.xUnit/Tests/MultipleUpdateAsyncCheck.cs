@@ -43,7 +43,7 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 
             Assert.True(removed);
 
-            List<Address>? addresses_Temp = await partitionReferencePostgreSQLConverter.GetSerializableObjects<Address>(name);
+            List<Address>? addresses_Temp = await partitionReferencePostgreSQLConverter.GetSerializableObjectsAsync<Address>(name);
             Assert.True(addresses_Temp is not null && addresses_Temp.Count == 0);
         }
 

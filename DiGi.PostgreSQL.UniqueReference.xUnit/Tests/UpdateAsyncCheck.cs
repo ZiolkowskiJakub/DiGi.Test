@@ -19,7 +19,7 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
             Core.Classes.UniqueReference? uniqueReference_1 = await uniqueReferencePostgreSQLConverter.UpdateAsync(address_1);
             Assert.NotNull(uniqueReference_1);
 
-            Address? address_2 = await uniqueReferencePostgreSQLConverter.GetSerializableObject<Address>(uniqueReference_1);
+            Address? address_2 = await uniqueReferencePostgreSQLConverter.GetSerializableObjectAsync<Address>(uniqueReference_1);
             Assert.NotNull(uniqueReference_1);
 
             Assert.Equal(address_1.ToSystem_String(), address_2.ToSystem_String());

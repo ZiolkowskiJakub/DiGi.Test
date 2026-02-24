@@ -8,8 +8,6 @@ namespace DiGi.Core.xUnit
             TestObject testObject = new();
 
             Query.SerializationCheck(testObject);
-
-
         }
     }
 }

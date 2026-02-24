@@ -24,7 +24,7 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
             PartitionReference.Classes.PartitionReference? partitionReference_1 = await bytesPostgreSQLConverter.UpdateAsync(address_1);
             Assert.NotNull(partitionReference_1);
 
-            Address? address_2 = await bytesPostgreSQLConverter.GetSerializableObject<Address>(partitionReference_1);
+            Address? address_2 = await bytesPostgreSQLConverter.GetSerializableObjectAsync<Address>(partitionReference_1);
             Assert.NotNull(partitionReference_1);
 
             Assert.Equal(address_1.ToSystem_String(), address_2.ToSystem_String());
@@ -33,6 +33,5 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 
             Assert.Equal(partitionReference_1.ToSystem_String(), partitionReference_2.ToSystem_String());
         }
-
     }
 }

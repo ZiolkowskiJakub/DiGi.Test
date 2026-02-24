@@ -9,7 +9,6 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit.Classes
         public ArchivePostgreSQLConverter(ConnectionData connectionData)
             : base(connectionData)
         {
-
         }
 
         public override DataType GetDataType(Type? type)
