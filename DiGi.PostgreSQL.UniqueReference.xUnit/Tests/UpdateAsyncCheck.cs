@@ -20,7 +20,7 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
             Assert.NotNull(uniqueReference_1);
 
             Address? address_2 = await uniqueReferencePostgreSQLConverter.GetSerializableObjectAsync<Address>(uniqueReference_1);
-            Assert.NotNull(uniqueReference_1);
+            Assert.NotNull(address_2);
 
             Assert.Equal(address_1.ToSystem_String(), address_2.ToSystem_String());
 

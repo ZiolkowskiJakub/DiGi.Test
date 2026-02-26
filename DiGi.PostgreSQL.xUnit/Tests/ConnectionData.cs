@@ -8,6 +8,8 @@ namespace DiGi.PostgreSQL.xUnit
             _ = Create.ConnectionData(Enums.StorageMethod.PartitionReference);
 
             _ = Create.ConnectionData(Enums.StorageMethod.UniqueReference);
+
+            _ = Create.ConnectionData(Enums.StorageMethod.PartitionUniqueReference);
         }
     }
 }

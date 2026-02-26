@@ -11,11 +11,15 @@ namespace DiGi.PostgreSQL.xUnit
 
             connectionData = Create.ConnectionData(Enums.StorageMethod.PartitionReference);
 
-            Assert.True(await PostgreSQL.Create.Database(connectionData));
+            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
 
             connectionData = Create.ConnectionData(Enums.StorageMethod.UniqueReference);
 
-            Assert.True(await PostgreSQL.Create.Database(connectionData));
+            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
+
+            connectionData = Create.ConnectionData(Enums.StorageMethod.PartitionUniqueReference);
+
+            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
         }
     }
 }

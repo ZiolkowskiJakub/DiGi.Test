@@ -36,6 +36,9 @@
 		<ItemGroup Condition="Exists('$(ProjectDir)..\user files\PostgreSQL_PartitionReference.conf')">
 			<Files Include="$(ProjectDir)..\user files\PostgreSQL_PartitionReference.conf" />
 		</ItemGroup>
+		<ItemGroup Condition="Exists('$(ProjectDir)..\user files\PostgreSQL_PartitionUniqueReference.conf')">
+			<Files Include="$(ProjectDir)..\user files\PostgreSQL_PartitionUniqueReference.conf" />
+		</ItemGroup>
 
 		<!-- Copy them to bin directory -->
 		<Copy SourceFiles="@(Files)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
