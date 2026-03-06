@@ -1,5 +1,5 @@
-﻿using DiGi.Core.Classes;
-using DiGi.Core;
+﻿using DiGi.Core;
+using DiGi.Core.Classes;
 using DiGi.PostgreSQL.Classes;
 using DiGi.PostgreSQL.PartitionUniqueReference.xUnit.Classes;
 

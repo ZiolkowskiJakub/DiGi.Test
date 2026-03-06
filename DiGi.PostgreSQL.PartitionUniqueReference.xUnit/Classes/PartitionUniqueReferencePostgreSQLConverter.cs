@@ -11,7 +11,6 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit.Classes
         public TestPartitionUniqueReferencePostgreSQLConverter(ConnectionData connectionData)
             : base(connectionData)
         {
-
             PartitionUniqueReferenceReferenceGenerating += TestPartitionUniqueReferencePostgreSQLConverter_PartitionUniqueReferenceReferenceGenerating;
         }
 
@@ -29,7 +28,5 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit.Classes
 
             return DataType.Archive;
         }
-
-
     }
 }
