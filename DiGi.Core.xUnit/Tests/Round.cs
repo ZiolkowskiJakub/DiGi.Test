@@ -5,7 +5,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Round()
         {
-            double value = Core.Query.Round(0, Constants.Tolerance.Distance);
+            double value = Core.Query.Round(0, Constans.Tolerance.Distance);
 
             Assert.Equal(0.0, value);
         }

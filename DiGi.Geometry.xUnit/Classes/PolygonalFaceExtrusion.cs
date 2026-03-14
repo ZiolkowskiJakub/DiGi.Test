@@ -9,7 +9,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFaceExtrusion()
         {
-            PolygonalFace3D? polygonalFace3D = Create.PolygonalFace3D(Spatial.Constants.Plane.WorldZ, new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0));
+            PolygonalFace3D? polygonalFace3D = Create.PolygonalFace3D(Spatial.Constans.Plane.WorldZ, new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0));
 
             Assert.NotNull(polygonalFace3D);
 
@@ -18,7 +18,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            PolygonalFaceExtrusion polygonalFaceExtrusion = new(polygonalFace3D, Spatial.Constants.Vector3D.WorldZ * 10);
+            PolygonalFaceExtrusion polygonalFaceExtrusion = new(polygonalFace3D, Spatial.Constans.Vector3D.WorldZ * 10);
 
             Assert.NotNull(polygonalFaceExtrusion);
 

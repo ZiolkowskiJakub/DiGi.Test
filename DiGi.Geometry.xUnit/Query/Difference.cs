@@ -20,7 +20,7 @@ namespace DiGi.Geometry.xUnit
             PolygonalFace2D? polygonalFace2D = polygonalFace2Ds.FirstOrDefault();
             Assert.NotNull(polygonalFace2D);
 
-            Assert.True(DiGi.Core.Query.AlmostEquals(polygonalFace2D_1.GetArea() - polygonalFace2D_2.GetArea(), polygonalFace2D.GetArea(), DiGi.Core.Constants.Tolerance.MacroDistance));
+            Assert.True(DiGi.Core.Query.AlmostEquals(polygonalFace2D_1.GetArea() - polygonalFace2D_2.GetArea(), polygonalFace2D.GetArea(), DiGi.Core.Constans.Tolerance.MacroDistance));
         }
     }
 }

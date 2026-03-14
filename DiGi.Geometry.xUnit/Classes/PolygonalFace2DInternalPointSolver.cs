@@ -10,7 +10,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2DInternalPointSolver()
         {
-            PolygonalFace3D? polygonalFace3D = Create.PolygonalFace3D(Spatial.Constants.Plane.WorldZ, new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0));
+            PolygonalFace3D? polygonalFace3D = Create.PolygonalFace3D(Spatial.Constans.Plane.WorldZ, new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0));
             Assert.NotNull(polygonalFace3D);
 
             if (polygonalFace3D is null)

@@ -21,19 +21,27 @@ namespace DiGi.Core.xUnit
             Assert.True(value.GetType() == typeof(string));
 
             configurationFile.Add("SOME_PROPERTY 2", 2.0);
-            value = configurationFile.GetValue("SOME_PROPERTY 2");
+            value = configurationFile.GetValue<double>("SOME_PROPERTY 2");
             Assert.NotNull(value);
             Assert.True(value.GetType() == typeof(double));
 
             configurationFile.Add("SOME_PROPERTY 3", 1);
-            value = configurationFile.GetValue("SOME_PROPERTY 3");
+            value = configurationFile.GetValue<int>("SOME_PROPERTY 3");
             Assert.NotNull(value);
             Assert.True(value.GetType() == typeof(int));
 
             configurationFile.Add("SOME_PROPERTY 4", false);
-            value = configurationFile.GetValue("SOME_PROPERTY 4");
+            value = configurationFile.GetValue<bool>("SOME_PROPERTY 4");
             Assert.NotNull(value);
             Assert.True(value.GetType() == typeof(bool));
+
+            object? value_Temp = configurationFile.GetValue<bool>("SOME_PROPERTy 4");
+            Assert.True(value_Temp.Equals(value));
+
+            Assert.True(configurationFile.Contains("SOME_PROPERTy 4"));
+            Assert.True(configurationFile.Contains("SOME_PROPERTy 4 "));
+            Assert.True(configurationFile.Contains("SOME_PROPERTY 4 "));
+
 
             List<string> names = configurationFile.Names;
             Assert.NotNull(names);

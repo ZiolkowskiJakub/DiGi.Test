@@ -33,8 +33,8 @@ namespace DiGi.Geometry.xUnit
             Assert.True(polygon2D_Offset_1.Inside(polygon2D));
             Assert.True(polygon2D_Offset_1.Inside(polygon2D_Offset_2));
 
-            Assert.Equal(rectangle2D_Offset_1.GetArea(), polygon2D_Offset_1.GetArea(), DiGi.Core.Constants.Tolerance.MacroDistance);
-            Assert.Equal(rectangle2D_Offset_2.GetArea(), polygon2D_Offset_2.GetArea(), DiGi.Core.Constants.Tolerance.MacroDistance);
+            Assert.Equal(rectangle2D_Offset_1.GetArea(), polygon2D_Offset_1.GetArea(), DiGi.Core.Constans.Tolerance.MacroDistance);
+            Assert.Equal(rectangle2D_Offset_2.GetArea(), polygon2D_Offset_2.GetArea(), DiGi.Core.Constans.Tolerance.MacroDistance);
         }
     }
 }
