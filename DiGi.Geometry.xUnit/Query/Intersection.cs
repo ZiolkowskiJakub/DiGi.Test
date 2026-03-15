@@ -47,7 +47,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(polygon2Ds_2);
             Assert.True(polygon2Ds_2.Count == 1);
 
-            Assert.True(DiGi.Core.Query.AlmostEquals(polygon2Ds_1[0].GetArea() + polygon2Ds_2[0].GetArea(), polygon2D_3.GetArea(), DiGi.Core.Constans.Tolerance.Distance));
+            Assert.True(DiGi.Core.Query.AlmostEquals(polygon2Ds_1[0].GetArea() + polygon2Ds_2[0].GetArea(), polygon2D_3.GetArea(), DiGi.Core.Constants.Tolerance.Distance));
         }
     }
 }

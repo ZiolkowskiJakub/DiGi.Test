@@ -12,7 +12,7 @@ namespace DiGi.Geometry.xUnit
         {
             List<Point3D> point3Ds;
 
-            Plane plane = Spatial.Constans.Plane.WorldZ;
+            Plane plane = Spatial.Constants.Plane.WorldZ;
 
             point3Ds = [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(10, 10, 0), new Point3D(0, 10, 0)];
 
