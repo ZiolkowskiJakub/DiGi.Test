@@ -66,6 +66,7 @@
     </Project>
     <Project Path="DiGi.GIS.xUnit/DiGi.GIS.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
     </Project>
   </Folder>
   <Folder Name="/Math/">
