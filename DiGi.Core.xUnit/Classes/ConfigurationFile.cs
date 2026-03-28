@@ -42,7 +42,6 @@ namespace DiGi.Core.xUnit
             Assert.True(configurationFile.Contains("SOME_PROPERTy 4 "));
             Assert.True(configurationFile.Contains("SOME_PROPERTY 4 "));
 
-
             List<string> names = configurationFile.Names;
             Assert.NotNull(names);
             Assert.NotEmpty(names);

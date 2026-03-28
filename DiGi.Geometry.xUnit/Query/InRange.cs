@@ -11,7 +11,7 @@ namespace DiGi.Geometry.xUnit
             string? path;
 
             path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "Polygonal2D_InRange_1.json");
-            if(string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
                 return;
             }

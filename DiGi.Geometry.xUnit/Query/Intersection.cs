@@ -1,5 +1,4 @@
 using DiGi.Geometry.Planar.Classes;
-using DiGi.Geometry.Planar.Interfaces;
 using System.Reflection;
 
 namespace DiGi.Geometry.xUnit
@@ -37,7 +36,6 @@ namespace DiGi.Geometry.xUnit
 
             Polygon2D? polygon2D_3 = DiGi.Core.Convert.ToDiGi<Polygon2D>((DiGi.Core.Classes.Path)path)?.FirstOrDefault();
             Assert.NotNull(polygon2D_3);
-
 
             List<Polygon2D>? polygon2Ds_1 = Planar.Query.Intersection<Polygon2D, Polygon2D>([polygon2D_1, polygon2D_3]);
             Assert.NotNull(polygon2Ds_1);

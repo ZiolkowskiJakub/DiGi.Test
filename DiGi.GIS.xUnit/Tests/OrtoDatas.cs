@@ -32,9 +32,9 @@ namespace DiGi.GIS.xUnit
             Geometry.Planar.Classes.BoundingBox2D? boundingBox2D = building2D.PolygonalFace2D?.GetBoundingBox();
             Assert.NotNull(boundingBox2D);
 
-            Core.Classes.Size size_Image = new (320, 320);
+            Core.Classes.Size size_Image = new(320, 320);
 
-            foreach(OrtoData ortoData in ortoDatas)
+            foreach (OrtoData ortoData in ortoDatas)
             {
                 Assert.NotNull(ortoData);
 

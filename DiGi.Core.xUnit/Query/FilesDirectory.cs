@@ -10,7 +10,7 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(assembly);
 
             string? directory = Path.GetDirectoryName(Path.GetDirectoryName(assembly.Location));
-            if(string.IsNullOrWhiteSpace(directory))
+            if (string.IsNullOrWhiteSpace(directory))
             {
                 return null;
             }

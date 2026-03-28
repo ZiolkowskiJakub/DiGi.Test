@@ -1,7 +1,4 @@
-﻿using DiGi.Core.Classes;
-using DiGi.Core.IO.Core.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace DiGi.Core.xUnit
 {
@@ -10,13 +7,11 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void TimeSpan()
         {
-            TimeSpanObject timeSpanObject = new () {TimeSpan = new System.TimeSpan(1,2,3,4,5,6)};
+            TimeSpanObject timeSpanObject = new() { TimeSpan = new System.TimeSpan(1, 2, 3, 4, 5, 6) };
 
             string jsonString = JsonSerializer.Serialize(timeSpanObject);
 
-
             Query.SerializationCheck(timeSpanObject);
-
         }
     }
 }
