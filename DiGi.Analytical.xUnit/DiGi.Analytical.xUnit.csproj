@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical.Building\DiGi.Analytical.Building.csproj" />
     <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical\DiGi.Analytical.csproj" />
     <ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
