@@ -11,7 +11,7 @@ namespace DiGi.Core.xUnit
         {
             List<Column> columns = [new Column("Index", typeof(int)), new Column("Address", typeof(Address)), new Column("Description", typeof(string))];
 
-            Table table = new (columns);
+            Table table = new(columns);
 
             Assert.Equal(3, table.ColumnCount);
 
@@ -19,7 +19,7 @@ namespace DiGi.Core.xUnit
 
             int count = 100;
 
-            for(int i =0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 table.AddRow([1, new Address($"Street {i}", "Warsaw", "00-409", Core.Enums.CountryCode.PL), $"Address {i}"]);
             }
@@ -29,7 +29,6 @@ namespace DiGi.Core.xUnit
             string? description = table.GetValue<string>(2, count - 1);
 
             Assert.Equal($"Address {count - 1}", description);
-
 
             IEnumerable<Column> columns_Temp = table.Columns;
 

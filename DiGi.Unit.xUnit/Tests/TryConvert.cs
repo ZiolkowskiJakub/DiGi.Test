@@ -9,7 +9,7 @@
             double? value;
 
             converted = Query.TryConvert(10, Enums.LengthUnit.Meter, Enums.LengthUnit.Milimeter, out value);
-            
+
             Assert.True(converted);
 
             Assert.Equal(10000, value);
