@@ -175,4 +175,8 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
     </Project>
   </Folder>
+  <Folder Name="/Unit/">
+    <Project Path="../DiGi.Unit/DiGi.Unit/DiGi.Unit.csproj" />
+    <Project Path="DiGi.Unit.xUnit/DiGi.Unit.xUnit.csproj" Id="de844674-2ef0-4ca1-b600-3738205efee4" />
+  </Folder>
 </Solution>
