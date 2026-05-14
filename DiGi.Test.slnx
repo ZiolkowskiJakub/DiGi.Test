@@ -83,6 +83,7 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
     </Project>
+    <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.Table/DiGi.PostgreSQL.Table.csproj" />
     <Project Path="../DiGi.PostgreSQL/DiGi.PostgreSQL.UniqueReference/DiGi.PostgreSQL.UniqueReference.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
