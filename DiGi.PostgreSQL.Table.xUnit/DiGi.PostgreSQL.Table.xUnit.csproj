@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+	  
+	  <LangVersion>latest</LangVersion>
+	  <OutputPath>..\bin\$(MSBuildProjectName)\</OutputPath>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	  <Nullable>enable</Nullable>
+
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <IsPackable>false</IsPackable>
+	  <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+	<Target Name="CopyUserFiles" AfterTargets="Build">
+		<ItemGroup>
+			<_UserFiles Include="$(ProjectDir)..\user files\**\*.*" />
+		</ItemGroup>
+		<Message Text="Copying all user files from directory..." Importance="high" />
+		<Copy SourceFiles="@(_UserFiles)" DestinationFiles="@(_UserFiles->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.IO\DiGi.Core.IO.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL.Table\DiGi.PostgreSQL.Table.csproj" />
+    <ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL\DiGi.PostgreSQL.csproj" />
+    <ProjectReference Include="..\DiGi.PostgreSQL.xUnit\DiGi.PostgreSQL.xUnit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

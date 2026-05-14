@@ -26,6 +26,10 @@ namespace DiGi.PostgreSQL.xUnit
                 case Enums.StorageMethod.PartitionUniqueReference:
                     fileName = "PostgreSQL_PartitionUniqueReference.conf";
                     break;
+
+                case Enums.StorageMethod.Table:
+                    fileName = "PostgreSQL_Table.conf";
+                    break;
             }
 
             Assert.NotNull(fileName);

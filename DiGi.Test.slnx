@@ -96,6 +96,7 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
     </Project>
     <Project Path="DiGi.PostgreSQL.PartitionUniqueReference.xUnit/DiGi.PostgreSQL.PartitionUniqueReference.xUnit.csproj" Id="a188e002-6d71-451c-9183-902d6058536b" />
+    <Project Path="DiGi.PostgreSQL.Table.xUnit/DiGi.PostgreSQL.Table.xUnit.csproj" Id="4af4728c-b9af-47d1-a94f-c47559754f4a" />
     <Project Path="DiGi.PostgreSQL.UniqueReference.xUnit/DiGi.PostgreSQL.UniqueReference.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
     </Project>

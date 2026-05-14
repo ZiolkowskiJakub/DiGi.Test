@@ -7,7 +7,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Size()
         {
-            Core.Classes.Size size = new Core.Classes.Size(10, 20);
+            Core.Classes.Size size = new (10, 20);
 
             Assert.Equal(10, size.Width);
             Assert.Equal(20, size.Height);

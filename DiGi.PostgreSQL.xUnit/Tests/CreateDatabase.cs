@@ -20,6 +20,10 @@ namespace DiGi.PostgreSQL.xUnit
             connectionData = Create.ConnectionData(Enums.StorageMethod.PartitionUniqueReference);
 
             Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
+
+            connectionData = Create.ConnectionData(Enums.StorageMethod.Table);
+
+            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
         }
     }
 }

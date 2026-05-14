@@ -7,7 +7,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Column()
         {
-            Column column; ;
+            Column column;
 
             column = new Column(2, "AAAA", typeof(string));
 
