@@ -15,7 +15,7 @@ namespace DiGi.PostgreSQL.Table.xUnit.Classes
 
         public override string TableName => "testtable";
 
-        protected override TableConversionOptions<Column>? tableConversionOptions => new () 
+        protected override TableConversionOptions<Column>? TableConversionOptions => new () 
         {
             PrimaryKeyColumns = [ new Column("Column_1", typeof(int))]
         };
