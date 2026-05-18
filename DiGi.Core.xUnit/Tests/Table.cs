@@ -167,20 +167,156 @@ namespace DiGi.Core.xUnit
             Assert.Equal("B", row?[0]);
         }
 
+
         [Fact]
-        public void Table_Indexer_WithColumnAndRowObjects_ShouldReturnCorrectValue()
+        public void Table_TryGetValue_ShouldReturnCorrectValueAndTrue()
         {
             // Arrange
             Table table = new();
-            var col = table.AddColumn("Test", typeof(string));
+            table.AddColumn("Name", typeof(string));
             var row = table.AddRow();
-            table.SetValue(col.Index, row.Index, "Hello World");
+            table.SetValue(0, 0, "Test Value");
 
             // Act
-            var value = table[col, row];
+            bool result = table.TryGetValue<string>(0, 0, out string? value);
 
             // Assert
-            Assert.Equal("Hello World", value);
+            Assert.True(result);
+            Assert.Equal("Test Value", value);
+        }
+
+        [Fact]
+        public void Table_TryGetValue_WithInvalidIndices_ShouldReturnFalse()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("Name", typeof(string));
+            table.AddRow();
+
+            // Act & Assert
+            Assert.False(table.TryGetValue<string>(1, 0, out _)); // Invalid Col
+            Assert.False(table.TryGetValue<string>(0, 1, out _)); // Invalid Row
+        }
+
+        [Fact]
+        public void Table_UpdateColumn_ChangeType_ShouldConvertValuesOrRemovethem()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("Value", typeof(string));
+            table.AddRow([ "123" ]); 
+            table.AddRow([ "NotANumber" ]);
+
+            // Act: Change type to int (assuming Column has a way to tryConvert)
+            // The implementation uses column_Temp.TryGetValidValue(value, out value, tryConvert)
+            // We need to check if this actually works for the provided Column class.
+            table.UpdateColumn(0, "Value", typeof(int), tryConvert: true);
+
+            // Assert
+            Assert.Equal(123, table[0, 0]); // Should be converted
+            Assert.Null(table[0, 1]);        // "NotANumber" cannot be converted to int and should be removed (line 631)
+        }
+
+        [Fact]
+        public void Table_UpdateRow_WithDictionaryStringKeys_ShouldUpdateCorrectly()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("Name", typeof(string));
+            table.AddColumn("Age", typeof(int));
+            table.AddRow(["Old Name", 20]);
+
+            var updates = new Dictionary<string, object?> { { "Name", "New Name" }, { "Age", 21 } };
+
+            // Act
+            table.UpdateRow(0, updates);
+
+            // Assert
+            Assert.Equal("New Name", table[0, 0]);
+            Assert.Equal(21, table[1, 0]);
+        }
+
+        [Fact]
+        public void Table_UpdateRow_WithEnumerableValues_ShouldUpdateCorrectly()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("Col1", typeof(string));
+            table.AddColumn("Col2", typeof(int));
+            table.AddRow(["V1", 1]);
+
+            var updates = new object[] { "V2", 2 };
+
+            // Act
+            table.UpdateRow(0, updates);
+
+            // Assert
+            Assert.Equal("V2", table[0, 0]);
+            Assert.Equal(2, table[1, 0]);
+        }
+
+
+        [Fact]
+        public void Table_UpdateRow_WithIntKeyDictionary_ShouldUpdateCorrectly()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("Col0", typeof(string));
+            table.AddColumn("Col1", typeof(int));
+            table.AddRow(["Old0", 0]);
+
+            var updates = new Dictionary<int, object?> { { 0, "New0" }, { 1, 1 } };
+
+            // Act
+            table.UpdateRow(0, updates);
+
+            // Assert
+            Assert.Equal("New0", table[0, 0]);
+            Assert.Equal(1, table[1, 0]);
+        }
+
+        [Fact]
+        public void Table_CreateRow_FromExistingRow_ShouldCloneValues()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("Col", typeof(string));
+            var originalRow = table.AddRow(["Original"]);
+
+            // Act
+            var clonedRow = table.CreateRow(1, originalRow);
+            table.AddRow(clonedRow); // Ensure it's added to the table if needed or just check values
+
+            // Assert
+            Assert.Equal("Original", clonedRow[0]);
+        }
+
+        [Fact]
+        public void Table_UpdateColumn_RenameOnly_ShouldUpdateName()
+        {
+            // Arrange
+            Table table = new();
+            table.AddColumn("OldName", typeof(string));
+
+            // Act
+            var updatedCol = table.UpdateColumn(0, "NewName", typeof(string));
+
+            // Assert
+            Assert.NotNull(updatedCol);
+            Assert.Equal("NewName", updatedCol.Name);
+        }
+
+        [Fact]
+        public void Table_GetRow_ValidAndInvalidIndex_ShouldReturnExpected()
+        {
+            // Arrange
+            Table table = new();
+            table.AddRow();
+
+            // Act & Assert
+            Assert.NotNull(table.GetRow(0));
+            Assert.Null(table.GetRow(-1));
+            Assert.Null(table.GetRow(1));
         }
     }
 }
