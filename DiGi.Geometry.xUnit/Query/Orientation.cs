@@ -33,7 +33,7 @@ namespace DiGi.Geometry.xUnit
             Orientation orientation_2;
 
             //Case 1
-            polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0));
+            polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0));
 
             polygonal3D_1 = polygonalFace3D_1?.ExternalEdge;
 
@@ -43,7 +43,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            polygonalFace3D_2 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(10, 0), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(0, 10));
+            polygonalFace3D_2 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10));
 
             polygonal3D_2 = polygonalFace3D_2?.ExternalEdge;
 
@@ -59,7 +59,7 @@ namespace DiGi.Geometry.xUnit
             Assert.True(orientation_1.Opposite() == orientation_2);
 
             //Case 2
-            polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0));
+            polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1)), new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0));
 
             polygonal3D_1 = polygonalFace3D_1?.ExternalEdge;
 
@@ -69,7 +69,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            polygonalFace3D_2 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, -1)), new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(10, 0), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(0, 10));
+            polygonalFace3D_2 = Spatial.Create.PolygonalFace3D(new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, -1)), new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10));
 
             polygonal3D_2 = polygonalFace3D_2?.ExternalEdge;
 
@@ -87,7 +87,7 @@ namespace DiGi.Geometry.xUnit
             //Case 3
 
             Plane plane_1 = new Plane(new Point3D(0, 0, 0), new Vector3D(0, 0, 1));
-            List<Planar.Classes.Point2D>? point2Ds = [new Planar.Classes.Point2D(0, 0), new Planar.Classes.Point2D(0, 10), new Planar.Classes.Point2D(10, 10), new Planar.Classes.Point2D(10, 0)];
+            List<Point2D>? point2Ds = [new Point2D(0, 0), new Point2D(0, 10), new Point2D(10, 10), new Point2D(10, 0)];
 
             polygonalFace3D_1 = Spatial.Create.PolygonalFace3D(plane_1, [.. point2Ds]);
 

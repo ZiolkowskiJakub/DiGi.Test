@@ -12,7 +12,7 @@ namespace DiGi.Core.xUnit
         {
             List<Column> columns = [new Column("Index", typeof(int)), new Column("Address", typeof(Address)), new Column("Description", typeof(string))];
 
-            IO.Table.Classes.Table table = new(columns);
+            Table table = new(columns);
 
             Assert.Equal(3, table.ColumnCount);
 
@@ -45,7 +45,7 @@ namespace DiGi.Core.xUnit
         public void Table_AddColumn_ShouldAssignCorrectIndexAndName()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             string colName = "TestColumn";
             Type colType = typeof(int);
 
@@ -64,7 +64,7 @@ namespace DiGi.Core.xUnit
         public void Table_GetColumnIndex_ByName_ShouldReturnCorrectIndex()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             table.AddColumn("Col1", typeof(string));
             table.AddColumn("Col2", typeof(int));
 
@@ -79,7 +79,7 @@ namespace DiGi.Core.xUnit
         public void Table_AddRow_WithDictionary_ShouldInsertValuesCorrectly()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             table.AddColumn("Name", typeof(string));
             table.AddColumn("Age", typeof(int));
 
@@ -102,7 +102,7 @@ namespace DiGi.Core.xUnit
         public void Table_SetValue_WithCorrectType_ShouldReturnTrueAndStoreValue()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             table.AddColumn("Price", typeof(decimal));
             table.AddRow(); // Create row at index 0
 
@@ -118,7 +118,7 @@ namespace DiGi.Core.xUnit
         public void Table_SetValue_WithInvalidType_ShouldReturnFalse()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             table.AddColumn("Age", typeof(int));
             table.AddRow();
 
@@ -132,7 +132,7 @@ namespace DiGi.Core.xUnit
         public void Table_RemoveRow_ShouldDecreaseRowCountAndReindex()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             table.AddRow(); // 0
             table.AddRow(); // 1
             table.AddRow(); // 2
@@ -151,7 +151,7 @@ namespace DiGi.Core.xUnit
         public void Table_RemoveColumn_ShouldRemoveValueFromAllRows()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             table.AddColumn("Col1", typeof(string));
             table.AddColumn("Col2", typeof(string));
 
@@ -171,7 +171,7 @@ namespace DiGi.Core.xUnit
         public void Table_Indexer_WithColumnAndRowObjects_ShouldReturnCorrectValue()
         {
             // Arrange
-            IO.Table.Classes.Table table = new();
+            Table table = new();
             var col = table.AddColumn("Test", typeof(string));
             var row = table.AddRow();
             table.SetValue(col.Index, row.Index, "Hello World");

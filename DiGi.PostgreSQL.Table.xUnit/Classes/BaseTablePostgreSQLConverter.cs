@@ -5,15 +5,15 @@ using DiGi.PostgreSQL.Table.Classes;
 
 namespace DiGi.PostgreSQL.Table.xUnit.Classes
 {
-    internal class TestTablePostgreSQLConverter : TablePostgreSQLConverter<Column>
+    internal class BaseTablePostgreSQLConverter : TablePostgreSQLConverter<Column>
     {
-        public TestTablePostgreSQLConverter(ConnectionData? connectionData) 
+        public BaseTablePostgreSQLConverter(ConnectionData? connectionData) 
             : base(connectionData)
         {
 
         }
 
-        public override string TableName => "testtable";
+        public override string TableName => "basetable";
 
         protected override TableConversionOptions<Column>? TableConversionOptions => new () 
         {

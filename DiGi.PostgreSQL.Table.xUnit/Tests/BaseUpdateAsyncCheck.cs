@@ -6,11 +6,11 @@ namespace DiGi.PostgreSQL.Table.xUnit
     public partial class Tests
     {
         [SkippableFact]
-        public async Task TablePostgreSQLConverterUpdateAsyncCheck()
+        public async Task BaseUpdateAsyncCheck()
         {
             ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(Enums.StorageMethod.Table);
 
-            TestTablePostgreSQLConverter testTablePostgreSQLConverter = new (connectionData);
+            BaseTablePostgreSQLConverter testTablePostgreSQLConverter = new (connectionData);
 
             Core.IO.Table.Classes.Table table = new ();
 
