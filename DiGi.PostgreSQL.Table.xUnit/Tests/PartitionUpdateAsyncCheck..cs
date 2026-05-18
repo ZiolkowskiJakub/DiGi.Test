@@ -24,7 +24,17 @@ namespace DiGi.PostgreSQL.Table.xUnit
             table.AddRow([3, "CCC", "D"]);
             table.AddRow([4, "AAA", "E"]);
 
-            bool updated = await partitionTablePostgreSQLConverter.UpdateAsync(table);
+            bool updated;
+
+            updated = await partitionTablePostgreSQLConverter.UpdateAsync(table);
+            Assert.True(updated);
+
+            table.ClearRows();
+            table.AddColumn(PartitionTablePostgreSQLConverter.Column_4);
+            table.AddRow([5, "CCC", "F", true]);
+            table.AddRow([6, "CCC", "G", false]);
+
+            updated = await partitionTablePostgreSQLConverter.UpdateAsync(table);
             Assert.True(updated);
 
             bool removed_Table = await PostgreSQL.Modify.RemoveTableAsync(connectionData, partitionTablePostgreSQLConverter.TableName);

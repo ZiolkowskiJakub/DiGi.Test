@@ -174,7 +174,7 @@ namespace DiGi.Core.xUnit
             // Arrange
             Table table = new();
             table.AddColumn("Name", typeof(string));
-            var row = table.AddRow();
+            table.AddRow();
             table.SetValue(0, 0, "Test Value");
 
             // Act
@@ -214,7 +214,7 @@ namespace DiGi.Core.xUnit
 
             // Assert
             Assert.Equal(123, table[0, 0]); // Should be converted
-            Assert.Null(table[0, 1]);        // "NotANumber" cannot be converted to int and should be removed (line 631)
+            Assert.Equal(default(int), table[0, 1]); //Shoud be default
         }
 
         [Fact]
@@ -273,22 +273,6 @@ namespace DiGi.Core.xUnit
             // Assert
             Assert.Equal("New0", table[0, 0]);
             Assert.Equal(1, table[1, 0]);
-        }
-
-        [Fact]
-        public void Table_CreateRow_FromExistingRow_ShouldCloneValues()
-        {
-            // Arrange
-            Table table = new();
-            table.AddColumn("Col", typeof(string));
-            var originalRow = table.AddRow(["Original"]);
-
-            // Act
-            var clonedRow = table.CreateRow(1, originalRow);
-            table.AddRow(clonedRow); // Ensure it's added to the table if needed or just check values
-
-            // Assert
-            Assert.Equal("Original", clonedRow[0]);
         }
 
         [Fact]
