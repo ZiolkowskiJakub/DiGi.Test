@@ -27,7 +27,7 @@ namespace DiGi.Core.xUnit
 
             Assert.Equal(count, table.RowCount);
 
-            string? description = table.GetValue<string>(2, count - 1);
+            string? description = table.GetValue<string>(count - 1, 2);
 
             Assert.Equal($"Address {count - 1}", description);
 
@@ -94,8 +94,8 @@ namespace DiGi.Core.xUnit
 
             // Assert
             Assert.NotNull(row);
-            Assert.Equal("Jan Kowalski", table[0, 0]); // ColIndex 0, RowIndex 0
-            Assert.Equal(30, table[1, 0]);             // ColIndex 1, RowIndex 0
+            Assert.Equal("Jan Kowalski", table[0, 0]); // RowIndex 0, ColumnIndex 0
+            Assert.Equal(30, table[0, 1]);             // RowIndex 0, ColumnIndex 1
         }
 
         [Fact]
@@ -214,7 +214,7 @@ namespace DiGi.Core.xUnit
 
             // Assert
             Assert.Equal(123, table[0, 0]); // Should be converted
-            Assert.Equal(default(int), table[0, 1]); //Shoud be default
+            Assert.Equal(default(int), table[1, 0]); //Shoud be default
         }
 
         [Fact]
@@ -233,7 +233,7 @@ namespace DiGi.Core.xUnit
 
             // Assert
             Assert.Equal("New Name", table[0, 0]);
-            Assert.Equal(21, table[1, 0]);
+            Assert.Equal(21, table[0, 1]);
         }
 
         [Fact]
@@ -252,7 +252,7 @@ namespace DiGi.Core.xUnit
 
             // Assert
             Assert.Equal("V2", table[0, 0]);
-            Assert.Equal(2, table[1, 0]);
+            Assert.Equal(2, table[0, 1]);
         }
 
 
@@ -272,7 +272,7 @@ namespace DiGi.Core.xUnit
 
             // Assert
             Assert.Equal("New0", table[0, 0]);
-            Assert.Equal(1, table[1, 0]);
+            Assert.Equal(1, table[0, 1]);
         }
 
         [Fact]

@@ -6,7 +6,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     public partial class Tests
     {
         [SkippableFact]
-        public async Task BaseUpdateAsyncCheck()
+        public async Task BasePushAsyncCheck()
         {
             ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(Enums.StorageMethod.Table);
 
@@ -22,7 +22,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
             table.AddRow([3, null]);
             table.AddRow([3, "CCC"]);
 
-            bool updated = await testTablePostgreSQLConverter.UpdateAsync(table);
+            bool updated = await testTablePostgreSQLConverter.PushAsync(table);
             Assert.True(updated);
 
             bool removed_Table = await PostgreSQL.Modify.RemoveTableAsync(connectionData, testTablePostgreSQLConverter.TableName);
