@@ -17,7 +17,7 @@ namespace DiGi.PostgreSQL.Table.xUnit.Classes
 
         protected override TableConversionOptions<Column>? TableConversionOptions => new () 
         {
-            PrimaryKeyColumns = [ new Column("Column_1", typeof(int))]
+            PrimaryKeyColumns = [ new ExtendedColumn("Column_1", typeof(int), "Main", "Main Column")]
         };
     }
 }

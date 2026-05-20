@@ -1,3 +1,4 @@
+using DiGi.Core.IO.Table.Classes;
 using DiGi.PostgreSQL.Classes;
 using DiGi.PostgreSQL.Table.xUnit.Classes;
 
@@ -15,7 +16,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
             Core.IO.Table.Classes.Table table = new ();
 
             table.AddColumn("Column_1", typeof(int));
-            table.AddColumn("Column_2", typeof(string));
+            table.AddColumn(new ExtendedColumn("Column_2", typeof(string), "Additional Column", "This is additional Column"));
 
             table.AddRow([1, "AAA"]);
             table.AddRow([2, "BBB"]);
@@ -24,6 +25,18 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
             bool updated = await testTablePostgreSQLConverter.PushAsync(table);
             Assert.True(updated);
+
+            HashSet<string> categories = await testTablePostgreSQLConverter.GetCategories();
+            Assert.True(categories is not null && categories.Count != 0);
+            Assert.Contains("Additional Column", categories);
+
+            List<Column> columns = await testTablePostgreSQLConverter.GetColumns();
+            Assert.NotNull(columns);
+            Assert.Equal(2, columns.Count);
+
+            columns = await testTablePostgreSQLConverter.GetColumns(["Additional Column"]);
+            Assert.NotNull(columns);
+            Assert.Single(columns);
 
             bool removed_Table = await PostgreSQL.Modify.RemoveTableAsync(connectionData, testTablePostgreSQLConverter.TableName);
             Assert.True(removed_Table);
