@@ -1,4 +1,5 @@
 using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Planar.Interfaces;
 using System.Reflection;
 
 namespace DiGi.Geometry.xUnit
@@ -6,7 +7,7 @@ namespace DiGi.Geometry.xUnit
     public partial class Query
     {
         [Fact]
-        public void Intersection()
+        public void Intersection_1()
         {
             string? path;
 
@@ -46,6 +47,35 @@ namespace DiGi.Geometry.xUnit
             Assert.True(polygon2Ds_2.Count == 1);
 
             Assert.True(DiGi.Core.Query.AlmostEquals(polygon2Ds_1[0].GetArea() + polygon2Ds_2[0].GetArea(), polygon2D_3.GetArea(), DiGi.Core.Constants.Tolerance.Distance));
+        }
+
+        [Fact]
+        public void Intersection_2()
+        {
+            string? path;
+
+            path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "Rectangle2D_Intersection_1.json");
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                return;
+            }
+
+            Rectangle2D? rectangle2D = DiGi.Core.Convert.ToDiGi<Rectangle2D>((DiGi.Core.Classes.Path)path)?.FirstOrDefault();
+            Assert.NotNull(rectangle2D);
+
+            path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "Polygon2D_Intersection_1.json");
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                return;
+            }
+
+            Polygon2D? polygon2D = DiGi.Core.Convert.ToDiGi<Polygon2D>((DiGi.Core.Classes.Path)path)?.FirstOrDefault();
+            Assert.NotNull(polygon2D);
+
+            List<Polygon2D>? polygon2Ds = Planar.Query.Intersection<Polygon2D, IPolygonal2D>([rectangle2D, polygon2D]);
+            Assert.NotNull(polygon2Ds);
+
+            Assert.Equal(2, polygon2Ds.Count);
         }
     }
 }
