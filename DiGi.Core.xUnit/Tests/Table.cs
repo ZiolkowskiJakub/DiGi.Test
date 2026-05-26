@@ -2,6 +2,7 @@ using DiGi.Core.Classes;
 using DiGi.Core.IO.Table.Classes;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace DiGi.Core.xUnit
 {
@@ -39,6 +40,61 @@ namespace DiGi.Core.xUnit
 
                 Assert.NotNull(column);
             }
+        }
+
+        [Fact]
+        public void Table_Serialization()
+        {
+            Row Row = new(0);
+            Row[1] = 10;
+            Row[2] = 20;
+
+            Table table_In = new Table();
+            table_In.AddColumn(new Column("Empty", typeof(string)));
+            table_In.AddColumn(new Column("Integer_1", typeof(int)));
+            table_In.AddColumn(new Column("Integer_2", typeof(int)));
+
+            table_In.AddRow([null, 10, 100]);
+            table_In.AddRow([null, 20, 200]);
+            table_In.AddRow([null, 30, 300]);
+            table_In.AddRow([null, 40, 400]);
+
+            JsonSerializerOptions jsonSerializerOptions = new();
+            jsonSerializerOptions.Converters.Add(new TableConverter<Table, Column, Row>());
+
+            // Zero string allocations - pipes the bytes directly into the destination stream asynchronously
+            string json = JsonSerializer.Serialize(table_In, jsonSerializerOptions);
+            Assert.True(!string.IsNullOrWhiteSpace(json));
+
+
+            Table? table_Out = JsonSerializer.Deserialize<Table>(json, jsonSerializerOptions);
+            Assert.NotNull(table_Out);
+
+            Assert.True(table_In.RowCount == table_Out.RowCount);
+            Assert.True(table_In.ColumnCount == table_Out.ColumnCount);
+
+            for (int i = 0; i < table_In.RowCount; i++)
+            {
+                for (int j = 0; j < table_In.ColumnCount; j++)
+                {
+                    bool similar = false;
+                    if(table_In[i, j] is null && table_Out[i, j] is null)
+                    {
+                        similar = true;
+                    }
+                    else if(table_In[i, j] is null || table_Out[i, j] is null)
+                    {
+                        similar = false;
+                    }
+                    else
+                    {
+                        similar = table_In[i, j]!.Equals(table_Out[i, j]);
+                    }
+
+                    Assert.True(similar);
+                }
+            }
+
         }
 
         [Fact]
