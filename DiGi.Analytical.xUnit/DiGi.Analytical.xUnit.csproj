@@ -12,6 +12,7 @@
 	    <ImplicitUsings>enable</ImplicitUsings>
 	    <IsPackable>false</IsPackable>
 	    <IsTestProject>true</IsTestProject>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
   <ItemGroup>
