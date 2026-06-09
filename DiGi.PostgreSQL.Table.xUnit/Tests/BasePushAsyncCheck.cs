@@ -26,15 +26,15 @@ namespace DiGi.PostgreSQL.Table.xUnit
             bool updated = await testTablePostgreSQLConverter.PushAsync(table);
             Assert.True(updated);
 
-            HashSet<string>? categories = await testTablePostgreSQLConverter.GetCategories();
+            HashSet<string>? categories = await testTablePostgreSQLConverter.GetCategoriesAsync();
             Assert.True(categories is not null && categories.Count != 0);
             Assert.Contains("Additional Column", categories);
 
-            List<Column>? columns = await testTablePostgreSQLConverter.GetColumns();
+            List<Column>? columns = await testTablePostgreSQLConverter.GetColumnsAsync();
             Assert.NotNull(columns);
             Assert.Equal(2, columns.Count);
 
-            columns = await testTablePostgreSQLConverter.GetColumnsByCategories(["Additional Column"]);
+            columns = await testTablePostgreSQLConverter.GetColumnsByCategoriesAsync(["Additional Column"]);
             Assert.NotNull(columns);
             Assert.Single(columns);
 

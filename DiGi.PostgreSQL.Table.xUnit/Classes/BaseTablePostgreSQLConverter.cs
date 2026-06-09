@@ -5,7 +5,7 @@ using DiGi.PostgreSQL.Table.Classes;
 
 namespace DiGi.PostgreSQL.Table.xUnit.Classes
 {
-    internal class BaseTablePostgreSQLConverter : TablePostgreSQLConverter<Column>
+    internal class BaseTablePostgreSQLConverter : TablePostgreSQLConverter<Core.IO.Table.Classes.Column>
     {
         public BaseTablePostgreSQLConverter(ConnectionData? connectionData) 
             : base(connectionData)
@@ -15,7 +15,7 @@ namespace DiGi.PostgreSQL.Table.xUnit.Classes
 
         public override string TableName => "basetable";
 
-        protected override TableConversionOptions<Column>? TableConversionOptions => new () 
+        protected override TableConversionOptions<Core.IO.Table.Classes.Column>? TableConversionOptions => new () 
         {
             PrimaryKeyColumns = [ new ExtendedColumn("Column_1", typeof(int), "Main", "Main Column")]
         };
