@@ -8,7 +8,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         [SkippableFact]
         public async Task PartitionPushAsyncCheck()
         {
-            ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(Enums.StorageMethod.Table);
+            ConnectionData connectionData = PostgreSQL.xUnit.Create.ConnectionData(DiGi.PostgreSQL.Enums.StorageMethod.Table);
 
             PartitionTablePostgreSQLConverter partitionTablePostgreSQLConverter = new(connectionData);
 
