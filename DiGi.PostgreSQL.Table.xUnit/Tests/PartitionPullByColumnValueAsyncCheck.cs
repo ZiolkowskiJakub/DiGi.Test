@@ -1,3 +1,4 @@
+using DiGi.Core.IO.Table.Classes;
 using DiGi.PostgreSQL.Classes;
 using DiGi.PostgreSQL.Table.xUnit.Classes;
 
@@ -39,7 +40,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
             string columnUniqueId = PartitionTablePostgreSQLConverter.Column_2.UniqueId() ?? string.Empty;
 
-            updated = await partitionTablePostgreSQLConverter.PullAsync(table, columnUniqueId, "CCC");
+            updated = await partitionTablePostgreSQLConverter.PullAsync(table, columnUniqueId, ["CCC"]);
             Assert.True(updated);
 
             Assert.Equal(true, table[0, 2]);
