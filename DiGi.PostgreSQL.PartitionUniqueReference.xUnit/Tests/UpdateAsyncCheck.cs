@@ -7,6 +7,10 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that an object can be updated, retrieved, and subsequently removed using the partition unique reference PostgreSQL converter.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task UpdateAsyncCheck()
         {

@@ -5,6 +5,10 @@ namespace DiGi.PostgreSQL.Table.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that data can be asynchronously pulled from a PostgreSQL partitioned table using the <see cref="PartitionTablePostgreSQLConverter"/>.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task PartitionPullAsyncCheck()
         {

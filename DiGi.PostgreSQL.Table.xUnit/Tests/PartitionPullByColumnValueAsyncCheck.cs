@@ -6,6 +6,10 @@ namespace DiGi.PostgreSQL.Table.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that data can be successfully pulled from a PostgreSQL partition table based on specific column values asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation of the test check.</returns>
         [SkippableFact]
         public async Task PartitionPullByColumnValueAsyncCheck()
         {

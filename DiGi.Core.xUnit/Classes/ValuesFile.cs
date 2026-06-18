@@ -7,6 +7,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the ValuesFile class by verifying that a list of serializable objects can be saved to and loaded from a temporary file.
+        /// </summary>
         [Fact]
         public void ValuesFile()
         {

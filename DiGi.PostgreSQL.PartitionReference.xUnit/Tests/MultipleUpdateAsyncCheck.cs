@@ -6,6 +6,11 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that multiple address records can be updated asynchronously via the <see cref="PartitionReferencePostgreSQLConverter"/>,
+        /// ensuring that unique partition references are generated and the record count is correctly maintained in the database.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task MultipleUpdateAsyncCheck()
         {

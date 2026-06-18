@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Verifies that the union operation of two <see cref="Triangle2D"/> objects sharing a common edge results in a single <see cref="Polygon2D"/> with an area equal to the sum of the individual triangle areas.
+        /// </summary>
         [Fact]
         public void Union()
         {

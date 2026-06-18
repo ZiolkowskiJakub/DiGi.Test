@@ -5,6 +5,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the <see cref="Core.Classes.IndexedDoubles"/> class, verifying its ability to handle random data population, copy construction, string serialization via <c>ToSystem_String</c>, and restoration through conversion.
+        /// </summary>
         [Fact]
         public void IndexDoubles()
         {

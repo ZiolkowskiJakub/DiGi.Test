@@ -7,6 +7,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the <see cref="PolygonalFace2DInternalPointSolver"/> to ensure it correctly solves for internal points within a 2D polygonal face.
+        /// </summary>
         [Fact]
         public void PolygonalFace2DInternalPointSolver()
         {

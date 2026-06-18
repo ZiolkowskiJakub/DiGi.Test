@@ -2,6 +2,9 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the creation and property assignment of a <see cref="Classes.GISModelAreal2DReference"/> object based on various input reference string formats, verifying that the Areal2DReference and GISModelReference properties are correctly populated.
+        /// </summary>
         [Fact]
         public void GISModelAreal2DReference()
         {

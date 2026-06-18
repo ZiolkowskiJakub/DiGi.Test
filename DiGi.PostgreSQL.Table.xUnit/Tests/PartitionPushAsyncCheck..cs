@@ -5,6 +5,10 @@ namespace DiGi.PostgreSQL.Table.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that the asynchronous push operation for a partition table in PostgreSQL functions correctly by inserting and updating data.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task PartitionPushAsyncCheck()
         {

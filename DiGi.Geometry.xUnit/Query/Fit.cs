@@ -5,6 +5,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Verifies that the Fit operation correctly fits other geometric entities, such as another bounding box or a segment, within the boundaries of a <see cref="BoundingBox2D"/>.
+        /// </summary>
         [Fact]
         public void Fit()
         {

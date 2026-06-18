@@ -5,6 +5,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the functionality of splitting a <see cref="Polyhedron"/> using a plane to ensure that the polyhedron is correctly divided into multiple parts.
+        /// </summary>
         [Fact]
         public void Split()
         {

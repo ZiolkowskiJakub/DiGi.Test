@@ -2,6 +2,9 @@
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the functionality of the Query.TryConvert method by verifying various unit conversion scenarios, including length, temperature, and time units, as well as tolerance handling.
+        /// </summary>
         [Fact]
         public void TryConvert()
         {

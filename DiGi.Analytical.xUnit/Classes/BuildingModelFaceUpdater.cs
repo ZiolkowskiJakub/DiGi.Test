@@ -8,6 +8,9 @@ namespace DiGi.Analytical.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the <see cref="BuildingModelFaceUpdater"/> to ensure that a face within a <see cref="BuildingModel"/> is correctly updated with new geometry.
+        /// </summary>
         [Fact]
         public void BuildingModelFaceUpdater()
         {

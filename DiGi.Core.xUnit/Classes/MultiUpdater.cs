@@ -2,6 +2,9 @@
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the MultiUpdater class to ensure that it correctly aggregates updates from multiple updater instances and modifies its value accordingly.
+        /// </summary>
         [Fact]
         public void MultiUpdater()
         {

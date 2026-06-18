@@ -6,6 +6,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the intersection of two-dimensional polygons by loading data from JSON files and verifying that the resulting intersection set contains exactly one polygon.
+        /// </summary>
         [Fact]
         public void Intersection_1()
         {
@@ -49,6 +52,9 @@ namespace DiGi.Geometry.xUnit
             Assert.True(DiGi.Core.Query.AlmostEquals(polygon2Ds_1[0].GetArea() + polygon2Ds_2[0].GetArea(), polygon2D_3.GetArea(), DiGi.Core.Constants.Tolerance.Distance));
         }
 
+        /// <summary>
+        /// Tests the intersection of a <see cref="Rectangle2D"/> and a <see cref="Polygon2D"/> using data loaded from JSON files to verify that the resulting collection contains the expected number of polygons.
+        /// </summary>
         [Fact]
         public void Intersection_2()
         {

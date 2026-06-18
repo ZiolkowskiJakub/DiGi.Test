@@ -5,6 +5,9 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the serialization and deserialization of year built data to ensure that the object can be correctly converted from a JSON string and back again without loss of information.
+        /// </summary>
         [Fact]
         public void YearBuiltData()
         {

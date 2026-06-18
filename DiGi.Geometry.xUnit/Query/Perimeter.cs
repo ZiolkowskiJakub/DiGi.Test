@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests whether the perimeter of a <see cref="Polygon2D"/> is calculated correctly.
+        /// </summary>
         [Fact]
         public void Perimeter()
         {

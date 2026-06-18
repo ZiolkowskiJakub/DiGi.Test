@@ -5,6 +5,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the functionality of splitting a self-intersecting polygon into multiple simple polygons and verifies that the total area is preserved.
+        /// </summary>
         [Fact]
         public void SelfIntersectionPolygons()
         {

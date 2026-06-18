@@ -9,6 +9,9 @@ namespace DiGi.Analytical.Test
 {
     public partial class MainForm : Form
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainForm"/> class.
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();

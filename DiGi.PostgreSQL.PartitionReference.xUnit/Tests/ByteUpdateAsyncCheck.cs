@@ -7,6 +7,10 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that byte-based data can be updated, retrieved, and removed asynchronously in a PostgreSQL database using partition references.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation of the test.</returns>
         [SkippableFact]
         public async Task ByteUpdateAsyncCheck()
         {

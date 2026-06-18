@@ -8,6 +8,9 @@ namespace DiGi.Analytical.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the <see cref="ConstructionRelationCluster"/> by verifying that it can store and retrieve construction-related objects and be used to create structure layers.
+        /// </summary>
         [Fact]
         public void ConstructionRelationCluster()
         {

@@ -7,6 +7,10 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that the update process for a partition reference in PostgreSQL correctly persists the data and allows for subsequent retrieval and verification of the serialized object.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task UpdateAsyncCheck()
         {

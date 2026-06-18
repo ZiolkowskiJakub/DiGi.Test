@@ -30,19 +30,32 @@
         public override string ToString() => $"({X:F4}, {Y:F4}, {Z:F4})";
     }
 
+    /// <summary>Represents a Non-Uniform Rational B-Spline (NURBS) curve defined by a set of control points, associated weights, a knot vector, and a degree.</summary>
     public class NurbsCurve
     {
         // (Previous properties and constructor from previous response, copy-paste here)
+        /// <summary>Gets the collection of <see cref="Vector3D"/> control points that define the geometry of the NURBS curve.</summary>
         public List<Vector3D> ControlPoints { get; private set; }
 
+        /// <summary>Gets the collection of weight values associated with each control point of the NURBS curve.</summary>
         public List<double> Weights { get; private set; }
+        /// <summary>Gets the sequence of knot values that determine the parameterization of the NURBS curve.</summary>
         public List<double> KnotVector { get; private set; }
+        /// <summary>Gets the degree of the NURBS curve.</summary>
         public int Degree { get; private set; }
 
+        /// <summary>Gets the total number of control points that define the NURBS curve.</summary>
         public int NumberOfControlPoints => ControlPoints.Count;
+        /// <summary>Gets the index of the last control point in the NURBS curve, calculated as the total number of control points minus one.</summary>
         public int N => NumberOfControlPoints - 1;
+        /// <summary>Gets the total number of knots in the knot vector, calculated as the number of control points plus the degree plus one.</summary>
         public int M => N + Degree + 1;
 
+        /// <summary>Initializes a new instance of the <see cref="NurbsCurve"/> class with the specified control points, weights, knot vector, and degree.</summary>
+        /// <param name="controlPoints">The collection of <see cref="Vector3D"/> control points that define the geometry of the curve.</param>
+        /// <param name="weights">The collection of weight values associated with each control point; must be equal in length to the <paramref name="controlPoints"/> collection.</param>
+        /// <param name="knotVector">The sequence of knot values that determine the parameterization of the curve.</param>
+        /// <param name="degree">The degree of the NURBS curve, which must be a positive integer of at least 1.</param>
         public NurbsCurve(IEnumerable<Vector3D> controlPoints, IEnumerable<double> weights, IEnumerable<double> knotVector, int degree)
         {
             if (controlPoints == null || !controlPoints.Any())
@@ -71,6 +84,9 @@
         }
 
         // (Evaluate and FindKnotSpan from previous response, copy-paste here)
+        /// <summary>Evaluates the NURBS curve at a specific parameter value to determine the corresponding 3D point on the curve.</summary>
+        /// <param name="u">The parameter value along the curve, typically within the range defined by the knot vector.</param>
+        /// <returns>A <see cref="Vector3D"/> representing the coordinates of the point on the curve at the specified parameter; returns a vector with NaN components if the sum of weighted basis functions is zero.</returns>
         public Vector3D Evaluate(double u)
         {
             int k = FindKnotSpan(u);
@@ -136,6 +152,12 @@
             return N;
         }
 
+        /// <summary>
+        /// Generates a clamped knot vector for a NURBS curve, ensuring that the curve starts and ends exactly at the first and last control points.
+        /// </summary>
+        /// <param name="numberOfControlPoints">The total number of control points used to define the curve.</param>
+        /// <param name="degree">The degree of the B-spline or NURBS curve.</param>
+        /// <returns>A list of doubles representing the clamped knot vector.</returns>
         public static List<double> CreateClampedKnotVector(int numberOfControlPoints, int degree)
         {
             int m = numberOfControlPoints + degree;

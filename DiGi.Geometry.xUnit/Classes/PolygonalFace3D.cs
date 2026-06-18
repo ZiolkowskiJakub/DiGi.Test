@@ -7,6 +7,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the creation and validation of a <see cref="PolygonalFace3D"/> instance, verifying that external and internal edges are correctly assigned and their orientations are properly handled.
+        /// </summary>
         [Fact]
         public void PolygonalFace3D()
         {

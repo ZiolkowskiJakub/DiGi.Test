@@ -4,6 +4,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the <see cref="Core.Classes.Size"/> class, verifying its property initialization and JSON serialization behavior.
+        /// </summary>
         [Fact]
         public void Size()
         {

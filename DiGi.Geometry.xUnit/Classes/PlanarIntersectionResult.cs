@@ -6,6 +6,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the planar intersection result calculation, verifying that intersections are correctly identified across various combinations of input flags and point positions relative to a plane.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult()
         {

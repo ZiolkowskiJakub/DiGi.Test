@@ -4,6 +4,10 @@ namespace DiGi.Typology.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the typology system, including the creation of typology items,
+        /// updating typology hierarchies, and verifying the retrieval of sub-typologies.
+        /// </summary>
         [Fact]
         public void Typology()
         {

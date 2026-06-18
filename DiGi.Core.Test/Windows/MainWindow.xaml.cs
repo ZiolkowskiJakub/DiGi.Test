@@ -22,6 +22,9 @@ namespace DiGi.Core.Test
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -553,6 +556,9 @@ namespace DiGi.Core.Test
             //Modify.FromJsonObject(testObject_2, jsonObject);
         }
 
+        /// <summary>
+        /// Tests the functionality of the <see cref="Core.Classes.Path"/> class, verifying operations such as retrieving the file extension, validating the path, and obtaining <see cref="System.IO.FileInfo"/>.
+        /// </summary>
         public void PathTest()
         {
             Core.Classes.Path path = @"Z:\DiGi\Line3Da.txt";
@@ -566,6 +572,9 @@ namespace DiGi.Core.Test
             FileInfo fileInfo = path.GetFileInfo();
         }
 
+        /// <summary>
+        /// Tests the serialization and deserialization round-trip for <see cref="SimpleParameterDefinition"/> and <see cref="EnumParameterDefinition"/> to ensure they can be converted to a string representation and back to their original types correctly.
+        /// </summary>
         public void ParameterTest()
         {
             string json = null;
@@ -582,6 +591,9 @@ namespace DiGi.Core.Test
             EnumParameterDefinition enumParameterDefinition_Temp = Convert.ToDiGi<EnumParameterDefinition>(json)?.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Tests the serialization and deserialization round-trip for various associated types, specifically verifying that <see cref="ParameterValue"/>, <see cref="AssociatedTypes"/>, and <see cref="ExternalParameterDefinition"/> can be converted to a string representation and back to their original types correctly.
+        /// </summary>
         public void AssociatedTypesTest()
         {
             string json;
@@ -604,6 +616,9 @@ namespace DiGi.Core.Test
             ExternalParameterDefinition externalParameterDefinition_Temp = Convert.ToDiGi<ExternalParameterDefinition>(json)?.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Tests the functionality of the <see cref="ParametrizedObject"/> class, specifically verifying value assignment via both simple keys and external parameter definitions, as well as ensuring serialization round-trip consistency.
+        /// </summary>
         public void ParametrizedObjectTest()
         {
             string json = null;

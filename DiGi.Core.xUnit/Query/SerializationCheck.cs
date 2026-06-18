@@ -6,6 +6,11 @@ namespace DiGi.Core.xUnit
 {
     public static partial class Query
     {
+        /// <summary>
+        /// Verifies that the provided serializable object can be correctly serialized to a JSON string and deserialized back into an object of the same type, ensuring data integrity by comparing the resulting serialized strings.
+        /// </summary>
+        /// <typeparam name="TSerializableObject">The type of the object being checked, which must implement <see cref="ISerializableObject"/>.</typeparam>
+        /// <param name="serializableObject">The serializable object instance to be validated for serialization and deserialization consistency.</param>
         public static void SerializationCheck<TSerializableObject>(this TSerializableObject? serializableObject) where TSerializableObject : ISerializableObject
         {
             Assert.NotNull(serializableObject);

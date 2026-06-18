@@ -5,6 +5,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the intersection functionality between two 2D segmentable geometries to verify that the intersection status and intersection points are correctly calculated.
+        /// </summary>
         [Fact]
         public void Intersect()
         {

@@ -4,6 +4,9 @@ namespace DiGi.Scripting.CSharp.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the execution of a C# script to verify that it correctly processes input variables and returns a successful response without exceptions.
+        /// </summary>
         [Fact]
         public void Script()
         {

@@ -4,6 +4,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that a <see cref="System.TimeSpan"/> property within a <see cref="TimeSpanObject"/> is correctly serialized and deserialized.
+        /// </summary>
         [Fact]
         public void TimeSpan()
         {

@@ -5,6 +5,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that the UniqueId property is excluded from JSON serialization for both standard serialization and custom object-to-JSON conversion.
+        /// </summary>
         [Fact]
         public void UniqueId()
         {

@@ -6,6 +6,10 @@ namespace DiGi.PostgreSQL.Table.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Validates the functionality of pushing a base table to a PostgreSQL database asynchronously, ensuring that data is correctly stored and that categories and columns can be retrieved.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task BasePushAsyncCheck()
         {

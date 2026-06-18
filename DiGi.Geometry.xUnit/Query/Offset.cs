@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the functionality of the planar offset query for both <see cref="Rectangle2D"/> and <see cref="Polygon2D"/> objects, verifying that positive and negative offsets result in expected containment and area properties.
+        /// </summary>
         [Fact]
         public void Offset()
         {

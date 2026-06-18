@@ -5,6 +5,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the serialization and deserialization process of an <see cref="Address"/> object to ensure that the archived data is correctly preserved and restored.
+        /// </summary>
         [Fact]
         public void ArchiveTest()
         {

@@ -6,6 +6,9 @@ namespace DiGi.Analytical.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the creation and initialization of a SpaceRelation object to ensure it correctly associates a FaceFloor with a Space and maintains its unique references.
+        /// </summary>
         [Fact]
         public void SpaceRelation()
         {

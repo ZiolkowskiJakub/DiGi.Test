@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the calculation of the intersection point between two 2D rays to ensure that intersecting rays return the correct point and non-intersecting rays return null.
+        /// </summary>
         [Fact]
         public void IntersectionPoint()
         {

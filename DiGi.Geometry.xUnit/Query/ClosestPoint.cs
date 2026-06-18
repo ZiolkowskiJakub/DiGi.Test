@@ -1,10 +1,13 @@
-﻿using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
 
 namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the functionality of finding the closest point using the <see cref="DiGi.Geometry.Planar.Query.ClosestPoint(Point2D, Point2D, Point2D, bool)"/> method across various scenarios and constraints.
+        /// </summary>
         [Fact]
         public void ClosestPoint()
         {

@@ -4,6 +4,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the Color class, verifying the conversion between System.Drawing.Color and string representations, as well as ensuring that ARGB values are preserved during these conversions and validating serialization.
+        /// </summary>
         [Fact]
         public void Color()
         {

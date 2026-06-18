@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the difference operation between two <see cref="PolygonalFace2D"/> objects to verify that the resulting geometry and its area are calculated correctly.
+        /// </summary>
         [Fact]
         public void Difference()
         {

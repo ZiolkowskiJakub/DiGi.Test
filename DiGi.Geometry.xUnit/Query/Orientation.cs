@@ -10,6 +10,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the orientation logic for polygons in both 2D and 3D spaces to ensure that clockwise and counter-clockwise orientations are correctly identified.
+        /// </summary>
         [Fact]
         public void Orientation()
         {

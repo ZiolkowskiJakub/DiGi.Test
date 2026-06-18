@@ -2,6 +2,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests that the rounding functionality correctly processes a zero value using the defined distance tolerance.
+        /// </summary>
         [Fact]
         public void Round()
         {

@@ -6,6 +6,9 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the loading and processing of ortho-data and building data from JSON files, verifying that bounding boxes can be calculated for buildings and sizes can be retrieved for ortho-data entries.
+        /// </summary>
         [Fact]
         public void OrtoDatas()
         {

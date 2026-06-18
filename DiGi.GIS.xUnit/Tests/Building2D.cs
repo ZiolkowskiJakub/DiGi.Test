@@ -5,6 +5,9 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the deserialization and serialization of a Building2D object to verify that the data is correctly preserved during the conversion process.
+        /// </summary>
         [Fact]
         public void Building2D()
         {

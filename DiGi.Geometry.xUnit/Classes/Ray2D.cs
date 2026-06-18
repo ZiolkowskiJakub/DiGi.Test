@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the projection functionality of a <see cref="Ray2D"/> instance to verify that points are correctly projected onto the ray's path.
+        /// </summary>
         [Fact]
         public void Ray2D()
         {

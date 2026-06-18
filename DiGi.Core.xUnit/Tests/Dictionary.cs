@@ -6,6 +6,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the serialization and deserialization of dictionary objects, verifying that they can be correctly converted between system strings and DiGi types.
+        /// </summary>
         [Fact]
         public void Dictionary()
         {

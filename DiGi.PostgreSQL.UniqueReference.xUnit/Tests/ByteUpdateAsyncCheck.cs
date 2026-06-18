@@ -8,6 +8,10 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that byte-based objects can be updated, retrieved, and removed asynchronously in a PostgreSQL database using the unique reference storage method.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task ByteUpdateAsyncCheck()
         {

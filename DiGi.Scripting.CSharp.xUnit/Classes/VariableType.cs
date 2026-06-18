@@ -5,6 +5,9 @@ namespace DiGi.Scripting.CSharp.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the serialization and deserialization process of the <see cref="VariableType"/> class to ensure that an object can be converted to a string and back without loss of data integrity.
+        /// </summary>
         [Fact]
         public void VariableType()
         {

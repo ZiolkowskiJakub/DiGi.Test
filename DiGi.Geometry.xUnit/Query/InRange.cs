@@ -5,6 +5,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests the range check functionality for 2D polygons by verifying if specific polygon instances are within the range of others using predefined JSON data files.
+        /// </summary>
         [Fact]
         public void InRange()
         {

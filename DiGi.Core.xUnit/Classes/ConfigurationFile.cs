@@ -6,6 +6,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the ConfigurationFile class to ensure that configuration properties can be added, retrieved with correct types, and checked for existence regardless of case or trailing whitespace.
+        /// </summary>
         [Fact]
         public void ConfigurationFile()
         {

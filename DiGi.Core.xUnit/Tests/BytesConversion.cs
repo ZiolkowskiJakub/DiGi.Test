@@ -5,6 +5,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that an <see cref="Address"/> object can be correctly converted to a byte array and subsequently deserialized back into an <see cref="Address"/> object while maintaining data integrity.
+        /// </summary>
         [Fact]
         public void BytesConversion()
         {

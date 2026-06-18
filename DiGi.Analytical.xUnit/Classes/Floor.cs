@@ -5,6 +5,9 @@ namespace DiGi.Analytical.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the creation of a <see cref="FaceFloor"/> instance and verifies that its geometry is correctly initialized.
+        /// </summary>
         [Fact]
         public void Floor()
         {

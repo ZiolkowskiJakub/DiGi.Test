@@ -2,6 +2,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that the <c>TryParseDouble</c> extension method correctly parses various string formats, including scientific notation and different culture-specific separators, into double-precision floating-point numbers.
+        /// </summary>
         [Fact]
         public void TryParseDouble()
         {

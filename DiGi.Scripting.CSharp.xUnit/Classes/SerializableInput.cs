@@ -5,6 +5,9 @@ namespace DiGi.Scripting.CSharp.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests whether the <see cref="SerializableInput"/> class can be correctly serialized to a string and deserialized back into an object while maintaining data integrity.
+        /// </summary>
         [Fact]
         public void SerializableInput()
         {

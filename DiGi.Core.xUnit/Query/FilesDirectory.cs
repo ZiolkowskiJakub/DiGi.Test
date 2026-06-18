@@ -5,6 +5,11 @@ namespace DiGi.Core.xUnit
 {
     public static partial class Query
     {
+        /// <summary>
+        /// Retrieves the path to the "files" directory relative to the location of the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly used as the reference point for calculating the directory path.</param>
+        /// <returns>The absolute path to the "files" directory, or <see langword="null"/> if the directory cannot be resolved.</returns>
         public static string? FilesDirectory(this Assembly? assembly)
         {
             Assert.NotNull(assembly);

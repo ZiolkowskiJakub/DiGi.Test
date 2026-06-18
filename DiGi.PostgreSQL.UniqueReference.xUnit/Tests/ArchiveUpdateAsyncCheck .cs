@@ -8,6 +8,10 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that updating an object in the PostgreSQL archive and retrieving it via a unique reference functions correctly.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation of the test.</returns>
         [SkippableFact]
         public async Task ArchiveUpdateAsyncCheck()
         {

@@ -5,6 +5,9 @@ namespace DiGi.Analytical.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality and serialization of the <see cref="RegulatedHeatTransferCoefficientsManager"/> class by adding regulated heat transfer coefficients for a specific regulation act and verifying the result.
+        /// </summary>
         [Fact]
         public void RegulatedHeatTransferCoefficientsManager()
         {

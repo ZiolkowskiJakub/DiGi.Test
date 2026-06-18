@@ -8,6 +8,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the basic functionality of the Table class, including column initialization, row addition, and data retrieval.
+        /// </summary>
         [Fact]
         public void Table()
         {
@@ -42,6 +45,9 @@ namespace DiGi.Core.xUnit
             }
         }
 
+        /// <summary>
+        /// Verifies that a <see cref="Table"/> object is correctly serialized to a JSON string and subsequently deserialized back into a <see cref="Table"/> instance, ensuring that the row and column counts remain consistent.
+        /// </summary>
         [Fact]
         public void Table_Serialization()
         {
@@ -97,6 +103,9 @@ namespace DiGi.Core.xUnit
 
         }
 
+        /// <summary>
+        /// Verifies that adding a new column to the table correctly assigns the specified name, type, and the expected zero-based index.
+        /// </summary>
         [Fact]
         public void Table_AddColumn_ShouldAssignCorrectIndexAndName()
         {
@@ -116,6 +125,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(1, table.ColumnCount);
         }
 
+        /// <summary>
+        /// Verifies that the GetColumnIndex method returns the correct zero-based index of a column when searched for by its name.
+        /// </summary>
         [Fact]
         public void Table_GetColumnIndex_ByName_ShouldReturnCorrectIndex()
         {
@@ -131,6 +143,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(1, index);
         }
 
+        /// <summary>
+        /// Verifies that the AddRow method correctly inserts values into the table when a dictionary containing column names and corresponding values is provided.
+        /// </summary>
         [Fact]
         public void Table_AddRow_WithDictionary_ShouldInsertValuesCorrectly()
         {
@@ -154,6 +169,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(30, table[0, 1]);             // RowIndex 0, ColumnIndex 1
         }
 
+        /// <summary>
+        /// Verifies that the SetValue method returns true and correctly stores the value in the table when the provided value matches the defined type of the column.
+        /// </summary>
         [Fact]
         public void Table_SetValue_WithCorrectType_ShouldReturnTrueAndStoreValue()
         {
@@ -170,6 +188,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(99.99m, table[0, 0]);
         }
 
+        /// <summary>
+        /// Verifies that the SetValue method returns false when attempting to set a cell value with a type that does not match the column's defined type and conversion is disabled.
+        /// </summary>
         [Fact]
         public void Table_SetValue_WithInvalidType_ShouldReturnFalse()
         {
@@ -184,6 +205,9 @@ namespace DiGi.Core.xUnit
             Assert.False(result);
         }
 
+        /// <summary>
+        /// Verifies that removing a row from the table decreases the total row count and ensures that subsequent rows are reindexed correctly.
+        /// </summary>
         [Fact]
         public void Table_RemoveRow_ShouldDecreaseRowCountAndReindex()
         {
@@ -203,6 +227,9 @@ namespace DiGi.Core.xUnit
             Assert.Null(table.GetRow(2));
         }
 
+        /// <summary>
+        /// Verifies that removing a column from the table removes the corresponding values from all rows in the table.
+        /// </summary>
         [Fact]
         public void Table_RemoveColumn_ShouldRemoveValueFromAllRows()
         {
@@ -224,6 +251,9 @@ namespace DiGi.Core.xUnit
         }
 
 
+        /// <summary>
+        /// Verifies that the TryGetValue method returns true and the expected value when provided with valid row and column indices.
+        /// </summary>
         [Fact]
         public void Table_TryGetValue_ShouldReturnCorrectValueAndTrue()
         {
@@ -241,6 +271,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal("Test Value", value);
         }
 
+        /// <summary>
+        /// Verifies that the TryGetValue method returns false when provided with invalid row or column indices.
+        /// </summary>
         [Fact]
         public void Table_TryGetValue_WithInvalidIndices_ShouldReturnFalse()
         {
@@ -254,6 +287,9 @@ namespace DiGi.Core.xUnit
             Assert.False(table.TryGetValue<string>(0, 1, out _)); // Invalid Row
         }
 
+        /// <summary>
+        /// Verifies that updating a column's type converts existing values to the new type when possible, or sets them to their default value if conversion fails.
+        /// </summary>
         [Fact]
         public void Table_UpdateColumn_ChangeType_ShouldConvertValuesOrRemovethem()
         {
@@ -273,6 +309,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(default(int), table[1, 0]); //Shoud be default
         }
 
+        /// <summary>
+        /// Verifies that the <see cref="DiGi.Core.IO.Table.Classes.Table"/>'s UpdateRow method correctly updates a row's cells when provided with a dictionary containing string keys and corresponding values.
+        /// </summary>
         [Fact]
         public void Table_UpdateRow_WithDictionaryStringKeys_ShouldUpdateCorrectly()
         {
@@ -292,6 +331,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(21, table[0, 1]);
         }
 
+        /// <summary>
+        /// Verifies that the <see cref="DiGi.Core.IO.Table.Classes.Table"/>'s UpdateRow method correctly updates a row's cells when provided with an enumerable collection of values.
+        /// </summary>
         [Fact]
         public void Table_UpdateRow_WithEnumerableValues_ShouldUpdateCorrectly()
         {
@@ -312,6 +354,9 @@ namespace DiGi.Core.xUnit
         }
 
 
+        /// <summary>
+        /// Verifies that the <see cref="DiGi.Core.IO.Table.Classes.Table"/>'s UpdateRow method correctly updates a row's cells when provided with a dictionary where keys are integer column indices.
+        /// </summary>
         [Fact]
         public void Table_UpdateRow_WithIntKeyDictionary_ShouldUpdateCorrectly()
         {
@@ -331,6 +376,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal(1, table[0, 1]);
         }
 
+        /// <summary>
+        /// Verifies that the <see cref="DiGi.Core.IO.Table.Classes.Table.UpdateColumn"/> method correctly updates only the name of a column when the provided type remains unchanged.
+        /// </summary>
         [Fact]
         public void Table_UpdateColumn_RenameOnly_ShouldUpdateName()
         {
@@ -346,6 +394,9 @@ namespace DiGi.Core.xUnit
             Assert.Equal("NewName", updatedCol.Name);
         }
 
+        /// <summary>
+        /// Verifies that the <see cref="DiGi.Core.IO.Table.Classes.Table"/>'s GetRow method returns the expected result when provided with both valid and invalid indices.
+        /// </summary>
         [Fact]
         public void Table_GetRow_ValidAndInvalidIndex_ShouldReturnExpected()
         {

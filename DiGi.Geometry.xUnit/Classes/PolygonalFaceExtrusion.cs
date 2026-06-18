@@ -6,6 +6,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the extrusion of a polygonal face to verify that it correctly generates a valid polyhedron and allows for the retrieval of an internal point.
+        /// </summary>
         [Fact]
         public void PolygonalFaceExtrusion()
         {

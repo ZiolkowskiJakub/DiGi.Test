@@ -7,6 +7,10 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that the asynchronous update and removal operations of the archive PostgreSQL converter function correctly when utilizing partition references.
+        /// </summary>
+        /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task ArchiveUpdateAsyncCheck()
         {

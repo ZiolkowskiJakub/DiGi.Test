@@ -6,6 +6,10 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that multiple records can be updated asynchronously in the PostgreSQL database using a unique reference converter.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
         public async Task MultipleUpdateAsyncCheck()
         {

@@ -4,6 +4,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the serialization and deserialization process of the <see cref="Core.Classes.SerializableObjectCollection"/> class to ensure that data integrity is maintained throughout the cycle.
+        /// </summary>
         [Fact]
         public void SerializableObjectCollection()
         {

@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the creation of a <see cref="Rectangle2D"/> object from a list of points and a direction vector, verifying that all input points are contained within the generated rectangle.
+        /// </summary>
         [Fact]
         public void Rectangle2D()
         {

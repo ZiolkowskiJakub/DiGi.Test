@@ -7,6 +7,10 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that an object can be updated in the PostgreSQL database, retrieved using its unique reference, and subsequently removed.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation of the test.</returns>
         [SkippableFact]
         public async Task UpdateAsyncCheck()
         {

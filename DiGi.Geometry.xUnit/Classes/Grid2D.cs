@@ -4,6 +4,11 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the functionality of the <see cref="Grid2D"/> class, verifying the creation of the grid,
+        /// the correctness of the bounding rectangle, the number and area of generated cell rectangles,
+        /// and that their centroids are contained within the grid boundaries.
+        /// </summary>
         [Fact]
         public void Grid2D()
         {

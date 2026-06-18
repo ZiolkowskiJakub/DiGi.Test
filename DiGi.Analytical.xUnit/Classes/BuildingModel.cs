@@ -8,6 +8,9 @@ namespace DiGi.Analytical.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the creation and configuration of a building model, including the assignment of floors, spaces, and internal conditions.
+        /// </summary>
         [Fact]
         public void BuildingModel()
         {

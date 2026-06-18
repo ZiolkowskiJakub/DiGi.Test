@@ -5,6 +5,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Verifies that <see cref="Tag"/> objects can be correctly serialized when instantiated with different data types such as double, string, integer, boolean, and DateTime.
+        /// </summary>
         [Fact]
         public void Tag()
         {

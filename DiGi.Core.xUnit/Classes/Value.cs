@@ -5,6 +5,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Classes
     {
+        /// <summary>
+        /// Tests the serialization of various data types when encapsulated within a <see cref="Value"/> instance to ensure consistency across different value types.
+        /// </summary>
         [Fact]
         public void Value()
         {

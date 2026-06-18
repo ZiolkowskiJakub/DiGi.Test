@@ -4,6 +4,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Tests the serialization of the <see cref="Column"/> class by verifying that it can be correctly processed using different data types.
+        /// </summary>
         [Fact]
         public void Column()
         {

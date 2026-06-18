@@ -4,6 +4,9 @@ namespace DiGi.Geometry.xUnit
 {
     public partial class Query
     {
+        /// <summary>
+        /// Tests that the normal vectors calculated for a <see cref="Polygon2D"/> are correct for both external and internal sides by verifying if points moved along these normals reside outside or inside the polygon respectively.
+        /// </summary>
         [Fact]
         public void Normals()
         {

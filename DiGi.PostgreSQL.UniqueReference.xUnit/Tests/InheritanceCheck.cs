@@ -7,6 +7,10 @@ namespace DiGi.PostgreSQL.UniqueReference.xUnit
 {
     public partial class Tests
     {
+        /// <summary>
+        /// Verifies that the <see cref="UniqueReferencePostgreSQLConverter"/> correctly handles inheritance and polymorphism when persisting, retrieving, and removing objects that implement <see cref="ISerializableObject"/>.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation of the test.</returns>
         [Fact]
         public async Task InheritanceCheck()
         {
