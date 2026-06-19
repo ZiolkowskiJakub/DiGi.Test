@@ -119,6 +119,9 @@ namespace DiGi.Geometry.xUnit
             }
         }
 
+        /// <summary>
+        /// Tests planar intersections with 3D line segments under various geometric configurations.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_Segment3D()
         {
@@ -157,6 +160,9 @@ namespace DiGi.Geometry.xUnit
             Assert.False(planarIntersectionResult_Disjoint.Intersect);
         }
 
+        /// <summary>
+        /// Tests planar intersections with 3D rays under various geometric configurations.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_Ray3D()
         {
@@ -184,6 +190,9 @@ namespace DiGi.Geometry.xUnit
             Assert.False(planarIntersectionResult_Parallel.Intersect);
         }
 
+        /// <summary>
+        /// Tests planar intersections with segmentable 3D objects.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_ISegmentable3D()
         {
@@ -207,6 +216,9 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(2, point2Ds_Result.Count);
         }
 
+        /// <summary>
+        /// Tests planar intersections with 3D polyhedrons.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_IPolyhedron()
         {
@@ -229,6 +241,9 @@ namespace DiGi.Geometry.xUnit
             Assert.True(planarIntersectionResult_Intersect.Intersect);
         }
 
+        /// <summary>
+        /// Tests intersections between two 3D polygonal faces.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_FaceFace()
         {
@@ -271,6 +286,9 @@ namespace DiGi.Geometry.xUnit
             Assert.False(planarIntersectionResult_Disjoint.Intersect);
         }
 
+        /// <summary>
+        /// Tests planar intersections under degenerate conditions.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_Degenerate()
         {
@@ -288,6 +306,9 @@ namespace DiGi.Geometry.xUnit
             Assert.Null(Create.PlanarIntersectionResult((Plane?)null, segment3D_Degenerate));
         }
 
+        /// <summary>
+        /// Tests planar intersections at tolerance boundaries.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_ToleranceBoundaries()
         {
@@ -307,6 +328,9 @@ namespace DiGi.Geometry.xUnit
             Assert.False(planarIntersectionResult_Outside.Intersect);
         }
 
+        /// <summary>
+        /// Tests the performance of planar intersection calculations.
+        /// </summary>
         [Fact]
         public void PlanarIntersectionResult_Performance()
         {
