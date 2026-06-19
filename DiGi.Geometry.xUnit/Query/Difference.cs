@@ -1,4 +1,5 @@
-﻿using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Planar;
+using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.xUnit
 {
@@ -24,6 +25,50 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(polygonalFace2D);
 
             Assert.True(DiGi.Core.Query.AlmostEquals(polygonalFace2D_1.GetArea() - polygonalFace2D_2.GetArea(), polygonalFace2D.GetArea(), DiGi.Core.Constants.Tolerance.MacroDistance));
+        }
+
+        /// <summary>
+        /// Tests that subtracting a disjoint geometry from another returns the original geometry itself.
+        /// </summary>
+        [Fact]
+        public void Difference_Disjoint()
+        {
+            var p1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
+            var p2 = new Polygon2D([new Point2D(5, 5), new Point2D(7, 5), new Point2D(7, 7), new Point2D(5, 7)]);
+
+            // Test 1: IPolygonal2D Difference
+            var result = Planar.Query.Difference(p1, p2);
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.Equal(4.0, result[0].GetArea(), 4);
+
+            // Test 2: PolygonalFace2D Difference
+            var face1 = p1.ToNTS_Polygon().ToDiGi();
+            var face2 = p2.ToNTS_Polygon().ToDiGi();
+            var faceResult = Planar.Query.Difference(face1, face2);
+            Assert.NotNull(faceResult);
+            Assert.Single(faceResult);
+            Assert.Equal(4.0, faceResult[0].GetArea(), 4);
+        }
+
+        /// <summary>
+        /// Tests that subtracting a topologically equal geometry from another returns an empty result.
+        /// </summary>
+        [Fact]
+        public void Difference_TopologicallyEqual()
+        {
+            var p1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
+            var p2 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
+
+            var result = Planar.Query.Difference(p1, p2);
+            Assert.NotNull(result);
+            Assert.Empty(result);
+
+            var face1 = p1.ToNTS_Polygon().ToDiGi();
+            var face2 = p2.ToNTS_Polygon().ToDiGi();
+            var faceResult = Planar.Query.Difference(face1, face2);
+            Assert.NotNull(faceResult);
+            Assert.Empty(faceResult);
         }
     }
 }
