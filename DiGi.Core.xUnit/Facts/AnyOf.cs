@@ -59,12 +59,12 @@ namespace DiGi.Core.xUnit
 
             // == and != operators (operator == compares the wrapped value to a raw object)
             Assert.True(anyInt1 == 100);
-            Assert.True(anyInt1.Value.Equals(anyInt2.Value));
-            Assert.False(anyInt1.Value.Equals(anyInt3.Value));
+            Assert.Equal(anyInt2.Value, anyInt1.Value);
+            Assert.NotEqual(anyInt3.Value, anyInt1.Value);
             Assert.False(anyInt1 == anyString);
 
             Assert.True(anyInt1 != 200);
-            Assert.True(!anyInt1.Value.Equals(anyInt3.Value));
+            Assert.NotEqual(anyInt3.Value, anyInt1.Value);
             Assert.False(anyInt1 == anyString);
 
             // Null equality checks
@@ -73,7 +73,7 @@ namespace DiGi.Core.xUnit
 
             AnyOf anyNullVal = new AnyOf(null, typeof(string));
             Assert.True(anyNullVal == null);
-            Assert.True(anyNullVal.Equals(null));
+            Assert.True(anyNullVal!.Equals(null));
         }
     }
 }

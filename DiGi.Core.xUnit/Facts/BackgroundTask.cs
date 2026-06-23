@@ -119,7 +119,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public async Task CancelableBackgroundTask_Cancellation()
         {
-            var task = new TestCancelableBackgroundTask(delayMs: 2000);
+            TestCancelableBackgroundTask task = new TestCancelableBackgroundTask(delayMs: 2000);
 
             bool canceledFired = false;
             task.Canceled += (s, e) => canceledFired = true;
@@ -137,6 +137,7 @@ namespace DiGi.Core.xUnit
             // IsCompleted returns false (as Task is null), IsRunning is false, and Status resets to Idle.
             Assert.False(task.IsRunning);
             Assert.Equal(CancelableBackgroundTaskStatus.Idle, task.CancelableBackgroundTaskStatus);
+            Assert.True(canceledFired);
         }
     }
 }

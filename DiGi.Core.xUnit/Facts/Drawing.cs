@@ -24,12 +24,16 @@ namespace DiGi.Core.xUnit
             Assert.Equal(pen.Color.Red, clonedPen.Color.Red);
         }
 
+        /// <summary>
+        /// Tests the CompareByPixels extension method with various Bitmap scenarios on Windows.
+        /// </summary>
         [Fact]
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public void CompareByPixels_ShouldEvaluateBitmaps()
         {
             // Create two identical bitmaps
-            using var bmp1 = new Bitmap(10, 10);
-            using var bmp2 = new Bitmap(10, 10);
+            using Bitmap bmp1 = new Bitmap(10, 10);
+            using Bitmap bmp2 = new Bitmap(10, 10);
 
             // Set a pixel on both
             bmp1.SetPixel(5, 5, System.Drawing.Color.Blue);
@@ -43,7 +47,7 @@ namespace DiGi.Core.xUnit
             Assert.False(bmp1.CompareByPixels(bmp2));
 
             // Create a bitmap of a different size
-            using var bmpDifferentSize = new Bitmap(10, 11);
+            using Bitmap bmpDifferentSize = new Bitmap(10, 11);
             Assert.False(bmp1.CompareByPixels(bmpDifferentSize));
 
             // Compare with nulls by fully qualifying the static query method
