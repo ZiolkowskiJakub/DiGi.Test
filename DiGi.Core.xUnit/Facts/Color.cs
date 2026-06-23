@@ -41,5 +41,37 @@ namespace DiGi.Core.xUnit
 
             Query.SerializationCheck(color_1);
         }
+
+        /// <summary>
+        /// Tests the Convert.ToDrawing query methods for string inputs, verifying support for named colors, shorthand CSS hex, standard hex, and ensuring exception-safety for invalid strings.
+        /// </summary>
+        [Fact]
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        public void ToDrawing_Conversion()
+        {
+            // Test named color (Verifying the fix for Bug 3)
+            System.Drawing.Color color_Named = Convert.ToDrawing("Red");
+            Assert.Equal(System.Drawing.Color.Red.ToArgb(), color_Named.ToArgb());
+
+            // Test shorthand CSS hex
+            System.Drawing.Color color_Shorthand = Convert.ToDrawing("#F00");
+            Assert.Equal(System.Drawing.Color.Red.ToArgb(), color_Shorthand.ToArgb());
+
+            // Test standard hex
+            System.Drawing.Color color_Standard = Convert.ToDrawing("#FF0000");
+            Assert.Equal(System.Drawing.Color.Red.ToArgb(), color_Standard.ToArgb());
+
+            // Test hex with alpha (RGBA format)
+            System.Drawing.Color color_Alpha = Convert.ToDrawing("#FF0000FF");
+            Assert.Equal(System.Drawing.Color.Red.ToArgb(), color_Alpha.ToArgb());
+
+            // Test invalid string (Verifying exception safety and fallback to Color.Empty)
+            System.Drawing.Color color_Invalid = Convert.ToDrawing("NotAColorName");
+            Assert.Equal(System.Drawing.Color.Empty.ToArgb(), color_Invalid.ToArgb());
+
+            // Test null string
+            System.Drawing.Color color_Null = Convert.ToDrawing((string?)null);
+            Assert.Equal(System.Drawing.Color.Empty.ToArgb(), color_Null.ToArgb());
+        }
     }
 }
