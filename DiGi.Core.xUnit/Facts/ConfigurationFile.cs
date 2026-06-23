@@ -33,17 +33,29 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(value);
             Assert.True(value.GetType() == typeof(int));
 
-            configurationFile.Add("SOME_PROPERTY 4", false);
+            configurationFile.Add("SOME_PROPERTY 4", true);
             value = configurationFile.GetValue<bool>("SOME_PROPERTY 4");
             Assert.NotNull(value);
             Assert.True(value.GetType() == typeof(bool));
 
+            // Verify case-insensitive lookup of a true value (tests the fix for case-insensitive TryGetValue)
             object? value_Temp = configurationFile.GetValue<bool>("SOME_PROPERTy 4");
             Assert.True(value_Temp.Equals(value));
 
             Assert.True(configurationFile.Contains("SOME_PROPERTy 4"));
             Assert.True(configurationFile.Contains("SOME_PROPERTy 4 "));
             Assert.True(configurationFile.Contains("SOME_PROPERTY 4 "));
+
+            // Verify the GetValue<T>(name, defaultValue, caseSensitive) overload (tests the fix for returning defaultValue)
+            // We use named arguments or distinct types to ensure correct overload resolution and avoid ambiguity with the caseSensitive overload.
+            bool bool_DefaultTest1 = configurationFile.GetValue<bool>("SOME_PROPERTY 4", defaultValue: false);
+            Assert.True(bool_DefaultTest1);
+
+            bool bool_DefaultTest2 = configurationFile.GetValue<bool>("NON_EXISTENT_PROPERTY", defaultValue: true);
+            Assert.True(bool_DefaultTest2);
+
+            int int_DefaultTest = configurationFile.GetValue<int>("NON_EXISTENT_PROPERTY", defaultValue: 42);
+            Assert.Equal(42, int_DefaultTest);
 
             List<string> names = configurationFile.Names;
             Assert.NotNull(names);
