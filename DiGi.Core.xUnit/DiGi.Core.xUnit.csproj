@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 <PropertyGroup>
 	<TargetFramework>net10.0</TargetFramework>
@@ -31,6 +31,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Parameter\DiGi.Core.Parameter.csproj" />
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Relation\DiGi.Core.Relation.csproj" />
+    <ProjectReference Include="..\..\DiGi.Core\DiGi.Core.Drawing\DiGi.Core.Drawing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
