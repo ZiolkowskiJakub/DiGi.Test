@@ -3,7 +3,7 @@ using DiGi.Geometry.Planar.Classes;
 
 namespace DiGi.Geometry.xUnit
 {
-    public partial class Query
+    public partial class Facts
     {
         /// <summary>
         /// Tests the optimized <see cref="Point2D.Distance"/> calculation.
