@@ -1,7 +1,9 @@
+using System;
+using System.Collections.Generic;
 using DiGi.Core.Classes;
+using DiGi.Core.Interfaces;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
-using System;
 
 namespace DiGi.Core.xUnit
 {
@@ -58,6 +60,30 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(relations);
             Assert.Single(relations);
             Assert.Equal(relation, relations[0]);
+        }
+
+        private class TestManyToOneRelation : ManyToOneRelation
+        {
+            public TestManyToOneRelation(IEnumerable<IUniqueReference>? uniqueReferences_From, IUniqueReference? uniqueReference_To)
+                : base(uniqueReferences_From, uniqueReference_To)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Tests that ManyToOneRelation handles null references during removal operations safely without throwing NullReferenceException.
+        /// </summary>
+        [Fact]
+        public void ManyToOneRelation_NullSafety()
+        {
+            TestManyToOneRelation relation_ManyToOne = new(null, null);
+
+            // Verify that calling Remove with a null uniqueReferences_From list does not throw NullReferenceException
+            List<IUniqueReference> uniqueReferences_ToRemove = [Create.UniqueReference(new TestUniqueObject())!];
+            List<IUniqueReference>? uniqueReferences_Removed = relation_ManyToOne.Remove(DiGi.Core.Relation.Enums.RelationSide.From, uniqueReferences_ToRemove);
+
+            Assert.NotNull(uniqueReferences_Removed);
+            Assert.Empty(uniqueReferences_Removed);
         }
     }
 }
