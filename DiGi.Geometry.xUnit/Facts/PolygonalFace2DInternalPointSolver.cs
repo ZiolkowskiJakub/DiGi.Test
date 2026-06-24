@@ -24,6 +24,12 @@ namespace DiGi.Geometry.xUnit
             int count = 1000;
 
             IPolygonalFace2D? polygonalFace2D = polygonalFace3D.Geometry2D;
+            Assert.NotNull(polygonalFace2D);
+
+            if (polygonalFace2D is null)
+            {
+                return;
+            }
 
             PolygonalFace2DInternalPointSolver polygonalFace2DInternalPointSolver = new(100)
             {
