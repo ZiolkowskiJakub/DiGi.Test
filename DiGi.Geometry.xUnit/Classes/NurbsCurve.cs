@@ -1,5 +1,6 @@
-﻿namespace DiGi.Geometry.xUnit
+namespace DiGi.Geometry.xUnit
 {
+    using Math = System.Math;
     public struct Vector3D
     {
         public double X { get; set; }

@@ -36,6 +36,7 @@
 	<ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry.Drawing\DiGi.Geometry.Drawing.csproj" />
 	<ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry.Object\DiGi.Geometry.Object.csproj" />
 	<ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
+	<ProjectReference Include="..\..\DiGi.Math\DiGi.Math\DiGi.Math.csproj" />
 	<ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
 	</ItemGroup>
 

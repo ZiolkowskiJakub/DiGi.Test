@@ -18,5 +18,8 @@
 
     <!-- Informational version (human-readable, can include git commit later) -->
     <InformationalVersion>$(Major).$(Minor).$(Build).$(Revision)</InformationalVersion>
+    
+    <!-- Suppress processor architecture mismatch warning (MSB3270) -->
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
   </PropertyGroup>
 </Project>

@@ -169,10 +169,53 @@ namespace DiGi.Geometry.xUnit
                 new Point2D(0, 5)
             ]);
 
-            var result = Planar.Query.Intersection<Polygon2D, IPolygonal2D>([uShape, rect]);
+            List<Polygon2D>? result = Planar.Query.Intersection<Polygon2D, IPolygonal2D>([uShape, rect]);
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(4.0, result.Sum(x => x.GetArea()), 4);
+        }
+
+        /// <summary>
+        /// Tests that when two 2D polygons share a single boundary edge (yielding a line intersection in NTS),
+        /// the intersection query gracefully returns an empty collection of polygons instead of throwing a NotImplementedException.
+        /// </summary>
+        [Fact]
+        public void Intersection_BoundaryTouch()
+        {
+            DiGi.Geometry.Planar.Classes.Polygon2D polygon2D_1 = new([
+                new DiGi.Geometry.Planar.Classes.Point2D(0.0, 0.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(2.0, 0.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(2.0, 2.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(0.0, 2.0)
+            ]);
+
+            DiGi.Geometry.Planar.Classes.Polygon2D polygon2D_2 = new([
+                new DiGi.Geometry.Planar.Classes.Point2D(2.0, 0.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(4.0, 0.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(4.0, 2.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(2.0, 2.0)
+            ]);
+
+            List<DiGi.Geometry.Planar.Classes.Polygon2D>? list_Result = DiGi.Geometry.Planar.Query.Intersection<DiGi.Geometry.Planar.Classes.Polygon2D, DiGi.Geometry.Planar.Classes.Polygon2D>([polygon2D_1, polygon2D_2]);
+            Assert.NotNull(list_Result);
+            Assert.Empty(list_Result);
+        }
+
+        /// <summary>
+        /// Tests that attempting an unsupported polygonal conversion using TryConvert gracefully returns false instead of throwing a NotImplementedException.
+        /// </summary>
+        [Fact]
+        public void TryConvert_Unsupported()
+        {
+            DiGi.Geometry.Planar.Classes.Polygon2D polygon2D_Test = new([
+                new DiGi.Geometry.Planar.Classes.Point2D(0.0, 0.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(2.0, 0.0),
+                new DiGi.Geometry.Planar.Classes.Point2D(0.0, 2.0)
+            ]);
+
+            bool success_Unsupported = DiGi.Geometry.Planar.Query.TryConvert<DiGi.Geometry.Planar.Classes.Rectangle2D>(polygon2D_Test, out List<DiGi.Geometry.Planar.Classes.Rectangle2D>? rectangle2Ds_Converted);
+            Assert.False(success_Unsupported);
+            Assert.Null(rectangle2Ds_Converted);
         }
     }
 }

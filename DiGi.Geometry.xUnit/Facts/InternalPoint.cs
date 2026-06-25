@@ -93,9 +93,9 @@ namespace DiGi.Geometry.xUnit
             List<Point2D> point2Ds = [];
             for (int i = 0; i < 100; i++)
             {
-                double angle = i * 2 * Math.PI / 100;
+                double angle = i * 2 * System.Math.PI / 100;
                 double radius = (i % 2 == 0) ? 10.0 : 1.0;
-                point2Ds.Add(new Point2D(radius * Math.Cos(angle), radius * Math.Sin(angle)));
+                point2Ds.Add(new Point2D(radius * System.Math.Cos(angle), radius * System.Math.Sin(angle)));
             }
 
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();

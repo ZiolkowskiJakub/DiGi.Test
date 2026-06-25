@@ -66,7 +66,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(6.0, segment2D_Perp2.Length, 6); // Length is 2 * B = 2 * 3 = 6
 
             // Case 6: Tilted Plane Projection
-            Spatial.Classes.Vector3D vector3D_TiltedNormal = new(1.0 / Math.Sqrt(2), 0, 1.0 / Math.Sqrt(2));
+            Spatial.Classes.Vector3D vector3D_TiltedNormal = new(1.0 / System.Math.Sqrt(2), 0, 1.0 / System.Math.Sqrt(2));
             Plane plane_Tilted = new(Spatial.Constants.Point3D.Zero, vector3D_TiltedNormal);
             ProjectionResult? projectionResult_Tilted = Create.ProjectionResult(plane_Tilted, ellipse3D_Valid);
             Assert.NotNull(projectionResult_Tilted);
@@ -74,7 +74,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(ellipse2Ds_Tilted);
             Assert.Single(ellipse2Ds_Tilted);
             Ellipse2D ellipse2D_Tilted = ellipse2Ds_Tilted[0];
-            Assert.Equal(5.0 / Math.Sqrt(2), ellipse2D_Tilted.A, 6);
+            Assert.Equal(5.0 / System.Math.Sqrt(2), ellipse2D_Tilted.A, 6);
             Assert.Equal(3.0, ellipse2D_Tilted.B, 6);
 
             // Case 7: Degenerate Ellipse (Zero Size)
@@ -99,7 +99,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(10.0, segment2D_Segment.Length, 6);
 
             // Case 9: Degenerate Projection (Tolerance-based Segment)
-            Spatial.Classes.Vector3D vector3D_NearPerpNormal = new(Math.Cos(0.001 * Math.PI / 180.0), 0, Math.Sin(0.001 * Math.PI / 180.0));
+            Spatial.Classes.Vector3D vector3D_NearPerpNormal = new(System.Math.Cos(0.001 * System.Math.PI / 180.0), 0, System.Math.Sin(0.001 * System.Math.PI / 180.0));
             Plane plane_NearPerp = new(Spatial.Constants.Point3D.Zero, vector3D_NearPerpNormal);
             ProjectionResult? projectionResult_NearPerp = Create.ProjectionResult(plane_NearPerp, ellipse3D_Valid, 0.01);
             Assert.NotNull(projectionResult_NearPerp);

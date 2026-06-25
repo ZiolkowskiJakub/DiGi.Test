@@ -90,5 +90,34 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, vector3D_FromTuple.Y);
             Assert.Equal(6.0, vector3D_FromTuple.Z);
         }
+
+        /// <summary>
+        /// Tests that copy-constructing a Vector3D or Point3D with a null reference initializes their coordinates to double.NaN and does not throw an IndexOutOfRangeException.
+        /// </summary>
+        [Fact]
+        public void Vector3D_NullCopyConstructor()
+        {
+            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Null = new((DiGi.Geometry.Spatial.Classes.Vector3D?)null);
+            Assert.NotNull(vector3D_Null);
+            Assert.True(double.IsNaN(vector3D_Null.X));
+            Assert.True(double.IsNaN(vector3D_Null.Y));
+            Assert.True(double.IsNaN(vector3D_Null.Z));
+
+            DiGi.Geometry.Spatial.Classes.Point3D point3D_Null = new((DiGi.Geometry.Spatial.Classes.Point3D?)null);
+            Assert.NotNull(point3D_Null);
+            Assert.True(double.IsNaN(point3D_Null.X));
+            Assert.True(double.IsNaN(point3D_Null.Y));
+            Assert.True(double.IsNaN(point3D_Null.Z));
+
+            DiGi.Geometry.Planar.Classes.Point2D point2D_Null = new((DiGi.Geometry.Planar.Classes.Point2D?)null);
+            Assert.NotNull(point2D_Null);
+            Assert.True(double.IsNaN(point2D_Null.X));
+            Assert.True(double.IsNaN(point2D_Null.Y));
+
+            DiGi.Geometry.Planar.Classes.Vector2D vector2D_Null = new((DiGi.Geometry.Planar.Classes.Vector2D?)null);
+            Assert.NotNull(vector2D_Null);
+            Assert.True(double.IsNaN(vector2D_Null.X));
+            Assert.True(double.IsNaN(vector2D_Null.Y));
+        }
     }
 }
