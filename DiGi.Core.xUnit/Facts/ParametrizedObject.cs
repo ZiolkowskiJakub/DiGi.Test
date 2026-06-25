@@ -30,5 +30,23 @@ namespace DiGi.Core.xUnit
 
             Assert.Equal(json, Convert.ToSystem_String(parametrizedObject_Temp));
         }
+
+        /// <summary>
+        /// Tests that ParametrizedObject.TryGetValue successfully retrieves a set parameter value and safely returns false on a non-existent parameter without throwing an exception or causing a stack overflow.
+        /// </summary>
+        [Fact]
+        public void ParametrizedObject_TryGetValue_ShouldNotStackOverflow()
+        {
+            ParametrizedObject parametrizedObject = new();
+            parametrizedObject.SetValue("ExistingKey", "Value123");
+
+            bool result_Exists = parametrizedObject.TryGetValue("ExistingKey", out object? value_Exists);
+            Assert.True(result_Exists);
+            Assert.Equal("Value123", value_Exists);
+
+            bool result_Missing = parametrizedObject.TryGetValue("NonExistentKey", out object? value_Missing);
+            Assert.False(result_Missing);
+            Assert.Null(value_Missing);
+        }
     }
 }

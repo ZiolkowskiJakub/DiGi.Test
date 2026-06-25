@@ -4,10 +4,13 @@ namespace DiGi.Core.xUnit
 {
     public partial class Facts
     {
+        /// <summary>
+        /// Tests basic operations of the ParameterGroup class, including setting, retrieving, checking existence, and removing parameter values.
+        /// </summary>
         [Fact]
         public void ParameterGroup_BasicOperations()
         {
-            var group = new ParameterGroup("General");
+            ParameterGroup group = new("General");
 
             Assert.Equal("General", group.Name);
 
@@ -19,8 +22,8 @@ namespace DiGi.Core.xUnit
             Assert.True(set2);
 
             // Retrieve values
-            var val1 = group.GetValue<int>("Param1");
-            var val2 = group.GetValue<string>("Param2");
+            int val1 = group.GetValue<int>("Param1");
+            string? val2 = group.GetValue<string>("Param2");
 
             Assert.Equal(42, val1);
             Assert.Equal("TestValue", val2);
@@ -35,13 +38,16 @@ namespace DiGi.Core.xUnit
             Assert.False(group.Contains("Param1"));
         }
 
+        /// <summary>
+        /// Tests that cloning a ParameterGroup performs a deep copy, isolating changes in the original group from the cloned one.
+        /// </summary>
         [Fact]
         public void ParameterGroup_Clone_ShouldPerformDeepCopy()
         {
-            var group = new ParameterGroup("OriginalGroup");
+            ParameterGroup group = new("OriginalGroup");
             group.SetValue("Param1", 100);
 
-            var clonedGroup = (ParameterGroup?)group.Clone();
+            ParameterGroup? clonedGroup = (ParameterGroup?)group.Clone();
             Assert.NotNull(clonedGroup);
             Assert.Equal("OriginalGroup", clonedGroup.Name);
 
@@ -56,10 +62,13 @@ namespace DiGi.Core.xUnit
             Assert.Equal(200, group.GetValue<int>("Param1"));
         }
 
+        /// <summary>
+        /// Tests basic operations of the ParameterGroupCollection class, including value assignment, retrieval, cloning, and deep copy isolation.
+        /// </summary>
         [Fact]
         public void ParameterGroupCollection_BasicOperations()
         {
-            var collection = new ParameterGroupCollection();
+            ParameterGroupCollection collection = new();
 
             // SetValue automatically resolves or creates groups
             bool set1 = collection.SetValue("Param1", 99.99); // Will default to default group name if GroupName is null/default
@@ -73,7 +82,7 @@ namespace DiGi.Core.xUnit
             Assert.Equal(99.99, val);
 
             // Clone collection
-            var clonedCollection = (ParameterGroupCollection?)collection.Clone();
+            ParameterGroupCollection? clonedCollection = (ParameterGroupCollection?)collection.Clone();
             Assert.NotNull(clonedCollection);
             Assert.True(clonedCollection.Contains("Param1"));
 
@@ -83,6 +92,31 @@ namespace DiGi.Core.xUnit
             // Verify deep copy isolation
             Assert.Equal(99.99, (double)clonedCollection.GetValue("Param1")!);
             Assert.Equal(11.11, (double)collection.GetValue("Param1")!);
+        }
+
+        /// <summary>
+        /// Tests that querying non-existent keys on a ParameterGroup using GetValue or TryGetValue returns null, default, or false without throwing KeyNotFoundExceptions.
+        /// </summary>
+        [Fact]
+        public void ParameterGroup_MissingKeys_ShouldReturnDefaultOrNullWithoutThrowing()
+        {
+            ParameterGroup group = new("General");
+
+            // Direct GetValue should return null for missing keys
+            object? val_Obj = group.GetValue("NonExistentKey");
+            Assert.Null(val_Obj);
+
+            // Generic GetValue<T> should return default(T)
+            int val_Int = group.GetValue<int>("NonExistentKey");
+            Assert.Equal(0, val_Int);
+
+            string? val_Str = group.GetValue<string>("NonExistentKey");
+            Assert.Null(val_Str);
+
+            // TryGetValue should safely return false and output null/default
+            bool result_Try = group.TryGetValue("NonExistentKey", out object? val_Try);
+            Assert.False(result_Try);
+            Assert.Null(val_Try);
         }
     }
 }
