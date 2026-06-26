@@ -1657,5 +1657,60 @@ namespace DiGi.Geometry.xUnit
             Assert.True(long_MsSegment < 150, $"Segment ClosestPoint performance check failed! Took {long_MsSegment} ms.");
             Assert.True(long_MsFace < 150, $"Face ClosestPoint performance check failed! Took {long_MsFace} ms.");
         }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized geometry conversion and projection queries.
+        /// </summary>
+        [Fact]
+        public void SpatialConvert_PerformanceAndCorrectness()
+        {
+            Plane plane = new Plane(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
+
+            Point2D point2D = new Point2D(5.0, 10.0);
+            Point3D? point3D_Converted = Spatial.Query.Convert(plane, point2D);
+            Assert.NotNull(point3D_Converted);
+            Assert.Equal(5.0, point3D_Converted.X, 1e-5);
+            Assert.Equal(10.0, point3D_Converted.Y, 1e-5);
+            Assert.Equal(0.0, point3D_Converted.Z, 1e-5);
+
+            Point3D point3D = new Point3D(5.0, 10.0, 0.0);
+            Point2D? point2D_Converted = Spatial.Query.Convert(plane, point3D);
+            Assert.NotNull(point2D_Converted);
+            Assert.Equal(5.0, point2D_Converted.X, 1e-5);
+            Assert.Equal(10.0, point2D_Converted.Y, 1e-5);
+
+            List<Point2D> point2Ds_Poly = new List<Point2D>();
+            for (int int_I = 0; int_I < 100; int_I++)
+            {
+                point2Ds_Poly.Add(new Point2D(int_I, int_I));
+            }
+            Polyline2D polyline2D = new Polyline2D(point2Ds_Poly);
+
+            Polyline3D? polyline3D_Converted = Spatial.Query.Convert(plane, polyline2D);
+            Assert.NotNull(polyline3D_Converted);
+            Assert.Equal(100, polyline3D_Converted.GetPoints()?.Count);
+
+            // Benchmark primitive point conversions
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            for (int int_I = 0; int_I < 100000; int_I++)
+            {
+                _ = Spatial.Query.Convert(plane, point2D);
+                _ = Spatial.Query.Convert(plane, point3D);
+            }
+            stopwatch.Stop();
+            long long_MsPoint = stopwatch.ElapsedMilliseconds;
+
+            // Benchmark collection conversions (1,000 conversions of 100-point polyline)
+            stopwatch.Restart();
+            for (int int_I = 0; int_I < 1000; int_I++)
+            {
+                _ = Spatial.Query.Convert(plane, polyline2D);
+            }
+            stopwatch.Stop();
+            long long_MsPolyline = stopwatch.ElapsedMilliseconds;
+
+            Assert.True(long_MsPoint < 150, $"Primitive point conversion performance check failed! Took {long_MsPoint} ms.");
+            Assert.True(long_MsPolyline < 150, $"Polyline conversion performance check failed! Took {long_MsPolyline} ms.");
+        }
     }
 }
