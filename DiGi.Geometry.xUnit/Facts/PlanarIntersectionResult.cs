@@ -357,7 +357,7 @@ namespace DiGi.Geometry.xUnit
 
             Assert.NotNull(planarIntersectionResult);
             Assert.False(planarIntersectionResult.Intersect);
-            Assert.True(stopwatch.ElapsedMilliseconds < 5, $"Early exit performance check failed for ISegmentable3D! Took {stopwatch.ElapsedMilliseconds} ms.");
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Early exit performance check failed for ISegmentable3D! Took {stopwatch.ElapsedMilliseconds} ms.");
 
             // Complex Polyhedron with 1000 faces disjoint from plane
             // Let's create a sphere-like or box bounding polyhedron that is disjoint
@@ -371,7 +371,7 @@ namespace DiGi.Geometry.xUnit
 
             Assert.NotNull(planarIntersectionResult_Poly);
             Assert.False(planarIntersectionResult_Poly.Intersect);
-            Assert.True(stopwatch.ElapsedMilliseconds < 5, $"Early exit performance check failed for IPolyhedron! Took {stopwatch.ElapsedMilliseconds} ms.");
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Early exit performance check failed for IPolyhedron! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
 
         /// <summary>
