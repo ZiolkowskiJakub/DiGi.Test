@@ -803,5 +803,859 @@ namespace DiGi.Geometry.xUnit
             // Assert Performance (should be extremely fast, typically < 20ms)
             Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Planar Area performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized TryGetConnectedPolygonalFace3Ds query.
+        /// </summary>
+        [Fact]
+        public void TryGetConnectedPolygonalFace3Ds_PerformanceAndCorrectness()
+        {
+            List<IPolygonalFace3D> polygonalFace3Ds = new();
+            for (int int_I = 1; int_I <= 20; int_I++)
+            {
+                List<Point3D> point3Ds_Vertices = new()
+                {
+                    new(int_I, 0, 0),
+                    new(int_I + 1, 0, 0),
+                    new(int_I + 1, 1, 0),
+                    new(int_I, 1, 0)
+                };
+                Polygon3D? polygon3D = Spatial.Create.Polygon3D(point3Ds_Vertices);
+                Assert.NotNull(polygon3D);
+                polygonalFace3Ds.Add(new PolygonalFace3D(polygon3D));
+            }
+
+            // Add one disconnected face
+            List<Point3D> point3Ds_Disconnected = new()
+            {
+                new(0, 0, 5),
+                new(1, 0, 5),
+                new(1, 1, 5),
+                new(0, 1, 5)
+            };
+            Polygon3D? polygon3D_Disconnected = Spatial.Create.Polygon3D(point3Ds_Disconnected);
+            Assert.NotNull(polygon3D_Disconnected);
+            polygonalFace3Ds.Add(new PolygonalFace3D(polygon3D_Disconnected));
+
+            List<Point3D> point3Ds_Source = new()
+            {
+                new(0, 0, 0),
+                new(1, 0, 0),
+                new(1, 1, 0),
+                new(0, 1, 0)
+            };
+            Polygon3D? polygon3D_Source = Spatial.Create.Polygon3D(point3Ds_Source);
+            Assert.NotNull(polygon3D_Source);
+            IPolygonalFace3D polygonalFace3D_Source = new PolygonalFace3D(polygon3D_Source);
+
+            // Warm up / JIT compile
+            _ = Spatial.Query.TryGetConnectedPolygonalFace3Ds(polygonalFace3D_Source, polygonalFace3Ds.Take(2), out _, out _);
+
+            // Execute and measure
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            bool bool_Result = Spatial.Query.TryGetConnectedPolygonalFace3Ds(
+                polygonalFace3D_Source,
+                polygonalFace3Ds,
+                out List<IPolygonalFace3D>? polygonalFace3Ds_Connected,
+                out List<IPolygonalFace3D>? polygonalFace3Ds_Disconnected,
+                tolerance: 1e-3);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.True(bool_Result);
+            Assert.NotNull(polygonalFace3Ds_Connected);
+            Assert.Equal(20, polygonalFace3Ds_Connected.Count);
+            Assert.NotNull(polygonalFace3Ds_Disconnected);
+            Assert.Single(polygonalFace3Ds_Disconnected);
+
+            // Assert Performance (should be extremely fast, typically < 20ms)
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"TryGetConnectedPolygonalFace3Ds performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized coplanar normal calculation.
+        /// </summary>
+        [Fact]
+        public void CoplanarNormal_PerformanceAndCorrectness()
+        {
+            List<Point3D> point3Ds = new();
+            for (int int_I = 0; int_I < 20000; int_I++)
+            {
+                double double_Angle = int_I * 2.0 * System.Math.PI / 20000.0;
+                point3Ds.Add(new(System.Math.Cos(double_Angle) * 10.0, System.Math.Sin(double_Angle) * 10.0, 0.0));
+            }
+
+            // Warm up / JIT compile
+            _ = Spatial.Query.Normal(point3Ds.Take(10));
+
+            // Execute and measure
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Normal = Spatial.Query.Normal(point3Ds);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.NotNull(vector3D_Normal);
+            Assert.Equal(0.0, vector3D_Normal.X, 1e-5);
+            Assert.Equal(0.0, vector3D_Normal.Y, 1e-5);
+            Assert.True(System.Math.Abs(vector3D_Normal.Z) > 0.99, "Normal Z component should be close to 1 or -1.");
+
+            // Assert Performance (should be extremely fast, typically < 10ms)
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"CoplanarNormal performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized ellipse intersection queries, ensuring the ellipse-line logic bug is resolved.
+        /// </summary>
+        [Fact]
+        public void EllipseIntersection_PerformanceAndCorrectness()
+        {
+            Ellipse2D ellipse2D = new(new Point2D(0, 0), 10.0, 5.0, new Vector2D(1, 0));
+            Line2D line2D = new(new Point2D(0, -10), new Vector2D(0, 1));
+
+            // Warm up / JIT compile
+            _ = Planar.Query.IntersectionPoints(ellipse2D, line2D);
+
+            // Execute and measure
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            List<Point2D>? point2Ds_Intersection = Planar.Query.IntersectionPoints(ellipse2D, line2D);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.NotNull(point2Ds_Intersection);
+            Assert.Equal(2, point2Ds_Intersection.Count);
+            
+            // Intersection points should be (0, -5) and (0, 5)
+            DiGi.Core.Modify.Sort(point2Ds_Intersection, x => x.Y);
+            Assert.Equal(0.0, point2Ds_Intersection[0].X, 1e-5);
+            Assert.Equal(-5.0, point2Ds_Intersection[0].Y, 1e-5);
+            Assert.Equal(0.0, point2Ds_Intersection[1].X, 1e-5);
+            Assert.Equal(5.0, point2Ds_Intersection[1].Y, 1e-5);
+
+            // Assert Performance (should be extremely fast, typically < 1ms)
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"EllipseIntersection performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized segment-collection intersections using bounding box filters.
+        /// </summary>
+        [Fact]
+        public void SegmentCollectionIntersection_PerformanceAndCorrectness()
+        {
+            List<Segment2D> segment2Ds_First = new();
+            for (int int_I = 0; int_I < 500; int_I++)
+            {
+                segment2Ds_First.Add(new(new Point2D(int_I * 2.0, 0.0), new Point2D(int_I * 2.0 + 1.0, 0.0)));
+            }
+
+            List<Segment2D> segment2Ds_Second = new();
+            for (int int_I = 0; int_I < 500; int_I++)
+            {
+                segment2Ds_Second.Add(new(new Point2D(int_I * 2.0 + 0.5, -1.0), new Point2D(int_I * 2.0 + 0.5, 1.0)));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Query.IntersectionPoints(segment2Ds_First.Take(5), segment2Ds_Second.Take(5));
+
+            // Execute and measure
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            List<Point2D>? point2Ds_Result = Planar.Query.IntersectionPoints(segment2Ds_First, segment2Ds_Second);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.NotNull(point2Ds_Result);
+            Assert.Equal(500, point2Ds_Result.Count);
+
+            // Assert Performance (with bounding box filter, it should be extremely fast, < 100ms)
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"SegmentCollectionIntersection performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized mesh boundary indexing methods.
+        /// </summary>
+        [Fact]
+        public void MeshBoundary_PerformanceAndCorrectness()
+        {
+            // Create a 100x100 grid mesh (10,000 quads, 20,000 triangles)
+            List<int[]> indexList = new();
+            for (int int_Y = 0; int_Y < 100; int_Y++)
+            {
+                for (int int_X = 0; int_X < 100; int_X++)
+                {
+                    int int_V00 = int_Y * 101 + int_X;
+                    int int_V10 = int_Y * 101 + (int_X + 1);
+                    int int_V01 = (int_Y + 1) * 101 + int_X;
+                    int int_V11 = (int_Y + 1) * 101 + (int_X + 1);
+
+                    indexList.Add(new[] { int_V00, int_V10, int_V01 });
+                    indexList.Add(new[] { int_V10, int_V11, int_V01 });
+                }
+            }
+
+            // Warm up / JIT compile
+            _ = Core.Query.SortedBoundaryIndexes(indexList.Take(10));
+            _ = Core.Query.IsNonManifold(indexList.Take(10));
+
+            // Execute and measure SortedBoundaryIndexes
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            List<List<int>>? sortedBoundaryPoints = Core.Query.SortedBoundaryIndexes(indexList);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.NotNull(sortedBoundaryPoints);
+            Assert.Single(sortedBoundaryPoints);
+            Assert.Equal(400, sortedBoundaryPoints[0].Count);
+
+            // Assert Performance (should be extremely fast, typically < 10ms for 20,000 triangles)
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"MeshBoundary performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+
+            // Execute and measure IsNonManifold
+            stopwatch.Restart();
+            bool bool_IsNonManifold = Core.Query.IsNonManifold(indexList);
+            stopwatch.Stop();
+
+            Assert.False(bool_IsNonManifold);
+            Assert.True(stopwatch.ElapsedMilliseconds < 50, $"IsNonManifold performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized segmentable distance query.
+        /// </summary>
+        [Fact]
+        public void PolylineDistance_PerformanceAndCorrectness()
+        {
+            List<Point2D> point2Ds_1 = new();
+            List<Point2D> point2Ds_2 = new();
+            for (int int_I = 0; int_I <= 500; int_I++)
+            {
+                point2Ds_1.Add(new(int_I * 2.0, 0.0));
+                point2Ds_2.Add(new(int_I * 2.0, int_I * 2.0 + 5.0));
+            }
+
+            Polyline2D polyline2D_1 = new(point2Ds_1);
+            Polyline2D polyline2D_2 = new(point2Ds_2);
+
+            // Warm up / JIT compile
+            _ = Planar.Query.Distance(polyline2D_1, polyline2D_2, out _, out _);
+
+            // Execute and measure
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            double double_Distance = Planar.Query.Distance(polyline2D_1, polyline2D_2, out Point2D? point2D_Closest1, out Point2D? point2D_Closest2);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.Equal(5.0, double_Distance, 1e-5);
+            Assert.NotNull(point2D_Closest1);
+            Assert.NotNull(point2D_Closest2);
+            Assert.Equal(5.0, point2D_Closest1.Distance(point2D_Closest2), 1e-5);
+
+            // Assert Performance (with AABB pruning, N*M nested loop should take <10ms, typically <1ms)
+            Assert.True(stopwatch.ElapsedMilliseconds < 100, $"PolylineDistance performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized Segment2D.On and Segment3D.On queries.
+        /// </summary>
+        [Fact]
+        public void SegmentOn_PerformanceAndCorrectness()
+        {
+            Segment2D segment2D = new(0.0, 0.0, 10.0, 0.0);
+            Point2D point2D_On = new(5.0, 0.0);
+            Point2D point2D_Close = new(5.0, 0.05);
+            Point2D point2D_Far = new(5.0, 0.15);
+            Point2D point2D_Before = new(-0.05, 0.0);
+            Point2D point2D_After = new(10.05, 0.0);
+
+            // Assert Correctness 2D
+            Assert.True(segment2D.On(point2D_On, 0.1));
+            Assert.True(segment2D.On(point2D_Close, 0.1));
+            Assert.False(segment2D.On(point2D_Far, 0.1));
+            Assert.True(segment2D.On(point2D_Before, 0.1));
+            Assert.True(segment2D.On(point2D_After, 0.1));
+            Assert.False(segment2D.On(new Point2D(-0.15, 0.0), 0.1));
+            Assert.False(segment2D.On(new Point2D(10.15, 0.0), 0.1));
+
+            Segment3D segment3D = new(0.0, 0.0, 0.0, 10.0, 0.0, 0.0);
+            Point3D point3D_On = new(5.0, 0.0, 0.0);
+            Point3D point3D_Close = new(5.0, 0.03, 0.04); // Distance is sqrt(0.03^2 + 0.04^2) = 0.05
+            Point3D point3D_Far = new(5.0, 0.09, 0.12);   // Distance is sqrt(0.09^2 + 0.12^2) = 0.15
+            Point3D point3D_Before = new(-0.05, 0.0, 0.0);
+            Point3D point3D_After = new(10.05, 0.0, 0.0);
+
+            // Assert Correctness 3D
+            Assert.True(segment3D.On(point3D_On, 0.1));
+            Assert.True(segment3D.On(point3D_Close, 0.1));
+            Assert.False(segment3D.On(point3D_Far, 0.1));
+            Assert.True(segment3D.On(point3D_Before, 0.1));
+            Assert.True(segment3D.On(point3D_After, 0.1));
+            Assert.False(segment3D.On(new Point3D(-0.15, 0.0, 0.0), 0.1));
+            Assert.False(segment3D.On(new Point3D(10.15, 0.0, 0.0), 0.1));
+
+            // Generate test dataset for performance
+            int int_Count = 50000;
+            List<Point2D> point2Ds_Test = new(int_Count);
+            List<Point3D> point3Ds_Test = new(int_Count);
+            for (int int_I = 0; int_I < int_Count; int_I++)
+            {
+                point2Ds_Test.Add(new(int_I * 0.0002, (int_I % 2 == 0) ? 0.01 : 0.2));
+                point3Ds_Test.Add(new(int_I * 0.0002, (int_I % 2 == 0) ? 0.01 : 0.2, 0.0));
+            }
+
+            // Warm up / JIT compile
+            _ = segment2D.On(point2D_On, 0.1);
+            _ = segment3D.On(point3D_On, 0.1);
+
+            // Benchmark 2D
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            int int_Hits2D = 0;
+            for (int int_I = 0; int_I < int_Count; int_I++)
+            {
+                if (segment2D.On(point2Ds_Test[int_I], 0.1))
+                {
+                    int_Hits2D++;
+                }
+            }
+            stopwatch.Stop();
+            long long_Ms2D = stopwatch.ElapsedMilliseconds;
+
+            // Benchmark 3D
+            stopwatch.Restart();
+            int int_Hits3D = 0;
+            for (int int_I = 0; int_I < int_Count; int_I++)
+            {
+                if (segment3D.On(point3Ds_Test[int_I], 0.1))
+                {
+                    int_Hits3D++;
+                }
+            }
+            stopwatch.Stop();
+            long long_Ms3D = stopwatch.ElapsedMilliseconds;
+
+            // Assert Performance (50k iterations should take less than 20ms, typically <2ms)
+            Assert.True(long_Ms2D < 100, $"Segment2D.On performance check failed! Took {long_Ms2D} ms.");
+            Assert.True(long_Ms3D < 100, $"Segment3D.On performance check failed! Took {long_Ms3D} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized Planar and Spatial Collinear queries.
+        /// </summary>
+        [Fact]
+        public void Collinear_PerformanceAndCorrectness()
+        {
+            Point2D point2D_1 = new(0.0, 0.0);
+            Point2D point2D_2 = new(10.0, 10.0);
+            Point2D point2D_3 = new(5.0, 5.0);
+            Point2D point2D_4 = new(5.0, 5.1);
+
+            // Assert Correctness 2D Points
+            Assert.True(Planar.Query.Collinear(point2D_1, point2D_2, point2D_3, 1e-5));
+            Assert.False(Planar.Query.Collinear(point2D_1, point2D_2, point2D_4, 1e-5));
+
+            Point3D point3D_1 = new(0.0, 0.0, 0.0);
+            Point3D point3D_2 = new(10.0, 10.0, 10.0);
+            Point3D point3D_3 = new(5.0, 5.0, 5.0);
+            Point3D point3D_4 = new(5.0, 5.0, 5.1);
+
+            // Assert Correctness 3D Points
+            Assert.True(Spatial.Query.Collinear(point3D_1, point3D_2, point3D_3, 1e-5));
+            Assert.False(Spatial.Query.Collinear(point3D_1, point3D_2, point3D_4, 1e-5));
+
+            // Generate test dataset for 2D collections
+            int int_Count = 10000;
+            List<Point2D> point2Ds_Collinear = new(int_Count);
+            List<Point2D> point2Ds_NonCollinear = new(int_Count);
+            for (int int_I = 0; int_I < int_Count; int_I++)
+            {
+                point2Ds_Collinear.Add(new(int_I, int_I));
+                point2Ds_NonCollinear.Add(new(int_I, (int_I == 5000) ? int_I + 5 : int_I));
+            }
+
+            // Generate test dataset for 3D collections
+            List<Point3D> point3Ds_Collinear = new(int_Count);
+            List<Point3D> point3Ds_NonCollinear = new(int_Count);
+            for (int int_I = 0; int_I < int_Count; int_I++)
+            {
+                point3Ds_Collinear.Add(new(int_I, int_I, int_I));
+                point3Ds_NonCollinear.Add(new(int_I, int_I, (int_I == 5000) ? int_I + 5 : int_I));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Query.Collinear(point2Ds_Collinear.Take(10), 1e-5);
+            _ = Spatial.Query.Collinear(point3Ds_Collinear.Take(10), 1e-5);
+
+            // Benchmark 2D Collinear Collection
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            bool bool_Collinear2D = Planar.Query.Collinear(point2Ds_Collinear, 1e-5);
+            bool bool_NonCollinear2D = Planar.Query.Collinear(point2Ds_NonCollinear, 1e-5);
+            stopwatch.Stop();
+            long long_Ms2D = stopwatch.ElapsedMilliseconds;
+
+            // Benchmark 3D Collinear Collection
+            stopwatch.Restart();
+            bool bool_Collinear3D = Spatial.Query.Collinear(point3Ds_Collinear, 1e-5);
+            bool bool_NonCollinear3D = Spatial.Query.Collinear(point3Ds_NonCollinear, 1e-5);
+            stopwatch.Stop();
+            long long_Ms3D = stopwatch.ElapsedMilliseconds;
+
+            // Assert Correctness
+            Assert.True(bool_Collinear2D);
+            Assert.False(bool_NonCollinear2D);
+            Assert.True(bool_Collinear3D);
+            Assert.False(bool_NonCollinear3D);
+
+            // Assert Performance (10k items check should be under 50ms, typically <1ms)
+            Assert.True(long_Ms2D < 100, $"Planar Collinear collection query performance check failed! Took {long_Ms2D} ms.");
+            Assert.True(long_Ms3D < 100, $"Spatial Collinear collection query performance check failed! Took {long_Ms3D} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized Spatial Inside queries.
+        /// </summary>
+        [Fact]
+        public void SpatialInside_PerformanceAndCorrectness()
+        {
+            Plane plane = Spatial.Constants.Plane.WorldZ;
+            List<Point3D> point3Ds_Vertices = new()
+            {
+                new(0.0, 0.0, 0.0),
+                new(10.0, 0.0, 0.0),
+                new(10.0, 10.0, 0.0),
+                new(0.0, 10.0, 0.0)
+            };
+
+            Polygon2D polygon2D = new(point3Ds_Vertices.ConvertAll(p => Spatial.Query.Convert(plane, p))!);
+            Polygon3D polygon3D = new(plane, polygon2D);
+
+            Point3D point3D_Inside = new(5.0, 5.0, 0.0);
+            Point3D point3D_Outside = new(15.0, 5.0, 0.0);
+            Point3D point3D_OffPlane = new(5.0, 5.0, 1.0);
+
+            // 1. Verify single point Inside query correctness
+            Assert.True(Spatial.Query.Inside(polygon3D, point3D_Inside));
+            Assert.False(Spatial.Query.Inside(polygon3D, point3D_Outside));
+            Assert.False(Spatial.Query.Inside(polygon3D, point3D_OffPlane));
+
+            // 2. Verify point collection Inside query correctness
+            List<Point3D> point3Ds_CollectionInside = new() { new(3.0, 3.0, 0.0), new(7.0, 7.0, 0.0) };
+            List<Point3D> point3Ds_CollectionOutside = new() { new(3.0, 3.0, 0.0), new(15.0, 7.0, 0.0) };
+            Assert.True(Spatial.Query.Inside(polygon3D, point3Ds_CollectionInside));
+            Assert.False(Spatial.Query.Inside(polygon3D, point3Ds_CollectionOutside));
+
+            // 3. Verify segmentable Inside query correctness
+            Polyline3D polyline3D_Inside = new(new List<Point3D> { new(1.0, 1.0, 0.0), new(9.0, 9.0, 0.0) });
+            Polyline3D polyline3D_Outside = new(new List<Point3D> { new(1.0, 1.0, 0.0), new(15.0, 9.0, 0.0) });
+            Assert.True(Spatial.Query.Inside(polygon3D, polyline3D_Inside));
+            Assert.False(Spatial.Query.Inside(polygon3D, polyline3D_Outside));
+
+            // Generate test dataset for point collection performance
+            int int_Count = 10000;
+            List<Point3D> point3Ds_Test = new(int_Count);
+            for (int int_I = 0; int_I < int_Count; int_I++)
+            {
+                point3Ds_Test.Add(new(5.0, 5.0, 0.0));
+            }
+
+            // Warm up / JIT compile
+            _ = Spatial.Query.Inside(polygon3D, point3D_Inside);
+            _ = Spatial.Query.Inside(polygon3D, point3Ds_CollectionInside);
+            _ = Spatial.Query.Inside(polygon3D, polyline3D_Inside);
+
+            // Benchmark point collection
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            bool bool_CollectionResult = Spatial.Query.Inside(polygon3D, point3Ds_Test);
+            stopwatch.Stop();
+            long long_MsCollection = stopwatch.ElapsedMilliseconds;
+
+            // Generate large segmentable geometry for performance
+            List<Point3D> point3Ds_Polyline = new(1000);
+            for (int int_I = 0; int_I < 1000; int_I++)
+            {
+                point3Ds_Polyline.Add(new(5.0, 5.0, 0.0));
+            }
+            Polyline3D polyline3D_Large = new(point3Ds_Polyline);
+
+            // Benchmark segmentable geometry
+            stopwatch.Restart();
+            bool bool_SegmentableResult = Spatial.Query.Inside(polygon3D, polyline3D_Large);
+            stopwatch.Stop();
+            long long_MsSegmentable = stopwatch.ElapsedMilliseconds;
+
+            // Assert Performance
+            Assert.True(bool_CollectionResult);
+            Assert.True(bool_SegmentableResult);
+            Assert.True(long_MsCollection < 150, $"Spatial point collection Inside check failed! Took {long_MsCollection} ms.");
+            Assert.True(long_MsSegmentable < 150, $"Spatial segmentable Inside check failed! Took {long_MsSegmentable} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized segment-segment intersection queries in 2D and 3D.
+        /// </summary>
+        [Fact]
+        public void SegmentIntersection_PerformanceAndCorrectness()
+        {
+            Segment2D segment2D_1 = new(0.0, 0.0, 10.0, 10.0);
+            Segment2D segment2D_2 = new(0.0, 10.0, 10.0, 0.0);
+            Segment2D segment2D_Parallel = new(1.0, 1.0, 11.0, 11.0);
+            Segment2D segment2D_NonIntersecting = new(20.0, 20.0, 30.0, 30.0);
+
+            Point2D? point2D_Intersect = segment2D_1.IntersectionPoint(segment2D_2, 1e-5);
+            Point2D? point2D_ParallelResult = segment2D_1.IntersectionPoint(segment2D_Parallel, 1e-5);
+            Point2D? point2D_NonIntersectResult = segment2D_1.IntersectionPoint(segment2D_NonIntersecting, 1e-5);
+
+            Assert.NotNull(point2D_Intersect);
+            Assert.Equal(5.0, point2D_Intersect.X, 1e-5);
+            Assert.Equal(5.0, point2D_Intersect.Y, 1e-5);
+            Assert.Null(point2D_ParallelResult);
+            Assert.Null(point2D_NonIntersectResult);
+
+            Point3D point3D_1Start = new(0.0, 0.0, 0.0);
+            Point3D point3D_1End = new(10.0, 10.0, 10.0);
+            Point3D point3D_2Start = new(0.0, 10.0, 0.0);
+            Point3D point3D_2End = new(10.0, 0.0, 10.0);
+            Point3D point3D_ParallelStart = new(1.0, 1.0, 1.0);
+            Point3D point3D_ParallelEnd = new(11.0, 11.0, 11.0);
+            Point3D point3D_SkewStart = new(0.0, 0.0, 5.0);
+            Point3D point3D_SkewEnd = new(10.0, 10.0, 15.0);
+
+            Point3D? point3D_Intersect = Spatial.Query.IntersectionPoint(point3D_1Start, point3D_1End, point3D_2Start, point3D_2End, 1e-5);
+            Point3D? point3D_ParallelResult = Spatial.Query.IntersectionPoint(point3D_1Start, point3D_1End, point3D_ParallelStart, point3D_ParallelEnd, 1e-5);
+            Point3D? point3D_SkewResult = Spatial.Query.IntersectionPoint(point3D_1Start, point3D_1End, point3D_SkewStart, point3D_SkewEnd, 1e-5);
+
+            Assert.NotNull(point3D_Intersect);
+            Assert.Equal(5.0, point3D_Intersect.X, 1e-5);
+            Assert.Equal(5.0, point3D_Intersect.Y, 1e-5);
+            Assert.Equal(5.0, point3D_Intersect.Z, 1e-5);
+            Assert.Null(point3D_ParallelResult);
+            Assert.Null(point3D_SkewResult);
+
+            int int_Iterations = 25000;
+            List<Segment2D> segment2Ds = new(int_Iterations);
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                segment2Ds.Add(new(0.0, 0.0, 10.0, 10.0));
+            }
+
+            _ = segment2D_1.IntersectionPoint(segment2D_2, 1e-5);
+            _ = Spatial.Query.IntersectionPoint(point3D_1Start, point3D_1End, point3D_2Start, point3D_2End, 1e-5);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            int int_Hits2D = 0;
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                if (segment2D_1.IntersectionPoint(segment2Ds[int_I], 1e-5) != null)
+                {
+                    int_Hits2D++;
+                }
+            }
+            stopwatch.Stop();
+            long long_Ms2D = stopwatch.ElapsedMilliseconds;
+
+            stopwatch.Restart();
+            int int_Hits3D = 0;
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                if (Spatial.Query.IntersectionPoint(point3D_1Start, point3D_1End, point3D_2Start, point3D_2End, 1e-5) != null)
+                {
+                    int_Hits3D++;
+                }
+            }
+            stopwatch.Stop();
+            long long_Ms3D = stopwatch.ElapsedMilliseconds;
+
+            Assert.True(long_Ms2D < 100, $"Segment2D.IntersectionPoint performance check failed! Took {long_Ms2D} ms.");
+            Assert.True(long_Ms3D < 100, $"Spatial.Query.IntersectionPoint performance check failed! Took {long_Ms3D} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized Spatial Centroid calculations.
+        /// </summary>
+        [Fact]
+        public void SpatialCentroid_PerformanceAndCorrectness()
+        {
+            Point3D point3D_1 = new(0.0, 0.0, 0.0);
+            Point3D point3D_2 = new(10.0, 0.0, 0.0);
+            Point3D point3D_3 = new(10.0, 10.0, 0.0);
+            Point3D point3D_4 = new(0.0, 10.0, 0.0);
+
+            Point3D? point3D_Mid = Spatial.Query.Centroid(new List<Point3D> { point3D_1, point3D_2 });
+            Assert.NotNull(point3D_Mid);
+            Assert.Equal(5.0, point3D_Mid.X, 1e-5);
+            Assert.Equal(0.0, point3D_Mid.Y, 1e-5);
+            Assert.Equal(0.0, point3D_Mid.Z, 1e-5);
+
+            Point3D? point3D_CentroidTri = Spatial.Query.Centroid(new List<Point3D> { point3D_1, point3D_2, point3D_3 });
+            Assert.NotNull(point3D_CentroidTri);
+            Assert.Equal(20.0 / 3.0, point3D_CentroidTri.X, 1e-5);
+            Assert.Equal(10.0 / 3.0, point3D_CentroidTri.Y, 1e-5);
+            Assert.Equal(0.0, point3D_CentroidTri.Z, 1e-5);
+
+            Point3D? point3D_CentroidPoly = Spatial.Query.Centroid(new List<Point3D> { point3D_1, point3D_2, point3D_3, point3D_4 });
+            Assert.NotNull(point3D_CentroidPoly);
+            Assert.Equal(5.0, point3D_CentroidPoly.X, 1e-5);
+            Assert.Equal(5.0, point3D_CentroidPoly.Y, 1e-5);
+            Assert.Equal(0.0, point3D_CentroidPoly.Z, 1e-5);
+
+            int int_Iterations = 10000;
+            List<Point3D[]> point3DArrays = new(int_Iterations);
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                point3DArrays.Add(new Point3D[]
+                {
+                    new(0.0, 0.0, 0.0),
+                    new(10.0, 0.0, 0.0),
+                    new(10.0, 10.0, 0.0),
+                    new(0.0, 10.0, 0.0),
+                    new(0.0, 5.0, 5.0),
+                    new(5.0, 0.0, 5.0)
+                });
+            }
+
+            _ = Spatial.Query.Centroid(point3DArrays[0]);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                _ = Spatial.Query.Centroid(point3DArrays[int_I]);
+            }
+            stopwatch.Stop();
+            long long_Ms = stopwatch.ElapsedMilliseconds;
+
+            Assert.True(long_Ms < 100, $"Spatial.Query.Centroid performance check failed! Took {long_Ms} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized 2D and 3D point AlmostEquals queries.
+        /// </summary>
+        [Fact]
+        public void AlmostEquals_PerformanceAndCorrectness()
+        {
+            Point2D point2D_1 = new(1.0, 2.0);
+            Point2D point2D_2 = new(1.0 + 1e-6, 2.0 - 1e-6);
+            Point2D point2D_3 = new(1.5, 2.5);
+
+            Assert.True(Planar.Query.AlmostEquals(point2D_1, point2D_2, 1e-4));
+            Assert.False(Planar.Query.AlmostEquals(point2D_1, point2D_3, 1e-4));
+
+            Point3D point3D_1 = new(1.0, 2.0, 3.0);
+            Point3D point3D_2 = new(1.0 + 1e-6, 2.0 - 1e-6, 3.0 + 1e-6);
+            Point3D point3D_3 = new(1.5, 2.5, 3.5);
+
+            Assert.True(Spatial.Query.AlmostEquals(point3D_1, point3D_2, 1e-4));
+            Assert.False(Spatial.Query.AlmostEquals(point3D_1, point3D_3, 1e-4));
+
+            int int_Iterations = 500000;
+            Point2D point2D_A = new(0.0, 0.0);
+            Point2D point2D_B = new(0.00001, 0.00001);
+            Point3D point3D_A = new(0.0, 0.0, 0.0);
+            Point3D point3D_B = new(0.00001, 0.00001, 0.00001);
+
+            _ = Planar.Query.AlmostEquals(point2D_A, point2D_B, 1e-3);
+            _ = Spatial.Query.AlmostEquals(point3D_A, point3D_B, 1e-3);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            int int_Hits2D = 0;
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                if (Planar.Query.AlmostEquals(point2D_A, point2D_B, 1e-3))
+                {
+                    int_Hits2D++;
+                }
+            }
+            stopwatch.Stop();
+            long long_Ms2D = stopwatch.ElapsedMilliseconds;
+
+            stopwatch.Restart();
+            int int_Hits3D = 0;
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                if (Spatial.Query.AlmostEquals(point3D_A, point3D_B, 1e-3))
+                {
+                    int_Hits3D++;
+                }
+            }
+            stopwatch.Stop();
+            long long_Ms3D = stopwatch.ElapsedMilliseconds;
+
+            Assert.Equal(int_Iterations, int_Hits2D);
+            Assert.Equal(int_Iterations, int_Hits3D);
+            Assert.True(long_Ms2D < 100, $"Planar.Query.AlmostEquals performance check failed! Took {long_Ms2D} ms.");
+            Assert.True(long_Ms3D < 100, $"Spatial.Query.AlmostEquals performance check failed! Took {long_Ms3D} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized Spatial InRange queries.
+        /// </summary>
+        [Fact]
+        public void SpatialInRange_PerformanceAndCorrectness()
+        {
+            Plane plane = Spatial.Constants.Plane.WorldZ;
+            List<Point3D> point3Ds_Vertices = new()
+            {
+                new(0.0, 0.0, 0.0),
+                new(10.0, 0.0, 0.0),
+                new(10.0, 10.0, 0.0),
+                new(0.0, 10.0, 0.0)
+            };
+
+            Polygon2D polygon2D = new(point3Ds_Vertices.ConvertAll(p => Spatial.Query.Convert(plane, p))!);
+            Polygon3D polygon3D = new(plane, polygon2D);
+
+            Point3D point3D_Inside = new(5.0, 5.0, 0.0);
+            Point3D point3D_Outside = new(15.0, 5.0, 0.0);
+            Point3D point3D_OffPlane = new(5.0, 5.0, 1.0);
+
+            Assert.True(Spatial.Query.InRange(polygon3D, point3D_Inside));
+            Assert.False(Spatial.Query.InRange(polygon3D, point3D_Outside));
+            Assert.False(Spatial.Query.InRange(polygon3D, point3D_OffPlane));
+
+            List<Point3D> point3Ds_CollectionInside = new() { new(3.0, 3.0, 0.0), new(7.0, 7.0, 0.0) };
+            List<Point3D> point3Ds_CollectionOutside = new() { new(3.0, 3.0, 0.0), new(15.0, 7.0, 0.0) };
+            Assert.True(Spatial.Query.InRange(polygon3D, point3Ds_CollectionInside));
+            Assert.False(Spatial.Query.InRange(polygon3D, point3Ds_CollectionOutside));
+
+            Polyline3D polyline3D_Inside = new(new List<Point3D> { new(1.0, 1.0, 0.0), new(9.0, 9.0, 0.0) });
+            Polyline3D polyline3D_Outside = new(new List<Point3D> { new(15.0, 15.0, 0.0), new(25.0, 25.0, 0.0) });
+            Assert.True(Spatial.Query.InRange(polygon3D, polyline3D_Inside));
+            Assert.False(Spatial.Query.InRange(polygon3D, polyline3D_Outside));
+
+            int int_Iterations = 10000;
+            List<Point3D> point3Ds_Test = new(int_Iterations);
+            for (int int_I = 0; int_I < int_Iterations; int_I++)
+            {
+                point3Ds_Test.Add(new(5.0, 5.0, 0.0));
+            }
+
+            _ = Spatial.Query.InRange(polygon3D, point3D_Inside);
+            _ = Spatial.Query.InRange(polygon3D, point3Ds_CollectionInside);
+            _ = Spatial.Query.InRange(polygon3D, polyline3D_Inside);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            bool bool_CollectionResult = Spatial.Query.InRange(polygon3D, point3Ds_Test);
+            stopwatch.Stop();
+            long long_MsCollection = stopwatch.ElapsedMilliseconds;
+
+            List<Point3D> point3Ds_Polyline = new(1000);
+            for (int int_I = 0; int_I < 1000; int_I++)
+            {
+                point3Ds_Polyline.Add(new(5.0, 5.0, 0.0));
+            }
+            Polyline3D polyline3D_Large = new(point3Ds_Polyline);
+
+            stopwatch.Restart();
+            bool bool_SegmentableResult = Spatial.Query.InRange(polygon3D, polyline3D_Large);
+            stopwatch.Stop();
+            long long_MsSegmentable = stopwatch.ElapsedMilliseconds;
+
+            Assert.True(bool_CollectionResult);
+            Assert.True(bool_SegmentableResult);
+            Assert.True(long_MsCollection < 150, $"Spatial point collection InRange check failed! Took {long_MsCollection} ms.");
+            Assert.True(long_MsSegmentable < 150, $"Spatial segmentable InRange check failed! Took {long_MsSegmentable} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized Spatial Normal queries.
+        /// </summary>
+        [Fact]
+        public void SpatialNormal_PerformanceAndCorrectness()
+        {
+            Point3D point3D_1 = new(0.0, 0.0, 0.0);
+            Point3D point3D_2 = new(10.0, 0.0, 0.0);
+            Point3D point3D_3 = new(0.0, 10.0, 0.0);
+
+            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_NormalTri = Spatial.Query.Normal(point3D_1, point3D_2, point3D_3);
+            Assert.NotNull(vector3D_NormalTri);
+            Assert.Equal(0.0, vector3D_NormalTri.X, 1e-5);
+            Assert.Equal(0.0, vector3D_NormalTri.Y, 1e-5);
+            Assert.True(System.Math.Abs(vector3D_NormalTri.Z) > 0.99);
+
+            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_AxisX = new(1.0, 0.0, 0.0);
+            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_AxisY = new(0.0, 1.0, 0.0);
+            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_NormalVec = Spatial.Query.Normal(vector3D_AxisX, vector3D_AxisY);
+            Assert.NotNull(vector3D_NormalVec);
+            Assert.Equal(0.0, vector3D_NormalVec.X, 1e-5);
+            Assert.Equal(0.0, vector3D_NormalVec.Y, 1e-5);
+            Assert.True(System.Math.Abs(vector3D_NormalVec.Z) > 0.99);
+
+            _ = Spatial.Query.Normal(point3D_1, point3D_2, point3D_3);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            for (int int_I = 0; int_I < 100000; int_I++)
+            {
+                _ = Spatial.Query.Normal(point3D_1, point3D_2, point3D_3);
+            }
+            stopwatch.Stop();
+            long long_Ms = stopwatch.ElapsedMilliseconds;
+
+            Assert.True(long_Ms < 100, $"Spatial.Query.Normal performance check failed! Took {long_Ms} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized ClosestPoint queries.
+        /// </summary>
+        [Fact]
+        public void SpatialClosestPoint_PerformanceAndCorrectness()
+        {
+            Point3D point3D_Start = new Point3D(0.0, 0.0, 0.0);
+            Point3D point3D_End = new Point3D(10.0, 0.0, 0.0);
+            Segment3D segment3D = new Segment3D(point3D_Start, point3D_End);
+            Point3D point3D_Target = new Point3D(5.0, 5.0, 0.0);
+
+            Point3D? point3D_ClosestSeg = segment3D.ClosestPoint(point3D_Target);
+            Assert.NotNull(point3D_ClosestSeg);
+            Assert.Equal(5.0, point3D_ClosestSeg.X, 1e-5);
+            Assert.Equal(0.0, point3D_ClosestSeg.Y, 1e-5);
+            Assert.Equal(0.0, point3D_ClosestSeg.Z, 1e-5);
+
+            Point2D point2D_Start = new Point2D(0.0, 0.0);
+            Point2D point2D_End = new Point2D(10.0, 0.0);
+            Segment2D segment2D = new Segment2D(point2D_Start, point2D_End);
+            Point2D point2D_Target = new Point2D(5.0, 5.0);
+
+            Point2D? point2D_ClosestSeg = segment2D.ClosestPoint(point2D_Target);
+            Assert.NotNull(point2D_ClosestSeg);
+            Assert.Equal(5.0, point2D_ClosestSeg.X, 1e-5);
+            Assert.Equal(0.0, point2D_ClosestSeg.Y, 1e-5);
+
+            Plane plane = new Plane(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
+            Polygon2D polygon2D = new Polygon2D(new List<Point2D>
+            {
+                new Point2D(0.0, 0.0),
+                new Point2D(10.0, 0.0),
+                new Point2D(10.0, 10.0),
+                new Point2D(0.0, 10.0)
+            });
+            Polygon3D polygon3D = new Polygon3D(plane, polygon2D);
+            PolygonalFace3D polygonalFace3D = new PolygonalFace3D(polygon3D);
+            List<PolygonalFace3D> polygonalFace3Ds = new List<PolygonalFace3D> { polygonalFace3D };
+
+            Point3D? point3D_ClosestFace = Spatial.Query.ClosestPoint(point3D_Target, polygonalFace3Ds, out PolygonalFace3D? closestFace, out double double_DistFace);
+            Assert.NotNull(point3D_ClosestFace);
+            Assert.NotNull(closestFace);
+            Assert.Equal(5.0, point3D_ClosestFace.X, 1e-5);
+            Assert.Equal(5.0, point3D_ClosestFace.Y, 1e-5);
+            Assert.Equal(0.0, point3D_ClosestFace.Z, 1e-5);
+            Assert.Equal(0.0, double_DistFace, 1e-5);
+
+            // Benchmark segment ClosestPoint
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            for (int int_I = 0; int_I < 100000; int_I++)
+            {
+                _ = segment3D.ClosestPoint(point3D_Target);
+                _ = segment2D.ClosestPoint(point2D_Target);
+            }
+            stopwatch.Stop();
+            long long_MsSegment = stopwatch.ElapsedMilliseconds;
+
+            // Benchmark face ClosestPoint
+            stopwatch.Restart();
+            for (int int_I = 0; int_I < 10000; int_I++)
+            {
+                _ = Spatial.Query.ClosestPoint(point3D_Target, polygonalFace3Ds, out _, out _, 0.0);
+            }
+            stopwatch.Stop();
+            long long_MsFace = stopwatch.ElapsedMilliseconds;
+
+            Assert.True(long_MsSegment < 150, $"Segment ClosestPoint performance check failed! Took {long_MsSegment} ms.");
+            Assert.True(long_MsFace < 150, $"Face ClosestPoint performance check failed! Took {long_MsFace} ms.");
+        }
     }
 }
