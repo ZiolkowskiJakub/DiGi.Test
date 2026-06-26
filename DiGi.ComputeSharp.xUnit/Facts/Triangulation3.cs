@@ -1,36 +1,35 @@
+using DiGi.ComputeSharp.Core.Classes;
 using DiGi.ComputeSharp.Core.Constants;
 using DiGi.ComputeSharp.Spatial.Classes;
 
 namespace DiGi.ComputeSharp.xUnit
 {
     /// <summary>
-    /// Contains unit tests for creating 3D line intersections.
+    /// Contains unit tests for creating 3D triangulations.
     /// </summary>
-    public partial class Tests
+    public partial class Facts
     {
         /// <summary>
-        /// Tests the intersection of two 3D lines and checks if the calculated point is correct.
+        /// Tests the triangulation of a 3D triangle intersected by a 3D line.
         /// Handles UnsupportedDoubleOperationException gracefully for FP64 unsupported GPUs.
         /// </summary>
         [Fact]
-        public void Line3Intersection()
+        public void Triangulation3()
         {
             if (!Query.IsComputeSharpSupported(testOutputHelper))
             {
                 return;
             }
 
-            Line3 line3_1 = new Line3(0, 0, 0, 10, 0, 0);
-            Line3 line3_2 = new Line3(1, -1, 0, 1, 1, 0);
+            Triangle3 triangle3_Base = new(new(true), 0, 0, 0, 0, 10, 0, 10, 0, 0);
+            Line3 line3_Splitter = new(4, 4, 0, 11, 11, 0);
 
             try
             {
-                Line3Intersection line3Intersection_Result = Spatial.Create.Line3Intersection(line3_1, line3_2, Tolerance.Distance);
+                Triangulation3 triangulation3_Result = Spatial.Create.Triangulation3(triangle3_Base, line3_Splitter, Tolerance.Distance);
 
-                Assert.False(line3Intersection_Result.IsNaN());
-                Assert.Equal(1.0, line3Intersection_Result.Point_1.X);
-                Assert.Equal(0.0, line3Intersection_Result.Point_1.Y);
-                Assert.Equal(0.0, line3Intersection_Result.Point_1.Z);
+                Assert.False(triangulation3_Result.IsNaN());
+                Assert.False(triangulation3_Result.triangle_1.IsNaN());
             }
             catch (Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
             {

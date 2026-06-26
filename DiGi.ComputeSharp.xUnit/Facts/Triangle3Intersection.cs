@@ -7,7 +7,7 @@ namespace DiGi.ComputeSharp.xUnit
     /// <summary>
     /// Contains unit tests for creating 3D triangle intersections.
     /// </summary>
-    public partial class Tests
+    public partial class Facts
     {
         /// <summary>
         /// Tests the intersection of two 3D triangles and checks the intersection results.
@@ -21,17 +21,17 @@ namespace DiGi.ComputeSharp.xUnit
                 return;
             }
 
-            Triangle3 triangle3_Case1_1 = new(new Bool(true), 2, 2, 0, 2, 8, 0, 8, 2, 0);
-            Triangle3 triangle3_Case1_2 = new(new Bool(true), 4, 4, 0, 4, 9, 0, 9, 4, 0);
+            Triangle3 triangle3_Case1_1 = new(new(true), 2, 2, 0, 2, 8, 0, 8, 2, 0);
+            Triangle3 triangle3_Case1_2 = new(new(true), 4, 4, 0, 4, 9, 0, 9, 4, 0);
 
-            Triangle3 triangle3_Case2_1 = new(new Bool(true), 2, 2, 0, 2, 8, 0, 8, 2, 0);
-            Triangle3 triangle3_Case2_2 = new(new Bool(true), 5, 5, 0, 4, 9, 0, 9, 4, 0);
+            Triangle3 triangle3_Case2_1 = new(new(true), 2, 2, 0, 2, 8, 0, 8, 2, 0);
+            Triangle3 triangle3_Case2_2 = new(new(true), 5, 5, 0, 4, 9, 0, 9, 4, 0);
 
-            Triangle3 triangle3_Case3_1 = new(new Bool(true), 1, 1, 0, 1, 6, 0, 6, 1, 0);
-            Triangle3 triangle3_Case3_2 = new(new Bool(true), 0, 5, 0, 5, 0, 0, 5, 5, 0);
+            Triangle3 triangle3_Case3_1 = new(new(true), 1, 1, 0, 1, 6, 0, 6, 1, 0);
+            Triangle3 triangle3_Case3_2 = new(new(true), 0, 5, 0, 5, 0, 0, 5, 5, 0);
 
-            Triangle3 triangle3_Case4_1 = new(new Bool(true), 0, 0, 0, 5, 5, 0, 5, 0, 0);
-            Triangle3 triangle3_Case4_2 = new(new Bool(true), 0, 0, 1, 10, 10, 1, 10, 0, 1);
+            Triangle3 triangle3_Case4_1 = new(new(true), 0, 0, 0, 5, 5, 0, 5, 0, 0);
+            Triangle3 triangle3_Case4_2 = new(new(true), 0, 0, 1, 10, 10, 1, 10, 0, 1);
             Coordinate3 coordinate3_Case4 = new(0, 0, 1);
 
             try

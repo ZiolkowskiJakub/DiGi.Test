@@ -136,6 +136,11 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
     </Project>
   </Folder>
+  <Folder Name="/Solar/">
+    <Project Path="../DiGi.Solar/DiGi.Solar/DiGi.Solar.csproj" />
+    <Project Path="../DiGi.Solar/DiGi.Solar.ComputeSharp/DiGi.Solar.ComputeSharp.csproj" />
+    <Project Path="DiGi.Solar.xUnit/DiGi.Solar.xUnit.csproj" />
+  </Folder>
   <Folder Name="/Tas/">
     <Project Path="../DiGi.Tas/DiGi.Tas.Core/DiGi.Tas.Core.csproj">
       <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj" />

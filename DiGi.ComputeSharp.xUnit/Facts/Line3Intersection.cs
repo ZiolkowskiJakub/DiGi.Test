@@ -1,35 +1,36 @@
-using DiGi.ComputeSharp.Core.Classes;
 using DiGi.ComputeSharp.Core.Constants;
 using DiGi.ComputeSharp.Spatial.Classes;
 
 namespace DiGi.ComputeSharp.xUnit
 {
     /// <summary>
-    /// Contains unit tests for creating 3D triangulations.
+    /// Contains unit tests for creating 3D line intersections.
     /// </summary>
-    public partial class Tests
+    public partial class Facts
     {
         /// <summary>
-        /// Tests the triangulation of a 3D triangle intersected by a 3D line.
+        /// Tests the intersection of two 3D lines and checks if the calculated point is correct.
         /// Handles UnsupportedDoubleOperationException gracefully for FP64 unsupported GPUs.
         /// </summary>
         [Fact]
-        public void Triangulation3()
+        public void Line3Intersection()
         {
             if (!Query.IsComputeSharpSupported(testOutputHelper))
             {
                 return;
             }
 
-            Triangle3 triangle3_Base = new(new Bool(true), 0, 0, 0, 0, 10, 0, 10, 0, 0);
-            Line3 line3_Splitter = new(4, 4, 0, 11, 11, 0);
+            Line3 line3_1 = new(0, 0, 0, 10, 0, 0);
+            Line3 line3_2 = new(1, -1, 0, 1, 1, 0);
 
             try
             {
-                Triangulation3 triangulation3_Result = Spatial.Create.Triangulation3(triangle3_Base, line3_Splitter, Tolerance.Distance);
+                Line3Intersection line3Intersection_Result = Spatial.Create.Line3Intersection(line3_1, line3_2, Tolerance.Distance);
 
-                Assert.False(triangulation3_Result.IsNaN());
-                Assert.False(triangulation3_Result.trinagle_1.IsNaN());
+                Assert.False(line3Intersection_Result.IsNaN());
+                Assert.Equal(1.0, line3Intersection_Result.Point_1.X);
+                Assert.Equal(0.0, line3Intersection_Result.Point_1.Y);
+                Assert.Equal(0.0, line3Intersection_Result.Point_1.Z);
             }
             catch (Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
             {

@@ -6,7 +6,7 @@ namespace DiGi.ComputeSharp.xUnit
     /// <summary>
     /// Contains unit tests for creating 3D line intersections.
     /// </summary>
-    public partial class Tests
+    public partial class Facts
     {
         /// <summary>
         /// Tests the intersection of one 3D line against a collection of other 3D lines.
@@ -20,8 +20,8 @@ namespace DiGi.ComputeSharp.xUnit
                 return;
             }
 
-            Line3 line3_1 = new Line3(0, 0, 0, 10, 0, 0);
-            Line3 line3_2 = new Line3(1, -1, 0, 1, 1, 0);
+            Line3 line3_1 = new(0, 0, 0, 10, 0, 0);
+            Line3 line3_2 = new(1, -1, 0, 1, 1, 0);
             Line3[] line3s_Target = [line3_2];
 
             try
