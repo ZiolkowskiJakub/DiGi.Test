@@ -2503,5 +2503,191 @@ namespace DiGi.Geometry.xUnit
 
             Assert.True(long_Ms < 5000, $"Polyline/Segmentable3D performance check failed! Took {long_Ms} ms.");
         }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the spatial-hash optimized Mesh2D point welding on a large dataset of unique triangles (O(n) instead of O(n^2)).
+        /// </summary>
+        [Fact]
+        public void Mesh2D_LargeDataset_PerformanceAndCorrectness()
+        {
+            // Build a zig-zag strip of 5000 triangles sharing edge points, forcing every point lookup to weld against the growing point list.
+            int triangleCount = 5000;
+            List<Triangle2D> triangle2Ds = new(triangleCount);
+            for (int i = 0; i < triangleCount; i++)
+            {
+                Point2D point2D_1 = new(i, 0);
+                Point2D point2D_2 = new(i + 1, 0);
+                Point2D point2D_3 = new(i, 1);
+                triangle2Ds.Add(new Triangle2D(point2D_1, point2D_2, point2D_3));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Create.Mesh2D(triangle2Ds.Take(10));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Mesh2D? mesh2D = Planar.Create.Mesh2D(triangle2Ds);
+            stopwatch.Stop();
+
+            // Assert Correctness: bottom line has triangleCount + 1 shared points, top apex points are all unique (triangleCount of them).
+            Assert.NotNull(mesh2D);
+            Assert.Equal((2 * triangleCount) + 1, mesh2D.PointsCount);
+            Assert.Equal(triangleCount, mesh2D.TrianglesCount);
+
+            // Assert Performance: with O(n^2) FindIndex welding this would take seconds; spatial-hash welding should stay well under the limit.
+            Assert.True(stopwatch.ElapsedMilliseconds < 500, $"Mesh2D large dataset welding performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the spatial-hash optimized Mesh3D point welding on a large dataset of unique triangles (O(n) instead of O(n^2)).
+        /// </summary>
+        [Fact]
+        public void Mesh3D_LargeDataset_PerformanceAndCorrectness()
+        {
+            // Build a zig-zag strip of 5000 triangles sharing edge points, forcing every point lookup to weld against the growing point list.
+            int triangleCount = 5000;
+            List<Triangle3D> triangle3Ds = new(triangleCount);
+            for (int i = 0; i < triangleCount; i++)
+            {
+                Point3D point3D_1 = new(i, 0, 0);
+                Point3D point3D_2 = new(i + 1, 0, 0);
+                Point3D point3D_3 = new(i, 1, 0);
+                triangle3Ds.Add(new Triangle3D(point3D_1, point3D_2, point3D_3));
+            }
+
+            // Warm up / JIT compile
+            _ = Spatial.Create.Mesh3D(triangle3Ds.Take(10));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Mesh3D? mesh3D = Spatial.Create.Mesh3D(triangle3Ds);
+            stopwatch.Stop();
+
+            // Assert Correctness: bottom line has triangleCount + 1 shared points, top apex points are all unique (triangleCount of them).
+            Assert.NotNull(mesh3D);
+            Assert.Equal((2 * triangleCount) + 1, mesh3D.PointsCount);
+            Assert.Equal(triangleCount, mesh3D.TrianglesCount);
+
+            // Assert Performance: with O(n^2) FindIndex welding this would take seconds; spatial-hash welding should stay well under the limit.
+            Assert.True(stopwatch.ElapsedMilliseconds < 500, $"Mesh3D large dataset welding performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the spatial-hash optimized Split deduplication on a large grid of segments (O(n) instead of O(n^2) result-list scans).
+        /// </summary>
+        [Fact]
+        public void Split_LargeDataset_PerformanceAndCorrectness()
+        {
+            // Build a dense grid of crossing segments so the dedup/result lookup runs many times against a large, growing result list.
+            int gridSize = 80;
+            List<Segment2D> segment2Ds_Grid = new(gridSize * 2);
+            for (int i = 0; i < gridSize; i++)
+            {
+                segment2Ds_Grid.Add(new Segment2D(new Point2D(0, i), new Point2D(gridSize, i)));
+                segment2Ds_Grid.Add(new Segment2D(new Point2D(i, 0), new Point2D(i, gridSize)));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Query.Split(segment2Ds_Grid.Take(4));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            List<Segment2D>? segment2Ds_Result = Planar.Query.Split(segment2Ds_Grid);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.NotNull(segment2Ds_Result);
+            Assert.True(segment2Ds_Result.Count > 0);
+
+            // Assert Performance: with the original O(n^2) List.Find scans (both the result dedup and the global intersection-point lookup) this took over 2.5s; spatial-hash caching keeps it well under the limit.
+            Assert.True(stopwatch.ElapsedMilliseconds < 500, $"Split large dataset performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized SelfIntersectionSegments query, which avoids re-enumerating a lazy source per outer iteration and uses a spatial-hash dedup instead of an O(n) List.Find scan over the growing result list.
+        /// </summary>
+        [Fact]
+        public void SelfIntersectionSegments_LargeDataset_PerformanceAndCorrectness()
+        {
+            // Build a zig-zag of 150 long horizontal segments offset diagonally, so every segment trace crosses many of the others, lazily projected from an index sequence to also exercise the single-enumeration fix.
+            int segmentCount = 150;
+            IEnumerable<Segment2D> segment2Ds_Lazy = Enumerable.Range(0, segmentCount).Select(i =>
+            {
+                double offset = (i % 2 == 0) ? 0.0 : 1.0;
+                return new Segment2D(new Point2D(0, i + offset), new Point2D(segmentCount, i - offset));
+            });
+
+            // Warm up / JIT compile
+            _ = Planar.Query.SelfIntersectionSegments(segment2Ds_Lazy.Take(5), 1000.0);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            List<Segment2D>? segment2Ds_Result = Planar.Query.SelfIntersectionSegments(segment2Ds_Lazy, 1000.0);
+            stopwatch.Stop();
+
+            // Assert Correctness
+            Assert.NotNull(segment2Ds_Result);
+            Assert.True(segment2Ds_Result.Count >= segmentCount);
+
+            // Assert Performance: with per-iteration re-enumeration of the lazy source plus O(n) List.Find dedup, this scaled far worse; the cached array + spatial-hash dedup keep it well under the limit.
+            Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"SelfIntersectionSegments large dataset performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the optimized SelfIntersectionSegments inner loop, which replaced an n-1 sized <see cref="List{Segment2D}"/> allocated on every outer iteration (O(n^2) memory churn) with a zero-allocation skip iterator.
+        /// </summary>
+        [Fact]
+        public void SelfIntersectionSegments_SkipIterator_PerformanceAndCorrectness()
+        {
+            // Build a denser zig-zag than the existing large-dataset test, specifically to amplify the O(n^2) temp-list allocation that the skip iterator replaces.
+            int segmentCount = 600;
+            List<Segment2D> segment2Ds = new(segmentCount);
+            for (int i = 0; i < segmentCount; i++)
+            {
+                double offset = (i % 2 == 0) ? 0.0 : 1.0;
+                segment2Ds.Add(new Segment2D(new Point2D(0, i + offset), new Point2D(segmentCount, i - offset)));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Query.SelfIntersectionSegments(segment2Ds.Take(5), 1000.0);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            List<Segment2D>? segment2Ds_Result = Planar.Query.SelfIntersectionSegments(segment2Ds, 1000.0);
+            stopwatch.Stop();
+
+            // Assert Correctness: every original segment is preserved in the result, plus any detected self-intersection segments.
+            Assert.NotNull(segment2Ds_Result);
+            Assert.True(segment2Ds_Result.Count >= segmentCount);
+
+            // Assert Performance: with the prior per-outer-iteration List<Segment2D> allocation this scaled quadratically in memory; the skip iterator keeps allocations flat and execution well under the limit.
+            Assert.True(stopwatch.ElapsedMilliseconds < 3000, $"SelfIntersectionSegments skip-iterator performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies both the correctness and the performance of the minimum-area Rectangle2D tie-breaker, which replaced an O(n*m) nested AlmostEquals scan over the convex hull for every candidate rectangle corner with a tolerance-bucketed spatial hash.
+        /// </summary>
+        [Fact]
+        public void Rectangle2D_TieBreaker_PerformanceAndCorrectness()
+        {
+            // Build a dense circle of points so the convex hull has many edges and the tie-breaker scan runs repeatedly with a large hull point count.
+            int pointCount = 2000;
+            List<Point2D> point2Ds = new(pointCount);
+            for (int i = 0; i < pointCount; i++)
+            {
+                double angle = i * 2.0 * System.Math.PI / pointCount;
+                point2Ds.Add(new(System.Math.Cos(angle) * 10.0, System.Math.Sin(angle) * 10.0));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Create.Rectangle2D(point2Ds.Take(10));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Rectangle2D? rectangle2D = Planar.Create.Rectangle2D(point2Ds);
+            stopwatch.Stop();
+
+            // Assert Correctness: minimum bounding rectangle for a circle of radius 10 should be a square with side close to 20.
+            Assert.NotNull(rectangle2D);
+            Assert.Equal(20.0, rectangle2D.Width, 1e-1);
+            Assert.Equal(20.0, rectangle2D.Height, 1e-1);
+
+            // Assert Performance: with the prior O(n*m) Find scan per tie-broken candidate this scaled far worse on a dense hull; the spatial hash keeps it well under the limit.
+            Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"Rectangle2D tie-breaker performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
     }
 }
