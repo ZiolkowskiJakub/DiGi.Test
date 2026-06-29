@@ -1,4 +1,5 @@
 using DiGi.Core.Parameter.Classes;
+using DiGi.Core.Parameter.Interfaces;
 
 namespace DiGi.Core.xUnit
 {
@@ -117,6 +118,68 @@ namespace DiGi.Core.xUnit
             bool result_Try = group.TryGetValue("NonExistentKey", out object? val_Try);
             Assert.False(result_Try);
             Assert.Null(val_Try);
+        }
+
+        /// <summary>
+        /// Tests that <see cref="ParameterGroupCollection.GetValue(IParameterDefinition, GetValueSettings)"/> and
+        /// <see cref="ParameterGroupCollection.GetValue{T}(IParameterDefinition, GetValueSettings)"/> still return
+        /// the correct value after replacing the Contains()+GetValue() double dictionary lookup with a single
+        /// TryGetValue() call.
+        /// </summary>
+        [Fact]
+        public void ParameterGroupCollection_GetValue_ByDefinition_ReturnsCorrectValue()
+        {
+            ParameterGroupCollection collection = new();
+
+            IParameterDefinition parameterDefinition = new SimpleParameterDefinition("Param1");
+
+            Assert.True(collection.SetValue(parameterDefinition, 42));
+
+            object? value_Object = collection.GetValue(parameterDefinition);
+            Assert.Equal(42, value_Object);
+
+            int value_Typed = collection.GetValue<int>(parameterDefinition);
+            Assert.Equal(42, value_Typed);
+        }
+
+        /// <summary>
+        /// Tests that <see cref="ParameterGroupCollection.GetValue(IParameterDefinition, GetValueSettings)"/> and
+        /// <see cref="ParameterGroupCollection.GetValue{T}(IParameterDefinition, GetValueSettings)"/> return
+        /// null/default (not throw) for a definition that was never added, and for a null definition.
+        /// </summary>
+        [Fact]
+        public void ParameterGroupCollection_GetValue_ByDefinition_MissingOrNull_ReturnsDefault()
+        {
+            ParameterGroupCollection collection = new();
+
+            IParameterDefinition parameterDefinition_Missing = new SimpleParameterDefinition("NeverAdded");
+
+            Assert.Null(collection.GetValue(parameterDefinition_Missing));
+            Assert.Equal(0, collection.GetValue<int>(parameterDefinition_Missing));
+
+            IParameterDefinition? parameterDefinition_Null = null;
+            Assert.Null(collection.GetValue(parameterDefinition_Null));
+            Assert.Equal(0, collection.GetValue<int>(parameterDefinition_Null));
+        }
+
+        /// <summary>
+        /// Tests that <see cref="ParameterGroupCollection.GetValue(IParameterDefinition, GetValueSettings)"/> correctly
+        /// distinguishes between multiple parameters in the collection, returning the value for the requested
+        /// definition specifically rather than e.g. the first one found.
+        /// </summary>
+        [Fact]
+        public void ParameterGroupCollection_GetValue_ByDefinition_MultipleParameters()
+        {
+            ParameterGroupCollection collection = new();
+
+            IParameterDefinition parameterDefinition_1 = new SimpleParameterDefinition("Param1");
+            IParameterDefinition parameterDefinition_2 = new SimpleParameterDefinition("Param2");
+
+            Assert.True(collection.SetValue(parameterDefinition_1, "Value1"));
+            Assert.True(collection.SetValue(parameterDefinition_2, "Value2"));
+
+            Assert.Equal("Value1", collection.GetValue(parameterDefinition_1));
+            Assert.Equal("Value2", collection.GetValue(parameterDefinition_2));
         }
     }
 }

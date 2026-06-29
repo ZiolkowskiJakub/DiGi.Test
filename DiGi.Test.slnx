@@ -52,6 +52,10 @@
     </Project>
     <Project Path="DiGi.Geometry.xUnit/DiGi.Geometry.xUnit.csproj" />
   </Folder>
+  <Folder Name="/EPW/">
+    <Project Path="../DiGi.EPW/DiGi.EPW/DiGi.EPW.csproj" />
+    <Project Path="DiGi.EPW.xUnit/DiGi.EPW.xUnit.csproj" />
+  </Folder>
   <Folder Name="/GIS/">
     <Project Path="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
