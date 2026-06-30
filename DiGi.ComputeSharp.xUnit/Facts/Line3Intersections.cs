@@ -31,9 +31,9 @@ namespace DiGi.ComputeSharp.xUnit
                 Line3Intersection line3Intersection_First = line3Intersections_Result!.First();
 
                 Assert.False(line3Intersection_First.IsNaN());
-                Assert.Equal(1.0, line3Intersection_First.Point_1.X);
-                Assert.Equal(0.0, line3Intersection_First.Point_1.Y);
-                Assert.Equal(0.0, line3Intersection_First.Point_1.Z);
+                Assert.Equal(1.0, line3Intersection_First.Point_1.X, Tolerance.Distance);
+                Assert.Equal(0.0, line3Intersection_First.Point_1.Y, Tolerance.Distance);
+                Assert.Equal(0.0, line3Intersection_First.Point_1.Z, Tolerance.Distance);
             }
             catch (Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
             {

@@ -53,7 +53,9 @@
     <Project Path="DiGi.Geometry.xUnit/DiGi.Geometry.xUnit.csproj" />
   </Folder>
   <Folder Name="/EPW/">
-    <Project Path="../DiGi.EPW/DiGi.EPW/DiGi.EPW.csproj" />
+    <Project Path="../DiGi.EPW/DiGi.EPW/DiGi.EPW.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
     <Project Path="DiGi.EPW.xUnit/DiGi.EPW.xUnit.csproj" />
   </Folder>
   <Folder Name="/GIS/">
@@ -141,8 +143,17 @@
     </Project>
   </Folder>
   <Folder Name="/Solar/">
-    <Project Path="../DiGi.Solar/DiGi.Solar/DiGi.Solar.csproj" />
-    <Project Path="../DiGi.Solar/DiGi.Solar.ComputeSharp/DiGi.Solar.ComputeSharp.csproj" />
+    <Project Path="../DiGi.Solar/DiGi.Solar.ComputeSharp/DiGi.Solar.ComputeSharp.csproj">
+      <BuildDependency Project="../DiGi.ComputeSharp/DiGi.ComputeSharp.Geometry/DiGi.ComputeSharp.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.ComputeSharp/DiGi.ComputeSharp/DiGi.ComputeSharp.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
+    <Project Path="../DiGi.Solar/DiGi.Solar/DiGi.Solar.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
     <Project Path="DiGi.Solar.xUnit/DiGi.Solar.xUnit.csproj" />
   </Folder>
   <Folder Name="/Tas/">

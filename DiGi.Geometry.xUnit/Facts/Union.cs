@@ -122,5 +122,66 @@ namespace DiGi.Geometry.xUnit
             Assert.Single(result);
             Assert.Equal(4.0, result[0].GetArea(), 4);
         }
+
+        /// <summary>
+        /// Documents the hole-handling fork that any change to the shading union must account for.
+        /// <para>A square ring (outer 6x6 with a central 2x2 void) is assembled from four rectangles. The <see cref="Polygon2D"/> union keeps external edges only, so the void is filled (area 36); the <see cref="PolygonalFace2D"/> union preserves the void (area 32).</para>
+        /// <para>The shading solver currently uses the external-edge path, so it over-counts shaded area for ring-shaped shadows. This test pins both behaviours so a switch between them is a deliberate, visible change.</para>
+        /// </summary>
+        [Fact]
+        public void Union_HoleHandling_Fork()
+        {
+            Polygon2D polygon2D_Bottom = new([new Point2D(0, 0), new Point2D(6, 0), new Point2D(6, 2), new Point2D(0, 2)]);
+            Polygon2D polygon2D_Top = new([new Point2D(0, 4), new Point2D(6, 4), new Point2D(6, 6), new Point2D(0, 6)]);
+            Polygon2D polygon2D_Left = new([new Point2D(0, 2), new Point2D(2, 2), new Point2D(2, 4), new Point2D(0, 4)]);
+            Polygon2D polygon2D_Right = new([new Point2D(4, 2), new Point2D(6, 2), new Point2D(6, 4), new Point2D(4, 4)]);
+
+            List<Polygon2D> polygon2Ds = [polygon2D_Bottom, polygon2D_Top, polygon2D_Left, polygon2D_Right];
+
+            // Polygon2D union keeps external edges only -> the central void is filled.
+            List<Polygon2D>? polygon2Ds_Union = Planar.Query.Union(polygon2Ds);
+            Assert.NotNull(polygon2Ds_Union);
+            Assert.Equal(36.0, polygon2Ds_Union.Sum(x => x.GetArea()), 3);
+
+            // PolygonalFace2D union preserves the void.
+            List<IPolygonalFace2D> polygonalFace2Ds = [];
+            foreach (Polygon2D polygon2D in polygon2Ds)
+            {
+                PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(polygon2D);
+                Assert.NotNull(polygonalFace2D);
+                polygonalFace2Ds.Add(polygonalFace2D);
+            }
+
+            List<PolygonalFace2D>? polygonalFace2Ds_Union = Planar.Query.Union(polygonalFace2Ds);
+            Assert.NotNull(polygonalFace2Ds_Union);
+            Assert.Equal(32.0, polygonalFace2Ds_Union.Sum(x => x.GetArea()), 3);
+        }
+
+        /// <summary>
+        /// Pins the area-conservation property the shading post-processing relies on: rebuilding <see cref="PolygonalFace2D"/> faces from a union result via <see cref="Create.PolygonalFace2Ds(IEnumerable{IPolygonal2D}, double)"/> must not change the total area.
+        /// <para>The shading solver runs this re-polygonization pass after the union. This test is the oracle for any change that collapses the union and face-creation into a single pass.</para>
+        /// </summary>
+        [Fact]
+        public void Union_FaceCreation_PreservesArea()
+        {
+            Triangle2D triangle2D_1 = new((0, 0), (4, 0), (0, 4));
+            Triangle2D triangle2D_2 = new((4, 4), (4, 0), (0, 4));
+            Triangle2D triangle2D_3 = new((1, 1), (3, 1), (1, 3));
+
+            List<Triangle2D> triangle2Ds = [triangle2D_1, triangle2D_2, triangle2D_3];
+
+            List<Polygon2D>? polygon2Ds_Union = Planar.Query.Union(triangle2Ds);
+            Assert.NotNull(polygon2Ds_Union);
+            double area_Union = polygon2Ds_Union.Sum(x => x.GetArea());
+
+            // Triangles 1 and 2 tile a 4x4 square; triangle 3 lies inside it.
+            Assert.Equal(16.0, area_Union, 3);
+
+            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(polygon2Ds_Union.ConvertAll(x => (IPolygonal2D)x), DiGi.Core.Constants.Tolerance.Distance);
+            Assert.NotNull(polygonalFace2Ds);
+            double area_Faces = polygonalFace2Ds.Sum(x => x.GetArea());
+
+            Assert.Equal(area_Union, area_Faces, 3);
+        }
     }
 }
