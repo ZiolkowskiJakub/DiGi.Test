@@ -174,11 +174,75 @@ namespace DiGi.Math.xUnit
             Assert.True(System.Math.Abs(matrix_IdentityProduct[2, 2] - 1.0) < 1e-9);
             Assert.True(System.Math.Abs(matrix_IdentityProduct[0, 1]) < 1e-9);
 
-            // Cofactor Sign Matrix
+            // Cofactor matrix (signed minors): for [[4,7],[2,6]] this is [[6,-2],[-7,4]].
             Matrix? matrix_Cofactors = matrix_2D.GetCofactorsMatrix();
             Assert.NotNull(matrix_Cofactors);
-            Assert.Equal(1.0, matrix_Cofactors[0, 0]); // (0+0)%2 == 0 -> 1.0
-            Assert.Equal(-1.0, matrix_Cofactors[0, 1]); // (0+1)%2 == 1 -> -1.0
+            Assert.Equal(6.0, matrix_Cofactors[0, 0]); // +det([6]) = 6
+            Assert.Equal(-2.0, matrix_Cofactors[0, 1]); // -det([2]) = -2
+            Assert.Equal(-7.0, matrix_Cofactors[1, 0]); // -det([7]) = -7
+            Assert.Equal(4.0, matrix_Cofactors[1, 1]); // +det([4]) = 4
+        }
+
+        /// <summary>
+        /// Tests Matrix.GetCofactorsMatrix, verifying the signed-minor cofactor values for a 3x3 matrix, the adjugate identity A * transpose(Cofactor) = det(A) * I, the 1x1 convention, and that a non-square matrix returns null.
+        /// </summary>
+        [Fact]
+        public void Matrix_GetCofactorsMatrix()
+        {
+            // A = [[1,2,3],[0,1,4],[5,6,0]] has det(A) = 1 and cofactor matrix
+            // [[-24, 20, -5], [18, -15, 4], [5, -4, 1]].
+            double[,] doubles_3D = new double[3, 3]
+            {
+                { 1.0, 2.0, 3.0 },
+                { 0.0, 1.0, 4.0 },
+                { 5.0, 6.0, 0.0 }
+            };
+            Matrix matrix_3D = new(doubles_3D);
+
+            Matrix? matrix_Cofactors = matrix_3D.GetCofactorsMatrix();
+            Assert.NotNull(matrix_Cofactors);
+
+            double[,] doubles_ExpectedCofactors = new double[3, 3]
+            {
+                { -24.0, 20.0, -5.0 },
+                { 18.0, -15.0, 4.0 },
+                { 5.0, -4.0, 1.0 }
+            };
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    Assert.True(System.Math.Abs(matrix_Cofactors[i, j] - doubles_ExpectedCofactors[i, j]) < 1e-9);
+                }
+            }
+
+            // Adjugate identity: A * transpose(Cofactor(A)) == det(A) * I.
+            Matrix? matrix_Adjugate = matrix_Cofactors.GetTransposed();
+            Assert.NotNull(matrix_Adjugate);
+            Matrix? matrix_Product = matrix_3D * matrix_Adjugate;
+            Assert.NotNull(matrix_Product);
+
+            double determinant = matrix_3D.Determinant();
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    double expected = i == j ? determinant : 0.0;
+                    Assert.True(System.Math.Abs(matrix_Product[i, j] - expected) < 1e-9);
+                }
+            }
+
+            // 1x1 convention: the cofactor matrix is [[1]].
+            Matrix matrix_1x1 = new(new double[,] { { 5.0 } });
+            Matrix? matrix_Cofactors_1x1 = matrix_1x1.GetCofactorsMatrix();
+            Assert.NotNull(matrix_Cofactors_1x1);
+            Assert.Equal(1, matrix_Cofactors_1x1.RowCount());
+            Assert.Equal(1, matrix_Cofactors_1x1.ColumnCount());
+            Assert.Equal(1.0, matrix_Cofactors_1x1[0, 0]);
+
+            // Non-square input returns null (cofactor matrix is only defined for square matrices).
+            Matrix matrix_NonSquare = new(new double[2, 3]);
+            Assert.Null(matrix_NonSquare.GetCofactorsMatrix());
         }
 
         /// <summary>

@@ -23,9 +23,11 @@ namespace DiGi.Math.xUnit
             double sinhVal = Query.Sinh(0.0);
             Assert.True(System.Math.Abs(sinhVal - 0.0) < 1e-9);
 
-            // Cube root test
+            // Cube root test (including negative and zero inputs to verify sign handling)
             double cubeRootVal = Query.CubeRoot(27.0);
             Assert.True(System.Math.Abs(cubeRootVal - 3.0) < 1e-9);
+            Assert.True(System.Math.Abs(Query.CubeRoot(-27.0) - (-3.0)) < 1e-9);
+            Assert.Equal(0.0, Query.CubeRoot(0.0));
 
             // LogN test (Log_2(8) = 3)
             double logNVal = Query.LogN(8.0, 2.0);
