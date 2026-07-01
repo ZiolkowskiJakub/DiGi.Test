@@ -1,7 +1,6 @@
-using System;
+using DiGi.Core.IO.Table.Classes;
 using System.Collections.Generic;
 using System.Text.Json;
-using DiGi.Core.IO.Table.Classes;
 
 namespace DiGi.Core.xUnit
 {

@@ -1,5 +1,4 @@
 using DiGi.Math.Classes;
-using System.Collections.Generic;
 
 namespace DiGi.Math.xUnit
 {

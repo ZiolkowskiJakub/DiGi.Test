@@ -11,8 +11,8 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Point2D_Distance_Correctness()
         {
-            Point2D point2D_1 = new (0, 0);
-            Point2D point2D_2 = new (3, 4); // Distance should be sqrt(3^2 + 4^2) = 5
+            Point2D point2D_1 = new(0, 0);
+            Point2D point2D_2 = new(3, 4); // Distance should be sqrt(3^2 + 4^2) = 5
 
             double distance = point2D_1.Distance(point2D_2);
 
@@ -25,13 +25,13 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Segment2D_Similar_Correctness()
         {
-            Point2D point2D_Start = new (0, 0);
-            Point2D point2D_End = new (10, 10);
+            Point2D point2D_Start = new(0, 0);
+            Point2D point2D_End = new(10, 10);
 
-            Segment2D segment2D_1 = new (point2D_Start, point2D_End);
-            Segment2D segment2D_2 = new (point2D_Start, point2D_End);
-            Segment2D segment2D_Reversed = new (point2D_End, point2D_Start);
-            Segment2D segment2D_Different = new (point2D_Start, new Point2D(5, 5));
+            Segment2D segment2D_1 = new(point2D_Start, point2D_End);
+            Segment2D segment2D_2 = new(point2D_Start, point2D_End);
+            Segment2D segment2D_Reversed = new(point2D_End, point2D_Start);
+            Segment2D segment2D_Different = new(point2D_Start, new Point2D(5, 5));
 
             Assert.True(segment2D_1.Similar(segment2D_2));
             Assert.True(segment2D_1.Similar(segment2D_Reversed));
@@ -44,9 +44,9 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void BoundingBox2D_On_Correctness()
         {
-            Point2D point2D_Min = new (-5, -5);
-            Point2D point2D_Max = new (5, 5);
-            BoundingBox2D boundingBox2D = new (point2D_Min, point2D_Max);
+            Point2D point2D_Min = new(-5, -5);
+            Point2D point2D_Max = new(5, 5);
+            BoundingBox2D boundingBox2D = new(point2D_Min, point2D_Max);
 
             // Point on left boundary
             Assert.True(boundingBox2D.On(new Point2D(-5, 0)));
@@ -64,24 +64,24 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void BoundingBox2D_InRange_Correctness()
         {
-            Point2D point2D_Min = new (-5, -5);
-            Point2D point2D_Max = new (5, 5);
-            BoundingBox2D boundingBox2D = new (point2D_Min, point2D_Max);
+            Point2D point2D_Min = new(-5, -5);
+            Point2D point2D_Max = new(5, 5);
+            BoundingBox2D boundingBox2D = new(point2D_Min, point2D_Max);
 
             // 1. Line passing directly through AABB
-            Line2D line2D_Through = new (new Point2D(-10, 0), new Vector2D(1, 0));
+            Line2D line2D_Through = new(new Point2D(-10, 0), new Vector2D(1, 0));
             Assert.True(boundingBox2D.InRange(line2D_Through));
 
             // 2. Line missing AABB
-            Line2D line2D_Miss = new (new Point2D(-10, 10), new Vector2D(1, 0));
+            Line2D line2D_Miss = new(new Point2D(-10, 10), new Vector2D(1, 0));
             Assert.False(boundingBox2D.InRange(line2D_Miss));
 
             // 3. Segment completely inside AABB
-            Segment2D segment2D_Inside = new (new Point2D(-2, -2), new Point2D(2, 2));
+            Segment2D segment2D_Inside = new(new Point2D(-2, -2), new Point2D(2, 2));
             Assert.True(boundingBox2D.InRange(segment2D_Inside));
 
             // 4. Segment outside AABB but aligned
-            Segment2D segment2D_Outside = new (new Point2D(10, 0), new Point2D(15, 0));
+            Segment2D segment2D_Outside = new(new Point2D(10, 0), new Point2D(15, 0));
             Assert.False(boundingBox2D.InRange(segment2D_Outside));
         }
 
@@ -92,8 +92,8 @@ namespace DiGi.Geometry.xUnit
         public void Segment_Segment_Intersection_Correctness()
         {
             // Standard crossing intersection
-            Segment2D segment2D_1 = new (new Point2D(-2, 0), new Point2D(2, 0));
-            Segment2D segment2D_2 = new (new Point2D(0, -2), new Point2D(0, 2));
+            Segment2D segment2D_1 = new(new Point2D(-2, 0), new Point2D(2, 0));
+            Segment2D segment2D_2 = new(new Point2D(0, -2), new Point2D(0, 2));
             IntersectionResult2D? intersectionResult2D_Cross = segment2D_1.IntersectionResult2D(segment2D_2);
 
             Assert.NotNull(intersectionResult2D_Cross);
@@ -105,23 +105,23 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0, point2D_Cross.Y, 5);
 
             // Parallel non-intersecting
-            Segment2D segment2D_Parallel1 = new (new Point2D(-2, 0), new Point2D(2, 0));
-            Segment2D segment2D_Parallel2 = new (new Point2D(-2, 2), new Point2D(2, 2));
+            Segment2D segment2D_Parallel1 = new(new Point2D(-2, 0), new Point2D(2, 0));
+            Segment2D segment2D_Parallel2 = new(new Point2D(-2, 2), new Point2D(2, 2));
             IntersectionResult2D? intersectionResult2D_Parallel = segment2D_Parallel1.IntersectionResult2D(segment2D_Parallel2);
             Assert.NotNull(intersectionResult2D_Parallel);
             Assert.False(intersectionResult2D_Parallel.Intersect);
 
             // Collinear overlapping (results in a Segment)
-            Segment2D segment2D_Collinear1 = new (new Point2D(0, 0), new Point2D(4, 0));
-            Segment2D segment2D_Collinear2 = new (new Point2D(2, 0), new Point2D(6, 0));
+            Segment2D segment2D_Collinear1 = new(new Point2D(0, 0), new Point2D(4, 0));
+            Segment2D segment2D_Collinear2 = new(new Point2D(2, 0), new Point2D(6, 0));
             IntersectionResult2D? intersectionResult2D_Overlapping = segment2D_Collinear1.IntersectionResult2D(segment2D_Collinear2);
             Assert.NotNull(intersectionResult2D_Overlapping);
             Assert.True(intersectionResult2D_Overlapping.Intersect);
             Assert.True(intersectionResult2D_Overlapping.Contains<Segment2D>());
 
             // Adjacent sharing end points (results in a Point)
-            Segment2D segment2D_Adjacent1 = new (new Point2D(0, 0), new Point2D(2, 2));
-            Segment2D segment2D_Adjacent2 = new (new Point2D(2, 2), new Point2D(4, 0));
+            Segment2D segment2D_Adjacent1 = new(new Point2D(0, 0), new Point2D(2, 2));
+            Segment2D segment2D_Adjacent2 = new(new Point2D(2, 2), new Point2D(4, 0));
             IntersectionResult2D? intersectionResult2D_Adjacent = segment2D_Adjacent1.IntersectionResult2D(segment2D_Adjacent2);
             Assert.NotNull(intersectionResult2D_Adjacent);
             Assert.True(intersectionResult2D_Adjacent.Intersect);
@@ -138,7 +138,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Segment_Collection_Intersection_Correctness()
         {
-            Segment2D segment2D_Source = new (new Point2D(0, -5), new Point2D(0, 5));
+            Segment2D segment2D_Source = new(new Point2D(0, -5), new Point2D(0, 5));
             List<Segment2D> segment2Ds =
             [
                 new Segment2D(new Point2D(-2, 0), new Point2D(2, 0)),  // Intersects at (0,0)
@@ -166,7 +166,7 @@ namespace DiGi.Geometry.xUnit
                 new Point2D(2, 2),
                 new Point2D(-2, -2)
             ];
-            Polyline2D polyline2D = new (point2Ds);
+            Polyline2D polyline2D = new(point2Ds);
 
             // Self intersection with maxCount = 1
             IntersectionResult2D? intersectionResult2D_Limited = polyline2D.IntersectionResult2D(1);
@@ -190,7 +190,7 @@ namespace DiGi.Geometry.xUnit
             }
 
             // Line passing through the box
-            Line2D line2D_Through = new (new Point2D(0, -10), new Vector2D(0, 1));
+            Line2D line2D_Through = new(new Point2D(0, -10), new Vector2D(0, 1));
             IntersectionResult2D? intersectionResult2D = polygonalFace2D.IntersectionResult2D(line2D_Through);
 
             Assert.NotNull(intersectionResult2D);

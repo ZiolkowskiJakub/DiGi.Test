@@ -1,7 +1,6 @@
 using DiGi.Core.Classes;
 using DiGi.Solar.Classes;
 using DiGi.Solar.ComputeSharp.Classes;
-using System;
 using System.Runtime.Versioning;
 using Xunit.Abstractions;
 

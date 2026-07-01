@@ -1,4 +1,3 @@
-using DiGi.Core.IO.DelimitedData;
 using DiGi.Core.IO.Table.Classes;
 using System.Collections.Generic;
 

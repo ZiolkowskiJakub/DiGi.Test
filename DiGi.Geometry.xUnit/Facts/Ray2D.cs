@@ -82,4 +82,4 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(1.0, ray2D_Target.Direction.Y, 9);
         }
     }
-}
+}

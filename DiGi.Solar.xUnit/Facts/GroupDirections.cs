@@ -1,6 +1,4 @@
 using DiGi.Geometry.Spatial.Classes;
-using System;
-using System.Collections.Generic;
 
 namespace DiGi.Solar.xUnit
 {

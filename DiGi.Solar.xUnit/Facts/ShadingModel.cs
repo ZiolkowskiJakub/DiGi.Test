@@ -4,8 +4,6 @@ using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.Solar.Classes;
 using DiGi.Solar.Interfaces;
-using System;
-using System.Collections.Generic;
 
 namespace DiGi.Solar.xUnit
 {

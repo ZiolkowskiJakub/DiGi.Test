@@ -1,6 +1,6 @@
+using DiGi.Core.IO.Table.Classes;
 using System.Collections.Generic;
 using System.Linq;
-using DiGi.Core.IO.Table.Classes;
 
 namespace DiGi.Core.xUnit
 {

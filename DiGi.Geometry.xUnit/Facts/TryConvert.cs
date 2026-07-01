@@ -1,7 +1,6 @@
 using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Planar.Interfaces;
-using System.Collections.Generic;
 
 namespace DiGi.Geometry.xUnit
 {

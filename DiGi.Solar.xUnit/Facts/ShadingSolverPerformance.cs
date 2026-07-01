@@ -4,8 +4,6 @@ using DiGi.Geometry.Spatial.Classes;
 using DiGi.Solar.Classes;
 using DiGi.Solar.ComputeSharp.Classes;
 using DiGi.Solar.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 

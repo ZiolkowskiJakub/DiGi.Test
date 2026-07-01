@@ -1,7 +1,5 @@
 using DiGi.Math.Classes;
 using DiGi.Math.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DiGi.Math.xUnit
 {

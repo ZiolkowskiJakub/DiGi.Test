@@ -1,11 +1,8 @@
 using DiGi.Geometry.Planar.Classes;
-using DiGi.Geometry.Planar.Interfaces;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.Math.Classes;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace DiGi.Geometry.xUnit
 {
@@ -923,7 +920,7 @@ namespace DiGi.Geometry.xUnit
             // Assert Correctness
             Assert.NotNull(point2Ds_Intersection);
             Assert.Equal(2, point2Ds_Intersection.Count);
-            
+
             // Intersection points should be (0, -5) and (0, 5)
             DiGi.Core.Modify.Sort(point2Ds_Intersection, x => x.Y);
             Assert.Equal(0.0, point2Ds_Intersection[0].X, 1e-5);

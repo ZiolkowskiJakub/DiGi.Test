@@ -1,4 +1,3 @@
-using DiGi.ComputeSharp.Core.Classes;
 using DiGi.ComputeSharp.Spatial.Classes;
 using Xunit.Abstractions;
 

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using DiGi.Core.Classes;
+using System.Collections.Generic;
 
 namespace DiGi.Core.xUnit
 {

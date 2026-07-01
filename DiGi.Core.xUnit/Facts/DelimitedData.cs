@@ -78,8 +78,8 @@ namespace DiGi.Core.xUnit
             // Wrap writer, but leave open so we can read the memory stream
             using (DelimitedDataWriter writer = new(',', stream) { AutoFlush = true })
             {
-                DelimitedDataRow row1 = new([ "ID", "Name" ]);
-                DelimitedDataRow row2 = new([ "1", "John \"The Boss\"" ]);
+                DelimitedDataRow row1 = new(["ID", "Name"]);
+                DelimitedDataRow row2 = new(["1", "John \"The Boss\""]);
 
                 writer.WriteRow(row1);
                 writer.WriteRow(row2);

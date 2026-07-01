@@ -1,5 +1,3 @@
-using System;
-
 namespace DiGi.Core.xUnit
 {
     public partial class Facts

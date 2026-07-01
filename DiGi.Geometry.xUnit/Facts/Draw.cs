@@ -1,9 +1,8 @@
 #pragma warning disable CA1416 // Validate platform compatibility
 
-using System.Drawing;
-using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Drawing;
-using System.Collections.Generic;
+using DiGi.Geometry.Planar.Classes;
+using System.Drawing;
 
 namespace DiGi.Geometry.xUnit
 {

@@ -1,5 +1,3 @@
-using DiGi.Geometry.Spatial.Classes;
-
 namespace DiGi.Geometry.xUnit
 {
     public partial class Facts

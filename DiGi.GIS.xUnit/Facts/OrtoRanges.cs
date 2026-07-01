@@ -1,9 +1,7 @@
-using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.GIS.Classes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace DiGi.GIS.xUnit

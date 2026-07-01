@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
+using System.Collections.Generic;
 
 namespace DiGi.Core.xUnit
 {

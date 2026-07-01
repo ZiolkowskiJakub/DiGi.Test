@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace DiGi.Math.xUnit
 {
     public partial class Facts
