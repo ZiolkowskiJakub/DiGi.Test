@@ -1,5 +1,6 @@
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
+using DiGi.Geometry.Spatial.Interfaces;
 using System.Diagnostics;
 
 namespace DiGi.Geometry.xUnit
@@ -96,6 +97,72 @@ namespace DiGi.Geometry.xUnit
 
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             Assert.True(elapsedMilliseconds < 500, $"Polyhedron InRange exterior-point performance check failed! {count} calls took {elapsedMilliseconds} ms.");
+        }
+
+        /// <summary>
+        /// Verifies that the <see cref="Query.IsClosed{TPolygonalFace3D}(Polyhedron{TPolygonalFace3D}?, double)"/> method correctly identifies closed and open polyhedra.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_IsClosed()
+        {
+            BoundingBox3D boundingBox3D = new(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
+            Polyhedron? polyhedron_Closed = Create.Polyhedron(boundingBox3D);
+            Assert.NotNull(polyhedron_Closed);
+
+            // A fully closed cube should return true.
+            Assert.True(polyhedron_Closed.IsClosed());
+
+            // A null polyhedron should return false.
+            Polyhedron? polyhedron_Null = null;
+            Assert.False(polyhedron_Null.IsClosed());
+
+            // Get the faces of the closed cube.
+            List<IPolygonalFace3D>? polygonalFace3Ds = polyhedron_Closed.PolygonalFaces;
+            Assert.NotNull(polygonalFace3Ds);
+            Assert.Equal(6, polygonalFace3Ds.Count);
+
+            // Create a polyhedron with one face missing (5 faces).
+            List<IPolygonalFace3D> polygonalFace3Ds_Open = new();
+            for (int int_I = 0; int_I < 5; int_I++)
+            {
+                polygonalFace3Ds_Open.Add(polygonalFace3Ds[int_I]);
+            }
+            Polyhedron? polyhedron_Open = Create.Polyhedron(polygonalFace3Ds_Open);
+            Assert.NotNull(polyhedron_Open);
+
+            // An open cube (missing one face) should return false.
+            Assert.False(polyhedron_Open.IsClosed());
+        }
+
+        /// <summary>
+        /// Verifies the performance and correctness of the <see cref="Query.IsClosed{TPolygonalFace3D}(Polyhedron{TPolygonalFace3D}?, double)"/> method on a complex shape.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_IsClosed_Performance()
+        {
+            // Create a complex closed polyhedron by extruding a 500-sided polygon.
+            List<Point3D> point3Ds = new();
+            for (int int_I = 0; int_I < 500; int_I++)
+            {
+                double double_Angle = int_I * 2.0 * System.Math.PI / 500.0;
+                point3Ds.Add(new Point3D(System.Math.Cos(double_Angle) * 10.0, System.Math.Sin(double_Angle) * 10.0, 0.0));
+            }
+            Polygon3D? polygon3D = Create.Polygon3D(point3Ds);
+            Assert.NotNull(polygon3D);
+            PolygonalFace3D? polygonalFace3D = new(polygon3D);
+            Polyhedron? polyhedron_Complex = Create.Polyhedron(polygonalFace3D, new Spatial.Classes.Vector3D(0, 0, 10));
+            Assert.NotNull(polyhedron_Complex);
+
+            // Warm-up / JIT compile.
+            _ = polyhedron_Complex.IsClosed();
+
+            // Measure execution time.
+            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            bool bool_IsClosed = polyhedron_Complex.IsClosed();
+            stopwatch.Stop();
+
+            Assert.True(bool_IsClosed);
+            Assert.True(stopwatch.ElapsedMilliseconds < 50, $"Polyhedron IsClosed performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
     }
 }
