@@ -30,6 +30,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.EPW\DiGi.EPW\DiGi.EPW.csproj" />
     <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
+    <Reference Include="DiGi.Weather">
+      <HintPath>..\..\DiGi.Weather\bin\DiGi.Weather.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

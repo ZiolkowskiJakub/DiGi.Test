@@ -1,3 +1,5 @@
+using System;
+
 namespace DiGi.EPW.xUnit
 {
     public partial class Facts
@@ -8,27 +10,54 @@ namespace DiGi.EPW.xUnit
         [Fact]
         public void DataRecord()
         {
-            Classes.DataRecord dataRecord = new(1992, 1, 1, 1, 60, "C9C9C9C9*0?9?9?9?9?9?9?9A7A7B8C8A7A7*0E8*0*0", -2.5, -3.1, 95, 100800, 0, 1415, 241, 0, 0, 0, 0, 0, 0, 0, 250, 1.0, 2, 1, 11.2, 22000, 0, "999999099", 0, 0.1560, 0, 88, 0.000, 0.0, 0.0);
+            Classes.DataRecord dataRecord = new(
+                new DateTime(1992, 1, 1, 1, 0, 0, DateTimeKind.Unspecified),
+                "C9C9C9C9*0?9?9?9?9?9?9?9A7A7B8C8A7A7*0E8*0*0",
+                -2.5f,
+                -3.1f,
+                95f,
+                100800f,
+                0f,
+                1415f,
+                241f,
+                0f,
+                0f,
+                0f,
+                0f,
+                0f,
+                0f,
+                0f,
+                250f,
+                1.0f,
+                2,
+                1,
+                11.2f,
+                22000f,
+                0,
+                "999999099",
+                0f,
+                0.1560f,
+                0f,
+                88,
+                0.000f,
+                0.0f,
+                0.0f);
 
-            Assert.Equal(1992, dataRecord.Year);
-            Assert.Equal(1, dataRecord.Month);
-            Assert.Equal(1, dataRecord.Day);
-            Assert.Equal(1, dataRecord.Hour);
-            Assert.Equal(60, dataRecord.Minute);
+            Assert.Equal(new DateTime(1992, 1, 1, 1, 0, 0, DateTimeKind.Unspecified), dataRecord.DateTime);
             Assert.Equal("C9C9C9C9*0?9?9?9?9?9?9?9A7A7B8C8A7A7*0E8*0*0", dataRecord.DataSourceAndUncertaintyFlags);
-            Assert.Equal(-2.5, dataRecord.DryBulbTemperature);
-            Assert.Equal(-3.1, dataRecord.DewPointTemperature);
-            Assert.Equal(95, dataRecord.RelativeHumidity);
-            Assert.Equal(100800, dataRecord.AtmosphericStationPressure);
-            Assert.Equal(250, dataRecord.WindDirection);
-            Assert.Equal(1.0, dataRecord.WindSpeed);
+            Assert.Equal(-2.5f, dataRecord.DryBulbTemperature);
+            Assert.Equal(-3.1f, dataRecord.DewPointTemperature);
+            Assert.Equal(95f, dataRecord.RelativeHumidity);
+            Assert.Equal(100800f, dataRecord.AtmosphericStationPressure);
+            Assert.Equal(250f, dataRecord.WindDirection);
+            Assert.Equal(1.0f, dataRecord.WindSpeed);
             Assert.Equal(2, dataRecord.TotalSkyCover);
             Assert.Equal(1, dataRecord.OpaqueSkyCover);
             Assert.Equal("999999099", dataRecord.PresentWeatherCodes);
-            Assert.Equal(0, dataRecord.PrecipitableWater);
-            Assert.Equal(0.1560, dataRecord.AerosolOpticalDepth);
+            Assert.Equal(0f, dataRecord.PrecipitableWater);
+            Assert.Equal(0.1560f, dataRecord.AerosolOpticalDepth);
             Assert.Equal(88, dataRecord.DaysSinceLastSnowfall);
-            Assert.Equal(0.000, dataRecord.Albedo);
+            Assert.Equal(0.000f, dataRecord.Albedo);
 
             Core.xUnit.Query.SerializationCheck(dataRecord);
         }

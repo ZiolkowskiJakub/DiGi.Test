@@ -45,13 +45,10 @@ namespace DiGi.EPW.xUnit
             Assert.Equal(8760, ePWFile.DataRecords.Count);
 
             DataRecord dataRecord_First = ePWFile.DataRecords[0];
-            Assert.Equal(1992, dataRecord_First.Year);
-            Assert.Equal(1, dataRecord_First.Month);
-            Assert.Equal(1, dataRecord_First.Day);
-            Assert.Equal(1, dataRecord_First.Hour);
-            Assert.Equal(-2.5, dataRecord_First.DryBulbTemperature);
-            Assert.Equal(-3.1, dataRecord_First.DewPointTemperature);
-            Assert.Equal(95, dataRecord_First.RelativeHumidity);
+            Assert.Equal(new System.DateTime(1992, 1, 1, 1, 0, 0, System.DateTimeKind.Unspecified), dataRecord_First.DateTime);
+            Assert.Equal(-2.5f, dataRecord_First.DryBulbTemperature);
+            Assert.Equal(-3.1f, dataRecord_First.DewPointTemperature);
+            Assert.Equal(95f, dataRecord_First.RelativeHumidity);
         }
 
         /// <summary>
@@ -92,10 +89,7 @@ namespace DiGi.EPW.xUnit
             DataRecord dataRecord_1 = ePWFile_1.DataRecords[0];
             DataRecord dataRecord_2 = ePWFile_2.DataRecords[0];
 
-            Assert.Equal(dataRecord_1.Year, dataRecord_2.Year);
-            Assert.Equal(dataRecord_1.Month, dataRecord_2.Month);
-            Assert.Equal(dataRecord_1.Day, dataRecord_2.Day);
-            Assert.Equal(dataRecord_1.Hour, dataRecord_2.Hour);
+            Assert.Equal(dataRecord_1.DateTime, dataRecord_2.DateTime);
             Assert.Equal(dataRecord_1.DryBulbTemperature, dataRecord_2.DryBulbTemperature);
             Assert.Equal(dataRecord_1.DewPointTemperature, dataRecord_2.DewPointTemperature);
             Assert.Equal(dataRecord_1.RelativeHumidity, dataRecord_2.RelativeHumidity);
