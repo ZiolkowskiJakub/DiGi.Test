@@ -8,11 +8,11 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Facts
     {
-        /// <summary>Loads a real GIS model from the 0207_GML.gmf sample file and verifies that <see cref="Create.OrtoRanges(GISModel?, IEnumerable{string}?, OrtoRangeOptions?, double)"/> (rewritten to use a <see cref="LinkedList{T}"/> for O(1) removals instead of O(n) <see cref="List{T}"/> shifting) produces the exact same clustering as a faithful reimplementation of the original List-based algorithm, confirming the data-structure change did not alter observable behavior.</summary>
+        /// <summary>Loads a real GIS model from the 2476_GML.gmf sample file and verifies that <see cref="Create.OrtoRanges(GISModel?, IEnumerable{string}?, OrtoRangeOptions?, double)"/> (rewritten to use a <see cref="LinkedList{T}"/> for O(1) removals instead of O(n) <see cref="List{T}"/> shifting) produces the exact same clustering as a faithful reimplementation of the original List-based algorithm, confirming the data-structure change did not alter observable behavior.</summary>
         [Fact]
         public void OrtoRanges()
         {
-            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "0207_GML.gmf");
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");
             Assert.False(string.IsNullOrWhiteSpace(path));
             Assert.True(System.IO.File.Exists(path));
 

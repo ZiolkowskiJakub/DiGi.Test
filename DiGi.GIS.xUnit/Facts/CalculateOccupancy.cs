@@ -6,11 +6,11 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Facts
     {
-        /// <summary>Loads a real GIS model from the 0207_GML.gmf sample file and recalculates occupancy, verifying that the calculation completes without throwing and assigns occupancy results to the model's administrative subdivisions.</summary>
+        /// <summary>Loads a real GIS model from the 2476_GML.gmf sample file and recalculates occupancy, verifying that the calculation completes without throwing and assigns occupancy results to the model's administrative subdivisions.</summary>
         [Fact]
         public void CalculateOccupancy()
         {
-            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "0207_GML.gmf");
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");
             Assert.False(string.IsNullOrWhiteSpace(path));
             Assert.True(System.IO.File.Exists(path));
 

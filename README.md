@@ -329,7 +329,7 @@ When a test needs an on-disk input file (sample `.gmf`, `.json`, `.epw`, etc.), 
    ```csharp
    using System.Reflection;
    // ...
-   string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "0207_GML.gmf");
+   string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");
    Assert.False(string.IsNullOrWhiteSpace(path));
    Assert.True(System.IO.File.Exists(path));
    ```

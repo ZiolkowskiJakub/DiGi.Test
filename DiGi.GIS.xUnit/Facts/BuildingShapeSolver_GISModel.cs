@@ -9,11 +9,11 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Facts
     {
-        /// <summary>Runs the solver against every building in the sample 0207_GML.gmf GIS model and verifies that each footprint with a positive-area external edge resolves to a defined shape, that classification is deterministic across repeated runs, and that simple rectangular and square footprints form the majority.</summary>
+        /// <summary>Runs the solver against every building in the sample 2476_GML.gmf GIS model and verifies that each footprint with a positive-area external edge resolves to a defined shape, that classification is deterministic across repeated runs, and that simple rectangular and square footprints form the majority.</summary>
         [Fact]
         public void BuildingShapeSolver_GISModel()
         {
-            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "0207_GML.gmf");
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");
             Assert.False(string.IsNullOrWhiteSpace(path));
             Assert.True(System.IO.File.Exists(path));
 
