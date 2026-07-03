@@ -113,6 +113,56 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Tests the mean-center (Average) fallback candidate. Uses an L-notched square whose bottom edge is
+        /// densely subdivided with collinear points: the area <see cref="Planar.Query.Centroid(IEnumerable{Point2D}?)"/>
+        /// is unaffected by the subdivision and falls inside the notch (invalid), while the vertex
+        /// <see cref="Planar.Query.Average(IEnumerable{Point2D}?)"/> is pulled toward the dense bottom edge and lands
+        /// strictly inside the polygon body, so <see cref="Planar.Query.InternalPoint(IEnumerable{Point2D}?, double)"/>
+        /// must return it.
+        /// </summary>
+        [Fact]
+        public void InternalPoint_MeanCenterFallback()
+        {
+            // Square (0,0)-(20,20) with a narrow deep notch cut from the top between x=9 and x=11 down to y=5.
+            // The bottom edge is subdivided with 21 collinear points, which does not change the area centroid
+            // but pulls the vertex mean well below y=5, clear of the notch.
+            List<Point2D> point2Ds = [];
+            for (int i = 0; i <= 20; i++)
+            {
+                point2Ds.Add(new Point2D(i, 0));
+            }
+            point2Ds.Add(new Point2D(20, 20));
+            point2Ds.Add(new Point2D(11, 20));
+            point2Ds.Add(new Point2D(11, 5));
+            point2Ds.Add(new Point2D(9, 5));
+            point2Ds.Add(new Point2D(9, 20));
+            point2Ds.Add(new Point2D(0, 20));
+
+            Point2D? point2D_Centroid = Planar.Query.Centroid(point2Ds);
+            Point2D? point2D_Mean = Planar.Query.Average(point2Ds);
+            Assert.NotNull(point2D_Centroid);
+            Assert.NotNull(point2D_Mean);
+
+            List<Segment2D>? segments = Create.Segment2Ds(point2Ds, true);
+            Assert.NotNull(segments);
+
+            // Precondition: the area centroid must fall inside the notch (outside the polygon) so the primary
+            // candidate is rejected and the mean-center fallback is exercised.
+            Assert.False(Planar.Query.Inside(point2Ds, point2D_Centroid));
+
+            // Precondition: the vertex mean must land strictly inside the polygon body.
+            Assert.True(Planar.Query.Inside(point2Ds, point2D_Mean));
+            Assert.False(Planar.Query.On(segments, point2D_Mean));
+
+            Point2D? internalPoint = Planar.Query.InternalPoint(point2Ds);
+            Assert.NotNull(internalPoint);
+
+            // InternalPoint must have returned the mean-center fallback candidate, not the invalid centroid.
+            Assert.Equal(point2D_Mean.X, internalPoint.X, 6);
+            Assert.Equal(point2D_Mean.Y, internalPoint.Y, 6);
+        }
+
+        /// <summary>
         /// Tests how the algorithm handles complex or self-intersecting invalid polygons.
         /// </summary>
         [Fact]

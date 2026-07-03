@@ -214,6 +214,138 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Benchmarks the mean-center <see cref="Planar.Query.Average(IEnumerable{Point2D}?)"/> query against the
+        /// area <see cref="Planar.Query.Centroid(IEnumerable{Point2D}?)"/> query on an identical dense point set,
+        /// verifying both return the same result for a symmetric polygon and that Average, which does strictly
+        /// fewer FLOPs per vertex, is not slower than Centroid beyond a generous noise margin.
+        /// </summary>
+        [Fact]
+        public void AverageAndCentroid_PerformanceComparison()
+        {
+            // Regular 10,000-gon approximating a circle of radius 10, centered at the origin.
+            List<Point2D> point2Ds = new();
+            for (int i = 0; i < 10000; i++)
+            {
+                double angle = i * 2.0 * System.Math.PI / 10000.0;
+                point2Ds.Add(new Point2D(System.Math.Cos(angle) * 10.0, System.Math.Sin(angle) * 10.0));
+            }
+
+            // Warm up / JIT compile
+            _ = Planar.Query.Average(point2Ds.Take(10));
+            _ = Planar.Query.Centroid(point2Ds.Take(10));
+
+            const int iterations = 200;
+
+            Stopwatch stopwatch_Average = Stopwatch.StartNew();
+            for (int i = 0; i < iterations; i++)
+            {
+                _ = Planar.Query.Average(point2Ds);
+            }
+            stopwatch_Average.Stop();
+
+            Stopwatch stopwatch_Centroid = Stopwatch.StartNew();
+            for (int i = 0; i < iterations; i++)
+            {
+                _ = Planar.Query.Centroid(point2Ds);
+            }
+            stopwatch_Centroid.Stop();
+
+            // Assert Correctness (both must resolve to the origin for a symmetric point set)
+            Point2D? point2D_Average = Planar.Query.Average(point2Ds);
+            Point2D? point2D_Centroid = Planar.Query.Centroid(point2Ds);
+            Assert.NotNull(point2D_Average);
+            Assert.NotNull(point2D_Centroid);
+            Assert.Equal(0.0, point2D_Average.X, 1e-6);
+            Assert.Equal(0.0, point2D_Average.Y, 1e-6);
+            Assert.Equal(0.0, point2D_Centroid.X, 1e-6);
+            Assert.Equal(0.0, point2D_Centroid.Y, 1e-6);
+
+            // Assert Performance (both are O(n) single-pass, so 200 iterations over 10,000 points must stay fast)
+            Assert.True(stopwatch_Average.ElapsedMilliseconds < 1000, $"Average benchmark failed! Took {stopwatch_Average.ElapsedMilliseconds} ms for {iterations} iterations.");
+            Assert.True(stopwatch_Centroid.ElapsedMilliseconds < 1000, $"Centroid benchmark failed! Took {stopwatch_Centroid.ElapsedMilliseconds} ms for {iterations} iterations.");
+
+            // Assert Comparison (Average does ~2 additions per vertex versus ~4 multiplications and additions for
+            // the shoelace-weighted Centroid, so it must not be slower beyond a generous noise margin)
+            Assert.True(stopwatch_Average.ElapsedTicks <= stopwatch_Centroid.ElapsedTicks * 5, $"Average ({stopwatch_Average.ElapsedMilliseconds} ms) unexpectedly slower than Centroid ({stopwatch_Centroid.ElapsedMilliseconds} ms) beyond noise margin.");
+        }
+
+        /// <summary>
+        /// Benchmarks <see cref="Planar.Query.Average(IEnumerable{Point2D}?)"/> against
+        /// <see cref="Planar.Query.Centroid(IEnumerable{Point2D}?)"/> across an increasing number of points, to
+        /// verify their relative execution time trend stays flat rather than diverging as the point count grows.
+        /// <para>
+        /// Each point count runs enough repeats to keep the measured workload comparable across scales, and the
+        /// per-call timing summary is written to the test output for inspection.
+        /// </para>
+        /// </summary>
+        [Fact]
+        public void AverageAndCentroid_ScalingBenchmark()
+        {
+            int[] counts = [100, 1_000, 10_000, 100_000, 1_000_000];
+
+            System.Text.StringBuilder stringBuilder_Summary = new();
+            stringBuilder_Summary.AppendLine();
+            stringBuilder_Summary.AppendLine("Points      | Average (us/call) | Centroid (us/call) | Ratio (Centroid/Average)");
+            stringBuilder_Summary.AppendLine("----------- | ------------------ | ------------------- | -------------------------");
+
+            foreach (int count in counts)
+            {
+                List<Point2D> point2Ds = new(count);
+                for (int i = 0; i < count; i++)
+                {
+                    double angle = i * 2.0 * System.Math.PI / count;
+                    point2Ds.Add(new Point2D(System.Math.Cos(angle) * 10.0, System.Math.Sin(angle) * 10.0));
+                }
+
+                // Warm up / JIT compile
+                _ = Planar.Query.Average(point2Ds.Take(10));
+                _ = Planar.Query.Centroid(point2Ds.Take(10));
+
+                // Assert Correctness (both must resolve to the origin for a symmetric point set)
+                Point2D? point2D_Average = Planar.Query.Average(point2Ds);
+                Point2D? point2D_Centroid = Planar.Query.Centroid(point2Ds);
+                Assert.NotNull(point2D_Average);
+                Assert.NotNull(point2D_Centroid);
+                Assert.Equal(0.0, point2D_Average.X, 1e-6);
+                Assert.Equal(0.0, point2D_Average.Y, 1e-6);
+                Assert.Equal(0.0, point2D_Centroid.X, 1e-6);
+                Assert.Equal(0.0, point2D_Centroid.Y, 1e-6);
+
+                // Keep total measured work roughly constant across scales
+                int repeats = System.Math.Max(1, 2_000_000 / count);
+
+                Stopwatch stopwatch_Average = Stopwatch.StartNew();
+                for (int i = 0; i < repeats; i++)
+                {
+                    _ = Planar.Query.Average(point2Ds);
+                }
+                stopwatch_Average.Stop();
+
+                Stopwatch stopwatch_Centroid = Stopwatch.StartNew();
+                for (int i = 0; i < repeats; i++)
+                {
+                    _ = Planar.Query.Centroid(point2Ds);
+                }
+                stopwatch_Centroid.Stop();
+
+                double average_PerCallMicroseconds = stopwatch_Average.Elapsed.TotalMilliseconds * 1000.0 / repeats;
+                double centroid_PerCallMicroseconds = stopwatch_Centroid.Elapsed.TotalMilliseconds * 1000.0 / repeats;
+                double ratio = centroid_PerCallMicroseconds / System.Math.Max(average_PerCallMicroseconds, 1e-6);
+
+                stringBuilder_Summary.AppendLine($"{count,11} | {average_PerCallMicroseconds,18:F3} | {centroid_PerCallMicroseconds,19:F3} | {ratio,24:F2}x");
+
+                // Assert Performance (both are O(n) single-pass, so the whole repeated run per scale must stay fast)
+                Assert.True(stopwatch_Average.ElapsedMilliseconds < 2000, $"At {count} points, Average benchmark failed! Took {stopwatch_Average.ElapsedMilliseconds} ms for {repeats} repeats.");
+                Assert.True(stopwatch_Centroid.ElapsedMilliseconds < 2000, $"At {count} points, Centroid benchmark failed! Took {stopwatch_Centroid.ElapsedMilliseconds} ms for {repeats} repeats.");
+
+                // Assert Comparison (Average must not be slower than Centroid beyond a generous noise margin at any scale)
+                Assert.True(average_PerCallMicroseconds <= centroid_PerCallMicroseconds * 5.0 + 1.0, $"At {count} points, Average ({average_PerCallMicroseconds:F3} us/call) unexpectedly slower than Centroid ({centroid_PerCallMicroseconds:F3} us/call) beyond noise margin.");
+            }
+
+            Console.WriteLine(stringBuilder_Summary.ToString());
+        }
+
+        /// <summary>
         /// Verifies both the correctness and the performance of the optimized ConvexHull query with order preservation on a lazy sequence.
         /// </summary>
         [Fact]
