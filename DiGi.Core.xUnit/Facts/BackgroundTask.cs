@@ -99,7 +99,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public async Task BackgroundTask_Lifecycle_Failure()
         {
-            var task = new TestBackgroundTask(delayMs: 10, shouldSucceed: false);
+            TestBackgroundTask task = new(delayMs: 10, shouldSucceed: false);
 
             task.Start();
 
@@ -119,7 +119,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public async Task CancelableBackgroundTask_Cancellation()
         {
-            TestCancelableBackgroundTask task = new TestCancelableBackgroundTask(delayMs: 2000);
+            TestCancelableBackgroundTask task = new(delayMs: 2000);
 
             bool canceledFired = false;
             task.Canceled += (s, e) => canceledFired = true;

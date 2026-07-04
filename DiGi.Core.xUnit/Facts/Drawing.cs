@@ -11,15 +11,15 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Pen_PropertiesAndCloning()
         {
-            var color = new Color(255, 255, 0, 0); // Red
-            var pen = new DiGi.Core.Drawing.Classes.Pen(color, 2.5);
+            Color color = new(255, 255, 0, 0); // Red
+            DiGi.Core.Drawing.Classes.Pen pen = new(color, 2.5);
 
             Assert.NotNull(pen.Color);
             Assert.Equal(255, pen.Color.Red);
             Assert.Equal(2.5, pen.Thickness);
 
             // Test cloning
-            var clonedPen = (DiGi.Core.Drawing.Classes.Pen?)pen.Clone();
+            DiGi.Core.Drawing.Classes.Pen? clonedPen = (DiGi.Core.Drawing.Classes.Pen?)pen.Clone();
             Assert.NotNull(clonedPen);
             Assert.Equal(pen.Thickness, clonedPen.Thickness);
             Assert.NotNull(clonedPen.Color);
@@ -34,8 +34,8 @@ namespace DiGi.Core.xUnit
         public void CompareByPixels_ShouldEvaluateBitmaps()
         {
             // Create two identical bitmaps
-            using Bitmap bmp1 = new Bitmap(10, 10);
-            using Bitmap bmp2 = new Bitmap(10, 10);
+            using Bitmap bmp1 = new(10, 10);
+            using Bitmap bmp2 = new(10, 10);
 
             // Set a pixel on both
             bmp1.SetPixel(5, 5, System.Drawing.Color.Blue);
@@ -49,7 +49,7 @@ namespace DiGi.Core.xUnit
             Assert.False(bmp1.CompareByPixels(bmp2));
 
             // Create a bitmap of a different size
-            using Bitmap bmpDifferentSize = new Bitmap(10, 11);
+            using Bitmap bmpDifferentSize = new(10, 11);
             Assert.False(bmp1.CompareByPixels(bmpDifferentSize));
 
             // Compare with nulls by fully qualifying the static query method

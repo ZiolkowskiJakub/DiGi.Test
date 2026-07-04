@@ -71,7 +71,7 @@ namespace DiGi.Core.xUnit
             AnyOf? nullAnyOf = null;
             Assert.True(nullAnyOf == null);
 
-            AnyOf anyNullVal = new AnyOf(null, typeof(string));
+            AnyOf anyNullVal = new(null, typeof(string));
             Assert.True(anyNullVal == null);
             Assert.True(anyNullVal!.Equals(null));
         }

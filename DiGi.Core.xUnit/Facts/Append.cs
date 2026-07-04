@@ -16,12 +16,12 @@ namespace DiGi.Core.xUnit
             System.Type type_Int = typeof(int);
             Modify.Append(stringBuilder_Null, type_Int);
 
-            StringBuilder stringBuilder_Valid = new StringBuilder();
+            StringBuilder stringBuilder_Valid = new();
             Modify.Append(stringBuilder_Valid, null);
             Assert.Equal(0, stringBuilder_Valid.Length);
 
             // 2. Test valid type formatting and appending
-            StringBuilder stringBuilder_Int = new StringBuilder();
+            StringBuilder stringBuilder_Int = new();
             Modify.Append(stringBuilder_Int, typeof(int));
 
             string? string_IntAssemblyFullName = typeof(int).Assembly.FullName;

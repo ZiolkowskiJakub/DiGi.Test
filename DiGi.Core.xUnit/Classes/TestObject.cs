@@ -54,7 +54,7 @@ namespace DiGi.Core.xUnit
             range = new Range<double>(random.NextDouble(), random.NextDouble());
             dateTime = DateTime.Now;
 
-            var colors = typeof(System.Drawing.Color)
+            System.Drawing.Color[] colors = typeof(System.Drawing.Color)
                 .GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Where(p => p.PropertyType == typeof(System.Drawing.Color))
                 .Select(p => (System.Drawing.Color)p.GetValue(null)!)

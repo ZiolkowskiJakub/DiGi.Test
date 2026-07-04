@@ -27,17 +27,17 @@ namespace DiGi.Core.xUnit
             Assert.Null(string_NullResultForSerializableObject);
 
             // 2. Test JsonObject with valid and invalid type properties
-            JsonObject jsonObject_Valid = new JsonObject();
+            JsonObject jsonObject_Valid = new();
             jsonObject_Valid.Add(Constants.Serialization.PropertyName.Type, JsonValue.Create("TestNamespace.TestType, TestAssembly"));
             string? string_ValidJsonObjectResult = DiGi.Core.Query.FullTypeName(jsonObject_Valid);
             Assert.Equal("TestNamespace.TestType, TestAssembly", string_ValidJsonObjectResult);
 
-            JsonObject jsonObject_InvalidObject = new JsonObject();
+            JsonObject jsonObject_InvalidObject = new();
             jsonObject_InvalidObject.Add(Constants.Serialization.PropertyName.Type, new JsonObject());
             string? string_InvalidObjectResult = DiGi.Core.Query.FullTypeName(jsonObject_InvalidObject);
             Assert.Null(string_InvalidObjectResult);
 
-            JsonObject jsonObject_InvalidArray = new JsonObject();
+            JsonObject jsonObject_InvalidArray = new();
             jsonObject_InvalidArray.Add(Constants.Serialization.PropertyName.Type, new JsonArray());
             string? string_InvalidArrayResult = DiGi.Core.Query.FullTypeName(jsonObject_InvalidArray);
             Assert.Null(string_InvalidArrayResult);

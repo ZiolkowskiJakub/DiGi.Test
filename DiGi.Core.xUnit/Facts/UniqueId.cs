@@ -50,7 +50,7 @@ namespace DiGi.Core.xUnit
             Assert.Equal("12345", string_Id4);
 
             // Test custom class fallback
-            object object_Custom = new object();
+            object object_Custom = new();
             string string_Id5 = DiGi.Core.Query.UniqueId(object_Custom);
             Assert.Equal(object_Custom.ToString(), string_Id5);
 

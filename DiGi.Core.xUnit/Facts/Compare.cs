@@ -55,8 +55,8 @@ namespace DiGi.Core.xUnit
             Assert.True(DiGi.Core.Query.Compare(5.0, 5.0, NumberComparisonType.GreaterOrEquals));
 
             // DateTime comparison
-            DateTime dateTime_1 = new DateTime(2026, 6, 23);
-            DateTime dateTime_2 = new DateTime(2026, 6, 24);
+            DateTime dateTime_1 = new(2026, 6, 23);
+            DateTime dateTime_2 = new(2026, 6, 24);
             Assert.True(DiGi.Core.Query.Compare(dateTime_1, dateTime_2, NumberComparisonType.Less));
             Assert.True(DiGi.Core.Query.Compare(dateTime_2, dateTime_1, NumberComparisonType.Greater));
         }

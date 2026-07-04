@@ -11,12 +11,12 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Range_Constructor_And_Properties()
         {
-            Range<int> range_Int = new Range<int>(10, 5);
+            Range<int> range_Int = new(10, 5);
             Assert.Equal(5, range_Int.Min);
             Assert.Equal(10, range_Int.Max);
             Assert.Equal(5, range_Int.Length);
 
-            Range<double> range_Double = new Range<double>(1.5, 4.5);
+            Range<double> range_Double = new(1.5, 4.5);
             Assert.Equal(1.5, range_Double.Min);
             Assert.Equal(4.5, range_Double.Max);
             Assert.Equal(3.0, range_Double.Length);
@@ -28,7 +28,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Range_In_Out_Containing()
         {
-            Range<int> range_Base = new Range<int>(0, 10);
+            Range<int> range_Base = new(0, 10);
 
             // Value containment
             Assert.True(range_Base.In(5));
@@ -38,10 +38,10 @@ namespace DiGi.Core.xUnit
             Assert.False(range_Base.In(11));
 
             // Range containment (parameter is entirely within range_Base)
-            Range<int> range_Inside = new Range<int>(2, 8);
-            Range<int> range_Touching = new Range<int>(0, 10);
-            Range<int> range_Outside = new Range<int>(5, 12);
-            Range<int> range_Disjoint = new Range<int>(12, 15);
+            Range<int> range_Inside = new(2, 8);
+            Range<int> range_Touching = new(0, 10);
+            Range<int> range_Outside = new(5, 12);
+            Range<int> range_Disjoint = new(12, 15);
 
             Assert.True(range_Base.In(range_Inside));
             Assert.True(range_Base.In(range_Touching));
@@ -61,7 +61,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Range_In_Out_Tolerance()
         {
-            Range<double> range_Base = new Range<double>(2.0, 8.0);
+            Range<double> range_Base = new(2.0, 8.0);
             double tolerance = 1.0;
 
             // Value In/Out with tolerance
@@ -71,15 +71,15 @@ namespace DiGi.Core.xUnit
             Assert.False(range_Base.In(9.1, tolerance));
 
             // Range In/Out with tolerance
-            Range<double> range_InsideWithTolerance = new Range<double>(1.5, 8.5);
-            Range<double> range_OutsideWithTolerance = new Range<double>(0.5, 9.5);
+            Range<double> range_InsideWithTolerance = new(1.5, 8.5);
+            Range<double> range_OutsideWithTolerance = new(0.5, 9.5);
 
             Assert.True(range_Base.In(range_InsideWithTolerance, tolerance));
             Assert.False(range_Base.In(range_OutsideWithTolerance, tolerance));
 
             // Out with tolerance (separated by > tolerance)
-            Range<double> range_DisjointClose = new Range<double>(9.5, 12.0); // distance is 1.5 > 1.0
-            Range<double> range_DisjointVeryClose = new Range<double>(8.5, 12.0); // distance is 0.5 <= 1.0
+            Range<double> range_DisjointClose = new(9.5, 12.0); // distance is 1.5 > 1.0
+            Range<double> range_DisjointVeryClose = new(8.5, 12.0); // distance is 0.5 <= 1.0
 
             Assert.True(range_Base.Out(range_DisjointClose, tolerance));
             Assert.False(range_Base.Out(range_DisjointVeryClose, tolerance));
@@ -95,11 +95,11 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Range_Intersect()
         {
-            Range<int> range_Base = new Range<int>(5, 15);
+            Range<int> range_Base = new(5, 15);
 
-            Range<int> range_Overlap = new Range<int>(10, 20);
-            Range<int> range_Touch = new Range<int>(15, 25);
-            Range<int> range_Disjoint = new Range<int>(16, 25);
+            Range<int> range_Overlap = new(10, 20);
+            Range<int> range_Touch = new(15, 25);
+            Range<int> range_Disjoint = new(16, 25);
 
             Assert.True(range_Base.Intersect(range_Overlap));
             Assert.False(range_Base.Intersect(range_Touch)); // Touching at 15 is considered outside (not intersecting) in this codebase
@@ -139,7 +139,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void BoundedIndex()
         {
-            Range<int> range_Bound = new Range<int>(0, 2); // 0, 1, 2 (count = 3)
+            Range<int> range_Bound = new(0, 2); // 0, 1, 2 (count = 3)
 
             // Index inside bounds
             Assert.Equal(0, range_Bound.BoundedIndex(0));
