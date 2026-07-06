@@ -1,5 +1,6 @@
 using DiGi.Core.Classes;
 using DiGi.Core.Enums;
+using DiGi.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="IO.File.Classes.StorageFile{TSerializableObject}.Remove(IEnumerable{UniqueReference})"/>
+        /// Tests that <see cref="DiGi.Core.IO.Modify.Remove{TSerializableObject}(IO.File.Classes.StorageFile{TSerializableObject}, IEnumerable{UniqueReference})"/>
         /// still removes every matching reference even when a non-matching reference is processed first.
         /// Previously the removal loop used `for (int i = Count - 1; i >= 0; i--) { var x = set.ElementAt(0); ... }`
         /// without removing non-matching elements from the set, so a non-matching first element would get
@@ -69,7 +70,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="IO.File.Classes.StorageFile{TSerializableObject}.GetValues(IEnumerable{int})"/> still
+        /// Tests that GetValues still
         /// returns the correct values by index after replacing the Count()+ElementAt(index) double-enumeration over
         /// a HashSet of unique references with a single materialization into an indexable list.
         /// </summary>

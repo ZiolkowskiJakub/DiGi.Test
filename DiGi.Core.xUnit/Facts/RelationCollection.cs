@@ -1,6 +1,7 @@
 using DiGi.Core.Interfaces;
 using DiGi.Core.Relation.Classes;
 using DiGi.Core.Relation.Interfaces;
+using DiGi.Core.Relation;
 using System.Collections.Generic;
 
 namespace DiGi.Core.xUnit

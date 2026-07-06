@@ -1,5 +1,6 @@
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Parameter.Interfaces;
+using DiGi.Core.Parameter;
 
 namespace DiGi.Core.xUnit
 {
@@ -121,8 +122,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="ParameterGroupCollection.GetValue(IParameterDefinition, GetValueSettings)"/> and
-        /// <see cref="ParameterGroupCollection.GetValue{T}(IParameterDefinition, GetValueSettings)"/> still return
+        /// Tests that GetValue and GetValue{T} still return
         /// the correct value after replacing the Contains()+GetValue() double dictionary lookup with a single
         /// TryGetValue() call.
         /// </summary>
@@ -143,8 +143,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="ParameterGroupCollection.GetValue(IParameterDefinition, GetValueSettings)"/> and
-        /// <see cref="ParameterGroupCollection.GetValue{T}(IParameterDefinition, GetValueSettings)"/> return
+        /// Tests that GetValue and GetValue{T} return
         /// null/default (not throw) for a definition that was never added, and for a null definition.
         /// </summary>
         [Fact]
@@ -163,7 +162,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="ParameterGroupCollection.GetValue(IParameterDefinition, GetValueSettings)"/> correctly
+        /// Tests that GetValue correctly
         /// distinguishes between multiple parameters in the collection, returning the value for the requested
         /// definition specifically rather than e.g. the first one found.
         /// </summary>
