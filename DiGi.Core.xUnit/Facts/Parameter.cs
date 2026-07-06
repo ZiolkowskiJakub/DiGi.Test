@@ -22,7 +22,7 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(simpleParameterDefinition_Temp);
             Assert.Equal(simpleParameterDefinition.Name, simpleParameterDefinition_Temp.Name);
 
-            EnumParameterDefinition enumParameterDefinition = new(Enums.TestEnum.Test1);
+            EnumParameterDefinition enumParameterDefinition = new(TestEnum.Test1);
             json = Convert.ToSystem_String(enumParameterDefinition);
             Assert.NotNull(json);
 

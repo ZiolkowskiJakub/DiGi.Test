@@ -1,5 +1,5 @@
-﻿using DiGi.Core.Classes;
-using DiGi.Core.IO.Core.Interfaces;
+using DiGi.Core.Classes;
+using DiGi.Core.IO.Interfaces;
 
 namespace DiGi.Core.xUnit
 {

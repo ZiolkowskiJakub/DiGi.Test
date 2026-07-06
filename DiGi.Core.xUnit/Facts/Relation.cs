@@ -20,6 +20,9 @@ namespace DiGi.Core.xUnit
             }
         }
 
+        /// <summary>
+        /// Tests that a one-to-one bidirectional relation correctly synchronizes and maps references on both ends.
+        /// </summary>
         [Fact]
         public void OneToOneBidirectionalRelation_Syncs_Correctly()
         {
@@ -39,6 +42,9 @@ namespace DiGi.Core.xUnit
             Assert.True(relation.Contains(DiGi.Core.Relation.Enums.RelationSide.To, Create.UniqueReference(objB)));
         }
 
+        /// <summary>
+        /// Tests that a relation cluster can successfully add and manage relations between unique objects.
+        /// </summary>
         [Fact]
         public void UniqueObjectRelationCluster_ManageRelations()
         {

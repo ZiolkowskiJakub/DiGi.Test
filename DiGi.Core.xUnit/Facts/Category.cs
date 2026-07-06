@@ -59,5 +59,21 @@ namespace DiGi.Core.xUnit
             Assert.False(category_Root.Equals(category_Root3));
             Assert.True(category_Root != category_Root3);
         }
+
+        /// <summary>
+        /// Tests the serialization and deserialization of a Category object, verifying copy cloning and JSON round-trip.
+        /// </summary>
+        [Fact]
+        public void Category_Serialization()
+        {
+            Category category_Root = new("Root");
+            Category category_Sub1 = new("Sub1");
+            Category category_Sub2 = new("Sub2");
+
+            category_Root.Add(category_Sub1);
+            category_Root.Add(category_Sub2);
+
+            Query.SerializationCheck(category_Root);
+        }
     }
 }

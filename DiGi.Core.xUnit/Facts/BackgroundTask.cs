@@ -51,10 +51,13 @@ namespace DiGi.Core.xUnit
             }
         }
 
+        /// <summary>
+        /// Tests the successful execution lifecycle of a background task, verifying all state transitions and events.
+        /// </summary>
         [Fact]
         public async Task BackgroundTask_Lifecycle_Success()
         {
-            var task = new TestBackgroundTask(delayMs: 20, shouldSucceed: true);
+            TestBackgroundTask task = new(delayMs: 20, shouldSucceed: true);
 
             bool startingFired = false;
             bool startedFired = false;
@@ -96,6 +99,9 @@ namespace DiGi.Core.xUnit
             Assert.True(task.ExecutionTimeSpan > System.TimeSpan.Zero);
         }
 
+        /// <summary>
+        /// Tests the failed execution lifecycle of a background task, verifying exception capture and final failed state.
+        /// </summary>
         [Fact]
         public async Task BackgroundTask_Lifecycle_Failure()
         {
@@ -116,6 +122,9 @@ namespace DiGi.Core.xUnit
             Assert.IsType<InvalidOperationException>(task.Exception);
         }
 
+        /// <summary>
+        /// Tests the cancelable lifecycle of a background task, verifying cancellation triggers and event firing.
+        /// </summary>
         [Fact]
         public async Task CancelableBackgroundTask_Cancellation()
         {

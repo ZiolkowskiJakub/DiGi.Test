@@ -8,6 +8,9 @@ namespace DiGi.Core.xUnit
 {
     public partial class Facts
     {
+        /// <summary>
+        /// Tests the properties and deep cloning behavior of the Pen class.
+        /// </summary>
         [Fact]
         public void Pen_PropertiesAndCloning()
         {

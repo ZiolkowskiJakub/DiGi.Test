@@ -1,5 +1,3 @@
-using DiGi.Core.xUnit.Enums;
-
 namespace DiGi.Core.xUnit
 {
     public partial class Facts

@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
-namespace DiGi.Core.xUnit.Enums
+namespace DiGi.Core.xUnit
 {
     /// <summary>Represents a set of test values used for verification and testing purposes.</summary>
     public enum TestEnum
