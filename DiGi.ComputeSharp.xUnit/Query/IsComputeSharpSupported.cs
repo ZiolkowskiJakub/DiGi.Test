@@ -21,6 +21,11 @@ namespace DiGi.ComputeSharp.xUnit
                     testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (no default GraphicsDevice found).");
                     return false;
                 }
+                if (!graphicsDevice.IsDoublePrecisionSupportAvailable())
+                {
+                    testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (graphics device does not support double precision operations).");
+                    return false;
+                }
                 return true;
             }
             catch (Exception exception)

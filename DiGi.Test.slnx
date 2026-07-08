@@ -66,10 +66,18 @@
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
       <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
     </Project>
+    <Project Path="../DiGi.GIS.Analytical/DiGi.GIS.Analytical/DiGi.GIS.Analytical.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj" />
+    </Project>
     <Project Path="DiGi.GIS.xUnit/DiGi.GIS.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
     </Project>
+    <Project Path="DiGi.GIS.Analytical.xUnit/DiGi.GIS.Analytical.xUnit.csproj" />
   </Folder>
   <Folder Name="/Math/">
     <Project Path="../DiGi.Math/DiGi.Math/DiGi.Math.csproj">

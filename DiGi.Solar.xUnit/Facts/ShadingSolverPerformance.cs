@@ -68,14 +68,14 @@ namespace DiGi.Solar.xUnit
 
             Vector3D vector3D_Normal = new(0.0, 0.0, 1.0);
 
-            DiGi.Geometry.Spatial.Classes.Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
-            DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Receiver = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(4.0, 0.0), new Point2D(4.0, 4.0), new Point2D(0.0, 4.0));
+            Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
+            PolygonalFace3D? polygonalFace3D_Receiver = Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(4.0, 0.0), new Point2D(4.0, 4.0), new Point2D(0.0, 4.0));
             Assert.NotNull(polygonalFace3D_Receiver);
             ShadingElement shadingElement_Receiver = new(polygonalFace3D_Receiver, false);
             Assert.True(shadingModel.Update(shadingElement_Receiver));
 
-            DiGi.Geometry.Spatial.Classes.Plane plane_Canopy = new(new Point3D(0.0, 0.0, 2.0), vector3D_Normal);
-            DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Canopy = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Canopy, new Point2D(-20.0, -20.0), new Point2D(24.0, -20.0), new Point2D(24.0, 24.0), new Point2D(-20.0, 24.0));
+            Plane plane_Canopy = new(new Point3D(0.0, 0.0, 2.0), vector3D_Normal);
+            PolygonalFace3D? polygonalFace3D_Canopy = Geometry.Spatial.Create.PolygonalFace3D(plane_Canopy, new Point2D(-20.0, -20.0), new Point2D(24.0, -20.0), new Point2D(24.0, 24.0), new Point2D(-20.0, 24.0));
             Assert.NotNull(polygonalFace3D_Canopy);
             ShadingElement shadingElement_Canopy = new(polygonalFace3D_Canopy, true);
             Assert.True(shadingModel.Update(shadingElement_Canopy));
@@ -108,8 +108,8 @@ namespace DiGi.Solar.xUnit
             ShadingModel shadingModel = new(Core.Enums.UTC.Plus0100, coordinates);
 
             Vector3D vector3D_Normal = new(0.0, 0.0, 1.0);
-            DiGi.Geometry.Spatial.Classes.Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
-            DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Receiver = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(4.0, 0.0), new Point2D(4.0, 4.0), new Point2D(0.0, 4.0));
+            Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
+            PolygonalFace3D? polygonalFace3D_Receiver = Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(4.0, 0.0), new Point2D(4.0, 4.0), new Point2D(0.0, 4.0));
             Assert.NotNull(polygonalFace3D_Receiver);
             ShadingElement shadingElement_Receiver = new(polygonalFace3D_Receiver, false);
             Assert.True(shadingModel.Update(shadingElement_Receiver));
@@ -151,8 +151,8 @@ namespace DiGi.Solar.xUnit
                     double x = i * step;
                     double y = j * step;
 
-                    DiGi.Geometry.Spatial.Classes.Plane plane = new(new Point3D(x, y, 0.0), vector3D_Normal);
-                    DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane, new Point2D(0.0, 0.0), new Point2D(size, 0.0), new Point2D(size, size), new Point2D(0.0, size));
+                    Plane plane = new(new Point3D(x, y, 0.0), vector3D_Normal);
+                    PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane, new Point2D(0.0, 0.0), new Point2D(size, 0.0), new Point2D(size, size), new Point2D(0.0, size));
                     if (polygonalFace3D == null)
                     {
                         continue;
@@ -168,8 +168,8 @@ namespace DiGi.Solar.xUnit
 
             for (int k = 0; k < 2; k++)
             {
-                DiGi.Geometry.Spatial.Classes.Plane plane = new(new Point3D(0.0, 0.0, 3.0 + k), vector3D_Normal);
-                DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane, new Point2D(-5.0, -5.0), new Point2D(width + 5.0, -5.0), new Point2D(width + 5.0, depth + 5.0), new Point2D(-5.0, depth + 5.0));
+                Plane plane = new(new Point3D(0.0, 0.0, 3.0 + k), vector3D_Normal);
+                PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane, new Point2D(-5.0, -5.0), new Point2D(width + 5.0, -5.0), new Point2D(width + 5.0, depth + 5.0), new Point2D(-5.0, depth + 5.0));
                 if (polygonalFace3D == null)
                 {
                     continue;
@@ -243,8 +243,8 @@ namespace DiGi.Solar.xUnit
 
             Vector3D vector3D_Normal = new(0.0, 0.0, 1.0);
 
-            DiGi.Geometry.Spatial.Classes.Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
-            DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Receiver = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(10.0, 0.0), new Point2D(10.0, 10.0), new Point2D(0.0, 10.0));
+            Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
+            PolygonalFace3D? polygonalFace3D_Receiver = Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(10.0, 0.0), new Point2D(10.0, 10.0), new Point2D(0.0, 10.0));
             if (polygonalFace3D_Receiver == null)
             {
                 return double.NaN;
@@ -255,8 +255,8 @@ namespace DiGi.Solar.xUnit
 
             for (int i = 0; i < canopyCount; i++)
             {
-                DiGi.Geometry.Spatial.Classes.Plane plane_Canopy = new(new Point3D(0.0, 0.0, 2.0), vector3D_Normal);
-                DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Canopy = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Canopy, new Point2D(3.0, 3.0), new Point2D(7.0, 3.0), new Point2D(7.0, 7.0), new Point2D(3.0, 7.0));
+                Plane plane_Canopy = new(new Point3D(0.0, 0.0, 2.0), vector3D_Normal);
+                PolygonalFace3D? polygonalFace3D_Canopy = Geometry.Spatial.Create.PolygonalFace3D(plane_Canopy, new Point2D(3.0, 3.0), new Point2D(7.0, 3.0), new Point2D(7.0, 7.0), new Point2D(3.0, 7.0));
                 if (polygonalFace3D_Canopy == null)
                 {
                     continue;
@@ -292,8 +292,8 @@ namespace DiGi.Solar.xUnit
 
             Vector3D vector3D_Normal = new(0.0, 0.0, 1.0);
 
-            DiGi.Geometry.Spatial.Classes.Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
-            DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Receiver = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(14.0, 0.0), new Point2D(14.0, 14.0), new Point2D(0.0, 14.0));
+            Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
+            PolygonalFace3D? polygonalFace3D_Receiver = Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(14.0, 0.0), new Point2D(14.0, 14.0), new Point2D(0.0, 14.0));
             Assert.NotNull(polygonalFace3D_Receiver);
             ShadingElement shadingElement_Receiver = new(polygonalFace3D_Receiver, false);
             Assert.True(shadingModel.Update(shadingElement_Receiver));
@@ -309,8 +309,8 @@ namespace DiGi.Solar.xUnit
 
             foreach (double[] bar in bars)
             {
-                DiGi.Geometry.Spatial.Classes.Plane plane_Bar = new(new Point3D(0.0, 0.0, 2.0), vector3D_Normal);
-                DiGi.Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D_Bar = DiGi.Geometry.Spatial.Create.PolygonalFace3D(plane_Bar, new Point2D(bar[0], bar[1]), new Point2D(bar[2], bar[1]), new Point2D(bar[2], bar[3]), new Point2D(bar[0], bar[3]));
+                Plane plane_Bar = new(new Point3D(0.0, 0.0, 2.0), vector3D_Normal);
+                PolygonalFace3D? polygonalFace3D_Bar = Geometry.Spatial.Create.PolygonalFace3D(plane_Bar, new Point2D(bar[0], bar[1]), new Point2D(bar[2], bar[1]), new Point2D(bar[2], bar[3]), new Point2D(bar[0], bar[3]));
                 Assert.NotNull(polygonalFace3D_Bar);
                 ShadingElement shadingElement_Bar = new(polygonalFace3D_Bar, true);
                 Assert.True(shadingModel.Update(shadingElement_Bar));
