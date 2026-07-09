@@ -97,7 +97,7 @@ namespace DiGi.Geometry.xUnit
             IntersectionResult2D? intersectionResult2D_Cross = segment2D_1.IntersectionResult2D(segment2D_2);
 
             Assert.NotNull(intersectionResult2D_Cross);
-            Assert.True(intersectionResult2D_Cross.Intersect);
+            Assert.True(intersectionResult2D_Cross.Any());
             Assert.Equal(1, intersectionResult2D_Cross.Count);
             Point2D? point2D_Cross = intersectionResult2D_Cross.GetGeometry2Ds<Point2D>()?[0];
             Assert.NotNull(point2D_Cross);
@@ -109,14 +109,14 @@ namespace DiGi.Geometry.xUnit
             Segment2D segment2D_Parallel2 = new(new Point2D(-2, 2), new Point2D(2, 2));
             IntersectionResult2D? intersectionResult2D_Parallel = segment2D_Parallel1.IntersectionResult2D(segment2D_Parallel2);
             Assert.NotNull(intersectionResult2D_Parallel);
-            Assert.False(intersectionResult2D_Parallel.Intersect);
+            Assert.False(intersectionResult2D_Parallel.Any());
 
             // Collinear overlapping (results in a Segment)
             Segment2D segment2D_Collinear1 = new(new Point2D(0, 0), new Point2D(4, 0));
             Segment2D segment2D_Collinear2 = new(new Point2D(2, 0), new Point2D(6, 0));
             IntersectionResult2D? intersectionResult2D_Overlapping = segment2D_Collinear1.IntersectionResult2D(segment2D_Collinear2);
             Assert.NotNull(intersectionResult2D_Overlapping);
-            Assert.True(intersectionResult2D_Overlapping.Intersect);
+            Assert.True(intersectionResult2D_Overlapping.Any());
             Assert.True(intersectionResult2D_Overlapping.Contains<Segment2D>());
 
             // Adjacent sharing end points (results in a Point)
@@ -124,7 +124,7 @@ namespace DiGi.Geometry.xUnit
             Segment2D segment2D_Adjacent2 = new(new Point2D(2, 2), new Point2D(4, 0));
             IntersectionResult2D? intersectionResult2D_Adjacent = segment2D_Adjacent1.IntersectionResult2D(segment2D_Adjacent2);
             Assert.NotNull(intersectionResult2D_Adjacent);
-            Assert.True(intersectionResult2D_Adjacent.Intersect);
+            Assert.True(intersectionResult2D_Adjacent.Any());
             Assert.True(intersectionResult2D_Adjacent.Contains<Point2D>());
             Point2D? point2D_Shared = intersectionResult2D_Adjacent.GetGeometry2Ds<Point2D>()?[0];
             Assert.NotNull(point2D_Shared);
@@ -148,7 +148,7 @@ namespace DiGi.Geometry.xUnit
 
             IntersectionResult2D? intersectionResult2D = segment2D_Source.IntersectionResult2D(segment2Ds);
             Assert.NotNull(intersectionResult2D);
-            Assert.True(intersectionResult2D.Intersect);
+            Assert.True(intersectionResult2D.Any());
             Assert.Equal(2, intersectionResult2D.Count);
         }
 
@@ -171,7 +171,7 @@ namespace DiGi.Geometry.xUnit
             // Self intersection with maxCount = 1
             IntersectionResult2D? intersectionResult2D_Limited = polyline2D.IntersectionResult2D(1);
             Assert.NotNull(intersectionResult2D_Limited);
-            Assert.True(intersectionResult2D_Limited.Intersect);
+            Assert.True(intersectionResult2D_Limited.Any());
             Assert.Equal(1, intersectionResult2D_Limited.Count);
         }
 
@@ -194,7 +194,7 @@ namespace DiGi.Geometry.xUnit
             IntersectionResult2D? intersectionResult2D = polygonalFace2D.IntersectionResult2D(line2D_Through);
 
             Assert.NotNull(intersectionResult2D);
-            Assert.True(intersectionResult2D.Intersect);
+            Assert.True(intersectionResult2D.Any());
             Assert.True(intersectionResult2D.Contains<Segment2D>()); // Intersects face as a segment from (0,-2) to (0,2)
         }
     }

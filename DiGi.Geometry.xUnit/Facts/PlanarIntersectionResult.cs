@@ -24,19 +24,19 @@ namespace DiGi.Geometry.xUnit
 
             planarIntersectionResult = Create.PlanarIntersectionResult(plane, point3D_1, point3D_2, true, true);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(!planarIntersectionResult.Intersect);
+            Assert.True(!planarIntersectionResult.Any());
 
             planarIntersectionResult = Create.PlanarIntersectionResult(plane, point3D_1, point3D_2, false, true);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
 
             planarIntersectionResult = Create.PlanarIntersectionResult(plane, point3D_1, point3D_2, true, false);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(!planarIntersectionResult.Intersect);
+            Assert.True(!planarIntersectionResult.Any());
 
             planarIntersectionResult = Create.PlanarIntersectionResult(plane, point3D_1, point3D_2, false, false);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
 
             point3D_1 = new Point3D(0, 1, 0);
             point3D_2 = new Point3D(0, 10, 0);
@@ -45,7 +45,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(planarIntersectionResult);
             if (planarIntersectionResult is not null)
             {
-                Assert.True(planarIntersectionResult.Intersect);
+                Assert.True(planarIntersectionResult.Any());
 
                 List<Segment3D>? segment3Ds = planarIntersectionResult.GetGeometry3Ds<Segment3D>();
                 Assert.NotNull(segment3Ds);
@@ -63,7 +63,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(planarIntersectionResult);
             if (planarIntersectionResult is not null)
             {
-                Assert.True(planarIntersectionResult.Intersect);
+                Assert.True(planarIntersectionResult.Any());
 
                 List<Ray3D>? ray3Ds = planarIntersectionResult.GetGeometry3Ds<Ray3D>();
                 Assert.NotNull(ray3Ds);
@@ -81,7 +81,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(planarIntersectionResult);
             if (planarIntersectionResult is not null)
             {
-                Assert.True(planarIntersectionResult.Intersect);
+                Assert.True(planarIntersectionResult.Any());
 
                 List<Ray3D>? ray3Ds = planarIntersectionResult.GetGeometry3Ds<Ray3D>();
                 Assert.NotNull(ray3Ds);
@@ -99,7 +99,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(planarIntersectionResult);
             if (planarIntersectionResult is not null)
             {
-                Assert.True(planarIntersectionResult.Intersect);
+                Assert.True(planarIntersectionResult.Any());
 
                 List<Line3D>? line3Ds = planarIntersectionResult.GetGeometry3Ds<Line3D>();
                 Assert.NotNull(line3Ds);
@@ -126,7 +126,7 @@ namespace DiGi.Geometry.xUnit
             Segment3D segment3D_Intersect = new(new Point3D(0, 0, -5), new Point3D(0, 0, 5));
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(plane, segment3D_Intersect);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
             List<Point2D>? point2Ds = planarIntersectionResult.GetGeometry2Ds<Point2D>();
             Assert.NotNull(point2Ds);
             Assert.Single(point2Ds);
@@ -137,13 +137,13 @@ namespace DiGi.Geometry.xUnit
             Segment3D segment3D_Parallel = new(new Point3D(0, 0, 5), new Point3D(10, 0, 5));
             PlanarIntersectionResult? planarIntersectionResult_Parallel = Create.PlanarIntersectionResult(plane, segment3D_Parallel);
             Assert.NotNull(planarIntersectionResult_Parallel);
-            Assert.False(planarIntersectionResult_Parallel.Intersect);
+            Assert.False(planarIntersectionResult_Parallel.Any());
 
             // Parallel on Plane
             Segment3D segment3D_OnPlane = new(new Point3D(0, 0, 0), new Point3D(10, 0, 0));
             PlanarIntersectionResult? planarIntersectionResult_OnPlane = Create.PlanarIntersectionResult(plane, segment3D_OnPlane);
             Assert.NotNull(planarIntersectionResult_OnPlane);
-            Assert.True(planarIntersectionResult_OnPlane.Intersect);
+            Assert.True(planarIntersectionResult_OnPlane.Any());
             List<Segment2D>? segment2Ds = planarIntersectionResult_OnPlane.GetGeometry2Ds<Segment2D>();
             Assert.NotNull(segment2Ds);
             Assert.Single(segment2Ds);
@@ -152,7 +152,7 @@ namespace DiGi.Geometry.xUnit
             Segment3D segment3D_Disjoint = new(new Point3D(0, 0, 2), new Point3D(0, 0, 10));
             PlanarIntersectionResult? planarIntersectionResult_Disjoint = Create.PlanarIntersectionResult(plane, segment3D_Disjoint);
             Assert.NotNull(planarIntersectionResult_Disjoint);
-            Assert.False(planarIntersectionResult_Disjoint.Intersect);
+            Assert.False(planarIntersectionResult_Disjoint.Any());
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace DiGi.Geometry.xUnit
             Ray3D ray3D_Intersect = new(new Point3D(0, 0, -5), new Spatial.Classes.Vector3D(0, 0, 1));
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(plane, ray3D_Intersect);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
             List<Point2D>? point2Ds = planarIntersectionResult.GetGeometry2Ds<Point2D>();
             Assert.NotNull(point2Ds);
             Assert.Single(point2Ds);
@@ -176,13 +176,13 @@ namespace DiGi.Geometry.xUnit
             Ray3D ray3D_Away = new(new Point3D(0, 0, 5), new Spatial.Classes.Vector3D(0, 0, 1));
             PlanarIntersectionResult? planarIntersectionResult_Away = Create.PlanarIntersectionResult(plane, ray3D_Away);
             Assert.NotNull(planarIntersectionResult_Away);
-            Assert.False(planarIntersectionResult_Away.Intersect);
+            Assert.False(planarIntersectionResult_Away.Any());
 
             // Disjoint / Parallel
             Ray3D ray3D_Parallel = new(new Point3D(0, 0, 5), new Spatial.Classes.Vector3D(1, 0, 0));
             PlanarIntersectionResult? planarIntersectionResult_Parallel = Create.PlanarIntersectionResult(plane, ray3D_Parallel);
             Assert.NotNull(planarIntersectionResult_Parallel);
-            Assert.False(planarIntersectionResult_Parallel.Intersect);
+            Assert.False(planarIntersectionResult_Parallel.Any());
         }
 
         /// <summary>
@@ -198,14 +198,14 @@ namespace DiGi.Geometry.xUnit
             Polyline3D polyline3D_Disjoint = new(point3Ds_Disjoint);
             PlanarIntersectionResult? planarIntersectionResult_Disjoint = Create.PlanarIntersectionResult(plane, polyline3D_Disjoint);
             Assert.NotNull(planarIntersectionResult_Disjoint);
-            Assert.False(planarIntersectionResult_Disjoint.Intersect);
+            Assert.False(planarIntersectionResult_Disjoint.Any());
 
             // Intersecting path (crosses z=0)
             List<Point3D> point3Ds_Intersect = [new(0, 0, -5), new(5, 5, 5), new(10, 0, -5)];
             Polyline3D polyline3D_Intersect = new(point3Ds_Intersect);
             PlanarIntersectionResult? planarIntersectionResult_Intersect = Create.PlanarIntersectionResult(plane, polyline3D_Intersect);
             Assert.NotNull(planarIntersectionResult_Intersect);
-            Assert.True(planarIntersectionResult_Intersect.Intersect);
+            Assert.True(planarIntersectionResult_Intersect.Any());
             List<Point2D>? point2Ds_Result = planarIntersectionResult_Intersect.GetGeometry2Ds<Point2D>();
             Assert.NotNull(point2Ds_Result);
             Assert.Equal(2, point2Ds_Result.Count);
@@ -225,7 +225,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(polyhedron_Disjoint);
             PlanarIntersectionResult? planarIntersectionResult_Disjoint = Create.PlanarIntersectionResult(plane, polyhedron_Disjoint);
             Assert.NotNull(planarIntersectionResult_Disjoint);
-            Assert.False(planarIntersectionResult_Disjoint.Intersect);
+            Assert.False(planarIntersectionResult_Disjoint.Any());
 
             // Intersecting Polyhedron (crosses Z=0)
             BoundingBox3D boundingBox3D_Intersect = new(new Point3D(-5, -5, -5), new Point3D(5, 5, 5));
@@ -233,7 +233,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(polyhedron_Intersect);
             PlanarIntersectionResult? planarIntersectionResult_Intersect = Create.PlanarIntersectionResult(plane, polyhedron_Intersect);
             Assert.NotNull(planarIntersectionResult_Intersect);
-            Assert.True(planarIntersectionResult_Intersect.Intersect);
+            Assert.True(planarIntersectionResult_Intersect.Any());
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace DiGi.Geometry.xUnit
 
             PlanarIntersectionResult? planarIntersectionResult_Coplanar = Create.PlanarIntersectionResult(polygonalFace3D_1, polygonalFace3D_2);
             Assert.NotNull(planarIntersectionResult_Coplanar);
-            Assert.True(planarIntersectionResult_Coplanar.Intersect);
+            Assert.True(planarIntersectionResult_Coplanar.Any());
 
             // Disjoint / Parallel
             Plane plane3 = new(new Point3D(0, 0, 5), new Spatial.Classes.Vector3D(0, 0, 1));
@@ -267,7 +267,7 @@ namespace DiGi.Geometry.xUnit
 
             PlanarIntersectionResult? planarIntersectionResult_DisjointParallel = Create.PlanarIntersectionResult(polygonalFace3D_1, polygonalFace3D_3);
             Assert.NotNull(planarIntersectionResult_DisjointParallel);
-            Assert.False(planarIntersectionResult_DisjointParallel.Intersect);
+            Assert.False(planarIntersectionResult_DisjointParallel.Any());
 
             // Disjoint Bounding Boxes
             Plane plane4 = new(new Point3D(20, 20, 0), new Spatial.Classes.Vector3D(0, 0, 1));
@@ -278,7 +278,7 @@ namespace DiGi.Geometry.xUnit
 
             PlanarIntersectionResult? planarIntersectionResult_Disjoint = Create.PlanarIntersectionResult(polygonalFace3D_1, polygonalFace3D_4);
             Assert.NotNull(planarIntersectionResult_Disjoint);
-            Assert.False(planarIntersectionResult_Disjoint.Intersect);
+            Assert.False(planarIntersectionResult_Disjoint.Any());
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace DiGi.Geometry.xUnit
             Segment3D segment3D_Degenerate = new(new Point3D(1, 1, 1), new Point3D(1, 1, 1));
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(plane, segment3D_Degenerate);
             Assert.NotNull(planarIntersectionResult);
-            Assert.False(planarIntersectionResult.Intersect);
+            Assert.False(planarIntersectionResult.Any());
 
             // Null inputs
             Assert.Null(Create.PlanarIntersectionResult((Plane?)null, (Segment3D?)null));
@@ -314,13 +314,13 @@ namespace DiGi.Geometry.xUnit
             Segment3D segment3D_Inside = new(new Point3D(0, 0, 1e-3 - 1e-9), new Point3D(0, 0, 10));
             PlanarIntersectionResult? planarIntersectionResult_Inside = Create.PlanarIntersectionResult(plane, segment3D_Inside, tolerance);
             Assert.NotNull(planarIntersectionResult_Inside);
-            Assert.True(planarIntersectionResult_Inside.Intersect);
+            Assert.True(planarIntersectionResult_Inside.Any());
 
             // Endpoint exactly outside boundary (Z = tolerance + 1e-9)
             Segment3D segment3D_Outside = new(new Point3D(0, 0, 1e-3 + 1e-9), new Point3D(0, 0, 10));
             PlanarIntersectionResult? planarIntersectionResult_Outside = Create.PlanarIntersectionResult(plane, segment3D_Outside, tolerance);
             Assert.NotNull(planarIntersectionResult_Outside);
-            Assert.False(planarIntersectionResult_Outside.Intersect);
+            Assert.False(planarIntersectionResult_Outside.Any());
         }
 
         /// <summary>
@@ -356,7 +356,7 @@ namespace DiGi.Geometry.xUnit
             stopwatch.Stop();
 
             Assert.NotNull(planarIntersectionResult);
-            Assert.False(planarIntersectionResult.Intersect);
+            Assert.False(planarIntersectionResult.Any());
             Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Early exit performance check failed for ISegmentable3D! Took {stopwatch.ElapsedMilliseconds} ms.");
 
             // Complex Polyhedron with 1000 faces disjoint from plane
@@ -370,7 +370,7 @@ namespace DiGi.Geometry.xUnit
             stopwatch.Stop();
 
             Assert.NotNull(planarIntersectionResult_Poly);
-            Assert.False(planarIntersectionResult_Poly.Intersect);
+            Assert.False(planarIntersectionResult_Poly.Any());
             Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Early exit performance check failed for IPolyhedron! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
 
@@ -395,7 +395,7 @@ namespace DiGi.Geometry.xUnit
 
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(polygonalFace3D, new Segment3D(new Point3D(-1, -1, 0), new Point3D(10, 10, 0)));
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace DiGi.Geometry.xUnit
 
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(new Plane(new Point3D(0, 0, 1), Spatial.Constants.Vector3D.WorldZ), polyhedron);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
         }
     }
 }

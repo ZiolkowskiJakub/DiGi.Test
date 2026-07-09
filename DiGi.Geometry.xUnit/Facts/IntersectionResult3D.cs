@@ -91,7 +91,7 @@ namespace DiGi.Geometry.xUnit
             IntersectionResult3D? intersectionResult3D_1 = sphere.IntersectionResult3D(line3D_Through);
 
             Assert.NotNull(intersectionResult3D_1);
-            Assert.True(intersectionResult3D_1.Intersect);
+            Assert.True(intersectionResult3D_1.Any());
             Assert.Equal(2, intersectionResult3D_1.Count);
 
             // Segment inside/crossing
@@ -99,7 +99,7 @@ namespace DiGi.Geometry.xUnit
             IntersectionResult3D? intersectionResult3D_2 = sphere.IntersectionResult3D(segment3D_Crossing);
 
             Assert.NotNull(intersectionResult3D_2);
-            Assert.True(intersectionResult3D_2.Intersect);
+            Assert.True(intersectionResult3D_2.Any());
             Assert.Equal(1, intersectionResult3D_2.Count); // intersects at (5, 0, 0)
         }
 
@@ -125,7 +125,7 @@ namespace DiGi.Geometry.xUnit
             IntersectionResult3D? intersectionResult3D = polyhedron.IntersectionResult3D(line3D_Through);
 
             Assert.NotNull(intersectionResult3D);
-            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(intersectionResult3D.Any());
             Assert.Equal(2, intersectionResult3D.Count); // crosses Z=-2 and Z=2 faces
         }
 
@@ -155,11 +155,11 @@ namespace DiGi.Geometry.xUnit
 
             IntersectionResult3D? intersectionResult3D = Create.IntersectionResult3D(polyhedron, new Segment3D(-1, 5, 5, 11, 5, 5));
             Assert.NotNull(intersectionResult3D);
-            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(intersectionResult3D.Any());
 
             PlanarIntersectionResult? planarIntersectionResult = Create.PlanarIntersectionResult(new Plane(new Point3D(0, 0, 5), Spatial.Constants.Vector3D.WorldZ), polyhedron);
             Assert.NotNull(planarIntersectionResult);
-            Assert.True(planarIntersectionResult.Intersect);
+            Assert.True(planarIntersectionResult.Any());
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace DiGi.Geometry.xUnit
 
             IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
             Assert.NotNull(intersectionResult3D);
-            Assert.False(intersectionResult3D.Intersect);
+            Assert.False(intersectionResult3D.Any());
             Assert.Equal(0, intersectionResult3D.Count);
         }
 
@@ -212,7 +212,7 @@ namespace DiGi.Geometry.xUnit
 
             IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
             Assert.NotNull(intersectionResult3D);
-            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(intersectionResult3D.Any());
 
             List<Polyhedron>? polyhedrons = intersectionResult3D.GetGeometry3Ds<Polyhedron>();
             Assert.NotNull(polyhedrons);
@@ -256,7 +256,7 @@ namespace DiGi.Geometry.xUnit
 
             IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
             Assert.NotNull(intersectionResult3D);
-            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(intersectionResult3D.Any());
 
             List<Polyhedron>? polyhedrons = intersectionResult3D.GetGeometry3Ds<Polyhedron>();
             Assert.NotNull(polyhedrons);
@@ -299,7 +299,7 @@ namespace DiGi.Geometry.xUnit
 
             IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
             Assert.NotNull(intersectionResult3D);
-            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(intersectionResult3D.Any());
 
             List<Polyhedron>? polyhedrons = intersectionResult3D.GetGeometry3Ds<Polyhedron>();
             Assert.True(polyhedrons == null || polyhedrons.Count == 0);
@@ -343,7 +343,7 @@ namespace DiGi.Geometry.xUnit
             stopwatch.Stop();
 
             Assert.NotNull(intersectionResult3D);
-            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(intersectionResult3D.Any());
             Assert.True(stopwatch.ElapsedMilliseconds < 50, $"Intersection performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
     }
