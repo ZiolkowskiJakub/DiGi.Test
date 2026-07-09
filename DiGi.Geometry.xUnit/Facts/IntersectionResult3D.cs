@@ -161,5 +161,190 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(planarIntersectionResult);
             Assert.True(planarIntersectionResult.Intersect);
         }
+
+        /// <summary>
+        /// Tests 3D boolean intersection between two disjoint polyhedra.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_CalculateIntersection_Disjoint()
+        {
+            Point3D point3D_Min1 = new(-2, -2, -2);
+            Point3D point3D_Max1 = new(2, 2, 2);
+            BoundingBox3D boundingBox3D_1 = new(point3D_Min1, point3D_Max1);
+            Polyhedron? polyhedron_1 = Create.Polyhedron(boundingBox3D_1);
+            Assert.NotNull(polyhedron_1);
+
+            Point3D point3D_Min2 = new(10, 10, 10);
+            Point3D point3D_Max2 = new(15, 15, 15);
+            BoundingBox3D boundingBox3D_2 = new(point3D_Min2, point3D_Max2);
+            Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D_2);
+            Assert.NotNull(polyhedron_2);
+
+            if (polyhedron_1 == null || polyhedron_2 == null)
+            {
+                return;
+            }
+
+            IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
+            Assert.NotNull(intersectionResult3D);
+            Assert.False(intersectionResult3D.Intersect);
+            Assert.Equal(0, intersectionResult3D.Count);
+        }
+
+        /// <summary>
+        /// Tests 3D boolean intersection between two identical polyhedra.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_CalculateIntersection_Identical()
+        {
+            Point3D point3D_Min = new(-2, -2, -2);
+            Point3D point3D_Max = new(2, 2, 2);
+            BoundingBox3D boundingBox3D_Box = new(point3D_Min, point3D_Max);
+            Polyhedron? polyhedron_1 = Create.Polyhedron(boundingBox3D_Box);
+            Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D_Box);
+            Assert.NotNull(polyhedron_1);
+            Assert.NotNull(polyhedron_2);
+
+            if (polyhedron_1 == null || polyhedron_2 == null)
+            {
+                return;
+            }
+
+            IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
+            Assert.NotNull(intersectionResult3D);
+            Assert.True(intersectionResult3D.Intersect);
+
+            List<Polyhedron>? polyhedrons = intersectionResult3D.GetGeometry3Ds<Polyhedron>();
+            Assert.NotNull(polyhedrons);
+            Polyhedron? polyhedron_Result = polyhedrons.FirstOrDefault();
+            Assert.NotNull(polyhedron_Result);
+
+            if (polyhedron_Result != null)
+            {
+                BoundingBox3D? bbox = polyhedron_Result.GetBoundingBox();
+                Assert.NotNull(bbox);
+                if (bbox != null)
+                {
+                    Assert.Equal(64.0, bbox.GetVolume(), 5);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Tests 3D boolean intersection between two partially overlapping polyhedra.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_CalculateIntersection_Overlapping()
+        {
+            Point3D point3D_Min1 = new(-2, -2, -2);
+            Point3D point3D_Max1 = new(2, 2, 2);
+            BoundingBox3D boundingBox3D_1 = new(point3D_Min1, point3D_Max1);
+            Polyhedron? polyhedron_1 = Create.Polyhedron(boundingBox3D_1);
+            Assert.NotNull(polyhedron_1);
+
+            Point3D point3D_Min2 = new(0, 0, 0);
+            Point3D point3D_Max2 = new(4, 4, 4);
+            BoundingBox3D boundingBox3D_2 = new(point3D_Min2, point3D_Max2);
+            Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D_2);
+            Assert.NotNull(polyhedron_2);
+
+            if (polyhedron_1 == null || polyhedron_2 == null)
+            {
+                return;
+            }
+
+            IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
+            Assert.NotNull(intersectionResult3D);
+            Assert.True(intersectionResult3D.Intersect);
+
+            List<Polyhedron>? polyhedrons = intersectionResult3D.GetGeometry3Ds<Polyhedron>();
+            Assert.NotNull(polyhedrons);
+            Polyhedron? polyhedron_Result = polyhedrons.FirstOrDefault();
+            Assert.NotNull(polyhedron_Result);
+
+            if (polyhedron_Result != null)
+            {
+                BoundingBox3D? bbox = polyhedron_Result.GetBoundingBox();
+                Assert.NotNull(bbox);
+                if (bbox != null)
+                {
+                    Assert.Equal(8.0, bbox.GetVolume(), 5);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tests 3D boolean intersection for coplanar touching polyhedra, verifying lower-dimensional boundary collection.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_CalculateIntersection_CoplanarTouch()
+        {
+            Point3D point3D_Min1 = new(-2, -2, -2);
+            Point3D point3D_Max1 = new(2, 2, 2);
+            BoundingBox3D boundingBox3D_1 = new(point3D_Min1, point3D_Max1);
+            Polyhedron? polyhedron_1 = Create.Polyhedron(boundingBox3D_1);
+            Assert.NotNull(polyhedron_1);
+
+            Point3D point3D_Min2 = new(2, -2, -2);
+            Point3D point3D_Max2 = new(6, 2, 2);
+            BoundingBox3D boundingBox3D_2 = new(point3D_Min2, point3D_Max2);
+            Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D_2);
+            Assert.NotNull(polyhedron_2);
+
+            if (polyhedron_1 == null || polyhedron_2 == null)
+            {
+                return;
+            }
+
+            IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
+            Assert.NotNull(intersectionResult3D);
+            Assert.True(intersectionResult3D.Intersect);
+
+            List<Polyhedron>? polyhedrons = intersectionResult3D.GetGeometry3Ds<Polyhedron>();
+            Assert.True(polyhedrons == null || polyhedrons.Count == 0);
+
+            List<PolygonalFace3D>? polygons = intersectionResult3D.GetGeometry3Ds<PolygonalFace3D>();
+            Assert.NotNull(polygons);
+            if (polygons != null)
+            {
+                Assert.NotEmpty(polygons);
+            }
+        }
+
+        /// <summary>
+        /// Tests execution performance and warm-up of the 3D polyhedron intersection algorithm.
+        /// </summary>
+        [Fact]
+        public void Polyhedron_CalculateIntersection_Performance()
+        {
+            Point3D point3D_Min1 = new(-2, -2, -2);
+            Point3D point3D_Max1 = new(2, 2, 2);
+            BoundingBox3D boundingBox3D_1 = new(point3D_Min1, point3D_Max1);
+            Polyhedron? polyhedron_1 = Create.Polyhedron(boundingBox3D_1);
+
+            Point3D point3D_Min2 = new(0, 0, 0);
+            Point3D point3D_Max2 = new(4, 4, 4);
+            BoundingBox3D boundingBox3D_2 = new(point3D_Min2, point3D_Max2);
+            Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D_2);
+
+            Assert.NotNull(polyhedron_1);
+            Assert.NotNull(polyhedron_2);
+
+            if (polyhedron_1 == null || polyhedron_2 == null)
+            {
+                return;
+            }
+
+            _ = polyhedron_1.IntersectionResult3D(polyhedron_2);
+
+            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            IntersectionResult3D? intersectionResult3D = polyhedron_1.IntersectionResult3D(polyhedron_2);
+            stopwatch.Stop();
+
+            Assert.NotNull(intersectionResult3D);
+            Assert.True(intersectionResult3D.Intersect);
+            Assert.True(stopwatch.ElapsedMilliseconds < 50, $"Intersection performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
+        }
     }
 }
