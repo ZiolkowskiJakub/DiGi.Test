@@ -8,6 +8,70 @@ namespace DiGi.Geometry.xUnit
     public partial class Facts
     {
         /// <summary>
+        /// Tests the generation of a <see cref="Polyhedron"/> from an <see cref="Ellipsoid"/>.
+        /// <para>Verifies the exact face count, closedness, rejection of degenerate inputs, geometric fidelity via a round-trip back to <see cref="Mesh3D"/> whose volume must match the directly generated mesh, and the JSON serialization round-trip.</para>
+        /// </summary>
+        [Fact]
+        public void Polyhedron_Ellipsoid()
+        {
+            Ellipsoid ellipsoid = new(new Point3D(1, 2, 3), 1, 2, 3);
+
+            Polyhedron? polyhedron = Create.Polyhedron(ellipsoid, 8, 12);
+            Assert.NotNull(polyhedron);
+            Assert.Equal(2 * 12 * (8 - 1), polyhedron.Count);
+            Assert.True(polyhedron.IsClosed());
+
+            Assert.Null(Create.Polyhedron((Ellipsoid?)null, 8, 12));
+            Assert.Null(Create.Polyhedron(ellipsoid, 1, 12));
+            Assert.Null(Create.Polyhedron(ellipsoid, 8, 2));
+            Assert.Null(Create.Polyhedron(ellipsoid, 0.0));
+
+            Polyhedron? polyhedron_AngleFactor = Create.Polyhedron(ellipsoid, System.Math.PI / 8);
+            Assert.NotNull(polyhedron_AngleFactor);
+            Assert.True(polyhedron_AngleFactor.IsClosed());
+
+            // Round trip back to a mesh must reproduce the same enclosed volume as the directly generated mesh
+            Mesh3D? mesh3D = Create.Mesh3D(ellipsoid, 8, 12);
+            Assert.NotNull(mesh3D);
+
+            Mesh3D? mesh3D_RoundTrip = Create.Mesh3D(polyhedron);
+            Assert.NotNull(mesh3D_RoundTrip);
+            Assert.True(mesh3D_RoundTrip.IsClosed());
+            Assert.Equal(mesh3D.GetVolume(), mesh3D_RoundTrip.GetVolume(), 6);
+
+            DiGi.Core.xUnit.Query.SerializationCheck(polyhedron);
+        }
+
+        /// <summary>
+        /// Tests the performance of generating a <see cref="Polyhedron"/> from an <see cref="Ellipsoid"/> and checking its closedness.
+        /// <para>After a warm-up call, generating a polyhedron with 9800 triangular faces plus running <see cref="Query.IsClosed{TPolygonalFace3D}(Polyhedron{TPolygonalFace3D}, double)"/> must complete within the stated threshold.</para>
+        /// </summary>
+        [Fact]
+        public void Polyhedron_Ellipsoid_Performance()
+        {
+            Ellipsoid ellipsoid = new(new Point3D(1, 2, 3), 3, 2, 1);
+
+            // Warm-up (JIT)
+            Polyhedron? polyhedron_WarmUp = Create.Polyhedron(ellipsoid, 6, 8);
+            Assert.NotNull(polyhedron_WarmUp);
+            Assert.True(polyhedron_WarmUp.IsClosed());
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            Polyhedron? polyhedron = Create.Polyhedron(ellipsoid, 50, 100);
+            Assert.NotNull(polyhedron);
+
+            bool closed = polyhedron.IsClosed();
+
+            stopwatch.Stop();
+
+            Assert.Equal(2 * 100 * (50 - 1), polyhedron.Count);
+            Assert.True(closed);
+
+            Assert.True(stopwatch.ElapsedMilliseconds < 1000, $"Polyhedron generation and evaluation took {stopwatch.ElapsedMilliseconds} ms, expected less than 1000 ms.");
+        }
+
+        /// <summary>
         /// Verifies that point classification against a box <see cref="Polyhedron"/> is correct for interior, boundary, and exterior points.
         /// <para>The bounding-box early-out added to <see cref="Polyhedron{TPolygonalFace3D}.InRange(Point3D, double)"/> must not change any of these results.</para>
         /// </summary>
