@@ -11,7 +11,7 @@ namespace DiGi.Communication.xUnit
         [Fact]
         public void PropagationResult_BadUrban()
         {
-            PropagationResultCheck(PowerDelayProfiles.BadUrban);
+            PropagationResultCheck(Create.SimpleMultipathPowerDelayProfile(Enums.DefaultSimpleMultipathPowerDelayProfile.BadUrban));
         }
 
         /// <summary>
@@ -20,17 +20,24 @@ namespace DiGi.Communication.xUnit
         [Fact]
         public void PropagationResult_TypicalUrban()
         {
-            PropagationResultCheck(PowerDelayProfiles.TypicalUrban);
+            PropagationResultCheck(Create.SimpleMultipathPowerDelayProfile(Enums.DefaultSimpleMultipathPowerDelayProfile.TypicalUrban));
         }
 
-        private static void PropagationResultCheck(List<PowerDelayProfilePoint> powerDelayProfilePoints)
+        private static void PropagationResultCheck(SimpleMultipathPowerDelayProfile? simpleMultipathPowerDelayProfile)
         {
+            Assert.NotNull(simpleMultipathPowerDelayProfile);
+
+            HashSet<double>? delays = simpleMultipathPowerDelayProfile.Delays;
+            Assert.NotNull(delays);
+
+            List<double> orderedDelays = [.. delays.OrderBy(x => x)];
+
             double distance = 300;
 
             List<MeshCell> meshCells = [];
-            foreach (PowerDelayProfilePoint powerDelayProfilePoint in powerDelayProfilePoints)
+            foreach (double delay in orderedDelays)
             {
-                double semiMinorAxis = Query.SemiMinorAxis(powerDelayProfilePoint.Delay, distance);
+                double semiMinorAxis = Query.SemiMinorAxis(delay, distance);
 
                 MeshCell meshCell = new(new Point3D(distance / 2, 0, semiMinorAxis), new Vector3D(0, 0, 1), new MaterialProperties(15, 0.005));
                 meshCells.Add(meshCell);
@@ -41,7 +48,7 @@ namespace DiGi.Communication.xUnit
                 900,
                 meshCells,
                 Enums.Polarization.Vertical,
-                powerDelayProfilePoints,
+                simpleMultipathPowerDelayProfile,
                 (theta, phi) => 2.0,
                 (theta, phi) => 1.0,
                 (theta, phi) => 1.0,
@@ -57,17 +64,17 @@ namespace DiGi.Communication.xUnit
 
             Assert.NotNull(ellipsoidComponents);
             Assert.NotNull(arrivalRays);
-            Assert.Equal(powerDelayProfilePoints.Count, ellipsoidComponents.Count);
-            Assert.Equal(powerDelayProfilePoints.Count, arrivalRays.Count);
+            Assert.Equal(orderedDelays.Count, ellipsoidComponents.Count);
+            Assert.Equal(orderedDelays.Count, arrivalRays.Count);
 
             // Validation: the sum of all corrected ray powers p_nkl must equal 1 for a normalized Power Delay Profile
             Assert.Equal(1.0, arrivalRays.TotalPower(), 6);
 
             // With a single contribution per ellipsoid the power equivalence coefficient w_Pn equals 1 and each ray power reproduces the measured fractional power p'_n
-            for (int i = 0; i < powerDelayProfilePoints.Count; i++)
+            for (int i = 0; i < orderedDelays.Count; i++)
             {
                 Assert.Equal(1.0, ellipsoidComponents[i].PowerEquivalenceCoefficient, 9);
-                Assert.Equal(powerDelayProfilePoints[i].FractionalPower, arrivalRays[i].Power, 9);
+                Assert.Equal(simpleMultipathPowerDelayProfile.GetPower(orderedDelays[i]), arrivalRays[i].Power, 9);
             }
 
             // Stage III: a directional reception characteristic of constant value 2 doubles the received power

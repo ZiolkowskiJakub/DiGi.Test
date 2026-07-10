@@ -40,14 +40,14 @@ namespace DiGi.Communication.xUnit
             Assert.Equal(900.0, propagationModel.Frequency, 9);
             Assert.Equal(Enums.Polarization.Vertical, propagationModel.Polarization);
 
-            // The fractional powers are normalized and the points are ordered by delay
-            List<PowerDelayProfilePoint>? powerDelayProfilePoints = propagationModel.PowerDelayProfilePoints;
-            Assert.NotNull(powerDelayProfilePoints);
-            Assert.Equal(2, powerDelayProfilePoints.Count);
-            Assert.Equal(1e-6, powerDelayProfilePoints[0].Delay, 12);
-            Assert.Equal(0.75, powerDelayProfilePoints[0].FractionalPower, 9);
-            Assert.Equal(2e-6, powerDelayProfilePoints[1].Delay, 12);
-            Assert.Equal(0.25, powerDelayProfilePoints[1].FractionalPower, 9);
+            // The fractional powers are normalized to sum to 1
+            SimpleMultipathPowerDelayProfile? simpleMultipathPowerDelayProfile_Result = propagationModel.SimpleMultipathPowerDelayProfile;
+            Assert.NotNull(simpleMultipathPowerDelayProfile_Result);
+            HashSet<double>? delays = simpleMultipathPowerDelayProfile_Result.Delays;
+            Assert.NotNull(delays);
+            Assert.Equal(2, delays.Count);
+            Assert.Equal(0.75, simpleMultipathPowerDelayProfile_Result.GetPower(1e-6), 9);
+            Assert.Equal(0.25, simpleMultipathPowerDelayProfile_Result.GetPower(2e-6), 9);
 
             List<MeshCell>? meshCells = propagationModel.MeshCells;
             Assert.NotNull(meshCells);
@@ -86,27 +86,25 @@ namespace DiGi.Communication.xUnit
         [Fact]
         public void ToPropagation_PropagationModel_TypicalUrban()
         {
-            List<PowerDelayProfilePoint> powerDelayProfilePoints = PowerDelayProfiles.TypicalUrban;
+            SimpleMultipathPowerDelayProfile? simpleMultipathPowerDelayProfile = Create.SimpleMultipathPowerDelayProfile(Enums.DefaultSimpleMultipathPowerDelayProfile.TypicalUrban);
+            Assert.NotNull(simpleMultipathPowerDelayProfile);
+
+            HashSet<double>? delays = simpleMultipathPowerDelayProfile.Delays;
+            Assert.NotNull(delays);
+
+            List<double> orderedDelays = [.. delays.OrderBy(x => x)];
 
             double distance = 300;
 
             Antenna antenna_Transmitter = new(new Point3D(0, 0, 0), Function.Transmitter);
             Antenna antenna_Receiver = new(new Point3D(distance, 0, 0), Function.Receiver);
 
-            Dictionary<double, double> values = [];
-            foreach (PowerDelayProfilePoint powerDelayProfilePoint in powerDelayProfilePoints)
-            {
-                values[powerDelayProfilePoint.Delay] = powerDelayProfilePoint.FractionalPower;
-            }
-
-            SimpleMultipathPowerDelayProfile simpleMultipathPowerDelayProfile = new(values);
-
             // One horizontal triangle per profile point with the centroid placed exactly on the propagation ellipsoid
             List<Point3D> point3Ds = [];
             List<int[]> indexes = [];
-            foreach (PowerDelayProfilePoint powerDelayProfilePoint in powerDelayProfilePoints)
+            foreach (double delay in orderedDelays)
             {
-                double semiMinorAxis = Query.SemiMinorAxis(powerDelayProfilePoint.Delay, distance);
+                double semiMinorAxis = Query.SemiMinorAxis(delay, distance);
 
                 int index = point3Ds.Count;
                 point3Ds.Add(new Point3D((distance / 2) - 1, -1, semiMinorAxis));
@@ -131,17 +129,17 @@ namespace DiGi.Communication.xUnit
 
             Assert.NotNull(ellipsoidComponents);
             Assert.NotNull(arrivalRays);
-            Assert.Equal(powerDelayProfilePoints.Count, ellipsoidComponents.Count);
-            Assert.Equal(powerDelayProfilePoints.Count, arrivalRays.Count);
+            Assert.Equal(orderedDelays.Count, ellipsoidComponents.Count);
+            Assert.Equal(orderedDelays.Count, arrivalRays.Count);
 
             // Validation: the sum of all corrected ray powers p_nkl must equal 1 for a normalized Power Delay Profile
             Assert.Equal(1.0, arrivalRays.TotalPower(), 6);
 
             // With a single contribution per ellipsoid the power equivalence coefficient w_Pn equals 1 and each ray power reproduces the measured fractional power p'_n
-            for (int i = 0; i < powerDelayProfilePoints.Count; i++)
+            for (int i = 0; i < orderedDelays.Count; i++)
             {
                 Assert.Equal(1.0, ellipsoidComponents[i].PowerEquivalenceCoefficient, 9);
-                Assert.Equal(powerDelayProfilePoints[i].FractionalPower, arrivalRays[i].Power, 9);
+                Assert.Equal(simpleMultipathPowerDelayProfile.GetPower(orderedDelays[i]), arrivalRays[i].Power, 9);
             }
 
             // Stage III: a directional reception characteristic of constant value 2 doubles the received power
