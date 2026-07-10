@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 	<ProjectReference Include="..\..\DiGi.Communication\DiGi.Communication\DiGi.Communication.csproj" />
+	<ProjectReference Include="..\..\DiGi.Communication\DiGi.Communication.ComputeSharp\DiGi.Communication.ComputeSharp.csproj" />
 	<ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
 	<ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
 	</ItemGroup>
