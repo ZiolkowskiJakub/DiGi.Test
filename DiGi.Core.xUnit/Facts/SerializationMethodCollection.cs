@@ -39,5 +39,35 @@ namespace DiGi.Core.xUnit
             Assert.True(index_Beta < index_Zulu);
             Assert.True(index_Beta < index_Yankee);
         }
+
+        /// <summary>
+        /// Tests that <see cref="SerializationMethodCollection.Create(Core.Interfaces.ISerializableObject)"/> writes the runtime type of the instance
+        /// into the type property, both when the collection matches the exact runtime type (cached full type name fast path)
+        /// and when a base-type collection is used for a derived instance (reflection fallback).
+        /// </summary>
+        [Fact]
+        public void SerializationMethodCollection_FullTypeName()
+        {
+            TestObject testObject = new();
+
+            string? fullTypeName_Expected = Core.Query.FullTypeName(typeof(TestObject));
+            Assert.NotNull(fullTypeName_Expected);
+
+            // Exact runtime type: the cached full type name is used.
+            SerializationMethodCollection? serializationMethodCollection = typeof(TestObject).SerializationMethodCollection();
+            Assert.NotNull(serializationMethodCollection);
+
+            JsonObject? jsonObject = serializationMethodCollection.Create(testObject);
+            Assert.NotNull(jsonObject);
+            Assert.Equal(fullTypeName_Expected, jsonObject[Core.Constants.Serialization.PropertyName.Type]?.GetValue<string>());
+
+            // Base-type collection with derived instance: the runtime type must still be written.
+            SerializationMethodCollection? serializationMethodCollection_Base = typeof(GuidObject).SerializationMethodCollection();
+            Assert.NotNull(serializationMethodCollection_Base);
+
+            JsonObject? jsonObject_Base = serializationMethodCollection_Base.Create(testObject);
+            Assert.NotNull(jsonObject_Base);
+            Assert.Equal(fullTypeName_Expected, jsonObject_Base[Core.Constants.Serialization.PropertyName.Type]?.GetValue<string>());
+        }
     }
 }
