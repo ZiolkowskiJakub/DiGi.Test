@@ -49,5 +49,36 @@ namespace DiGi.Core.xUnit
             Assert.False(result_Missing);
             Assert.Null(value_Missing);
         }
+
+        /// <summary>
+        /// Verifies the performance and correctness of cloning a ParametrizedObject.
+        /// </summary>
+        [Fact]
+        public void ParametrizedObject_Clone_Performance()
+        {
+            ParametrizedObject parametrizedObject = new();
+            parametrizedObject.SetValue("StringParam", "Test");
+            parametrizedObject.SetValue("IntParam", 42);
+            parametrizedObject.SetValue("DoubleParam", 3.14);
+
+            // Warm-up
+            ParametrizedObject? clone_WarmUp = parametrizedObject.Clone<ParametrizedObject>();
+            Assert.NotNull(clone_WarmUp);
+
+            int count = 10000;
+            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            for (int i = 0; i < count; i++)
+            {
+                ParametrizedObject? clone = parametrizedObject.Clone<ParametrizedObject>();
+                Assert.NotNull(clone);
+                Assert.Equal("Test", clone.GetValue("StringParam"));
+            }
+
+            stopwatch.Stop();
+
+            // The optimized clone should easily complete 10,000 deep clones of ParametrizedObject in less than 50 milliseconds.
+            Assert.True(stopwatch.ElapsedMilliseconds < 50, $"Cloning {count} ParametrizedObject instances took {stopwatch.ElapsedMilliseconds} ms, which exceeds the 50 ms threshold.");
+        }
     }
 }
