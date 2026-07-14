@@ -1,5 +1,6 @@
 using DiGi.Core.Classes;
 using DiGi.Geometry.Spatial.Classes;
+using DiGi.Solar.Classes;
 
 namespace DiGi.Solar.xUnit
 {
@@ -40,6 +41,67 @@ namespace DiGi.Solar.xUnit
 
             Assert.NotNull(vector3D_India);
             Assert.Equal(1.0, vector3D_India.Length, 5);
+        }
+
+        /// <summary>
+        /// Tests that the sun direction calculation correctly calculates the solar vector for a ShadingModel.
+        /// </summary>
+        [Fact]
+        public void SunDirection_ShadingModel()
+        {
+            Coordinates coordinates = new(51.4778, 0.0); // Greenwich, UK
+            ShadingModel shadingModel = new(Core.Enums.UTC.PlusMinus0000, coordinates);
+            DateTime dateTime = new(2026, 6, 21, 12, 0, 0);
+
+            Vector3D? vector3D = Query.SunDirection(shadingModel, dateTime, false);
+            Assert.NotNull(vector3D);
+            Assert.Equal(1.0, vector3D.Length, 5);
+        }
+
+        /// <summary>
+        /// Tests that the sun direction calculation correctly calculates the solar vector from a SolarTimes object.
+        /// </summary>
+        [Fact]
+        public void SunDirection_SolarTimes()
+        {
+            DateTime dateTime = new(2026, 6, 21, 12, 0, 0);
+            int timeOffset = 0;
+            Innovative.Geometry.Angle angle_Latitude = new(51.4778);
+            Innovative.Geometry.Angle angle_Longitude = new(0.0);
+            Innovative.SolarCalculator.SolarTimes solarTimes = new(dateTime, timeOffset, angle_Latitude, angle_Longitude);
+
+            Vector3D? vector3D = Query.SunDirection(solarTimes);
+            Assert.NotNull(vector3D);
+            Assert.Equal(1.0, vector3D.Length, 5);
+        }
+
+        /// <summary>
+        /// Tests that the sun direction calculation handles null input references and boundary date-time parameters by returning null.
+        /// </summary>
+        [Fact]
+        public void SunDirection_NullAndBoundaryCases()
+        {
+            Coordinates coordinates = new(51.4778, 0.0);
+
+            // Null Coordinates
+            Vector3D? vector3D_NullCoords = Query.SunDirection((Coordinates)null!, Core.Enums.UTC.PlusMinus0000, DateTime.Now, false);
+            Assert.Null(vector3D_NullCoords);
+
+            // MinValue DateTime
+            Vector3D? vector3D_MinDateTime = Query.SunDirection(coordinates, Core.Enums.UTC.PlusMinus0000, DateTime.MinValue, false);
+            Assert.Null(vector3D_MinDateTime);
+
+            // MaxValue DateTime
+            Vector3D? vector3D_MaxDateTime = Query.SunDirection(coordinates, Core.Enums.UTC.PlusMinus0000, DateTime.MaxValue, false);
+            Assert.Null(vector3D_MaxDateTime);
+
+            // Null ShadingModel
+            Vector3D? vector3D_NullShadingModel = Query.SunDirection((ShadingModel)null!, DateTime.Now, false);
+            Assert.Null(vector3D_NullShadingModel);
+
+            // Null SolarTimes
+            Vector3D? vector3D_NullSolarTimes = Query.SunDirection((Innovative.SolarCalculator.SolarTimes)null!);
+            Assert.Null(vector3D_NullSolarTimes);
         }
     }
 }

@@ -39,5 +39,33 @@ namespace DiGi.Solar.xUnit
             Assert.Contains(dateTime_3, groups[1].Item2);
             Assert.Single(groups[1].Item2);
         }
+
+        /// <summary>
+        /// Tests that the GroupDirections method correctly handles edge cases such as null or empty dictionaries, and dictionaries containing null values.
+        /// </summary>
+        [Fact]
+        public void GroupDirections_EdgeCases()
+        {
+            // Null dictionary
+            List<Tuple<Vector3D, List<DateTime>>>? groups_Null = Query.GroupDirections(null, 0.1);
+            Assert.Null(groups_Null);
+
+            // Empty dictionary
+            Dictionary<DateTime, Vector3D> dictionary_Empty = [];
+            List<Tuple<Vector3D, List<DateTime>>>? groups_Empty = Query.GroupDirections(dictionary_Empty, 0.1);
+            Assert.NotNull(groups_Empty);
+            Assert.Empty(groups_Empty);
+
+            // Dictionary with null values
+            Dictionary<DateTime, Vector3D> dictionary_WithNulls = new()
+            {
+                { new DateTime(2026, 6, 26, 10, 0, 0), null! },
+                { new DateTime(2026, 6, 26, 11, 0, 0), new Vector3D(0.0, 0.0, 1.0) }
+            };
+            List<Tuple<Vector3D, List<DateTime>>>? groups_WithNulls = Query.GroupDirections(dictionary_WithNulls, 0.1);
+            Assert.NotNull(groups_WithNulls);
+            Assert.Single(groups_WithNulls);
+            Assert.Single(groups_WithNulls[0].Item2);
+        }
     }
 }
