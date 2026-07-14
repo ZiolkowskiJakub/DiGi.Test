@@ -16,6 +16,12 @@
     <Project Path="DiGi.Analytical.xUnit/DiGi.Analytical.xUnit.csproj" />
   </Folder>
   <Folder Name="/Communication/">
+    <Project Path="../DiGi.Communication/DiGi.Communication.ComputeSharp/DiGi.Communication.ComputeSharp.csproj">
+      <BuildDependency Project="../DiGi.ComputeSharp/DiGi.ComputeSharp.Geometry/DiGi.ComputeSharp.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.ComputeSharp/DiGi.ComputeSharp/DiGi.ComputeSharp.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
     <Project Path="../DiGi.Communication/DiGi.Communication/DiGi.Communication.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />

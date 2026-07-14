@@ -1,0 +1,4 @@
+- [x] Add the comparison test in `DiGi.Communication.xUnit`
+- [/] Run the test to observe failure
+- [ ] Analyze the mismatch and fix the CPU `ScatteringSolver` in `DiGi.Communication`
+- [ ] Verify both solvers match and the tests pass
