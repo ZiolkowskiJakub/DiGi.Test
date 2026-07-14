@@ -185,5 +185,43 @@ namespace DiGi.Communication.xUnit
                 }
             }
         }
+
+        /// <summary>
+        /// Tests that <see cref="ScatteringSolver"/> successfully runs and handles a face with a null bounding box without throwing any exceptions.
+        /// </summary>
+        [Fact]
+        public void ScatteringSolver_NullBoundingBox_DoesNotThrow()
+        {
+            double distance = 10.0;
+            Antenna antenna_Transmitter = new(new Point3D(0, 0, 5), Function.Transmitter);
+            Antenna antenna_Receiver = new(new Point3D(distance, 0, 5), Function.Receiver);
+
+            Dictionary<double, double> values = new()
+            {
+                [1.0e-6] = 5.0
+            };
+            SimpleMultipathPowerDelayProfile profile = new(values);
+
+            GeometricalPropagationModel model = new();
+            Assert.True(model.Assign(profile, antenna_Transmitter, antenna_Receiver));
+
+            List<Point3D> point3Ds = [new Point3D(0, 0, 0), new Point3D(0, 0, 0), new Point3D(0, 0, 0)];
+            List<int[]> indexArrays = [[0, 1, 2]];
+            Mesh3D complexMesh = new(point3Ds, indexArrays);
+
+            ScatteringObject scatteringObject = new("Degenerate", complexMesh);
+            Assert.True(model.Update(scatteringObject));
+
+            ScatteringSolverOptions options = new(0.2, 0.5, 0.001);
+            ScatteringSolver cpuSolver = new()
+            {
+                GeometricalPropagationModel = model,
+                ScatteringSolverOptions = options
+            };
+
+            bool success = cpuSolver.Solve();
+            Assert.True(success);
+            Assert.NotNull(cpuSolver.ScatteringProfiles);
+        }
     }
 }
