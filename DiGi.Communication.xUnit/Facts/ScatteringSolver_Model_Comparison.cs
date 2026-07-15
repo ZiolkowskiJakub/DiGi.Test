@@ -43,9 +43,18 @@ namespace DiGi.Communication.xUnit
                 GeometricalPropagationModel = geometricalPropagationModel_Gpu,
                 ScatteringSolverOptions = scatteringSolverOptions
             };
-
+            System.Diagnostics.Stopwatch stopwatch_Cpu = System.Diagnostics.Stopwatch.StartNew();
             bool bool_CpuSuccess = scatteringSolver_Cpu.Solve();
+            stopwatch_Cpu.Stop();
+
+            System.Diagnostics.Stopwatch stopwatch_Gpu = System.Diagnostics.Stopwatch.StartNew();
             bool bool_GpuSuccess = scatteringSolver_Gpu.Solve();
+            stopwatch_Gpu.Stop();
+
+            testOutputHelper.WriteLine($"CPU Solve Time: {stopwatch_Cpu.ElapsedMilliseconds} ms");
+            testOutputHelper.WriteLine($"GPU Solve Time: {stopwatch_Gpu.ElapsedMilliseconds} ms");
+
+            System.IO.File.WriteAllText("baseline_times.txt", $"CPU: {stopwatch_Cpu.ElapsedMilliseconds} ms\nGPU: {stopwatch_Gpu.ElapsedMilliseconds} ms\n");
 
             Assert.True(bool_CpuSuccess);
             Assert.True(bool_GpuSuccess);

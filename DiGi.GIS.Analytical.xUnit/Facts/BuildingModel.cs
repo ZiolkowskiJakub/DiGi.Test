@@ -1,14 +1,24 @@
 using DiGi.Analytical.Building.Classes;
 using DiGi.Analytical.Building.Interfaces;
+using DiGi.Analytical.Classes;
+using DiGi.Geometry.Spatial;
 using DiGi.GIS.Classes;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Xunit.Abstractions;
 
 namespace DiGi.GIS.Analytical.xUnit
 {
     public partial class Facts
     {
+        private readonly ITestOutputHelper testOutputHelper;
+
+        public Facts(ITestOutputHelper testOutputHelper)
+        {
+            this.testOutputHelper = testOutputHelper;
+        }
+
         /// <summary>
         /// Tests that the BuildingModel extension method returns null when the input Building2D is null.
         /// </summary>
@@ -102,6 +112,93 @@ namespace DiGi.GIS.Analytical.xUnit
                 List<IComponent>? components = buildingModel.GetComponents<IComponent>();
                 Assert.NotNull(components);
                 Assert.NotEmpty(components);
+            }
+        }
+
+        /// <summary>
+        /// Tests that every Shell produced by converting Building2D objects from the "2476_GML.gmf" file
+        /// to BuildingModel is closed within <see cref="Core.Constants.Tolerance.MacroDistance"/>.
+        /// Escalates tolerance from default (<see cref="Core.Constants.Tolerance.Distance"/>) upward
+        /// until the shell is closed or the maximum tolerance is exceeded.
+        /// </summary>
+        [Fact]
+        public void BuildingModel_FromGmfFile_ShellsAreClosed()
+        {
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");
+            Assert.NotNull(path);
+            Assert.True(System.IO.File.Exists(path));
+
+            using GISModelFile gISModelFile = new(path);
+            Assert.True(gISModelFile.Open());
+
+            List<Building2D>? building2Ds = gISModelFile.Value?.GetObjects<Building2D>();
+            Assert.NotNull(building2Ds);
+            Assert.NotEmpty(building2Ds);
+
+            double[] tolerances = [Core.Constants.Tolerance.Distance, 1e-5, 1e-4, Core.Constants.Tolerance.MacroDistance];
+            Dictionary<double, int> closedCounts = [];
+            foreach (double tolerance in tolerances)
+            {
+                closedCounts[tolerance] = 0;
+            }
+
+            int totalBuildings = 0;
+            int totalShells = 0;
+
+            foreach (Building2D building2D in building2Ds)
+            {
+                if (building2D.PolygonalFace2D is null)
+                {
+                    continue;
+                }
+
+                totalBuildings++;
+
+                BuildingModel? buildingModel = Create.BuildingModel(building2D);
+                Assert.NotNull(buildingModel);
+
+                List<Shell>? shells = buildingModel.GetShells<Space>();
+                Assert.NotNull(shells);
+                Assert.NotEmpty(shells);
+
+                totalShells += shells.Count;
+
+                double buildingClosedAt = 0;
+
+                foreach (Shell shell in shells)
+                {
+                    Assert.NotNull(shell);
+
+                    bool closed = false;
+                    double closedAt = 0;
+
+                    foreach (double tolerance in tolerances)
+                    {
+                        if (shell.IsClosed(tolerance))
+                        {
+                            closed = true;
+                            closedAt = tolerance;
+                            break;
+                        }
+                    }
+
+                    Assert.True(closed, $"Shell for building {building2D.Guid} is not closed within Tolerance.MacroDistance ({Core.Constants.Tolerance.MacroDistance}).");
+
+                    if (closedAt > buildingClosedAt)
+                    {
+                        buildingClosedAt = closedAt;
+                    }
+                }
+
+                Assert.True(buildingClosedAt <= Core.Constants.Tolerance.MacroDistance, $"Building {building2D.Guid} closed at tolerance {buildingClosedAt} which exceeds Tolerance.MacroDistance ({Core.Constants.Tolerance.MacroDistance}).");
+
+                closedCounts[buildingClosedAt]++;
+            }
+
+            testOutputHelper.WriteLine($"Total buildings: {totalBuildings}, total shells: {totalShells}");
+            foreach (double tolerance in tolerances)
+            {
+                testOutputHelper.WriteLine($"  Closed at tolerance {tolerance:E2}: {closedCounts[tolerance]} buildings");
             }
         }
     }
