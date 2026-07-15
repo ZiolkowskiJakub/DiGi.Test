@@ -223,5 +223,89 @@ namespace DiGi.Communication.xUnit
             Assert.True(success);
             Assert.NotNull(cpuSolver.ScatteringProfiles);
         }
+
+        /// <summary>
+        /// Tests that both CPU and GPU solvers partition disconnected intersection segments of a single scattering object
+        /// into separate <see cref="ScatteringPointGroup"/> instances instead of merging them.
+        /// </summary>
+        [Fact]
+        public void ScatteringSolver_DisconnectedSegments_CreatesSeparateGroups()
+        {
+            double distance = 20.0;
+            Antenna antenna_Transmitter = new(new Point3D(0, -10, 5), Function.Transmitter);
+            Antenna antenna_Receiver = new(new Point3D(0, 10, 5), Function.Receiver);
+
+            double delay = 2.88 / DiGi.Communication.Constants.Physical.LightSpeed;
+            Dictionary<double, double> values = new()
+            {
+                [delay] = 5.0
+            };
+            SimpleMultipathPowerDelayProfile profile = new(values);
+
+            GeometricalPropagationModel model = new();
+            Assert.True(model.Assign(profile, antenna_Transmitter, antenna_Receiver));
+
+            // Create two disconnected triangles representing the same scattering object,
+            // shifted in X to avoid mutual path occlusion.
+            List<Point3D> point3Ds = [
+                // Triangle 1 (negative Y region, negative X)
+                new Point3D(-6, -5, 0),
+                new Point3D(-2, -5, 0),
+                new Point3D(-4, -5, 4),
+                // Triangle 2 (positive Y region, positive X)
+                new Point3D(2, 5, 0),
+                new Point3D(6, 5, 0),
+                new Point3D(4, 5, 4)
+            ];
+            List<int[]> indexArrays = [
+                [0, 1, 2],
+                [3, 4, 5]
+            ];
+            Mesh3D complexMesh = new(point3Ds, indexArrays);
+
+            ScatteringObject scatteringObject = new("U-Shape", complexMesh);
+            Assert.True(model.Update(scatteringObject));
+
+            ScatteringSolverOptions options = new(0.2, 0.5, 0.001);
+
+            // CPU Solver verification
+            ScatteringSolver cpuSolver = new()
+            {
+                GeometricalPropagationModel = model,
+                ScatteringSolverOptions = options
+            };
+            Assert.True(cpuSolver.Solve());
+            Assert.NotNull(cpuSolver.ScatteringProfiles);
+            Assert.Single(cpuSolver.ScatteringProfiles);
+            IScatteringProfile cpuProfile = cpuSolver.ScatteringProfiles[0];
+            Assert.NotNull(cpuProfile.Scatterings);
+            List<Scattering> cpuScatterings = [.. cpuProfile.Scatterings];
+            Assert.Single(cpuScatterings);
+            Scattering cpuScattering = cpuScatterings[0];
+            Assert.NotNull(cpuScattering.ScatteringPointGroups);
+            // Since the two triangles are separated, it must create 2 separate groups for the reference "U-Shape"
+            Assert.Equal(2, cpuScattering.ScatteringPointGroups.Count);
+            Assert.Equal("U-Shape", cpuScattering.ScatteringPointGroups[0].Reference);
+            Assert.Equal("U-Shape", cpuScattering.ScatteringPointGroups[1].Reference);
+
+            // GPU Solver verification
+            DiGi.Communication.ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
+            {
+                GeometricalPropagationModel = model,
+                ScatteringSolverOptions = options
+            };
+            Assert.True(gpuSolver.Solve());
+            Assert.NotNull(gpuSolver.ScatteringProfiles);
+            Assert.Single(gpuSolver.ScatteringProfiles);
+            IScatteringProfile gpuProfile = gpuSolver.ScatteringProfiles[0];
+            Assert.NotNull(gpuProfile.Scatterings);
+            List<Scattering> gpuScatterings = [.. gpuProfile.Scatterings];
+            Assert.Single(gpuScatterings);
+            Scattering gpuScattering = gpuScatterings[0];
+            Assert.NotNull(gpuScattering.ScatteringPointGroups);
+            Assert.Equal(2, gpuScattering.ScatteringPointGroups.Count);
+            Assert.Equal("U-Shape", gpuScattering.ScatteringPointGroups[0].Reference);
+            Assert.Equal("U-Shape", gpuScattering.ScatteringPointGroups[1].Reference);
+        }
     }
 }
