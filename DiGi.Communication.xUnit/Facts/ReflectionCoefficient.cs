@@ -1,4 +1,4 @@
-using DiGi.Communication.Enums;
+using DiGi.Communication.Obselete.Enums;
 using System.Numerics;
 
 namespace DiGi.Communication.xUnit

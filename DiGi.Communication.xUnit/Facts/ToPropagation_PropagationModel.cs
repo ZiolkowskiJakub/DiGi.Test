@@ -1,5 +1,9 @@
 using DiGi.Communication.Classes;
 using DiGi.Communication.Enums;
+using DiGi.Communication.Obselete.Classes;
+using DiGi.Communication.Obselete.Convert;
+using DiGi.Communication.Obselete.Delegates;
+using DiGi.Communication.Obselete.Enums;
 using DiGi.Geometry.Spatial.Classes;
 
 namespace DiGi.Communication.xUnit
@@ -33,12 +37,12 @@ namespace DiGi.Communication.xUnit
 
             Dictionary<string, MaterialProperties> materialPropertiesDictionary = new() { ["Concrete"] = new(5, 0.02) };
 
-            PropagationModel? propagationModel = geometricalPropagationModel.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, new MaterialProperties(15, 0.005), (theta, phi) => 2.0, (theta, phi) => 1.0, (theta, phi) => 1.0, (theta, phi) => 1.0, materialPropertiesDictionary);
+            PropagationModel? propagationModel = geometricalPropagationModel.ToPropagation_PropagationModel(900, Polarization.Vertical, new MaterialProperties(15, 0.005), (theta, phi) => 2.0, (theta, phi) => 1.0, (theta, phi) => 1.0, (theta, phi) => 1.0, materialPropertiesDictionary);
 
             Assert.NotNull(propagationModel);
             Assert.Equal(300.0, propagationModel.Distance, 9);
             Assert.Equal(900.0, propagationModel.Frequency, 9);
-            Assert.Equal(Enums.Polarization.Vertical, propagationModel.Polarization);
+            Assert.Equal(Polarization.Vertical, propagationModel.Polarization);
 
             // The fractional powers are normalized to sum to 1
             SimpleMultipathPowerDelayProfile? simpleMultipathPowerDelayProfile_Result = propagationModel.SimpleMultipathPowerDelayProfile;
@@ -119,7 +123,7 @@ namespace DiGi.Communication.xUnit
             Assert.True(geometricalPropagationModel.Assign(simpleMultipathPowerDelayProfile, antenna_Transmitter, antenna_Receiver));
             Assert.True(geometricalPropagationModel.Update(scatteringObject));
 
-            PropagationResult? propagationResult = geometricalPropagationModel.PropagationResult(900, Enums.Polarization.Vertical, new MaterialProperties(15, 0.005), (theta, phi) => 2.0, (theta, phi) => 1.0, (theta, phi) => 1.0);
+            PropagationResult? propagationResult = geometricalPropagationModel.PropagationResult(900, Polarization.Vertical, new MaterialProperties(15, 0.005), (theta, phi) => 2.0, (theta, phi) => 1.0, (theta, phi) => 1.0);
 
             Assert.NotNull(propagationResult);
             Assert.True(propagationResult.TotalPower > 0);
@@ -156,7 +160,7 @@ namespace DiGi.Communication.xUnit
             AntennaCharacteristic antennaCharacteristic = (theta, phi) => 1.0;
 
             GeometricalPropagationModel? geometricalPropagationModel_Null = null;
-            Assert.Null(geometricalPropagationModel_Null.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel_Null.ToPropagation_PropagationModel(900, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
 
             Dictionary<double, double> values = new() { [1e-6] = 1.0 };
             SimpleMultipathPowerDelayProfile simpleMultipathPowerDelayProfile = new(values);
@@ -165,28 +169,28 @@ namespace DiGi.Communication.xUnit
             Assert.True(geometricalPropagationModel.Assign(simpleMultipathPowerDelayProfile, new Antenna(new Point3D(0, 0, 0), Function.Transmitter), new Antenna(new Point3D(300, 0, 0), Function.Receiver)));
 
             // Non-positive or NaN frequency
-            Assert.Null(geometricalPropagationModel.ToPropagation_PropagationModel(0, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
-            Assert.Null(geometricalPropagationModel.ToPropagation_PropagationModel(double.NaN, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel.ToPropagation_PropagationModel(0, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel.ToPropagation_PropagationModel(double.NaN, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
 
             // Missing default material properties
-            Assert.Null(geometricalPropagationModel.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, null, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel.ToPropagation_PropagationModel(900, Polarization.Vertical, null, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
 
             // Positive control: the same model converts successfully for valid input
-            Assert.NotNull(geometricalPropagationModel.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.NotNull(geometricalPropagationModel.ToPropagation_PropagationModel(900, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
 
             // Model without an assigned power delay profile
             GeometricalPropagationModel geometricalPropagationModel_Empty = new();
-            Assert.Null(geometricalPropagationModel_Empty.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel_Empty.ToPropagation_PropagationModel(900, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
 
             // Model without a receiving antenna
             GeometricalPropagationModel geometricalPropagationModel_NoReceiver = new();
             Assert.True(geometricalPropagationModel_NoReceiver.Assign(simpleMultipathPowerDelayProfile, new Antenna(new Point3D(0, 0, 0), Function.Transmitter), new Antenna(new Point3D(300, 0, 0), Function.Transmitter)));
-            Assert.Null(geometricalPropagationModel_NoReceiver.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel_NoReceiver.ToPropagation_PropagationModel(900, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
 
             // Vertical transmitter-receiver link: the model coordinate system is undefined
             GeometricalPropagationModel geometricalPropagationModel_Vertical = new();
             Assert.True(geometricalPropagationModel_Vertical.Assign(simpleMultipathPowerDelayProfile, new Antenna(new Point3D(0, 0, 0), Function.Transmitter), new Antenna(new Point3D(0, 0, 300), Function.Receiver)));
-            Assert.Null(geometricalPropagationModel_Vertical.ToPropagation_PropagationModel(900, Enums.Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
+            Assert.Null(geometricalPropagationModel_Vertical.ToPropagation_PropagationModel(900, Polarization.Vertical, materialProperties, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic, antennaCharacteristic));
         }
     }
 }

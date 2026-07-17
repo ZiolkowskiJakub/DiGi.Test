@@ -1,4 +1,4 @@
-using DiGi.Communication.Classes;
+using DiGi.Communication.Obselete.Classes;
 using DiGi.Geometry.Spatial.Classes;
 
 namespace DiGi.Communication.xUnit

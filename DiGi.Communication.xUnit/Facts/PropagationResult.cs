@@ -1,4 +1,6 @@
 using DiGi.Communication.Classes;
+using DiGi.Communication.Obselete.Classes;
+using DiGi.Communication.Obselete.Enums;
 using DiGi.Geometry.Spatial.Classes;
 
 namespace DiGi.Communication.xUnit
@@ -47,7 +49,7 @@ namespace DiGi.Communication.xUnit
                 distance,
                 900,
                 meshCells,
-                Enums.Polarization.Vertical,
+                Polarization.Vertical,
                 simpleMultipathPowerDelayProfile,
                 (theta, phi) => 2.0,
                 (theta, phi) => 1.0,
