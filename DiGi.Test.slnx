@@ -132,6 +132,7 @@
     <Project Path="DiGi.PostgreSQL.xUnit/DiGi.PostgreSQL.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
     </Project>
+    <Project Path="DiGi.GIS.PostgreSQL.xUnit/DiGi.GIS.PostgreSQL.xUnit.csproj" />
   </Folder>
   <Folder Name="/Rhino/">
     <Project Path="../DiGi.Rhino/DiGi.Rhino.Core/DiGi.Rhino.Core.csproj">

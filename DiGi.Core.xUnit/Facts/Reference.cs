@@ -102,20 +102,23 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="SerializableReference.GetHashCode"/> does not throw when the reference renders to a
-        /// null string. <see cref="Core.Convert.ToSystem_String(TypeReference?, string?, string?)"/> returns null when
-        /// both the type reference and the unique id are absent, which previously caused a NullReferenceException
-        /// inside GetHashCode and therefore in Equals and every hashed collection.
+        /// Tests that a reference built with the sparsest possible content still renders, hashes and compares without
+        /// throwing.
+        /// <para>Under the previous format this reference rendered to null, which propagated a NullReferenceException
+        /// through GetHashCode, Equals and every hashed collection. The discriminator is now always emitted, so the
+        /// rendered string is never null and the crash is gone by construction rather than by guard.</para>
         /// </summary>
         [Fact]
         public void SerializableReference_GetHashCode_NullToString_DoesNotThrow()
         {
             UniqueIdReference uniqueIdReference = new((TypeReference?)null, string.Empty);
 
-            Assert.Null(uniqueIdReference.ToString());
+            string? value = uniqueIdReference.ToString();
+            Assert.NotNull(value);
+            Assert.StartsWith(Constants.Reference.Kind.UniqueId, value);
 
             int hashCode = uniqueIdReference.GetHashCode();
-            Assert.Equal(string.Empty.GetHashCode(), hashCode);
+            Assert.Equal(value!.GetHashCode(), hashCode);
 
             Assert.True(uniqueIdReference.Equals(uniqueIdReference));
             Assert.False(uniqueIdReference.Equals((IReference?)null));
@@ -162,10 +165,14 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that reference equality is symmetric across different reference kinds that happen to render to the
-        /// same string. <see cref="SerializableReference.Equals(IReference?)"/> previously compared hash codes only,
-        /// while <see cref="TypeReference.Equals(object?)"/> additionally required a matching type, so the two
-        /// directions disagreed and violated the equality contract.
+        /// Tests that reference equality is symmetric across different reference kinds.
+        /// <para><see cref="SerializableReference.Equals(IReference?)"/> once compared hash codes only, while
+        /// <see cref="TypeReference.Equals(object?)"/> additionally required a matching type, so the two directions
+        /// disagreed and violated the equality contract.</para>
+        /// <para>These two inputs are the pair that used to collide: a type reference whose name was literally
+        /// <c>"X"</c> rendered identically to a unique identifier reference for <c>X</c>, because the old format
+        /// encoded the reference kind by shape. The discriminator now distinguishes them, so the strings must differ
+        /// as well as the instances.</para>
         /// </summary>
         [Fact]
         public void SerializableReference_Equals_IsSymmetric()
@@ -173,7 +180,7 @@ namespace DiGi.Core.xUnit
             TypeReference typeReference = new("\"X\"");
             UniqueIdReference uniqueIdReference = new((TypeReference?)null, "X");
 
-            Assert.Equal(typeReference.ToString(), uniqueIdReference.ToString());
+            Assert.NotEqual(typeReference.ToString(), uniqueIdReference.ToString());
 
             Assert.False(uniqueIdReference.Equals((IReference)typeReference));
             Assert.False(typeReference.Equals((object)uniqueIdReference));
