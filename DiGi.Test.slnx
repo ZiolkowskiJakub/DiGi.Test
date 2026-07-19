@@ -97,6 +97,13 @@
     </Project>
     <Project Path="DiGi.GIS.Analytical.xUnit/DiGi.GIS.Analytical.xUnit.csproj" />
   </Folder>
+  <Folder Name="/GLTF/">
+    <Project Path="../DiGi.GLTF/DiGi.GLTF/DiGi.GLTF.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+    </Project>
+    <Project Path="DiGi.GLTF.xUnit/DiGi.GLTF.xUnit.csproj" />
+  </Folder>
   <Folder Name="/Math/">
     <Project Path="../DiGi.Math/DiGi.Math/DiGi.Math.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />

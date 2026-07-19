@@ -62,7 +62,6 @@ namespace DiGi.Core.xUnit
 
             Assert.IsAssignableFrom<IComplexReference>(complexReference);
             Assert.False(complexReference is IUniqueReference);
-            Assert.False(complexReference is UniqueReference);
         }
 
         /// <summary>
