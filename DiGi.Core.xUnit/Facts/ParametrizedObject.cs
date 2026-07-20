@@ -80,5 +80,42 @@ namespace DiGi.Core.xUnit
             // The optimized clone should easily complete 10,000 deep clones of ParametrizedObject in less than 50 milliseconds.
             Assert.True(stopwatch.ElapsedMilliseconds < 50, $"Cloning {count} ParametrizedObject instances took {stopwatch.ElapsedMilliseconds} ms, which exceeds the 50 ms threshold.");
         }
+
+        /// <summary>
+        /// Tests retrieving enumeration values from a <see cref="ParametrizedObject"/> using <see cref="ParametrizedObject.GetValue{T}(GetValueSettings?)"/> with <see cref="DiGi.Core.Enums.CountryCode"/>.
+        /// </summary>
+        [Fact]
+        public void ParametrizedObject_GetValue_Enum()
+        {
+            ParametrizedObject parametrizedObject = new();
+
+            // Initially, retrieving an unset enum should return null.
+            DiGi.Core.Enums.CountryCode? countryCode_Initial = parametrizedObject.GetValue<DiGi.Core.Enums.CountryCode?>();
+            Assert.Null(countryCode_Initial);
+
+            // Set value via Enum definition key
+            bool result_SetEnumKey = parametrizedObject.SetValue(DiGi.Core.Enums.CountryCode.PL, DiGi.Core.Enums.CountryCode.PL);
+            Assert.True(result_SetEnumKey);
+
+            // Test GetValue<CountryCode>() without key argument
+            DiGi.Core.Enums.CountryCode? countryCode_GetValueNoArg = parametrizedObject.GetValue<DiGi.Core.Enums.CountryCode>();
+            Assert.Equal(DiGi.Core.Enums.CountryCode.PL, countryCode_GetValueNoArg);
+
+            // Test GetValue<CountryCode>(Enum) with enum member key
+            DiGi.Core.Enums.CountryCode? countryCode_GetValueByEnumKey = parametrizedObject.GetValue<DiGi.Core.Enums.CountryCode>(DiGi.Core.Enums.CountryCode.PL);
+            Assert.Equal(DiGi.Core.Enums.CountryCode.PL, countryCode_GetValueByEnumKey);
+
+            // Test GetValue(Enum) returning object
+            object? object_GetValueByEnumKey = parametrizedObject.GetValue(DiGi.Core.Enums.CountryCode.PL);
+            Assert.Equal(DiGi.Core.Enums.CountryCode.PL, object_GetValueByEnumKey);
+
+            // Set another parameter with simple string key and string enum name value
+            parametrizedObject.SetValue("CountryParam", "DE");
+
+            // Test GetValue<CountryCode>(string) by string parameter name with TryConvert enabled
+            GetValueSettings getValueSettings = new(tryConvert: true, checkAccessType: false);
+            DiGi.Core.Enums.CountryCode? countryCode_GetValueByStringKey = parametrizedObject.GetValue<DiGi.Core.Enums.CountryCode>("CountryParam", getValueSettings);
+            Assert.Equal(DiGi.Core.Enums.CountryCode.DE, countryCode_GetValueByStringKey);
+        }
     }
 }
