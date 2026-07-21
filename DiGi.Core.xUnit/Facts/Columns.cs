@@ -20,7 +20,7 @@ namespace DiGi.Core.xUnit
                 yield return "Col2";
             }
 
-            List<Column>? columns = DiGi.Core.IO.DelimitedData.Create.Columns(SingleUseNames());
+            List<Column>? columns = IO.DelimitedData.Create.Columns(SingleUseNames());
 
             Assert.NotNull(columns);
             Assert.Equal(3, columns.Count);
@@ -42,13 +42,13 @@ namespace DiGi.Core.xUnit
         public void Columns_EmptyOrNullNames()
         {
             List<string> names_Empty = [];
-            List<Column>? columns_Empty = DiGi.Core.IO.DelimitedData.Create.Columns(names_Empty);
+            List<Column>? columns_Empty = IO.DelimitedData.Create.Columns(names_Empty);
 
             Assert.NotNull(columns_Empty);
             Assert.Empty(columns_Empty);
 
             List<string>? names_Null = null;
-            List<Column>? columns_Null = DiGi.Core.IO.DelimitedData.Create.Columns(names_Null);
+            List<Column>? columns_Null = IO.DelimitedData.Create.Columns(names_Null);
 
             Assert.Null(columns_Null);
         }

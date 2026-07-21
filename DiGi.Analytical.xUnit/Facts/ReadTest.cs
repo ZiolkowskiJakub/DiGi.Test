@@ -12,9 +12,9 @@ namespace DiGi.Analytical.xUnit
         {
             string path = @"C:\Users\jakub\Downloads\InternalGain.txt";
 
-            if (System.IO.File.Exists(path))
+            if (File.Exists(path))
             {
-                List<ISerializableObject>? serializableObjects = DiGi.Core.Convert.ToDiGi<ISerializableObject>(new Core.Classes.Path(path));
+                List<ISerializableObject>? serializableObjects = Core.Convert.ToDiGi<ISerializableObject>(new Core.Classes.Path(path));
                 Assert.NotNull(serializableObjects);
             }
         }

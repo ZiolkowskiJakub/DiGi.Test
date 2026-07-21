@@ -395,8 +395,8 @@ namespace DiGi.Geometry.xUnit
             for (int seed = 0; seed < 300; seed++)
             {
                 System.Random random = DiGi.Core.Create.Random(seed);
-                Segment2D? segment2D_1 = DiGi.Geometry.Planar.Random.Create.Segment2D(boundingBox2D, random);
-                Segment2D? segment2D_2 = DiGi.Geometry.Planar.Random.Create.Segment2D(boundingBox2D, random);
+                Segment2D? segment2D_1 = Planar.Random.Create.Segment2D(boundingBox2D, random);
+                Segment2D? segment2D_2 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                 if (segment2D_1 == null || segment2D_2 == null)
                 {
                     continue;
@@ -434,8 +434,8 @@ namespace DiGi.Geometry.xUnit
             for (int seed = 0; seed < 300; seed++)
             {
                 System.Random random = DiGi.Core.Create.Random(seed);
-                Segment2D? segment2D_1 = DiGi.Geometry.Planar.Random.Create.Segment2D(boundingBox2D, random);
-                Segment2D? segment2D_2 = DiGi.Geometry.Planar.Random.Create.Segment2D(boundingBox2D, random);
+                Segment2D? segment2D_1 = Planar.Random.Create.Segment2D(boundingBox2D, random);
+                Segment2D? segment2D_2 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                 if (segment2D_1 == null || segment2D_2 == null)
                 {
                     continue;
@@ -491,13 +491,13 @@ namespace DiGi.Geometry.xUnit
                 List<Segment2D> segment2Ds_2 = [];
                 for (int i = 0; i < 25; i++)
                 {
-                    Segment2D? segment2D_1 = DiGi.Geometry.Planar.Random.Create.Segment2D(boundingBox2D, random);
+                    Segment2D? segment2D_1 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                     if (segment2D_1 != null)
                     {
                         segment2Ds_1.Add(segment2D_1);
                     }
 
-                    Segment2D? segment2D_2 = DiGi.Geometry.Planar.Random.Create.Segment2D(boundingBox2D, random);
+                    Segment2D? segment2D_2 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                     if (segment2D_2 != null)
                     {
                         segment2Ds_2.Add(segment2D_2);

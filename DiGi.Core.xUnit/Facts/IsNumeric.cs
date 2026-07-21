@@ -9,34 +9,34 @@ namespace DiGi.Core.xUnit
         public void IsNumeric()
         {
             // Test standard integer types
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(int), out bool isInt_Int));
+            Assert.True(Core.Query.IsNumeric(typeof(int), out bool isInt_Int));
             Assert.True(isInt_Int);
 
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(long), out bool isInt_Long));
+            Assert.True(Core.Query.IsNumeric(typeof(long), out bool isInt_Long));
             Assert.True(isInt_Long);
 
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(byte), out bool isInt_Byte));
+            Assert.True(Core.Query.IsNumeric(typeof(byte), out bool isInt_Byte));
             Assert.True(isInt_Byte);
 
             // Test floating/decimal types
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(double), out bool isInt_Double));
+            Assert.True(Core.Query.IsNumeric(typeof(double), out bool isInt_Double));
             Assert.False(isInt_Double);
 
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(decimal), out bool isInt_Decimal));
+            Assert.True(Core.Query.IsNumeric(typeof(decimal), out bool isInt_Decimal));
             Assert.False(isInt_Decimal);
 
             // Test nullable types (Verifying the fix for Bug 1)
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(int?), out bool isInt_NullableInt));
+            Assert.True(Core.Query.IsNumeric(typeof(int?), out bool isInt_NullableInt));
             Assert.True(isInt_NullableInt);
 
-            Assert.True(DiGi.Core.Query.IsNumeric(typeof(double?), out bool isInt_NullableDouble));
+            Assert.True(Core.Query.IsNumeric(typeof(double?), out bool isInt_NullableDouble));
             Assert.False(isInt_NullableDouble);
 
             // Test non-numeric types
-            Assert.False(DiGi.Core.Query.IsNumeric(typeof(string), out bool isInt_String));
+            Assert.False(Core.Query.IsNumeric(typeof(string), out bool isInt_String));
             Assert.False(isInt_String);
 
-            Assert.False(DiGi.Core.Query.IsNumeric(typeof(object), out bool isInt_Object));
+            Assert.False(Core.Query.IsNumeric(typeof(object), out bool isInt_Object));
             Assert.False(isInt_Object);
 
             // Test instance-based IsNumeric

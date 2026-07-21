@@ -1,6 +1,5 @@
 using DiGi.Core.Parameter.Classes;
 using DiGi.Core.Parameter.Interfaces;
-using DiGi.Core.Parameter;
 
 namespace DiGi.Core.xUnit
 {

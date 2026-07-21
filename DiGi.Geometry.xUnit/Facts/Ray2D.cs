@@ -58,7 +58,7 @@ namespace DiGi.Geometry.xUnit
             DiGi.Geometry.Planar.Classes.Ray2D ray2D_Target = new(point2D_Origin, vector2D_Direction);
 
             // 1. Test Transform method with Translation and Rotation (90 deg CCW around origin)
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Combined = DiGi.Geometry.Planar.Create.Transform2D.Rotation(System.Math.PI / 2.0) * DiGi.Geometry.Planar.Create.Transform2D.Translation(1.0, 2.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Combined = Planar.Create.Transform2D.Rotation(System.Math.PI / 2.0) * Planar.Create.Transform2D.Translation(1.0, 2.0);
             Assert.NotNull(transform2D_Combined);
 
             bool bool_Result = ray2D_Target.Transform(transform2D_Combined);

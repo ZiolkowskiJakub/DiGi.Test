@@ -15,7 +15,7 @@ namespace DiGi.Geometry.xUnit
             Triangle2D triangle2D_1 = new((0, 0), (10, 0), (0, 10));
             Triangle2D triangle2D_2 = new((10, 10), (10, 0), (0, 10));
 
-            List<Polygon2D>? polygon2Ds = Planar.Query.Union(triangle2D_1, triangle2D_2);
+            List<Polygon2D>? polygon2Ds = Query.Union(triangle2D_1, triangle2D_2);
             Assert.NotNull(polygon2Ds);
             Assert.True(polygon2Ds.Count == 1);
 
@@ -32,7 +32,7 @@ namespace DiGi.Geometry.xUnit
             var p2 = new Polygon2D([new Point2D(5, 5), new Point2D(7, 5), new Point2D(7, 7), new Point2D(5, 7)]);
 
             // Test 1: Polygon2D Union
-            var result = Planar.Query.Union(p1, p2);
+            var result = Query.Union(p1, p2);
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(8.0, result.Sum(x => x.GetArea()), 4);
@@ -40,7 +40,7 @@ namespace DiGi.Geometry.xUnit
             // Test 2: PolygonalFace2D Union
             var face1 = p1.ToNTS_Polygon().ToDiGi();
             var face2 = p2.ToNTS_Polygon().ToDiGi();
-            var faceResult = Planar.Query.Union(face1, face2);
+            var faceResult = Query.Union(face1, face2);
             Assert.NotNull(faceResult);
             Assert.Equal(2, faceResult.Count);
             Assert.Equal(8.0, faceResult.Sum(x => x.GetArea()), 4);
@@ -68,7 +68,7 @@ namespace DiGi.Geometry.xUnit
             ]);
 
             // Just calling Union should handle it via individual geometry fixes and complete successfully
-            var result = Planar.Query.Union<IPolygonal2D>([invalidPoly, poly2]);
+            var result = Query.Union<IPolygonal2D>([invalidPoly, poly2]);
             Assert.NotNull(result);
             Assert.NotEmpty(result);
         }
@@ -80,12 +80,12 @@ namespace DiGi.Geometry.xUnit
         public void Union_EmptyAndSingle()
         {
             List<Polygon2D> emptyList = [];
-            var resultEmpty = Planar.Query.Union(emptyList);
+            var resultEmpty = Query.Union(emptyList);
             Assert.NotNull(resultEmpty);
             Assert.Empty(resultEmpty);
 
             var poly = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
-            var resultSingle = Planar.Query.Union([poly]);
+            var resultSingle = Query.Union([poly]);
             Assert.NotNull(resultSingle);
             Assert.Single(resultSingle);
             Assert.Equal(4.0, resultSingle[0].GetArea(), 4);
@@ -102,7 +102,7 @@ namespace DiGi.Geometry.xUnit
             var p3 = new Polygon2D([new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2)]);
             var p4 = new Polygon2D([new Point2D(3, 0), new Point2D(5, 0), new Point2D(5, 2), new Point2D(3, 2)]);
 
-            var result = Planar.Query.Union([p1, p2, p3, p4]);
+            var result = Query.Union([p1, p2, p3, p4]);
             Assert.NotNull(result);
             Assert.Single(result);
             Assert.Equal(10.0, result[0].GetArea(), 4);
@@ -117,7 +117,7 @@ namespace DiGi.Geometry.xUnit
             var p1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
             var p2 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
 
-            var result = Planar.Query.Union(p1, p2);
+            var result = Query.Union(p1, p2);
             Assert.NotNull(result);
             Assert.Single(result);
             Assert.Equal(4.0, result[0].GetArea(), 4);
@@ -139,7 +139,7 @@ namespace DiGi.Geometry.xUnit
             List<Polygon2D> polygon2Ds = [polygon2D_Bottom, polygon2D_Top, polygon2D_Left, polygon2D_Right];
 
             // Polygon2D union keeps external edges only -> the central void is filled.
-            List<Polygon2D>? polygon2Ds_Union = Planar.Query.Union(polygon2Ds);
+            List<Polygon2D>? polygon2Ds_Union = Query.Union(polygon2Ds);
             Assert.NotNull(polygon2Ds_Union);
             Assert.Equal(36.0, polygon2Ds_Union.Sum(x => x.GetArea()), 3);
 
@@ -147,12 +147,12 @@ namespace DiGi.Geometry.xUnit
             List<IPolygonalFace2D> polygonalFace2Ds = [];
             foreach (Polygon2D polygon2D in polygon2Ds)
             {
-                PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(polygon2D);
+                PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(polygon2D);
                 Assert.NotNull(polygonalFace2D);
                 polygonalFace2Ds.Add(polygonalFace2D);
             }
 
-            List<PolygonalFace2D>? polygonalFace2Ds_Union = Planar.Query.Union(polygonalFace2Ds);
+            List<PolygonalFace2D>? polygonalFace2Ds_Union = Query.Union(polygonalFace2Ds);
             Assert.NotNull(polygonalFace2Ds_Union);
             Assert.Equal(32.0, polygonalFace2Ds_Union.Sum(x => x.GetArea()), 3);
         }
@@ -170,14 +170,14 @@ namespace DiGi.Geometry.xUnit
 
             List<Triangle2D> triangle2Ds = [triangle2D_1, triangle2D_2, triangle2D_3];
 
-            List<Polygon2D>? polygon2Ds_Union = Planar.Query.Union(triangle2Ds);
+            List<Polygon2D>? polygon2Ds_Union = Query.Union(triangle2Ds);
             Assert.NotNull(polygon2Ds_Union);
             double area_Union = polygon2Ds_Union.Sum(x => x.GetArea());
 
             // Triangles 1 and 2 tile a 4x4 square; triangle 3 lies inside it.
             Assert.Equal(16.0, area_Union, 3);
 
-            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(polygon2Ds_Union.ConvertAll(x => (IPolygonal2D)x), DiGi.Core.Constants.Tolerance.Distance);
+            List<PolygonalFace2D>? polygonalFace2Ds = Create.PolygonalFace2Ds(polygon2Ds_Union.ConvertAll(x => (IPolygonal2D)x), DiGi.Core.Constants.Tolerance.Distance);
             Assert.NotNull(polygonalFace2Ds);
             double area_Faces = polygonalFace2Ds.Sum(x => x.GetArea());
 

@@ -2,7 +2,6 @@ using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace DiGi.Geometry.xUnit
@@ -36,7 +35,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron = Create.Polyhedron(polygonalFaceExtrusion);
             Assert.NotNull(polyhedron);
 
-            Assert.True(Spatial.Query.TrySplit(new Plane(Create.Plane(1.0)), polyhedron, out List<Polyhedron>? polyhedrons));
+            Assert.True(Query.TrySplit(new Plane(Create.Plane(1.0)), polyhedron, out List<Polyhedron>? polyhedrons));
 
             Assert.NotNull(polyhedrons);
             if (polyhedrons is null)
@@ -212,7 +211,7 @@ namespace DiGi.Geometry.xUnit
 
             Plane plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
+            Assert.True(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
 
             Assert.NotNull(mesh3Ds_Above);
             Assert.NotEmpty(mesh3Ds_Above);
@@ -234,7 +233,7 @@ namespace DiGi.Geometry.xUnit
             Assert.True(totalTriangles >= mesh3D.TrianglesCount);
 
             // Test convenience overload
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? result));
+            Assert.True(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? result));
             Assert.NotNull(result);
             Assert.Equal(mesh3Ds_Above.Count + mesh3Ds_Below.Count, result.Count);
         }
@@ -253,7 +252,7 @@ namespace DiGi.Geometry.xUnit
 
             Plane plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
+            Assert.True(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
 
             Assert.NotNull(mesh3Ds_Above);
             Assert.NotEmpty(mesh3Ds_Above);
@@ -275,7 +274,7 @@ namespace DiGi.Geometry.xUnit
 
             Plane plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
+            Assert.True(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
 
             Assert.NotNull(mesh3Ds_Above);
             Assert.Empty(mesh3Ds_Above);
@@ -296,15 +295,15 @@ namespace DiGi.Geometry.xUnit
 
             Plane? plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.False(Spatial.Query.TrySplit(null as Plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above_Null, out List<Mesh3D>? mesh3Ds_Below_Null));
+            Assert.False(Query.TrySplit(null as Plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above_Null, out List<Mesh3D>? mesh3Ds_Below_Null));
             Assert.Null(mesh3Ds_Above_Null);
             Assert.Null(mesh3Ds_Below_Null);
 
-            Assert.False(Spatial.Query.TrySplit(plane, null as Mesh3D, out List<Mesh3D>? mesh3Ds_Above_Null2, out List<Mesh3D>? mesh3Ds_Below_Null2));
+            Assert.False(Query.TrySplit(plane, null as Mesh3D, out List<Mesh3D>? mesh3Ds_Above_Null2, out List<Mesh3D>? mesh3Ds_Below_Null2));
             Assert.Null(mesh3Ds_Above_Null2);
             Assert.Null(mesh3Ds_Below_Null2);
 
-            Assert.False(Spatial.Query.TrySplit(null as Plane, null as Mesh3D, out List<Mesh3D>? mesh3Ds_Above_Null3, out List<Mesh3D>? mesh3Ds_Below_Null3));
+            Assert.False(Query.TrySplit(null as Plane, null as Mesh3D, out List<Mesh3D>? mesh3Ds_Above_Null3, out List<Mesh3D>? mesh3Ds_Below_Null3));
             Assert.Null(mesh3Ds_Above_Null3);
             Assert.Null(mesh3Ds_Below_Null3);
         }
@@ -324,7 +323,7 @@ namespace DiGi.Geometry.xUnit
 
             Plane plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.False(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
+            Assert.False(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
             Assert.Null(mesh3Ds_Above);
             Assert.Null(mesh3Ds_Below);
         }
@@ -347,7 +346,7 @@ namespace DiGi.Geometry.xUnit
             double tolerance = DiGi.Core.Constants.Tolerance.Distance;
             Plane plane = new(new Point3D(0, 0, 3), Spatial.Constants.Vector3D.WorldZ);
 
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below, tolerance));
+            Assert.True(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below, tolerance));
 
             Assert.NotNull(mesh3Ds_Above);
             Assert.NotEmpty(mesh3Ds_Above);
@@ -418,7 +417,7 @@ namespace DiGi.Geometry.xUnit
 
             Plane plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.True(Spatial.Query.TrySplit(plane, combinedMesh, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
+            Assert.True(Query.TrySplit(plane, combinedMesh, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
 
             Assert.NotNull(mesh3Ds_Above);
             Assert.True(mesh3Ds_Above.Count >= 2);
@@ -441,7 +440,7 @@ namespace DiGi.Geometry.xUnit
 
             Plane plane = Spatial.Constants.Plane.WorldZ;
 
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
+            Assert.True(Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below));
 
             Assert.NotNull(mesh3Ds_Above);
             Assert.Single(mesh3Ds_Above);
@@ -500,13 +499,13 @@ namespace DiGi.Geometry.xUnit
             // Warm-up
             Mesh3D? mesh3D_WarmUp = Create.Mesh3D(ellipsoid, 8, 12);
             Assert.NotNull(mesh3D_WarmUp);
-            Assert.True(Spatial.Query.TrySplit(plane, mesh3D_WarmUp, out List<Mesh3D>? _, out List<Mesh3D>? _));
+            Assert.True(Query.TrySplit(plane, mesh3D_WarmUp, out List<Mesh3D>? _, out List<Mesh3D>? _));
 
             Mesh3D? mesh3D = Create.Mesh3D(ellipsoid, 100, 200);
             Assert.NotNull(mesh3D);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
-            bool result = Spatial.Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below);
+            bool result = Query.TrySplit(plane, mesh3D, out List<Mesh3D>? mesh3Ds_Above, out List<Mesh3D>? mesh3Ds_Below);
             stopwatch.Stop();
 
             Assert.True(result);

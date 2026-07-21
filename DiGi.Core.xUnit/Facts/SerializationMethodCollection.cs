@@ -59,7 +59,7 @@ namespace DiGi.Core.xUnit
 
             JsonObject? jsonObject = serializationMethodCollection.Create(testObject);
             Assert.NotNull(jsonObject);
-            Assert.Equal(fullTypeName_Expected, jsonObject[Core.Constants.Serialization.PropertyName.Type]?.GetValue<string>());
+            Assert.Equal(fullTypeName_Expected, jsonObject[Constants.Serialization.PropertyName.Type]?.GetValue<string>());
 
             // Base-type collection with derived instance: the runtime type must still be written.
             SerializationMethodCollection? serializationMethodCollection_Base = typeof(GuidObject).SerializationMethodCollection();
@@ -67,7 +67,7 @@ namespace DiGi.Core.xUnit
 
             JsonObject? jsonObject_Base = serializationMethodCollection_Base.Create(testObject);
             Assert.NotNull(jsonObject_Base);
-            Assert.Equal(fullTypeName_Expected, jsonObject_Base[Core.Constants.Serialization.PropertyName.Type]?.GetValue<string>());
+            Assert.Equal(fullTypeName_Expected, jsonObject_Base[Constants.Serialization.PropertyName.Type]?.GetValue<string>());
         }
     }
 }

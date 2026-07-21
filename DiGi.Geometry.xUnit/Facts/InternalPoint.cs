@@ -19,7 +19,7 @@ namespace DiGi.Geometry.xUnit
                 new(0, 10)
             ];
 
-            Point2D? internalPoint = Planar.Query.InternalPoint(points);
+            Point2D? internalPoint = Query.InternalPoint(points);
             Assert.NotNull(internalPoint);
 
             // Centroid of square is (5, 5)
@@ -46,15 +46,15 @@ namespace DiGi.Geometry.xUnit
                 new(0, 10)
             ];
 
-            Point2D? internalPoint = Planar.Query.InternalPoint(points);
+            Point2D? internalPoint = Query.InternalPoint(points);
             Assert.NotNull(internalPoint);
 
             // Verify that the returned point is strictly inside the U-shape
             List<Segment2D>? segments = Create.Segment2Ds(points, true);
             Assert.NotNull(segments);
 
-            Assert.True(Planar.Query.Inside(points, internalPoint));
-            Assert.False(Planar.Query.On(segments, internalPoint));
+            Assert.True(Query.Inside(points, internalPoint));
+            Assert.False(Query.On(segments, internalPoint));
         }
 
         /// <summary>
@@ -73,14 +73,14 @@ namespace DiGi.Geometry.xUnit
                 new(0, 10)
             ];
 
-            Point2D? internalPoint = Planar.Query.InternalPoint(points);
+            Point2D? internalPoint = Query.InternalPoint(points);
             Assert.NotNull(internalPoint);
 
             List<Segment2D>? segments = Create.Segment2Ds(points, true);
             Assert.NotNull(segments);
 
-            Assert.True(Planar.Query.Inside(points, internalPoint));
-            Assert.False(Planar.Query.On(segments, internalPoint));
+            Assert.True(Query.Inside(points, internalPoint));
+            Assert.False(Query.On(segments, internalPoint));
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace DiGi.Geometry.xUnit
             }
 
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            Point2D? internalPoint = Planar.Query.InternalPoint(point2Ds);
+            Point2D? internalPoint = Query.InternalPoint(point2Ds);
             stopwatch.Stop();
 
             Assert.NotNull(internalPoint);
@@ -108,8 +108,8 @@ namespace DiGi.Geometry.xUnit
             List<Segment2D>? segment2Ds = Create.Segment2Ds(point2Ds, true);
             Assert.NotNull(segment2Ds);
 
-            Assert.True(Planar.Query.Inside(point2Ds, internalPoint));
-            Assert.False(Planar.Query.On(segment2Ds, internalPoint));
+            Assert.True(Query.Inside(point2Ds, internalPoint));
+            Assert.False(Query.On(segment2Ds, internalPoint));
         }
 
         /// <summary>
@@ -138,8 +138,8 @@ namespace DiGi.Geometry.xUnit
             point2Ds.Add(new Point2D(9, 20));
             point2Ds.Add(new Point2D(0, 20));
 
-            Point2D? point2D_Centroid = Planar.Query.Centroid(point2Ds);
-            Point2D? point2D_Mean = Planar.Query.Average(point2Ds);
+            Point2D? point2D_Centroid = Query.Centroid(point2Ds);
+            Point2D? point2D_Mean = Query.Average(point2Ds);
             Assert.NotNull(point2D_Centroid);
             Assert.NotNull(point2D_Mean);
 
@@ -148,13 +148,13 @@ namespace DiGi.Geometry.xUnit
 
             // Precondition: the area centroid must fall inside the notch (outside the polygon) so the primary
             // candidate is rejected and the mean-center fallback is exercised.
-            Assert.False(Planar.Query.Inside(point2Ds, point2D_Centroid));
+            Assert.False(Query.Inside(point2Ds, point2D_Centroid));
 
             // Precondition: the vertex mean must land strictly inside the polygon body.
-            Assert.True(Planar.Query.Inside(point2Ds, point2D_Mean));
-            Assert.False(Planar.Query.On(segments, point2D_Mean));
+            Assert.True(Query.Inside(point2Ds, point2D_Mean));
+            Assert.False(Query.On(segments, point2D_Mean));
 
-            Point2D? internalPoint = Planar.Query.InternalPoint(point2Ds);
+            Point2D? internalPoint = Query.InternalPoint(point2Ds);
             Assert.NotNull(internalPoint);
 
             // InternalPoint must have returned the mean-center fallback candidate, not the invalid centroid.
@@ -178,7 +178,7 @@ namespace DiGi.Geometry.xUnit
             ];
 
             // Should handle it gracefully, possibly returning null or an internal point of one of the loops
-            Point2D? internalPoint = Planar.Query.InternalPoint(points);
+            Point2D? internalPoint = Query.InternalPoint(points);
             // We just verify it does not throw an exception
         }
 
@@ -188,10 +188,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void InternalPoint_NullAndEmpty()
         {
-            Assert.Null(Planar.Query.InternalPoint(null));
-            Assert.Null(Planar.Query.InternalPoint([]));
-            Assert.Null(Planar.Query.InternalPoint([new Point2D(0, 0)]));
-            Assert.Null(Planar.Query.InternalPoint([new Point2D(0, 0), new Point2D(5, 5)]));
+            Assert.Null(Query.InternalPoint(null));
+            Assert.Null(Query.InternalPoint([]));
+            Assert.Null(Query.InternalPoint([new Point2D(0, 0)]));
+            Assert.Null(Query.InternalPoint([new Point2D(0, 0), new Point2D(5, 5)]));
         }
     }
 }

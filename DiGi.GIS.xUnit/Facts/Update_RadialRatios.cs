@@ -30,7 +30,7 @@ namespace DiGi.GIS.xUnit
             string reference_Target = "building_target";
             // Centered at (5, 5), Area = 100.0
             List<Point2D> point2Ds_Target = [new(0, 0), new(10, 0), new(10, 10), new(0, 10)];
-            PolygonalFace2D? polygonalFace2D_Target = DiGi.Geometry.Planar.Create.PolygonalFace2D(point2Ds_Target.ToArray());
+            PolygonalFace2D? polygonalFace2D_Target = Geometry.Planar.Create.PolygonalFace2D(point2Ds_Target.ToArray());
             Assert.NotNull(polygonalFace2D_Target);
             Building2D building2D_Target = new(guid_Target, reference_Target, polygonalFace2D_Target, 2, Enums.BuildingPhase.occupied, Enums.BuildingGeneralFunction.residential_buildings, []);
             list_MockBuildings.Add(building2D_Target);
@@ -39,7 +39,7 @@ namespace DiGi.GIS.xUnit
             Guid guid_Neighbour1 = Guid.NewGuid();
             string reference_Neighbour1 = "building_neighbour1";
             List<Point2D> point2Ds_Neighbour1 = [new(20, 0), new(30, 0), new(30, 10), new(20, 10)];
-            PolygonalFace2D? polygonalFace2D_Neighbour1 = DiGi.Geometry.Planar.Create.PolygonalFace2D(point2Ds_Neighbour1.ToArray());
+            PolygonalFace2D? polygonalFace2D_Neighbour1 = Geometry.Planar.Create.PolygonalFace2D(point2Ds_Neighbour1.ToArray());
             Assert.NotNull(polygonalFace2D_Neighbour1);
             Building2D building2D_Neighbour1 = new(guid_Neighbour1, reference_Neighbour1, polygonalFace2D_Neighbour1, 3, Enums.BuildingPhase.occupied, Enums.BuildingGeneralFunction.residential_buildings, []);
             list_MockBuildings.Add(building2D_Neighbour1);
@@ -49,7 +49,7 @@ namespace DiGi.GIS.xUnit
             Guid guid_Neighbour2 = Guid.NewGuid();
             string reference_Neighbour2 = "building_neighbour2";
             List<Point2D> point2Ds_Neighbour2 = [new(0, 20), new(10, 20), new(10, 30), new(0, 30)];
-            PolygonalFace2D? polygonalFace2D_Neighbour2 = DiGi.Geometry.Planar.Create.PolygonalFace2D(point2Ds_Neighbour2.ToArray());
+            PolygonalFace2D? polygonalFace2D_Neighbour2 = Geometry.Planar.Create.PolygonalFace2D(point2Ds_Neighbour2.ToArray());
             Assert.NotNull(polygonalFace2D_Neighbour2);
             Building2D building2D_Neighbour2 = new(guid_Neighbour2, reference_Neighbour2, polygonalFace2D_Neighbour2, 0, Enums.BuildingPhase.occupied, Enums.BuildingGeneralFunction.residential_buildings, []);
             list_MockBuildings.Add(building2D_Neighbour2);
@@ -61,8 +61,8 @@ namespace DiGi.GIS.xUnit
             Row? row_Mock = table_Mock.GetRow(0);
             Assert.NotNull(row_Mock);
 
-            Column? column_Reference = table_Mock.GetColumn(table_Mock.GetColumnIndex(DiGi.GIS.IO.Constants.Column.Reference.Name));
-            Column? column_CountyId = table_Mock.GetColumn(table_Mock.GetColumnIndex(DiGi.GIS.IO.Constants.Column.CountyId.Name));
+            Column? column_Reference = table_Mock.GetColumn(table_Mock.GetColumnIndex(IO.Constants.Column.Reference.Name));
+            Column? column_CountyId = table_Mock.GetColumn(table_Mock.GetColumnIndex(IO.Constants.Column.CountyId.Name));
             Assert.NotNull(column_Reference);
             Assert.NotNull(column_CountyId);
 
@@ -71,10 +71,10 @@ namespace DiGi.GIS.xUnit
             Assert.Equal(reference_Target, reference_Row);
             Assert.Equal(countyId_Mock, countyId_Row);
 
-            Column? column_CoverageRatio10 = table_Mock.GetColumn(table_Mock.GetColumnIndex(DiGi.GIS.IO.Create.Column_RadialBuildingCoverageRatio(10.0).Name));
-            Column? column_FloorAreaRatio10 = table_Mock.GetColumn(table_Mock.GetColumnIndex(DiGi.GIS.IO.Create.Column_RadialFloorAreaRatio(10.0).Name));
-            Column? column_CoverageRatio30 = table_Mock.GetColumn(table_Mock.GetColumnIndex(DiGi.GIS.IO.Create.Column_RadialBuildingCoverageRatio(30.0).Name));
-            Column? column_FloorAreaRatio30 = table_Mock.GetColumn(table_Mock.GetColumnIndex(DiGi.GIS.IO.Create.Column_RadialFloorAreaRatio(30.0).Name));
+            Column? column_CoverageRatio10 = table_Mock.GetColumn(table_Mock.GetColumnIndex(IO.Create.Column_RadialBuildingCoverageRatio(10.0).Name));
+            Column? column_FloorAreaRatio10 = table_Mock.GetColumn(table_Mock.GetColumnIndex(IO.Create.Column_RadialFloorAreaRatio(10.0).Name));
+            Column? column_CoverageRatio30 = table_Mock.GetColumn(table_Mock.GetColumnIndex(IO.Create.Column_RadialBuildingCoverageRatio(30.0).Name));
+            Column? column_FloorAreaRatio30 = table_Mock.GetColumn(table_Mock.GetColumnIndex(IO.Create.Column_RadialFloorAreaRatio(30.0).Name));
 
             Assert.NotNull(column_CoverageRatio10);
             Assert.NotNull(column_FloorAreaRatio10);
@@ -146,8 +146,8 @@ namespace DiGi.GIS.xUnit
             Row? row_Gmf = table_Gmf.GetRow(0);
             Assert.NotNull(row_Gmf);
 
-            Column? column_CoverageRatio50 = table_Gmf.GetColumn(table_Gmf.GetColumnIndex(DiGi.GIS.IO.Create.Column_RadialBuildingCoverageRatio(50.0).Name));
-            Column? column_FloorAreaRatio50 = table_Gmf.GetColumn(table_Gmf.GetColumnIndex(DiGi.GIS.IO.Create.Column_RadialFloorAreaRatio(50.0).Name));
+            Column? column_CoverageRatio50 = table_Gmf.GetColumn(table_Gmf.GetColumnIndex(IO.Create.Column_RadialBuildingCoverageRatio(50.0).Name));
+            Column? column_FloorAreaRatio50 = table_Gmf.GetColumn(table_Gmf.GetColumnIndex(IO.Create.Column_RadialFloorAreaRatio(50.0).Name));
             Assert.NotNull(column_CoverageRatio50);
             Assert.NotNull(column_FloorAreaRatio50);
 

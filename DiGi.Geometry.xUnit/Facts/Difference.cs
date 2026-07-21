@@ -17,7 +17,7 @@ namespace DiGi.Geometry.xUnit
             PolygonalFace2D? polygonalFace2D_2 = DiGi.Core.Convert.ToDiGi<PolygonalFace2D>("{\"_type\":\"DiGi.Geometry.Planar.Classes.PolygonalFace2D,DiGi.Geometry\",\"ExternalEdge\":{\"_type\":\"DiGi.Geometry.Planar.Classes.Polygon2D,DiGi.Geometry\",\"Points\":[{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621018.21,\"Y\":520334.81},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621032.1,\"Y\":520333.43},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621031.03,\"Y\":520322.73},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621026.16,\"Y\":520323.22},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621026.4,\"Y\":520325.61},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621017.38,\"Y\":520326.51},{\"_type\":\"DiGi.Geometry.Planar.Classes.Point2D,DiGi.Geometry\",\"X\":621018.21,\"Y\":520334.81}]},\"InternalEdges\":null}")?.FirstOrDefault();
             Assert.NotNull(polygonalFace2D_2);
 
-            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Query.Difference(polygonalFace2D_1, polygonalFace2D_2);
+            List<PolygonalFace2D>? polygonalFace2Ds = Query.Difference(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(polygonalFace2Ds);
             Assert.True(polygonalFace2Ds.Count == 1);
 
@@ -37,7 +37,7 @@ namespace DiGi.Geometry.xUnit
             var p2 = new Polygon2D([new Point2D(5, 5), new Point2D(7, 5), new Point2D(7, 7), new Point2D(5, 7)]);
 
             // Test 1: IPolygonal2D Difference
-            var result = Planar.Query.Difference(p1, p2);
+            var result = Query.Difference(p1, p2);
             Assert.NotNull(result);
             Assert.Single(result);
             Assert.Equal(4.0, result[0].GetArea(), 4);
@@ -45,7 +45,7 @@ namespace DiGi.Geometry.xUnit
             // Test 2: PolygonalFace2D Difference
             var face1 = p1.ToNTS_Polygon().ToDiGi();
             var face2 = p2.ToNTS_Polygon().ToDiGi();
-            var faceResult = Planar.Query.Difference(face1, face2);
+            var faceResult = Query.Difference(face1, face2);
             Assert.NotNull(faceResult);
             Assert.Single(faceResult);
             Assert.Equal(4.0, faceResult[0].GetArea(), 4);
@@ -60,13 +60,13 @@ namespace DiGi.Geometry.xUnit
             var p1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
             var p2 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2)]);
 
-            var result = Planar.Query.Difference(p1, p2);
+            var result = Query.Difference(p1, p2);
             Assert.NotNull(result);
             Assert.Empty(result);
 
             var face1 = p1.ToNTS_Polygon().ToDiGi();
             var face2 = p2.ToNTS_Polygon().ToDiGi();
-            var faceResult = Planar.Query.Difference(face1, face2);
+            var faceResult = Query.Difference(face1, face2);
             Assert.NotNull(faceResult);
             Assert.Empty(faceResult);
         }

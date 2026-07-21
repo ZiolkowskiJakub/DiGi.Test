@@ -1,9 +1,6 @@
 using DiGi.Communication.Classes;
 using DiGi.Communication.Interfaces;
 using DiGi.Geometry.Spatial.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace DiGi.Communication.xUnit
@@ -19,7 +16,7 @@ namespace DiGi.Communication.xUnit
         {
             string? string_FilePath = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "GeometricalPropagationModel.json");
             Assert.False(string.IsNullOrWhiteSpace(string_FilePath));
-            Assert.True(System.IO.File.Exists(string_FilePath));
+            Assert.True(File.Exists(string_FilePath));
 
             List<GeometricalPropagationModel>? list_Models = Core.Convert.ToDiGi<GeometricalPropagationModel>((Core.Classes.Path)string_FilePath!);
             Assert.NotNull(list_Models);
@@ -30,7 +27,7 @@ namespace DiGi.Communication.xUnit
             GeometricalPropagationModel geometricalPropagationModel_Cpu = new(geometricalPropagationModel_Source);
             GeometricalPropagationModel geometricalPropagationModel_Gpu = new(geometricalPropagationModel_Source);
 
-            ScatteringSolverOptions scatteringSolverOptions = new(DiGi.Communication.Constants.Factor.Angle, 0.1, DiGi.Core.Constants.Tolerance.Distance);
+            ScatteringSolverOptions scatteringSolverOptions = new(Constants.Factor.Angle, 0.1, Core.Constants.Tolerance.Distance);
 
             ScatteringSolver scatteringSolver_Cpu = new()
             {
@@ -54,7 +51,7 @@ namespace DiGi.Communication.xUnit
             testOutputHelper.WriteLine($"CPU Solve Time: {stopwatch_Cpu.ElapsedMilliseconds} ms");
             testOutputHelper.WriteLine($"GPU Solve Time: {stopwatch_Gpu.ElapsedMilliseconds} ms");
 
-            System.IO.File.WriteAllText("baseline_times.txt", $"CPU: {stopwatch_Cpu.ElapsedMilliseconds} ms\nGPU: {stopwatch_Gpu.ElapsedMilliseconds} ms\n");
+            File.WriteAllText("baseline_times.txt", $"CPU: {stopwatch_Cpu.ElapsedMilliseconds} ms\nGPU: {stopwatch_Gpu.ElapsedMilliseconds} ms\n");
 
             Assert.True(bool_CpuSuccess);
             Assert.True(bool_GpuSuccess);
@@ -118,8 +115,8 @@ namespace DiGi.Communication.xUnit
                         }
                     }
 
-                    double diffPercent = System.Math.Abs(gpuPoints.Count - cpuPoints.Count) / (double)gpuPoints.Count;
-                    Assert.True(diffPercent < 0.02 || System.Math.Abs(gpuPoints.Count - cpuPoints.Count) <= 5, 
+                    double diffPercent = Math.Abs(gpuPoints.Count - cpuPoints.Count) / (double)gpuPoints.Count;
+                    Assert.True(diffPercent < 0.02 || Math.Abs(gpuPoints.Count - cpuPoints.Count) <= 5,
                         $"Point count mismatch: GPU={gpuPoints.Count}, CPU={cpuPoints.Count}");
 
                     List<Tuple<Point3D, string>> remainingCpuPoints = new(cpuPoints);

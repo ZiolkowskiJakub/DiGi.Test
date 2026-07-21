@@ -42,11 +42,11 @@ namespace DiGi.Geometry.xUnit
             Polygon2D? polygon2D_3 = DiGi.Core.Convert.ToDiGi<Polygon2D>((DiGi.Core.Classes.Path)path)?.FirstOrDefault();
             Assert.NotNull(polygon2D_3);
 
-            List<Polygon2D>? polygon2Ds_1 = Planar.Query.Intersection<Polygon2D, Polygon2D>([polygon2D_1, polygon2D_3]);
+            List<Polygon2D>? polygon2Ds_1 = Query.Intersection<Polygon2D, Polygon2D>([polygon2D_1, polygon2D_3]);
             Assert.NotNull(polygon2Ds_1);
             Assert.True(polygon2Ds_1.Count == 1);
 
-            List<Polygon2D>? polygon2Ds_2 = Planar.Query.Intersection<Polygon2D, Polygon2D>([polygon2D_2, polygon2D_3]);
+            List<Polygon2D>? polygon2Ds_2 = Query.Intersection<Polygon2D, Polygon2D>([polygon2D_2, polygon2D_3]);
             Assert.NotNull(polygon2Ds_2);
             Assert.True(polygon2Ds_2.Count == 1);
 
@@ -79,7 +79,7 @@ namespace DiGi.Geometry.xUnit
             Polygon2D? polygon2D = DiGi.Core.Convert.ToDiGi<Polygon2D>((DiGi.Core.Classes.Path)path)?.FirstOrDefault();
             Assert.NotNull(polygon2D);
 
-            List<Polygon2D>? polygon2Ds = Planar.Query.Intersection<Polygon2D, IPolygonal2D>([rectangle2D, polygon2D]);
+            List<Polygon2D>? polygon2Ds = Query.Intersection<Polygon2D, IPolygonal2D>([rectangle2D, polygon2D]);
             Assert.NotNull(polygon2Ds);
 
             Assert.Equal(2, polygon2Ds.Count);
@@ -102,13 +102,13 @@ namespace DiGi.Geometry.xUnit
             // Test 1: PolygonalFace2D Intersection
             var face1 = poly1.ToNTS_Polygon().ToDiGi();
             var face2 = poly2.ToNTS_Polygon().ToDiGi();
-            var faceResult = Planar.Query.Intersection(face1, face2);
+            var faceResult = Query.Intersection(face1, face2);
             Assert.NotNull(faceResult);
             Assert.Single(faceResult);
             Assert.Equal(100.0, faceResult[0].GetArea(), 4);
 
             // Test 2: Polygon2D Intersection
-            var polyResult = Planar.Query.Intersection(poly1, poly2);
+            var polyResult = Query.Intersection(poly1, poly2);
             Assert.NotNull(polyResult);
             Assert.Single(polyResult);
             Assert.Equal(100.0, polyResult[0].GetArea(), 4);
@@ -134,13 +134,13 @@ namespace DiGi.Geometry.xUnit
                 new Point2D(5, 7)
             ]);
 
-            var result = Planar.Query.Intersection(poly1, poly2);
+            var result = Query.Intersection(poly1, poly2);
             Assert.NotNull(result);
             Assert.Empty(result);
 
             var face1 = poly1.ToNTS_Polygon().ToDiGi();
             var face2 = poly2.ToNTS_Polygon().ToDiGi();
-            var faceResult = Planar.Query.Intersection(face1, face2);
+            var faceResult = Query.Intersection(face1, face2);
             Assert.NotNull(faceResult);
             Assert.Empty(faceResult);
         }
@@ -169,7 +169,7 @@ namespace DiGi.Geometry.xUnit
                 new Point2D(0, 5)
             ]);
 
-            List<Polygon2D>? result = Planar.Query.Intersection<Polygon2D, IPolygonal2D>([uShape, rect]);
+            List<Polygon2D>? result = Query.Intersection<Polygon2D, IPolygonal2D>([uShape, rect]);
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(4.0, result.Sum(x => x.GetArea()), 4);
@@ -196,7 +196,7 @@ namespace DiGi.Geometry.xUnit
                 new DiGi.Geometry.Planar.Classes.Point2D(2.0, 2.0)
             ]);
 
-            List<DiGi.Geometry.Planar.Classes.Polygon2D>? list_Result = DiGi.Geometry.Planar.Query.Intersection<DiGi.Geometry.Planar.Classes.Polygon2D, DiGi.Geometry.Planar.Classes.Polygon2D>([polygon2D_1, polygon2D_2]);
+            List<DiGi.Geometry.Planar.Classes.Polygon2D>? list_Result = Query.Intersection<DiGi.Geometry.Planar.Classes.Polygon2D, DiGi.Geometry.Planar.Classes.Polygon2D>([polygon2D_1, polygon2D_2]);
             Assert.NotNull(list_Result);
             Assert.Empty(list_Result);
         }
@@ -213,7 +213,7 @@ namespace DiGi.Geometry.xUnit
                 new DiGi.Geometry.Planar.Classes.Point2D(0.0, 2.0)
             ]);
 
-            bool success_Unsupported = DiGi.Geometry.Planar.Query.TryConvert<DiGi.Geometry.Planar.Classes.Rectangle2D>(polygon2D_Test, out List<DiGi.Geometry.Planar.Classes.Rectangle2D>? rectangle2Ds_Converted);
+            bool success_Unsupported = Query.TryConvert<DiGi.Geometry.Planar.Classes.Rectangle2D>(polygon2D_Test, out List<DiGi.Geometry.Planar.Classes.Rectangle2D>? rectangle2Ds_Converted);
             Assert.False(success_Unsupported);
             Assert.Null(rectangle2Ds_Converted);
         }

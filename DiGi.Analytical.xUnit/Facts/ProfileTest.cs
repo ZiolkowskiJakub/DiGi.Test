@@ -43,9 +43,9 @@ namespace DiGi.Analytical.xUnit
             indexedDoubles = Building.HVAC.Query.IndexedDoubles(buildingModel, space, new Range<int>(0, 71), internalGainProfileType);
             Assert.NotNull(indexedDoubles);
 
-            int hourIndex = DiGi.Analytical.Query.FirstHourIndex(DayOfWeek.Monday, 2025);
+            int hourIndex = Query.FirstHourIndex(DayOfWeek.Monday, 2025);
 
-            DateTime dateTime = DiGi.Analytical.Create.DateTime(2025, hourIndex + (5 * 24));
+            DateTime dateTime = Create.DateTime(2025, hourIndex + (5 * 24));
             Assert.Equal(2025, dateTime.Year);
         }
     }

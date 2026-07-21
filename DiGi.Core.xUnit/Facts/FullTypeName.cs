@@ -15,37 +15,37 @@ namespace DiGi.Core.xUnit
         {
             // 1. Test Null Inputs
             JsonObject? jsonObject_Null = null;
-            string? string_NullResultForJsonObject = DiGi.Core.Query.FullTypeName(jsonObject_Null);
+            string? string_NullResultForJsonObject = Core.Query.FullTypeName(jsonObject_Null);
             Assert.Null(string_NullResultForJsonObject);
 
             System.Type? type_Null = null;
-            string? string_NullResultForType = DiGi.Core.Query.FullTypeName(type_Null);
+            string? string_NullResultForType = Core.Query.FullTypeName(type_Null);
             Assert.Null(string_NullResultForType);
 
             Interfaces.ISerializableObject? serializableObject_Null = null;
-            string? string_NullResultForSerializableObject = DiGi.Core.Query.FullTypeName(serializableObject_Null);
+            string? string_NullResultForSerializableObject = Core.Query.FullTypeName(serializableObject_Null);
             Assert.Null(string_NullResultForSerializableObject);
 
             // 2. Test JsonObject with valid and invalid type properties
             JsonObject jsonObject_Valid = new();
             jsonObject_Valid.Add(Constants.Serialization.PropertyName.Type, JsonValue.Create("TestNamespace.TestType, TestAssembly"));
-            string? string_ValidJsonObjectResult = DiGi.Core.Query.FullTypeName(jsonObject_Valid);
+            string? string_ValidJsonObjectResult = Core.Query.FullTypeName(jsonObject_Valid);
             Assert.Equal("TestNamespace.TestType, TestAssembly", string_ValidJsonObjectResult);
 
             JsonObject jsonObject_InvalidObject = new();
             jsonObject_InvalidObject.Add(Constants.Serialization.PropertyName.Type, new JsonObject());
-            string? string_InvalidObjectResult = DiGi.Core.Query.FullTypeName(jsonObject_InvalidObject);
+            string? string_InvalidObjectResult = Core.Query.FullTypeName(jsonObject_InvalidObject);
             Assert.Null(string_InvalidObjectResult);
 
             JsonObject jsonObject_InvalidArray = new();
             jsonObject_InvalidArray.Add(Constants.Serialization.PropertyName.Type, new JsonArray());
-            string? string_InvalidArrayResult = DiGi.Core.Query.FullTypeName(jsonObject_InvalidArray);
+            string? string_InvalidArrayResult = Core.Query.FullTypeName(jsonObject_InvalidArray);
             Assert.Null(string_InvalidArrayResult);
 
             // 3. Test Type Formatting (Primitive and Generic)
             System.Type type_Int = typeof(int);
-            string? string_IntResult1 = DiGi.Core.Query.FullTypeName(type_Int);
-            string? string_IntResult2 = DiGi.Core.Query.FullTypeName(type_Int);
+            string? string_IntResult1 = Core.Query.FullTypeName(type_Int);
+            string? string_IntResult2 = Core.Query.FullTypeName(type_Int);
             Assert.NotNull(string_IntResult1);
             Assert.Equal(string_IntResult1, string_IntResult2);
 
@@ -57,8 +57,8 @@ namespace DiGi.Core.xUnit
             Assert.Equal(string_ExpectedIntName, string_IntResult1);
 
             System.Type type_Generic = typeof(List<double>);
-            string? string_GenericResult1 = DiGi.Core.Query.FullTypeName(type_Generic);
-            string? string_GenericResult2 = DiGi.Core.Query.FullTypeName(type_Generic);
+            string? string_GenericResult1 = Core.Query.FullTypeName(type_Generic);
+            string? string_GenericResult2 = Core.Query.FullTypeName(type_Generic);
             Assert.NotNull(string_GenericResult1);
             Assert.Equal(string_GenericResult1, string_GenericResult2);
 
@@ -77,8 +77,8 @@ namespace DiGi.Core.xUnit
 
             // 4. Test ISerializableObject
             Core.Classes.Color color_Instance = new Core.Classes.Color(System.Drawing.Color.Blue);
-            string? string_ColorResult = DiGi.Core.Query.FullTypeName(color_Instance);
-            string? string_ExpectedColorName = DiGi.Core.Query.FullTypeName(typeof(Core.Classes.Color));
+            string? string_ColorResult = Core.Query.FullTypeName(color_Instance);
+            string? string_ExpectedColorName = Core.Query.FullTypeName(typeof(Core.Classes.Color));
             Assert.Equal(string_ExpectedColorName, string_ColorResult);
         }
     }

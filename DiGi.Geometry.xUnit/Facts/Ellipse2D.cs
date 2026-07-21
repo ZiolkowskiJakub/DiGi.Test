@@ -73,7 +73,7 @@ namespace DiGi.Geometry.xUnit
             DiGi.Geometry.Planar.Classes.Ellipse2D ellipse2D_Target = new(point2D_Center, 5.0, 10.0, vector2D_DirA);
 
             // 1. Test Transform method with Translation
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = DiGi.Geometry.Planar.Create.Transform2D.Translation(10.0, -10.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(10.0, -10.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = ellipse2D_Target.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);
@@ -87,7 +87,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0.0, ellipse2D_Target.DirectionA.Y, 9);
 
             // 2. Test Transform method with Uniform Scaling (radius should double)
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = DiGi.Geometry.Planar.Create.Transform2D.Scale(2.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0);
             Assert.NotNull(transform2D_Scale);
             bool bool_ScaleResult = ellipse2D_Target.Transform(transform2D_Scale);
             Assert.True(bool_ScaleResult);
@@ -98,7 +98,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(20.0, ellipse2D_Target.B, 9);
 
             // 3. Test Transform method with Rotation (around origin by 90 degrees)
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Rot = DiGi.Geometry.Planar.Create.Transform2D.Rotation(System.Math.PI / 2.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Rot = Planar.Create.Transform2D.Rotation(System.Math.PI / 2.0);
             Assert.NotNull(transform2D_Rot);
             bool bool_RotResult = ellipse2D_Target.Transform(transform2D_Rot);
             Assert.True(bool_RotResult);

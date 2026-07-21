@@ -16,7 +16,7 @@ namespace DiGi.Core.xUnit
             GuidReference guidReference = new(new TypeReference(typeof(TestObject)), Guid.NewGuid());
             UniqueIdReference uniqueIdReference = new(new TypeReference(typeof(Classes.UniqueIdObject)), "BLD-001");
 
-            IReference? reference = Core.Create.Reference(guidReference, uniqueIdReference);
+            IReference? reference = Create.Reference(guidReference, uniqueIdReference);
 
             ComplexReference? complexReference = Assert.IsType<ComplexReference>(reference);
             Assert.Equal(2, complexReference.Count);
@@ -42,17 +42,17 @@ namespace DiGi.Core.xUnit
             ComplexReference complexReference_1 = new(references_1);
             ComplexReference complexReference_2 = new(references_2);
 
-            IReference? reference_ComplexComplex = Core.Create.Reference(complexReference_1, complexReference_2);
+            IReference? reference_ComplexComplex = Create.Reference(complexReference_1, complexReference_2);
             ComplexReference? complexReference_Joined = Assert.IsType<ComplexReference>(reference_ComplexComplex);
             Assert.Equal(4, complexReference_Joined.Count);
             Assert.Equal(guidReference_1.ToString(), complexReference_Joined[0]?.ToString());
             Assert.Equal(guidReference_4.ToString(), complexReference_Joined[3]?.ToString());
 
-            IReference? reference_ComplexPlain = Core.Create.Reference(complexReference_1, guidReference_3);
+            IReference? reference_ComplexPlain = Create.Reference(complexReference_1, guidReference_3);
             ComplexReference? complexReference_ComplexPlain = Assert.IsType<ComplexReference>(reference_ComplexPlain);
             Assert.Equal(3, complexReference_ComplexPlain.Count);
 
-            IReference? reference_PlainComplex = Core.Create.Reference(guidReference_1, complexReference_2);
+            IReference? reference_PlainComplex = Create.Reference(guidReference_1, complexReference_2);
             ComplexReference? complexReference_PlainComplex = Assert.IsType<ComplexReference>(reference_PlainComplex);
             Assert.Equal(3, complexReference_PlainComplex.Count);
             Assert.Equal(guidReference_1.ToString(), complexReference_PlainComplex[0]?.ToString());
@@ -71,7 +71,7 @@ namespace DiGi.Core.xUnit
             List<ISerializableReference?> references = [guidReference_1];
             ComplexReference complexReference = new(references);
 
-            Core.Create.Reference(complexReference, guidReference_2);
+            Create.Reference(complexReference, guidReference_2);
 
             Assert.Equal(1, complexReference.Count);
         }
@@ -85,9 +85,9 @@ namespace DiGi.Core.xUnit
         {
             GuidReference guidReference = new(new TypeReference(typeof(TestObject)), Guid.NewGuid());
 
-            Assert.Same(guidReference, Core.Create.Reference(guidReference, null));
-            Assert.Same(guidReference, Core.Create.Reference(null, guidReference));
-            Assert.Null(Core.Create.Reference((IReference?)null, null));
+            Assert.Same(guidReference, Create.Reference(guidReference, null));
+            Assert.Same(guidReference, Create.Reference(null, guidReference));
+            Assert.Null(Create.Reference((IReference?)null, null));
         }
 
         /// <summary>
@@ -103,8 +103,8 @@ namespace DiGi.Core.xUnit
                 new TypeReference(typeof(Classes.UniqueIdObject)),
                 0);
 
-            Assert.Null(Core.Create.Reference(guidReference, relationListClusterReference));
-            Assert.Null(Core.Create.Reference(relationListClusterReference, guidReference));
+            Assert.Null(Create.Reference(guidReference, relationListClusterReference));
+            Assert.Null(Create.Reference(relationListClusterReference, guidReference));
         }
 
         /// <summary>

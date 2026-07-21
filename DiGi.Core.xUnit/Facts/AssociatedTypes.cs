@@ -30,7 +30,7 @@ namespace DiGi.Core.xUnit
             AssociatedTypes? associatedTypes_Temp = Convert.ToDiGi<AssociatedTypes>(json)?.FirstOrDefault();
             Assert.NotNull(associatedTypes_Temp);
 
-            ExternalParameterDefinition? externalParameterDefinition = DiGi.Core.Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test", "Test description", DiGi.Core.Parameter.Enums.ParameterType.Double, typeof(Core.Classes.Color), nullable: false);
+            ExternalParameterDefinition? externalParameterDefinition = Core.Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "Test", "Test description", Core.Parameter.Enums.ParameterType.Double, typeof(Core.Classes.Color), nullable: false);
             Assert.NotNull(externalParameterDefinition);
 
             json = Convert.ToSystem_String(externalParameterDefinition);

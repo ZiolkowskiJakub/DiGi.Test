@@ -2253,7 +2253,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(2.0, point2D_Foci[1].Y, 1e-5);
 
             // Assert Correctness of Transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = DiGi.Geometry.Planar.Create.Transform2D.Translation(10.0, -10.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(10.0, -10.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = ellipse2D_Test.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);

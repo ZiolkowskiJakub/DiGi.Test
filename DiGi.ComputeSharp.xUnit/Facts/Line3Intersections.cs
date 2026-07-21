@@ -26,7 +26,7 @@ namespace DiGi.ComputeSharp.xUnit
 
             try
             {
-                IEnumerable<Line3Intersection>? line3Intersections_Result = DiGi.ComputeSharp.Spatial.Create.Line3Intersections(line3_1, line3s_Target, Tolerance.Distance);
+                IEnumerable<Line3Intersection>? line3Intersections_Result = Spatial.Create.Line3Intersections(line3_1, line3s_Target, Tolerance.Distance);
                 Assert.NotNull(line3Intersections_Result);
                 Line3Intersection line3Intersection_First = line3Intersections_Result!.First();
 

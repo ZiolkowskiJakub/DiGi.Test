@@ -56,7 +56,7 @@ namespace DiGi.Core.xUnit
             Assert.False(bmp1.CompareByPixels(bmpDifferentSize));
 
             // Compare with nulls by fully qualifying the static query method
-            Assert.True(DiGi.Core.Drawing.Query.CompareByPixels(null, null));
+            Assert.True(Drawing.Query.CompareByPixels(null, null));
             Assert.False(bmp1.CompareByPixels(null));
         }
 
@@ -69,13 +69,13 @@ namespace DiGi.Core.xUnit
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public void CompareByPixels_DifferentSourceFormats_StillEqual()
         {
-            using Bitmap bitmap24bpp = new(8, 8, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            using Bitmap bitmap24bpp = new(8, 8, PixelFormat.Format24bppRgb);
             using (Graphics graphics = Graphics.FromImage(bitmap24bpp))
             {
                 graphics.Clear(System.Drawing.Color.Green);
             }
 
-            using Bitmap bitmap32bpp = new(8, 8, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            using Bitmap bitmap32bpp = new(8, 8, PixelFormat.Format32bppArgb);
             using (Graphics graphics = Graphics.FromImage(bitmap32bpp))
             {
                 graphics.Clear(System.Drawing.Color.Green);

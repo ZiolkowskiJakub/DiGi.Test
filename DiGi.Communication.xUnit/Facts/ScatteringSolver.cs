@@ -2,8 +2,6 @@ using DiGi.Communication.Classes;
 using DiGi.Communication.Enums;
 using DiGi.Communication.Interfaces;
 using DiGi.Geometry.Spatial.Classes;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit.Abstractions;
 
@@ -176,7 +174,7 @@ namespace DiGi.Communication.xUnit
                             Assert.Equal(gpuGroup.Reference, cpuGroup.Reference);
                             Assert.NotNull(cpuGroup.Points);
                             Assert.NotNull(gpuGroup.Points);
-                            
+
                             // Check point count matching approximately (due to slightly different precision on GPU vs CPU)
                             Assert.True(Math.Abs(gpuGroup.Points.Count - cpuGroup.Points.Count) <= 2,
                                 $"Point count mismatch on group {cpuGroup.Reference}: CPU={cpuGroup.Points.Count}, GPU={gpuGroup.Points.Count}");
@@ -235,7 +233,7 @@ namespace DiGi.Communication.xUnit
             Antenna antenna_Transmitter = new(new Point3D(0, -10, 5), Function.Transmitter);
             Antenna antenna_Receiver = new(new Point3D(0, 10, 5), Function.Receiver);
 
-            double delay = 2.88 / DiGi.Communication.Constants.Physical.LightSpeed;
+            double delay = 2.88 / Constants.Physical.LightSpeed;
             Dictionary<double, double> values = new()
             {
                 [delay] = 5.0

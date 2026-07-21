@@ -11,10 +11,10 @@ namespace DiGi.Core.xUnit
         {
             // Call DiGi.Core.Parameter.Query.Description explicitly: a same-signature extension method also
             // exists in the enclosing DiGi.Core namespace, which would otherwise win extension-method lookup.
-            string? description1 = DiGi.Core.Parameter.Query.Description(TestEnum.Test1);
+            string? description1 = Core.Parameter.Query.Description(TestEnum.Test1);
             Assert.Equal("Test 1", description1);
 
-            string? description2 = DiGi.Core.Parameter.Query.Description(TestEnum.Test2);
+            string? description2 = Core.Parameter.Query.Description(TestEnum.Test2);
             Assert.Equal("Test 2", description2);
         }
 
@@ -25,7 +25,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Description_Type_ReturnsNullWhenAttributeMissing()
         {
-            string? description = DiGi.Core.Parameter.Query.Description(typeof(TestObject));
+            string? description = Core.Parameter.Query.Description(typeof(TestObject));
             Assert.Null(description);
         }
 
@@ -36,7 +36,7 @@ namespace DiGi.Core.xUnit
         public void Description_Enum_NullInput_ReturnsNull()
         {
             System.Enum? @enum = null;
-            Assert.Null(DiGi.Core.Parameter.Query.Description(@enum));
+            Assert.Null(Core.Parameter.Query.Description(@enum));
         }
     }
 }

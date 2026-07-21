@@ -49,7 +49,7 @@ namespace DiGi.Geometry.xUnit
             DiGi.Geometry.Planar.Classes.Segment2D segment2D_Line = new(point2D_Start, point2D_End);
 
             // 1. Test Transform method with Translation
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = DiGi.Geometry.Planar.Create.Transform2D.Translation(2.0, 3.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(2.0, 3.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = segment2D_Line.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);

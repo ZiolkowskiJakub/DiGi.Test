@@ -6,9 +6,6 @@ using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.Solar.Classes;
 using DiGi.Solar.ComputeSharp.Classes;
 using DiGi.Solar.Enums;
-using DiGi.Solar.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Runtime.Versioning;
 
 namespace DiGi.Solar.xUnit
@@ -24,7 +21,7 @@ namespace DiGi.Solar.xUnit
             DateTime dateTime = new(2026, 6, 26, 12, 0, 0);
             Plane plane = Geometry.Spatial.Constants.Plane.WorldZ;
             Polygon2D externalEdge = new([new Point2D(0.0, 0.0), new Point2D(10.0, 0.0), new Point2D(10.0, 10.0), new Point2D(0.0, 10.0)]);
-            PolygonalFace2D polygonalFace2D = DiGi.Geometry.Planar.Create.PolygonalFace2D(externalEdge, [])!;
+            PolygonalFace2D polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(externalEdge, [])!;
             List<IPolygonalFace2D> polygonalFace2Ds = [polygonalFace2D];
 
             GeometricalShadingSolverResult geometricalShadingSolverResult = new(dateTime, plane, polygonalFace2Ds);

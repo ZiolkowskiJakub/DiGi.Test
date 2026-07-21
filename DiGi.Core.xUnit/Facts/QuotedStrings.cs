@@ -12,7 +12,7 @@ namespace DiGi.Core.xUnit
         {
             // 1. Basic splitting with quotes and escaped quotes
             string string_Input1 = "abc,\"d\"\"e\",fgh";
-            List<string>? list_Fields1 = DiGi.Core.Query.QuotedStrings(string_Input1, ",");
+            List<string>? list_Fields1 = Core.Query.QuotedStrings(string_Input1, ",");
             Assert.NotNull(list_Fields1);
             Assert.Equal(3, list_Fields1.Count);
             Assert.Equal("abc", list_Fields1[0]);
@@ -21,7 +21,7 @@ namespace DiGi.Core.xUnit
 
             // 2. Trailing and consecutive empty fields (Verifying the fix for Bug 1)
             string string_Input2 = "abc,fgh,";
-            List<string>? list_Fields2 = DiGi.Core.Query.QuotedStrings(string_Input2, ",");
+            List<string>? list_Fields2 = Core.Query.QuotedStrings(string_Input2, ",");
             Assert.NotNull(list_Fields2);
             Assert.Equal(3, list_Fields2.Count);
             Assert.Equal("abc", list_Fields2[0]);
@@ -30,7 +30,7 @@ namespace DiGi.Core.xUnit
 
             // 3. Consecutive separators
             string string_Input3 = "abc,,fgh";
-            List<string>? list_Fields3 = DiGi.Core.Query.QuotedStrings(string_Input3, ",");
+            List<string>? list_Fields3 = Core.Query.QuotedStrings(string_Input3, ",");
             Assert.NotNull(list_Fields3);
             Assert.Equal(3, list_Fields3.Count);
             Assert.Equal("abc", list_Fields3[0]);
@@ -39,14 +39,14 @@ namespace DiGi.Core.xUnit
 
             // 4. Single separator (should yield two empty fields)
             string string_Input4 = ",";
-            List<string>? list_Fields4 = DiGi.Core.Query.QuotedStrings(string_Input4, ",");
+            List<string>? list_Fields4 = Core.Query.QuotedStrings(string_Input4, ",");
             Assert.NotNull(list_Fields4);
             Assert.Equal(2, list_Fields4.Count);
             Assert.Equal(string.Empty, list_Fields4[0]);
             Assert.Equal(string.Empty, list_Fields4[1]);
 
             // 5. Null input handling
-            List<string>? list_FieldsNull = DiGi.Core.Query.QuotedStrings(null, ",");
+            List<string>? list_FieldsNull = Core.Query.QuotedStrings(null, ",");
             Assert.Null(list_FieldsNull);
         }
     }

@@ -232,7 +232,7 @@ namespace DiGi.Core.xUnit
         public void TryConvert_Reference_FromJson()
         {
             GuidReference guidReference = new(new TypeReference(typeof(TestObject)), Guid.NewGuid());
-            string? json = Core.Convert.ToSystem_String(guidReference);
+            string? json = Convert.ToSystem_String(guidReference);
             Assert.False(string.IsNullOrWhiteSpace(json));
 
             Assert.True(Core.Query.TryConvert(json, out GuidReference? guidReference_Converted));

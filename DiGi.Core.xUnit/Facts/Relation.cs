@@ -38,8 +38,8 @@ namespace DiGi.Core.xUnit
             Assert.Equal(objB.UniqueId, relation.UniqueReference_To.UniqueId);
 
             // Test if Contains works for both objects using correct RelationSide and UniqueReferences
-            Assert.True(relation.Contains(DiGi.Core.Relation.Enums.RelationSide.From, Create.UniqueReference(objA)));
-            Assert.True(relation.Contains(DiGi.Core.Relation.Enums.RelationSide.To, Create.UniqueReference(objB)));
+            Assert.True(relation.Contains(Relation.Enums.RelationSide.From, Create.UniqueReference(objA)));
+            Assert.True(relation.Contains(Relation.Enums.RelationSide.To, Create.UniqueReference(objB)));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace DiGi.Core.xUnit
 
             // Verify that calling Remove with a null uniqueReferences_From list does not throw NullReferenceException
             List<IUniqueReference> uniqueReferences_ToRemove = [Create.UniqueReference(new TestUniqueObject())!];
-            List<IUniqueReference>? uniqueReferences_Removed = relation_ManyToOne.Remove(DiGi.Core.Relation.Enums.RelationSide.From, uniqueReferences_ToRemove);
+            List<IUniqueReference>? uniqueReferences_Removed = relation_ManyToOne.Remove(Relation.Enums.RelationSide.From, uniqueReferences_ToRemove);
 
             Assert.NotNull(uniqueReferences_Removed);
             Assert.Empty(uniqueReferences_Removed);

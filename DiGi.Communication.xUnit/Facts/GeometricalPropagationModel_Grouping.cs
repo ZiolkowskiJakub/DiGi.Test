@@ -1,6 +1,5 @@
 using DiGi.Communication.Classes;
 using DiGi.Geometry.Spatial.Classes;
-using System.Collections.Generic;
 
 namespace DiGi.Communication.xUnit
 {

@@ -52,7 +52,7 @@ namespace DiGi.Math.xUnit
             Assert.Null(linearEquation_1.Evaluate(null));
 
             // Serialization Check
-            DiGi.Core.xUnit.Query.SerializationCheck(linearEquation_1);
+            Core.xUnit.Query.SerializationCheck(linearEquation_1);
 
             // JSON constructor
             JsonObject jsonObject = new()
@@ -129,7 +129,7 @@ namespace DiGi.Math.xUnit
             Assert.Equal(3.0, castCoefficients[1]); // slope a
 
             // Serialization Check
-            DiGi.Core.xUnit.Query.SerializationCheck(polynomialEquation_1);
+            Core.xUnit.Query.SerializationCheck(polynomialEquation_1);
         }
     }
 }

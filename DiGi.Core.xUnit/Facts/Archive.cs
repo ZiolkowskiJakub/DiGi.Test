@@ -11,7 +11,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Archive()
         {
-            Address address_1 = new("Street", "City", "00-000", Core.Enums.CountryCode.PL);
+            Address address_1 = new("Street", "City", "00-000", Enums.CountryCode.PL);
 
             IArchive? archive = IO.Query.Serialize(address_1);
             Assert.NotNull(archive);

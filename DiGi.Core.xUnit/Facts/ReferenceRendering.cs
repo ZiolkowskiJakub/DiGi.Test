@@ -99,7 +99,7 @@ namespace DiGi.Core.xUnit
                 JsonObject? jsonObject = serializableObject.ToJsonObject();
                 Assert.NotNull(jsonObject);
 
-                ISerializableObject? serializableObject_Parsed = Core.Create.SerializableObject<ISerializableObject>(jsonObject);
+                ISerializableObject? serializableObject_Parsed = Create.SerializableObject<ISerializableObject>(jsonObject);
                 Assert.NotNull(serializableObject_Parsed);
 
                 Assert.Equal(reference.GetType(), serializableObject_Parsed.GetType());

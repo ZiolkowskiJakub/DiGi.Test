@@ -12,12 +12,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_Disjoint()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(10, 10), new Point2D(12, 10), new Point2D(12, 12), new Point2D(10, 12));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(10, 10), new Point2D(12, 10), new Point2D(12, 12), new Point2D(10, 12));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(differenceResult2D);
             Assert.Equal(BooleanOpertaionType.Difference, differenceResult2D.BooleanOpertaionType);
             Assert.True(differenceResult2D.Any());
@@ -34,10 +34,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_Identical()
         {
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D, polygonalFace2D);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D, polygonalFace2D);
             Assert.NotNull(differenceResult2D);
             Assert.False(differenceResult2D.Any());
             Assert.Equal(0, differenceResult2D.Count);
@@ -49,12 +49,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_Overlapping()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(differenceResult2D);
             Assert.True(differenceResult2D.Any());
 
@@ -69,12 +69,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_HoleCreation()
         {
-            PolygonalFace2D? polygonalFace2D_Outer = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10));
-            PolygonalFace2D? polygonalFace2D_Inner = Planar.Create.PolygonalFace2D(new Point2D(3, 3), new Point2D(7, 3), new Point2D(7, 7), new Point2D(3, 7));
+            PolygonalFace2D? polygonalFace2D_Outer = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10));
+            PolygonalFace2D? polygonalFace2D_Inner = Create.PolygonalFace2D(new Point2D(3, 3), new Point2D(7, 3), new Point2D(7, 7), new Point2D(3, 7));
             Assert.NotNull(polygonalFace2D_Outer);
             Assert.NotNull(polygonalFace2D_Inner);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_Outer, polygonalFace2D_Inner);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_Outer, polygonalFace2D_Inner);
             Assert.NotNull(differenceResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = differenceResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -93,12 +93,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_ContainedInSecond()
         {
-            PolygonalFace2D? polygonalFace2D_Small = Planar.Create.PolygonalFace2D(new Point2D(4, 4), new Point2D(6, 4), new Point2D(6, 6), new Point2D(4, 6));
-            PolygonalFace2D? polygonalFace2D_Big = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10));
+            PolygonalFace2D? polygonalFace2D_Small = Create.PolygonalFace2D(new Point2D(4, 4), new Point2D(6, 4), new Point2D(6, 6), new Point2D(4, 6));
+            PolygonalFace2D? polygonalFace2D_Big = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10));
             Assert.NotNull(polygonalFace2D_Small);
             Assert.NotNull(polygonalFace2D_Big);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_Small, polygonalFace2D_Big);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_Small, polygonalFace2D_Big);
             Assert.NotNull(differenceResult2D);
             Assert.False(differenceResult2D.Any());
         }
@@ -109,12 +109,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_EdgeTouch()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(differenceResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = differenceResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -131,13 +131,13 @@ namespace DiGi.Geometry.xUnit
         public void PolygonalFace2D_DifferenceResult2D_Degenerate_LowerDimensional()
         {
             Polygon2D polygon2D_Degenerate = new([new Point2D(0, 0), new Point2D(10, 0), new Point2D(5, 0)]);
-            PolygonalFace2D? polygonalFace2D_Degenerate = Planar.Create.PolygonalFace2D(polygon2D_Degenerate);
+            PolygonalFace2D? polygonalFace2D_Degenerate = Create.PolygonalFace2D(polygon2D_Degenerate);
             Assert.NotNull(polygonalFace2D_Degenerate);
 
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(4, -1), new Point2D(6, -1), new Point2D(6, 1), new Point2D(4, 1));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(4, -1), new Point2D(6, -1), new Point2D(6, 1), new Point2D(4, 1));
             Assert.NotNull(polygonalFace2D_2);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_Degenerate, polygonalFace2D_2);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_Degenerate, polygonalFace2D_2);
             Assert.NotNull(differenceResult2D);
             Assert.True(differenceResult2D.Any());
             Assert.False(differenceResult2D.Contains<PolygonalFace2D>());
@@ -156,13 +156,13 @@ namespace DiGi.Geometry.xUnit
         public void PolygonalFace2D_DifferenceResult2D_SelfIntersecting_Repaired()
         {
             Polygon2D polygon2D_Bowtie = new([new Point2D(0, 0), new Point2D(2, 0), new Point2D(0, 2), new Point2D(2, 2)]);
-            PolygonalFace2D? polygonalFace2D_Bowtie = Planar.Create.PolygonalFace2D(polygon2D_Bowtie);
+            PolygonalFace2D? polygonalFace2D_Bowtie = Create.PolygonalFace2D(polygon2D_Bowtie);
             Assert.NotNull(polygonalFace2D_Bowtie);
 
-            PolygonalFace2D? polygonalFace2D_Right = Planar.Create.PolygonalFace2D(new Point2D(1, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(1, 2));
+            PolygonalFace2D? polygonalFace2D_Right = Create.PolygonalFace2D(new Point2D(1, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(1, 2));
             Assert.NotNull(polygonalFace2D_Right);
 
-            DifferenceResult2D? differenceResult2D = Planar.Create.DifferenceResult2D(polygonalFace2D_Bowtie, polygonalFace2D_Right);
+            DifferenceResult2D? differenceResult2D = Create.DifferenceResult2D(polygonalFace2D_Bowtie, polygonalFace2D_Right);
             Assert.NotNull(differenceResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = differenceResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -176,13 +176,13 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_DifferenceResult2D_Null()
         {
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D);
 
-            DifferenceResult2D? differenceResult2D_NullFirst = Planar.Create.DifferenceResult2D(null, polygonalFace2D);
+            DifferenceResult2D? differenceResult2D_NullFirst = Create.DifferenceResult2D(null, polygonalFace2D);
             Assert.Null(differenceResult2D_NullFirst);
 
-            DifferenceResult2D? differenceResult2D_NullSecond = Planar.Create.DifferenceResult2D(polygonalFace2D, null);
+            DifferenceResult2D? differenceResult2D_NullSecond = Create.DifferenceResult2D(polygonalFace2D, null);
             Assert.NotNull(differenceResult2D_NullSecond);
 
             List<PolygonalFace2D>? polygonalFace2Ds = differenceResult2D_NullSecond.GetGeometry2Ds<PolygonalFace2D>();
@@ -197,7 +197,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void DifferenceResult2D_SerializationCheck()
         {
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D);
 
             Segment2D segment2D = new(new Point2D(5, 0), new Point2D(9, 0));

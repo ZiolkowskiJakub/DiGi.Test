@@ -22,7 +22,7 @@ namespace DiGi.Geometry.xUnit
             Polygon2D internalEdge_Inside = Square(2, 2, 1);
             Polygon2D internalEdge_Outside = Square(20, 20, 1);
 
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(externalEdge, [internalEdge_Inside, internalEdge_Outside]);
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(externalEdge, [internalEdge_Inside, internalEdge_Outside]);
             Assert.NotNull(polygonalFace2D);
 
             List<IPolygonal2D>? internalEdges = polygonalFace2D.InternalEdges;
@@ -48,7 +48,7 @@ namespace DiGi.Geometry.xUnit
             Polygon2D internalEdge_Overlapping = Square(7, 7, 2);
             Polygon2D internalEdge_Separate = Square(12, 12, 2);
 
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(externalEdge, [internalEdge_Nested, internalEdge_Separate, internalEdge_Large, internalEdge_Overlapping]);
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(externalEdge, [internalEdge_Nested, internalEdge_Separate, internalEdge_Large, internalEdge_Overlapping]);
             Assert.NotNull(polygonalFace2D);
 
             List<IPolygonal2D>? internalEdges = polygonalFace2D.InternalEdges;
@@ -70,7 +70,7 @@ namespace DiGi.Geometry.xUnit
             Polygon2D internalEdge_JustInside = new([new Point2D(0.02, 0.02), new Point2D(1, 0.02), new Point2D(1, 1), new Point2D(0.02, 1)]);
             Polygon2D internalEdge_TooClose = new([new Point2D(0.005, 2), new Point2D(1, 2), new Point2D(1, 3), new Point2D(0.005, 3)]);
 
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(externalEdge, [internalEdge_JustInside, internalEdge_TooClose], tolerance);
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(externalEdge, [internalEdge_JustInside, internalEdge_TooClose], tolerance);
             Assert.NotNull(polygonalFace2D);
 
             List<IPolygonal2D>? internalEdges = polygonalFace2D.InternalEdges;
@@ -84,10 +84,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_Create_Points()
         {
-            Assert.Null(Planar.Create.PolygonalFace2D((Point2D[]?)null));
-            Assert.Null(Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0)));
+            Assert.Null(Create.PolygonalFace2D((Point2D[]?)null));
+            Assert.Null(Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0)));
 
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(0, 3));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(0, 3));
             Assert.NotNull(polygonalFace2D);
             Assert.Equal(6.0, polygonalFace2D.GetArea(), 3);
             Assert.Null(polygonalFace2D.InternalEdges);
@@ -112,16 +112,16 @@ namespace DiGi.Geometry.xUnit
 
             List<Segment2D> segment2Ds = Square(0, 0, 10);
 
-            Assert.Null(Planar.Create.PolygonalFace2Ds(segment2Ds.GetRange(0, 2)));
+            Assert.Null(Create.PolygonalFace2Ds(segment2Ds.GetRange(0, 2)));
 
-            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(segment2Ds);
+            List<PolygonalFace2D>? polygonalFace2Ds = Create.PolygonalFace2Ds(segment2Ds);
             Assert.NotNull(polygonalFace2Ds);
             Assert.Single(polygonalFace2Ds);
             Assert.Equal(100.0, polygonalFace2Ds[0].GetArea(), 3);
 
             segment2Ds.AddRange(Square(3, 3, 4));
 
-            polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(segment2Ds);
+            polygonalFace2Ds = Create.PolygonalFace2Ds(segment2Ds);
             Assert.NotNull(polygonalFace2Ds);
             Assert.Equal(2, polygonalFace2Ds.Count);
             Assert.Equal(100.0, polygonalFace2Ds.Sum(x => x.GetArea()), 3);
@@ -138,20 +138,20 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2Ds_Polygonal2Ds()
         {
-            Assert.Null(Planar.Create.PolygonalFace2Ds((IEnumerable<IPolygonal2D>?)null));
+            Assert.Null(Create.PolygonalFace2Ds((IEnumerable<IPolygonal2D>?)null));
 
             Polygon2D polygon2D_1 = new([new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4)]);
             Polygon2D polygon2D_2 = new([new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6)]);
 
             List<IPolygonal2D> polygonal2Ds = [polygon2D_1, polygon2D_2];
 
-            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(polygonal2Ds);
+            List<PolygonalFace2D>? polygonalFace2Ds = Create.PolygonalFace2Ds(polygonal2Ds);
             Assert.NotNull(polygonalFace2Ds);
 
-            List<Segment2D>? segment2Ds = Planar.Query.Segments(polygonal2Ds);
+            List<Segment2D>? segment2Ds = Query.Segments(polygonal2Ds);
             Assert.NotNull(segment2Ds);
 
-            List<PolygonalFace2D>? polygonalFace2Ds_Segments = Planar.Create.PolygonalFace2Ds(segment2Ds);
+            List<PolygonalFace2D>? polygonalFace2Ds_Segments = Create.PolygonalFace2Ds(segment2Ds);
             Assert.NotNull(polygonalFace2Ds_Segments);
 
             Assert.Equal(polygonalFace2Ds_Segments.Count, polygonalFace2Ds.Count);
@@ -178,7 +178,7 @@ namespace DiGi.Geometry.xUnit
             Polygon2D externalEdge = new([new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10)]);
             Polygon2D internalEdge = new([new Point2D(2, 2), new Point2D(4, 2), new Point2D(4, 4), new Point2D(2, 4)]);
 
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(externalEdge, [internalEdge]);
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(externalEdge, [internalEdge]);
             Assert.NotNull(polygonalFace2D);
 
             Assert.NotNull(polygonalFace2D.ExternalEdge);
@@ -219,10 +219,10 @@ namespace DiGi.Geometry.xUnit
             }
 
             // Warm up / JIT compile
-            _ = Planar.Create.PolygonalFace2D(Square(0, 0, 10), [Square(2, 2, 1)]);
+            _ = Create.PolygonalFace2D(Square(0, 0, 10), [Square(2, 2, 1)]);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(externalEdge, internalEdges);
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(externalEdge, internalEdges);
             stopwatch.Stop();
 
             Assert.NotNull(polygonalFace2D);
@@ -245,7 +245,7 @@ namespace DiGi.Geometry.xUnit
             }
 
             stopwatch.Restart();
-            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(polygonal2Ds);
+            List<PolygonalFace2D>? polygonalFace2Ds = Create.PolygonalFace2Ds(polygonal2Ds);
             stopwatch.Stop();
 
             Assert.NotNull(polygonalFace2Ds);

@@ -12,7 +12,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         [SkippableFact]
         public async Task PartitionPullAsyncCheck()
         {
-            if (!PostgreSQL.xUnit.Create.IsAvailable(DiGi.PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
             {
                 return;
             }

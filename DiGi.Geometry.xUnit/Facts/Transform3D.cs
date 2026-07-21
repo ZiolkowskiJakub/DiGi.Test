@@ -17,13 +17,13 @@ namespace DiGi.Geometry.xUnit
             DiGi.Geometry.Spatial.Classes.Vector3D vector3D_AxisY = new(0.0, 1.0, 0.0);
             DiGi.Geometry.Spatial.Classes.Vector3D vector3D_AxisZ = new(0.0, 0.0, 1.0);
 
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotX = Spatial.Create.Transform3D.Rotation(vector3D_AxisX, angle);
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotY = Spatial.Create.Transform3D.Rotation(vector3D_AxisY, angle);
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotZ = Spatial.Create.Transform3D.Rotation(vector3D_AxisZ, angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotX = Create.Transform3D.Rotation(vector3D_AxisX, angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotY = Create.Transform3D.Rotation(vector3D_AxisY, angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotZ = Create.Transform3D.Rotation(vector3D_AxisZ, angle);
 
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_SpecX = Spatial.Create.Transform3D.RotationX(angle);
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_SpecY = Spatial.Create.Transform3D.RotationY(angle);
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_SpecZ = Spatial.Create.Transform3D.RotationZ(angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_SpecX = Create.Transform3D.RotationX(angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_SpecY = Create.Transform3D.RotationY(angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_SpecZ = Create.Transform3D.RotationZ(angle);
 
             Assert.NotNull(transform3D_RotX);
             Assert.NotNull(transform3D_RotY);
@@ -50,7 +50,7 @@ namespace DiGi.Geometry.xUnit
             // 3. Verify rotation around diagonal axis (1, 1, 1) by 120 degrees permutes coordinates
             DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Diag = new(1.0, 1.0, 1.0);
             double angle120 = 2.0 * System.Math.PI / 3.0;
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotDiag = Spatial.Create.Transform3D.Rotation(vector3D_Diag, angle120);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotDiag = Create.Transform3D.Rotation(vector3D_Diag, angle120);
             Assert.NotNull(transform3D_RotDiag);
 
             DiGi.Geometry.Spatial.Classes.Point3D point3D_2 = new(1.0, 0.0, 0.0);
@@ -64,7 +64,7 @@ namespace DiGi.Geometry.xUnit
             // 4. Verify rotation around a custom origin point
             // Rotate (2, 0, 0) around origin (1, 0, 0) and Z-axis by 90 degrees -> should be (1, 1, 0)
             DiGi.Geometry.Spatial.Classes.Point3D point3D_Origin = new(1.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotAroundPt = Spatial.Create.Transform3D.Rotation(point3D_Origin, vector3D_AxisZ, angle);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_RotAroundPt = Create.Transform3D.Rotation(point3D_Origin, vector3D_AxisZ, angle);
             Assert.NotNull(transform3D_RotAroundPt);
 
             DiGi.Geometry.Spatial.Classes.Point3D point3D_3 = new(2.0, 0.0, 0.0);
@@ -87,7 +87,7 @@ namespace DiGi.Geometry.xUnit
         {
             // 1. Test Vector3D.Transform (translation should be ignored)
             DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Orig = new(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_Translation = Spatial.Create.Transform3D.Translation(10.0, 20.0, 30.0);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_Translation = Create.Transform3D.Translation(10.0, 20.0, 30.0);
             bool bool_SuccessVec = vector3D_Orig.Transform(transform3D_Translation);
 
             Assert.True(bool_SuccessVec);
@@ -105,8 +105,8 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(33.0, point3D_Orig.Z, 9);
 
             // 3. Test TRS Decomposition
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Scale = Spatial.Create.Transform3D.Scale(2.0, 3.0, 4.0);
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Rotation = Spatial.Create.Transform3D.RotationX(System.Math.PI / 4.0);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Scale = Create.Transform3D.Scale(2.0, 3.0, 4.0);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Rotation = Create.Transform3D.RotationX(System.Math.PI / 4.0);
             DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_Combined = transform3D_Translation * transform3D_Rotation * transform3D_Scale;
 
             Assert.NotNull(transform3D_Combined);
@@ -143,8 +143,8 @@ namespace DiGi.Geometry.xUnit
             double pitch = System.Math.PI / 4.0; // 45 deg
             double roll = System.Math.PI / 3.0;  // 60 deg
 
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_YPR = Spatial.Create.Transform3D.RotationYawPitchRoll(yaw, pitch, roll);
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_ManualYPR = Spatial.Create.Transform3D.RotationZ(yaw) * Spatial.Create.Transform3D.RotationY(pitch) * Spatial.Create.Transform3D.RotationX(roll);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_YPR = Create.Transform3D.RotationYawPitchRoll(yaw, pitch, roll);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_ManualYPR = Create.Transform3D.RotationZ(yaw) * Create.Transform3D.RotationY(pitch) * Create.Transform3D.RotationX(roll);
 
             Assert.NotNull(transform3D_ManualYPR);
 
@@ -157,7 +157,7 @@ namespace DiGi.Geometry.xUnit
             }
 
             // 5. Test ShearXY
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Shear = Spatial.Create.Transform3D.ShearXY(2.0, 3.0);
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Shear = Create.Transform3D.ShearXY(2.0, 3.0);
             DiGi.Geometry.Spatial.Classes.Point3D point3D_ShearTest1 = new(0.0, 0.0, 1.0);
             bool bool_SuccessShear1 = point3D_ShearTest1.Transform(transform3D_Shear);
 

@@ -20,13 +20,13 @@ namespace DiGi.Core.xUnit
         {
             TestUniqueIdObject testUniqueIdObject = new("Alpha");
 
-            UniqueReference? uniqueReference_Object = Core.Create.UniqueReference(testUniqueIdObject);
+            UniqueReference? uniqueReference_Object = Create.UniqueReference(testUniqueIdObject);
             Assert.NotNull(uniqueReference_Object);
 
             JsonObject? jsonObject = testUniqueIdObject.ToJsonObject();
             Assert.NotNull(jsonObject);
 
-            UniqueReference? uniqueReference_JsonObject = Core.Create.UniqueReference(jsonObject);
+            UniqueReference? uniqueReference_JsonObject = Create.UniqueReference(jsonObject);
             Assert.NotNull(uniqueReference_JsonObject);
 
             Assert.IsType<UniqueIdReference>(uniqueReference_Object);
@@ -50,13 +50,13 @@ namespace DiGi.Core.xUnit
         {
             TestObject testObject = new("Beta");
 
-            UniqueReference? uniqueReference_Object = Core.Create.UniqueReference(testObject);
+            UniqueReference? uniqueReference_Object = Create.UniqueReference(testObject);
             Assert.NotNull(uniqueReference_Object);
 
             JsonObject? jsonObject = testObject.ToJsonObject();
             Assert.NotNull(jsonObject);
 
-            UniqueReference? uniqueReference_JsonObject = Core.Create.UniqueReference(jsonObject);
+            UniqueReference? uniqueReference_JsonObject = Create.UniqueReference(jsonObject);
             Assert.NotNull(uniqueReference_JsonObject);
 
             Assert.IsType<GuidReference>(uniqueReference_Object);

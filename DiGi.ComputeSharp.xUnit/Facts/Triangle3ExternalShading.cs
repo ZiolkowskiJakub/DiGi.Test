@@ -56,7 +56,7 @@ namespace DiGi.ComputeSharp.xUnit
 
                 graphicsDevice.For(count, count_External, new Triangle3ExternalShadingComputeShader(trianglesBuffer, externalBuffer, resultBuffer, vector, tolerance));
 
-                List<Triangle3Intersection>? results = DiGi.ComputeSharp.Core.Create.List(resultBuffer);
+                List<Triangle3Intersection>? results = Core.Create.List(resultBuffer);
                 Assert.NotNull(results);
                 Assert.Equal(count * count_External, results!.Count);
 

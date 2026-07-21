@@ -1,11 +1,9 @@
 using DiGi.Analytical.Building.Classes;
-using DiGi.Analytical.Building.Interfaces;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Core.Parameter.Classes;
 using DiGi.GIS.Analytical.Enums;
 using DiGi.GIS.Classes;
-using System;
 
 namespace DiGi.GIS.PostgreSQL.xUnit
 {
@@ -25,13 +23,13 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             int countyId = 42;
 
-            IReference? reference = PostgreSQL.Create.Reference(buildingModel, buildingGuidObject, countyId);
+            IReference? reference = Create.Reference(buildingModel, buildingGuidObject, countyId);
             Assert.NotNull(reference);
 
             string? referenceString = reference.ToString();
             Assert.True(!string.IsNullOrWhiteSpace(referenceString));
 
-            Assert.True(PostgreSQL.Query.TryParse(referenceString!, out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
+            Assert.True(Query.TryParse(referenceString!, out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
 
             Assert.Equal("MODEL_001", buildingModelReference);
             Assert.Equal(countyId, countyId_Parsed);
@@ -53,7 +51,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             int countyId = 42;
 
-            IReference? reference = PostgreSQL.Create.Reference(buildingModel, buildingGuidObject, countyId);
+            IReference? reference = Create.Reference(buildingModel, buildingGuidObject, countyId);
             ComplexReference complexReference = Assert.IsType<ComplexReference>(reference);
 
             Assert.Equal(3, complexReference.Count);
@@ -80,13 +78,13 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel buildingModel = new();
             buildingModel.SetValue(BuildingModelParameter.Reference, "MODEL_ABC", new SetValueSettings(true, false));
 
-            IReference? reference = PostgreSQL.Create.Reference(buildingModel);
+            IReference? reference = Create.Reference(buildingModel);
             Assert.NotNull(reference);
 
             string? referenceString = reference.ToString();
             Assert.True(!string.IsNullOrWhiteSpace(referenceString));
 
-            Assert.True(PostgreSQL.Query.TryParse(referenceString!, out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
+            Assert.True(Query.TryParse(referenceString!, out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
 
             Assert.Equal("MODEL_ABC", buildingModelReference);
             Assert.Null(countyId_Parsed);
@@ -102,7 +100,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void TryParse_UnparseableString()
         {
-            Assert.True(PostgreSQL.Query.TryParse("PLAIN_STRING_NOT_A_REFERENCE", out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
+            Assert.True(Query.TryParse("PLAIN_STRING_NOT_A_REFERENCE", out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
 
             Assert.Equal("PLAIN_STRING_NOT_A_REFERENCE", buildingModelReference);
             Assert.Null(countyId_Parsed);
@@ -118,7 +116,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void TryParse_PlainBuildingReference()
         {
-            Assert.True(PostgreSQL.Query.TryParse("141201_2.0001.1234/5.BUD", out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
+            Assert.True(Query.TryParse("141201_2.0001.1234/5.BUD", out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
 
             Assert.Equal("141201_2.0001.1234/5.BUD", buildingModelReference);
             Assert.Null(countyId_Parsed);
@@ -131,17 +129,17 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void TryParse_NullOrEmpty()
         {
-            Assert.False(PostgreSQL.Query.TryParse(null, out string buildingModelReference_1, out int? countyId_1, out GuidReference? buildingObjectGuidReference_1));
+            Assert.False(Query.TryParse(null, out string buildingModelReference_1, out int? countyId_1, out GuidReference? buildingObjectGuidReference_1));
             Assert.Equal(string.Empty, buildingModelReference_1);
             Assert.Null(countyId_1);
             Assert.Null(buildingObjectGuidReference_1);
 
-            Assert.False(PostgreSQL.Query.TryParse(string.Empty, out string buildingModelReference_2, out int? countyId_2, out GuidReference? buildingObjectGuidReference_2));
+            Assert.False(Query.TryParse(string.Empty, out string buildingModelReference_2, out int? countyId_2, out GuidReference? buildingObjectGuidReference_2));
             Assert.Equal(string.Empty, buildingModelReference_2);
             Assert.Null(countyId_2);
             Assert.Null(buildingObjectGuidReference_2);
 
-            Assert.False(PostgreSQL.Query.TryParse("   ", out string buildingModelReference_3, out int? countyId_3, out GuidReference? buildingObjectGuidReference_3));
+            Assert.False(Query.TryParse("   ", out string buildingModelReference_3, out int? countyId_3, out GuidReference? buildingObjectGuidReference_3));
             Assert.Equal(string.Empty, buildingModelReference_3);
             Assert.Null(countyId_3);
             Assert.Null(buildingObjectGuidReference_3);
@@ -154,7 +152,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         public void Reference_NullBuildingModel()
         {
             BuildingModel? buildingModel = null;
-            Assert.Null(PostgreSQL.Create.Reference(buildingModel!));
+            Assert.Null(Create.Reference(buildingModel!));
         }
 
         /// <summary>
@@ -166,7 +164,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel buildingModel = new();
             buildingModel.SetValue(BuildingModelParameter.Reference, "TOSTRING_MODEL", new SetValueSettings(true, false));
 
-            IReference? reference = PostgreSQL.Create.Reference(buildingModel);
+            IReference? reference = Create.Reference(buildingModel);
             Assert.NotNull(reference);
 
             string? referenceString = reference.ToString();
@@ -186,11 +184,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             BuildingModel buildingGuidObject = new();
 
-            IReference? reference = PostgreSQL.Create.Reference(buildingModel, buildingGuidObject, 7);
+            IReference? reference = Create.Reference(buildingModel, buildingGuidObject, 7);
             Assert.NotNull(reference);
             Assert.IsType<ComplexReference>(reference);
 
-            Assert.True(PostgreSQL.Query.TryParse(reference.ToString(), out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
+            Assert.True(Query.TryParse(reference.ToString(), out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
 
             Assert.Equal("COMPLEX_MODEL", buildingModelReference);
             Assert.Equal(7, countyId_Parsed);
@@ -208,10 +206,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel buildingModel = new();
             buildingModel.SetValue(BuildingModelParameter.Reference, "SIMPLE_MODEL", new SetValueSettings(true, false));
 
-            IReference? reference = PostgreSQL.Create.Reference(buildingModel);
+            IReference? reference = Create.Reference(buildingModel);
             Assert.NotNull(reference);
 
-            Assert.True(PostgreSQL.Query.TryParse(reference.ToString(), out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
+            Assert.True(Query.TryParse(reference.ToString(), out string buildingModelReference, out int? countyId_Parsed, out GuidReference? buildingObjectGuidReference));
 
             Assert.Equal("SIMPLE_MODEL", buildingModelReference);
             Assert.Null(countyId_Parsed);

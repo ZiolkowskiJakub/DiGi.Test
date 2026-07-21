@@ -2,8 +2,6 @@ using DiGi.Core.Interfaces;
 using DiGi.Geometry.Core.Enums;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
-using System.Collections.Generic;
-using System.Text.Json.Nodes;
 
 namespace DiGi.Geometry.xUnit
 {

@@ -21,10 +21,10 @@ namespace DiGi.Geometry.xUnit
             point3Ds.Add(new Point3D(10, 10.000001, 10));
             point3Ds.Add(new Point3D(1, 1, 1));
 
-            DensityBasedSpatialClusteringResult<Point3D>? densityBasedSpatialClusteringResult = DiGi.Geometry.Core.Create.DensityBasedSpatialClusteringResult(point3Ds, 0.001, 1);
+            DensityBasedSpatialClusteringResult<Point3D>? densityBasedSpatialClusteringResult = Core.Create.DensityBasedSpatialClusteringResult(point3Ds, 0.001, 1);
             Assert.NotNull(densityBasedSpatialClusteringResult);
 
-            Point3D? point3D = densityBasedSpatialClusteringResult.GetPoint(1, points => DiGi.Geometry.Spatial.Query.Average(points)!);
+            Point3D? point3D = densityBasedSpatialClusteringResult.GetPoint(1, points => Spatial.Query.Average(points)!);
             Assert.NotNull(point3D);
 
             // Serialization can be verified to compile and serialize, but deserialization round-trip is bypassed

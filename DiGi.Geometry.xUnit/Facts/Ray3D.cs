@@ -59,8 +59,8 @@ namespace DiGi.Geometry.xUnit
             DiGi.Geometry.Spatial.Classes.Ray3D ray3D_Target = new(point3D_Origin, vector3D_Direction);
 
             // 1. Test Transform method with Translation and Rotation (90 deg around X-axis)
-            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_Translation = DiGi.Geometry.Spatial.Create.Transform3D.Translation(new DiGi.Geometry.Spatial.Classes.Vector3D(1.0, 2.0, 3.0));
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Rotation = DiGi.Geometry.Spatial.Create.Transform3D.RotationX(System.Math.PI / 2.0);
+            DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_Translation = Spatial.Create.Transform3D.Translation(new DiGi.Geometry.Spatial.Classes.Vector3D(1.0, 2.0, 3.0));
+            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Rotation = Spatial.Create.Transform3D.RotationX(System.Math.PI / 2.0);
             DiGi.Geometry.Spatial.Classes.Transform3D? transform3D_Combined = transform3D_Translation * transform3D_Rotation;
             Assert.NotNull(transform3D_Combined);
 

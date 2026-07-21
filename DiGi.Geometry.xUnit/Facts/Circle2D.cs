@@ -109,7 +109,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Target.Radius, 9);
 
             // 2. Test Transform method with Translation
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = DiGi.Geometry.Planar.Create.Transform2D.Translation(-10.0, 10.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(-10.0, 10.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = circle2D_Target.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);
@@ -119,7 +119,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Target.Radius, 9);
 
             // 3. Test Transform method with Scaling
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = DiGi.Geometry.Planar.Create.Transform2D.Scale(2.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0);
             Assert.NotNull(transform2D_Scale);
             bool bool_ScaleResult = circle2D_Target.Transform(transform2D_Scale);
             Assert.True(bool_ScaleResult);

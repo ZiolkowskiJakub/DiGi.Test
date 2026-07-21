@@ -17,7 +17,7 @@ namespace DiGi.Geometry.xUnit
             // 1. Verify generic Distance<T> with out parameter populates closestPoint2D correctly
             System.Collections.Generic.List<DiGi.Geometry.Planar.Classes.Rectangle2D> list_Shapes = [rectangle2D_Shape];
             DiGi.Geometry.Planar.Classes.Point2D? point2D_Closest;
-            double double_Distance = DiGi.Geometry.Planar.Query.Distance(point2D_Target, list_Shapes, out point2D_Closest);
+            double double_Distance = Planar.Query.Distance(point2D_Target, list_Shapes, out point2D_Closest);
 
             Assert.Equal(10.0, double_Distance, 9);
             Assert.NotNull(point2D_Closest);
@@ -29,7 +29,7 @@ namespace DiGi.Geometry.xUnit
 
             // 2. Verify generic ClosestPoint<T> with out parameter populates distance correctly
             double double_ClosestDistance;
-            DiGi.Geometry.Planar.Classes.Point2D? point2D_ClosestPoint = DiGi.Geometry.Planar.Query.ClosestPoint(point2D_Target, list_Shapes, out double_ClosestDistance);
+            DiGi.Geometry.Planar.Classes.Point2D? point2D_ClosestPoint = Planar.Query.ClosestPoint(point2D_Target, list_Shapes, out double_ClosestDistance);
 
             Assert.NotNull(point2D_ClosestPoint);
             Assert.Equal(10.0, double_ClosestDistance, 9);
@@ -49,7 +49,7 @@ namespace DiGi.Geometry.xUnit
             DiGi.Geometry.Planar.Classes.Point2D? point2D_ClosestOnBox;
 
             // Distance between Rectangle2D [0,10]x[0,10] and BoundingBox2D [20,30]x[0,10]
-            double double_BoxDistance = DiGi.Geometry.Planar.Query.Distance(
+            double double_BoxDistance = Planar.Query.Distance(
                 rectangle2D_Shape,
                 boundingBox2D_Box,
                 out point2D_ClosestOnSegmentable,

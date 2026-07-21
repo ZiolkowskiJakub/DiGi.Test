@@ -129,7 +129,7 @@ namespace DiGi.Core.xUnit
             Query.SerializationCheck(value_Type);
 
             // ISerializableObject constructor
-            Address address_Val = new("street", "city", "postal", Core.Enums.CountryCode.PL);
+            Address address_Val = new("street", "city", "postal", Enums.CountryCode.PL);
             Value value_Serializable = new(address_Val);
             Assert.Equal(typeof(Address), value_Serializable.ValueType);
             Assert.Equal(address_Val, value_Serializable.GetValue<Address>());

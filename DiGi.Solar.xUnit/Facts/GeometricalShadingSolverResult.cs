@@ -14,7 +14,7 @@ namespace DiGi.Solar.xUnit
         public void GeometricalShadingSolverResult()
         {
             DateTime dateTime = new(2026, 6, 26, 12, 0, 0);
-            Plane plane = DiGi.Geometry.Spatial.Constants.Plane.WorldZ;
+            Plane plane = Geometry.Spatial.Constants.Plane.WorldZ;
 
             List<IPolygonalFace2D> polygonalFace2Ds = [null!];
 

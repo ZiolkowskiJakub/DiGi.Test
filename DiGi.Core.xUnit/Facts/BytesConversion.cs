@@ -1,4 +1,4 @@
-﻿using DiGi.Core.Classes;
+using DiGi.Core.Classes;
 using System.Linq;
 
 namespace DiGi.Core.xUnit
@@ -11,7 +11,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void BytesConversion()
         {
-            Address address_1 = new("Street", "City", "00-000", Core.Enums.CountryCode.PL);
+            Address address_1 = new("Street", "City", "00-000", Enums.CountryCode.PL);
 
             byte[]? bytes = Convert.ToSystem_Bytes(address_1);
             Assert.NotNull(bytes);

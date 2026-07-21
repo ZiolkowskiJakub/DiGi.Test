@@ -90,7 +90,7 @@ namespace DiGi.Communication.xUnit
         [Fact]
         public void ToPropagation_PropagationModel_TypicalUrban()
         {
-            SimpleMultipathPowerDelayProfile? simpleMultipathPowerDelayProfile = Create.SimpleMultipathPowerDelayProfile(Enums.DefaultSimpleMultipathPowerDelayProfile.TypicalUrban);
+            SimpleMultipathPowerDelayProfile? simpleMultipathPowerDelayProfile = Create.SimpleMultipathPowerDelayProfile(DefaultSimpleMultipathPowerDelayProfile.TypicalUrban);
             Assert.NotNull(simpleMultipathPowerDelayProfile);
 
             HashSet<double>? delays = simpleMultipathPowerDelayProfile.Delays;

@@ -18,10 +18,10 @@ namespace DiGi.Solar.xUnit
             Coordinates coordinates = new(50.0, 20.0);
             ShadingModel shadingModel = new(Core.Enums.UTC.Plus0100, coordinates);
 
-            Plane plane_WorldZ = DiGi.Geometry.Spatial.Constants.Plane.WorldZ;
+            Plane plane_WorldZ = Geometry.Spatial.Constants.Plane.WorldZ;
             List<Point3D> point3Ds = [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(10, 10, 0), new Point3D(0, 10, 0)];
             Polygon3D polygon3D_ExternalEdge = new(plane_WorldZ, point3Ds.ConvertAll(plane_WorldZ.Convert)!);
-            IPolygonalFace3D? polygonalFace3D = DiGi.Geometry.Spatial.Create.PolygonalFace3D(polygon3D_ExternalEdge, []);
+            IPolygonalFace3D? polygonalFace3D = Create.PolygonalFace3D(polygon3D_ExternalEdge, []);
             Assert.NotNull(polygonalFace3D);
 
             ShadingElement shadingElement = new(polygonalFace3D, false);

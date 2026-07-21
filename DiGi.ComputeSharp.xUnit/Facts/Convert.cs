@@ -17,7 +17,7 @@ namespace DiGi.ComputeSharp.xUnit
         {
             Coordinate3 coordinate3 = new(2, 3, 5);
 
-            Vector3D? vector3D = DiGi.ComputeSharp.Geometry.Spatial.Convert.ToDiGi_Vector3D(coordinate3);
+            Vector3D? vector3D = Geometry.Spatial.Convert.ToDiGi_Vector3D(coordinate3);
 
             Assert.NotNull(vector3D);
             Assert.Equal(2.0, vector3D!.X, 1e-9);
@@ -33,7 +33,7 @@ namespace DiGi.ComputeSharp.xUnit
         {
             Coordinate3 coordinate3 = new(2, 3, 5);
 
-            Point3D? point3D = DiGi.ComputeSharp.Geometry.Spatial.Convert.ToDiGi(coordinate3);
+            Point3D? point3D = Geometry.Spatial.Convert.ToDiGi(coordinate3);
 
             Assert.NotNull(point3D);
             Assert.Equal(2.0, point3D!.X, 1e-9);

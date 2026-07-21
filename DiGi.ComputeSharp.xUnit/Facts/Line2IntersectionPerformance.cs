@@ -2,7 +2,6 @@ using ComputeSharp;
 using DiGi.ComputeSharp.Planar.Classes;
 using DiGi.Geometry.Planar.Classes;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace DiGi.ComputeSharp.xUnit
 {
@@ -68,7 +67,7 @@ namespace DiGi.ComputeSharp.xUnit
                 using GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
 
                 // Warm-up: force HLSL compilation / JIT on a small batch so it is excluded from the measured runs.
-                int warmUpCount = System.Math.Min(256, maxCount);
+                int warmUpCount = Math.Min(256, maxCount);
                 RunGpu(graphicsDevice, reference_Line2, line2s_All, warmUpCount, tolerance);
                 RunNative(reference_Segment2D, segment2Ds_All, warmUpCount, tolerance);
                 RunNativeParallel(reference_Segment2D, segment2Ds_All, warmUpCount, tolerance);
@@ -206,7 +205,7 @@ namespace DiGi.ComputeSharp.xUnit
                 }
 
                 return localHits;
-            }, localHits => System.Threading.Interlocked.Add(ref hits, localHits));
+            }, localHits => Interlocked.Add(ref hits, localHits));
 
             return hits;
         }

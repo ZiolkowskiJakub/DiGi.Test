@@ -306,9 +306,9 @@ namespace DiGi.Math.xUnit
             Assert.IsType<Matrix2D>(squareMatrix);
 
             // Serialization checks
-            DiGi.Core.xUnit.Query.SerializationCheck(matrix2D_A);
-            DiGi.Core.xUnit.Query.SerializationCheck(matrix3D_A);
-            DiGi.Core.xUnit.Query.SerializationCheck(matrix4D_A);
+            Core.xUnit.Query.SerializationCheck(matrix2D_A);
+            Core.xUnit.Query.SerializationCheck(matrix3D_A);
+            Core.xUnit.Query.SerializationCheck(matrix4D_A);
         }
 
         /// <summary>
@@ -321,13 +321,13 @@ namespace DiGi.Math.xUnit
             Matrix matrix = new(values);
 
             // To MathNet
-            MathNet.Numerics.LinearAlgebra.Matrix<double>? mathNetMatrix = DiGi.Math.Convert.ToMathNet(matrix);
+            MathNet.Numerics.LinearAlgebra.Matrix<double>? mathNetMatrix = Convert.ToMathNet(matrix);
             Assert.NotNull(mathNetMatrix);
             Assert.Equal(1.0, mathNetMatrix[0, 0]);
             Assert.Equal(4.0, mathNetMatrix[1, 1]);
 
             // From MathNet
-            Matrix? matrix_Back = DiGi.Math.Convert.ToDiGi(mathNetMatrix);
+            Matrix? matrix_Back = Convert.ToDiGi(mathNetMatrix);
             Assert.NotNull(matrix_Back);
             Assert.Equal(2, matrix_Back.RowCount());
             Assert.Equal(2, matrix_Back.ColumnCount());

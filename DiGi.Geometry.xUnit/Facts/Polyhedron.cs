@@ -221,7 +221,7 @@ namespace DiGi.Geometry.xUnit
             _ = polyhedron_Complex.IsClosed();
 
             // Measure execution time.
-            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            System.Diagnostics.Stopwatch stopwatch = Stopwatch.StartNew();
             bool bool_IsClosed = polyhedron_Complex.IsClosed();
             stopwatch.Stop();
 

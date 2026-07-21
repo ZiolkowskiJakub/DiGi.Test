@@ -12,24 +12,24 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void BooleanOpertaionType_BooleanOperationResult2D_Dispatch()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            BooleanOperationResult2D? booleanOperationResult2D_Intersection = Planar.Create.BooleanOperationResult2D(BooleanOpertaionType.Intersection, polygonalFace2D_1, polygonalFace2D_2);
+            BooleanOperationResult2D? booleanOperationResult2D_Intersection = Create.BooleanOperationResult2D(BooleanOpertaionType.Intersection, polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(booleanOperationResult2D_Intersection);
             Assert.IsType<IntersectionResult2D>(booleanOperationResult2D_Intersection);
             Assert.Equal(BooleanOpertaionType.Intersection, booleanOperationResult2D_Intersection.BooleanOpertaionType);
             Assert.Equal(4.0, booleanOperationResult2D_Intersection.GetGeometry2Ds<PolygonalFace2D>()!.Sum(x => x.GetArea()), 3);
 
-            BooleanOperationResult2D? booleanOperationResult2D_Difference = Planar.Create.BooleanOperationResult2D(BooleanOpertaionType.Difference, polygonalFace2D_1, polygonalFace2D_2);
+            BooleanOperationResult2D? booleanOperationResult2D_Difference = Create.BooleanOperationResult2D(BooleanOpertaionType.Difference, polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(booleanOperationResult2D_Difference);
             Assert.IsType<DifferenceResult2D>(booleanOperationResult2D_Difference);
             Assert.Equal(BooleanOpertaionType.Difference, booleanOperationResult2D_Difference.BooleanOpertaionType);
             Assert.Equal(12.0, booleanOperationResult2D_Difference.GetGeometry2Ds<PolygonalFace2D>()!.Sum(x => x.GetArea()), 3);
 
-            BooleanOperationResult2D? booleanOperationResult2D_Union = Planar.Create.BooleanOperationResult2D(BooleanOpertaionType.Union, polygonalFace2D_1, polygonalFace2D_2);
+            BooleanOperationResult2D? booleanOperationResult2D_Union = Create.BooleanOperationResult2D(BooleanOpertaionType.Union, polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(booleanOperationResult2D_Union);
             Assert.IsType<UnionResult2D>(booleanOperationResult2D_Union);
             Assert.Equal(BooleanOpertaionType.Union, booleanOperationResult2D_Union.BooleanOpertaionType);
@@ -42,12 +42,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_IntersectionResult2D_EdgeTouch_Segment()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            IntersectionResult2D? intersectionResult2D = Planar.Create.IntersectionResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            IntersectionResult2D? intersectionResult2D = Create.IntersectionResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(intersectionResult2D);
             Assert.True(intersectionResult2D.Any());
             Assert.False(intersectionResult2D.Contains<PolygonalFace2D>());
@@ -65,12 +65,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_IntersectionResult2D_CornerTouch_Point()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(4, 2), new Point2D(4, 4), new Point2D(2, 4));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(4, 2), new Point2D(4, 4), new Point2D(2, 4));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            IntersectionResult2D? intersectionResult2D = Planar.Create.IntersectionResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            IntersectionResult2D? intersectionResult2D = Create.IntersectionResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(intersectionResult2D);
             Assert.True(intersectionResult2D.Any());
             Assert.False(intersectionResult2D.Contains<PolygonalFace2D>());
@@ -89,7 +89,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void BooleanOperationResult2D_DefensiveCloning()
         {
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D);
 
             UnionResult2D unionResult2D = new(polygonalFace2D);
@@ -111,31 +111,31 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_Query_BooleanOperations_Consistency()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
-            PolygonalFace2D? polygonalFace2D_Far = Planar.Create.PolygonalFace2D(new Point2D(100, 100), new Point2D(102, 100), new Point2D(102, 102), new Point2D(100, 102));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
+            PolygonalFace2D? polygonalFace2D_Far = Create.PolygonalFace2D(new Point2D(100, 100), new Point2D(102, 100), new Point2D(102, 102), new Point2D(100, 102));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
             Assert.NotNull(polygonalFace2D_Far);
 
-            List<PolygonalFace2D>? polygonalFace2Ds_Union = Planar.Query.Union(polygonalFace2D_1, polygonalFace2D_2);
+            List<PolygonalFace2D>? polygonalFace2Ds_Union = Query.Union(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(polygonalFace2Ds_Union);
             Assert.Single(polygonalFace2Ds_Union);
             Assert.Equal(28.0, polygonalFace2Ds_Union[0].GetArea(), 3);
 
-            List<PolygonalFace2D>? polygonalFace2Ds_UnionDisjoint = Planar.Query.Union(polygonalFace2D_1, polygonalFace2D_Far);
+            List<PolygonalFace2D>? polygonalFace2Ds_UnionDisjoint = Query.Union(polygonalFace2D_1, polygonalFace2D_Far);
             Assert.NotNull(polygonalFace2Ds_UnionDisjoint);
             Assert.Equal(2, polygonalFace2Ds_UnionDisjoint.Count);
 
-            List<PolygonalFace2D>? polygonalFace2Ds_Difference = Planar.Query.Difference(polygonalFace2D_1, polygonalFace2D_2);
+            List<PolygonalFace2D>? polygonalFace2Ds_Difference = Query.Difference(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(polygonalFace2Ds_Difference);
             Assert.Equal(12.0, polygonalFace2Ds_Difference.Sum(x => x.GetArea()), 3);
 
-            List<PolygonalFace2D>? polygonalFace2Ds_DifferenceEqual = Planar.Query.Difference(polygonalFace2D_1, polygonalFace2D_1);
+            List<PolygonalFace2D>? polygonalFace2Ds_DifferenceEqual = Query.Difference(polygonalFace2D_1, polygonalFace2D_1);
             Assert.NotNull(polygonalFace2Ds_DifferenceEqual);
             Assert.Empty(polygonalFace2Ds_DifferenceEqual);
 
-            List<PolygonalFace2D>? polygonalFace2Ds_DifferenceDisjoint = Planar.Query.Difference(polygonalFace2D_1, polygonalFace2D_Far);
+            List<PolygonalFace2D>? polygonalFace2Ds_DifferenceDisjoint = Query.Difference(polygonalFace2D_1, polygonalFace2D_Far);
             Assert.NotNull(polygonalFace2Ds_DifferenceDisjoint);
             Assert.Single(polygonalFace2Ds_DifferenceDisjoint);
             Assert.Equal(16.0, polygonalFace2Ds_DifferenceDisjoint[0].GetArea(), 3);

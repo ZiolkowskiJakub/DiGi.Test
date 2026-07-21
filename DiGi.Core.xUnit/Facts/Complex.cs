@@ -5,7 +5,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void Complex()
         {
-            ComplexObject complexObject = new (new System.Numerics.Complex(1, 2));
+            ComplexObject complexObject = new(new System.Numerics.Complex(1, 2));
 
             Query.SerializationCheck(complexObject);
         }

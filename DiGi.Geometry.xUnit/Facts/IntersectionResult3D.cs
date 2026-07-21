@@ -228,7 +228,6 @@ namespace DiGi.Geometry.xUnit
                     Assert.Equal(64.0, bbox.GetVolume(), 5);
                 }
             }
-
         }
 
         /// <summary>

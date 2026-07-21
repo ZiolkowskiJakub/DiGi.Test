@@ -1,6 +1,5 @@
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
-using System;
 
 namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
 {

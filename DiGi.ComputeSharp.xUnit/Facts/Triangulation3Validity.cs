@@ -29,7 +29,7 @@ namespace DiGi.ComputeSharp.xUnit
             double cy = (uz * vx) - (ux * vz);
             double cz = (ux * vy) - (uy * vx);
 
-            return 0.5 * System.Math.Sqrt((cx * cx) + (cy * cy) + (cz * cz));
+            return 0.5 * Math.Sqrt((cx * cx) + (cy * cy) + (cz * cz));
         }
 
         private static List<Triangle3> Triangulation_SubTriangles(Triangulation3 triangulation)
@@ -79,8 +79,8 @@ namespace DiGi.ComputeSharp.xUnit
             }
 
             double originalArea = Triangulation_Area(original);
-            double areaTolerance = 1e-3 * System.Math.Max(1.0, originalArea);
-            Assert.True(System.Math.Abs(areaSum - originalArea) <= areaTolerance, $"Area not conserved: sub-triangle sum={areaSum}, original={originalArea}.");
+            double areaTolerance = 1e-3 * Math.Max(1.0, originalArea);
+            Assert.True(Math.Abs(areaSum - originalArea) <= areaTolerance, $"Area not conserved: sub-triangle sum={areaSum}, original={originalArea}.");
         }
 
         private void AssertValidTriangulation(Triangle3 original, Line3 line, Triangulation3 triangulation, double tolerance)

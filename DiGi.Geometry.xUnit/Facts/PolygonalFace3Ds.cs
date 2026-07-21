@@ -2,7 +2,6 @@ using DiGi.Geometry.Core.Enums;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
-using System.Collections.Generic;
 
 namespace DiGi.Geometry.xUnit
 {
@@ -21,7 +20,7 @@ namespace DiGi.Geometry.xUnit
         {
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_2 == null)
+            if (polyhedron_2 == null)
             {
                 return;
             }
@@ -38,7 +37,7 @@ namespace DiGi.Geometry.xUnit
         {
             Polyhedron? polyhedron_1 = PolygonalFace3Ds_Box(-2, 2);
             Assert.NotNull(polyhedron_1);
-            if(polyhedron_1 == null)
+            if (polyhedron_1 == null)
             {
                 return;
             }
@@ -67,7 +66,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(5, 9);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -88,7 +87,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -97,7 +96,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(result);
             Assert.NotEmpty(result);
 
-            foreach(IPolygonalFace3D polygonalFace3D in result)
+            foreach (IPolygonalFace3D polygonalFace3D in result)
             {
                 Assert.NotNull(polygonalFace3D);
                 Point3D? point3D = polygonalFace3D.GetInternalPoint();
@@ -117,7 +116,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(5, 9);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -138,7 +137,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -158,7 +157,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(5, 9);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -181,7 +180,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(5, 9);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -202,7 +201,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -222,7 +221,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -251,7 +250,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(5, 9);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -276,7 +275,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -302,7 +301,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -321,7 +320,7 @@ namespace DiGi.Geometry.xUnit
         {
             Polyhedron? polyhedron = PolygonalFace3Ds_Box(-2, 2);
             Assert.NotNull(polyhedron);
-            if(polyhedron == null)
+            if (polyhedron == null)
             {
                 return;
             }
@@ -352,7 +351,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_Inner = PolygonalFace3Ds_Box(-1, 1);
             Assert.NotNull(polyhedron_Outer);
             Assert.NotNull(polyhedron_Inner);
-            if(polyhedron_Outer == null || polyhedron_Inner == null)
+            if (polyhedron_Outer == null || polyhedron_Inner == null)
             {
                 return;
             }
@@ -382,7 +381,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_Inner = PolygonalFace3Ds_Box(-1, 1);
             Assert.NotNull(polyhedron_Outer);
             Assert.NotNull(polyhedron_Inner);
-            if(polyhedron_Outer == null || polyhedron_Inner == null)
+            if (polyhedron_Outer == null || polyhedron_Inner == null)
             {
                 return;
             }
@@ -407,7 +406,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D);
             Assert.NotNull(polyhedron_2);
 
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -432,7 +431,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D);
             Assert.NotNull(polyhedron_2);
 
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -452,7 +451,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -472,7 +471,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(2, 6);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -504,7 +503,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D);
             Assert.NotNull(polyhedron_2);
 
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -529,7 +528,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(2, 6);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -557,7 +556,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = Create.Polyhedron(boundingBox3D);
             Assert.NotNull(polyhedron_2);
 
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -586,7 +585,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_B = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_A);
             Assert.NotNull(polyhedron_B);
-            if(polyhedron_A == null || polyhedron_B == null)
+            if (polyhedron_A == null || polyhedron_B == null)
             {
                 return;
             }
@@ -616,7 +615,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }
@@ -644,7 +643,7 @@ namespace DiGi.Geometry.xUnit
             {
                 Polyhedron? polyhedron_WarmupA = PolygonalFace3Ds_Box(-2, 2);
                 Polyhedron? polyhedron_WarmupB = PolygonalFace3Ds_Box(0, 4);
-                if(polyhedron_WarmupA != null && polyhedron_WarmupB != null)
+                if (polyhedron_WarmupA != null && polyhedron_WarmupB != null)
                 {
                     _ = BooleanOpertaionType.Union.PolygonalFace3Ds(polyhedron_WarmupA, polyhedron_WarmupB, true, true);
                     _ = BooleanOpertaionType.Intersection.PolygonalFace3Ds(polyhedron_WarmupA, polyhedron_WarmupB, true, true);
@@ -656,7 +655,7 @@ namespace DiGi.Geometry.xUnit
             Polyhedron? polyhedron_2 = PolygonalFace3Ds_Box(0, 4);
             Assert.NotNull(polyhedron_1);
             Assert.NotNull(polyhedron_2);
-            if(polyhedron_1 == null || polyhedron_2 == null)
+            if (polyhedron_1 == null || polyhedron_2 == null)
             {
                 return;
             }

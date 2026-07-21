@@ -133,6 +133,104 @@ namespace DiGi.Unit.xUnit
             Assert.True(bool_Converted);
             Assert.NotNull(double_Value);
             Assert.Equal(10.0, double_Value.Value, 5);
+
+            // 7. Verify ElectricConductanceUnit conversions
+            bool_Converted = Query.TryConvert(1.0, ElectricConductanceUnit.Siemens, ElectricConductanceUnit.Millisiemens, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1000.0, double_Value.Value, 5);
+
+            bool_Converted = Query.TryConvert(1.0, ElectricConductanceUnit.Millisiemens, ElectricConductanceUnit.Microsiemens, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1000.0, double_Value.Value, 5);
+
+            // 8. Verify ElectricConductivityUnit conversions
+            bool_Converted = Query.TryConvert(1.0, ElectricConductivityUnit.SiemensPerMeter, ElectricConductivityUnit.MillisiemensPerMeter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1000.0, double_Value.Value, 5);
+
+            bool_Converted = Query.TryConvert(1.0, ElectricConductivityUnit.MillisiemensPerCentimeter, ElectricConductivityUnit.SiemensPerMeter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.1, double_Value.Value, 5);
+
+            // 9. Verify inverse conversion between Siemens (Conductance) and Ohm (Resistance)
+            // 500 mS = 0.5 S -> 1 / 0.5 S = 2 Ohms
+            bool_Converted = Query.TryConvert(500.0, ElectricConductanceUnit.Millisiemens, ElectricResistanceUnit.Ohm, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(2.0, double_Value.Value, 5);
+
+            // 10 Ohms -> 1 / 10 Ohm = 0.1 S = 100 mS
+            bool_Converted = Query.TryConvert(10.0, ElectricResistanceUnit.Ohm, ElectricConductanceUnit.Millisiemens, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(100.0, double_Value.Value, 5);
+
+            // 2 Siemens -> 1 / 2 S = 0.5 Ohms
+            bool_Converted = Query.TryConvert(2.0, ElectricConductanceUnit.Siemens, ElectricResistanceUnit.Ohm, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.5, double_Value.Value, 5);
+
+            // 10. Verify inverse conversion between Time and Frequency
+            // 0.02 s -> 1 / 0.02 s = 50 Hz
+            bool_Converted = Query.TryConvert(0.02, TimeUnit.Second, FrequencyUnit.Hertz, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(50.0, double_Value.Value, 5);
+
+            // 1 kHz -> 1 / 1000 Hz = 0.001 s
+            bool_Converted = Query.TryConvert(1.0, FrequencyUnit.Kilohertz, TimeUnit.Second, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.001, double_Value.Value, 5);
+
+            // 11. Verify ThermalResistanceUnit conversions
+            bool_Converted = Query.TryConvert(1.0, ThermalResistanceUnit.SquareMeterKelvinPerWatt, ThermalResistanceUnit.SquareMeterDegreeCelsiusPerWatt, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1.0, double_Value.Value, 5);
+
+            // 12. Verify ThermalTransmittanceUnit conversions
+            bool_Converted = Query.TryConvert(1.0, ThermalTransmittanceUnit.WattPerSquareMeterKelvin, ThermalTransmittanceUnit.WattPerSquareMeterDegreeCelsius, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1.0, double_Value.Value, 5);
+
+            // 13. Verify inverse conversion between ThermalResistance (R-value) and ThermalTransmittance (U-value)
+            // R = 0.2 m2K/W -> U = 1 / 0.2 = 5.0 W/m2K
+            bool_Converted = Query.TryConvert(0.2, ThermalResistanceUnit.SquareMeterKelvinPerWatt, ThermalTransmittanceUnit.WattPerSquareMeterKelvin, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(5.0, double_Value.Value, 5);
+
+            // U = 2.0 W/m2K -> R = 1 / 2.0 = 0.5 m2K/W
+            bool_Converted = Query.TryConvert(2.0, ThermalTransmittanceUnit.WattPerSquareMeterKelvin, ThermalResistanceUnit.SquareMeterKelvinPerWatt, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.5, double_Value.Value, 5);
+
+            // 14. Verify WavenumberUnit conversions
+            bool_Converted = Query.TryConvert(1.0, WavenumberUnit.ReciprocalCentimeter, WavenumberUnit.ReciprocalMeter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(100.0, double_Value.Value, 5);
+
+            // 15. Verify inverse conversion between Length (wavelength) and Wavenumber (spatial frequency)
+            // 0.01 m -> 1 / 0.01 = 100 1/m = 1 1/cm
+            bool_Converted = Query.TryConvert(0.01, LengthUnit.Meter, WavenumberUnit.ReciprocalCentimeter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1.0, double_Value.Value, 5);
+
+            // 100 1/m -> 1 / 100 = 0.01 m
+            bool_Converted = Query.TryConvert(100.0, WavenumberUnit.ReciprocalMeter, LengthUnit.Meter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.01, double_Value.Value, 5);
         }
     }
 }

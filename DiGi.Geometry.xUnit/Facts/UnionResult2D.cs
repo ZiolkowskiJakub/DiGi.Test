@@ -12,12 +12,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_Disjoint()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(10, 10), new Point2D(12, 10), new Point2D(12, 12), new Point2D(10, 12));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(10, 10), new Point2D(12, 10), new Point2D(12, 12), new Point2D(10, 12));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(unionResult2D);
             Assert.Equal(BooleanOpertaionType.Union, unionResult2D.BooleanOpertaionType);
             Assert.Equal(2, unionResult2D.Count);
@@ -34,12 +34,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_Overlapping()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(4, 0), new Point2D(4, 4), new Point2D(0, 4));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(6, 2), new Point2D(6, 6), new Point2D(2, 6));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(unionResult2D);
             Assert.True(unionResult2D.Any());
 
@@ -55,12 +55,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_EdgeTouch_Merge()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 0), new Point2D(4, 0), new Point2D(4, 2), new Point2D(2, 2));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(unionResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = unionResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -75,10 +75,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_Identical()
         {
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D, polygonalFace2D);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D, polygonalFace2D);
             Assert.NotNull(unionResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = unionResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -93,12 +93,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_CornerTouch()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(4, 2), new Point2D(4, 4), new Point2D(2, 4));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(2, 2), new Point2D(4, 2), new Point2D(4, 4), new Point2D(2, 4));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D_1, polygonalFace2D_2);
             Assert.NotNull(unionResult2D);
             Assert.True(unionResult2D.Any());
 
@@ -114,12 +114,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_HoleCreation()
         {
-            PolygonalFace2D? polygonalFace2D_U = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(6, 0), new Point2D(6, 6), new Point2D(4, 6), new Point2D(4, 2), new Point2D(2, 2), new Point2D(2, 6), new Point2D(0, 6));
-            PolygonalFace2D? polygonalFace2D_Cap = Planar.Create.PolygonalFace2D(new Point2D(0, 4), new Point2D(6, 4), new Point2D(6, 6), new Point2D(0, 6));
+            PolygonalFace2D? polygonalFace2D_U = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(6, 0), new Point2D(6, 6), new Point2D(4, 6), new Point2D(4, 2), new Point2D(2, 2), new Point2D(2, 6), new Point2D(0, 6));
+            PolygonalFace2D? polygonalFace2D_Cap = Create.PolygonalFace2D(new Point2D(0, 4), new Point2D(6, 4), new Point2D(6, 6), new Point2D(0, 6));
             Assert.NotNull(polygonalFace2D_U);
             Assert.NotNull(polygonalFace2D_Cap);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D_U, polygonalFace2D_Cap);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D_U, polygonalFace2D_Cap);
             Assert.NotNull(unionResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = unionResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -138,18 +138,18 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void PolygonalFace2D_UnionResult2D_Null()
         {
-            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D);
 
-            UnionResult2D? unionResult2D_NullSecond = Planar.Create.UnionResult2D(polygonalFace2D, null);
+            UnionResult2D? unionResult2D_NullSecond = Create.UnionResult2D(polygonalFace2D, null);
             Assert.NotNull(unionResult2D_NullSecond);
             Assert.Equal(1, unionResult2D_NullSecond.Count);
 
-            UnionResult2D? unionResult2D_NullFirst = Planar.Create.UnionResult2D(null, polygonalFace2D);
+            UnionResult2D? unionResult2D_NullFirst = Create.UnionResult2D(null, polygonalFace2D);
             Assert.NotNull(unionResult2D_NullFirst);
             Assert.Equal(1, unionResult2D_NullFirst.Count);
 
-            UnionResult2D? unionResult2D_BothNull = Planar.Create.UnionResult2D(null, null);
+            UnionResult2D? unionResult2D_BothNull = Create.UnionResult2D(null, null);
             Assert.Null(unionResult2D_BothNull);
         }
 
@@ -161,13 +161,13 @@ namespace DiGi.Geometry.xUnit
         public void PolygonalFace2D_UnionResult2D_SelfIntersecting_Repaired()
         {
             Polygon2D polygon2D_Bowtie = new([new Point2D(0, 0), new Point2D(2, 0), new Point2D(0, 2), new Point2D(2, 2)]);
-            PolygonalFace2D? polygonalFace2D_Bowtie = Planar.Create.PolygonalFace2D(polygon2D_Bowtie);
+            PolygonalFace2D? polygonalFace2D_Bowtie = Create.PolygonalFace2D(polygon2D_Bowtie);
             Assert.NotNull(polygonalFace2D_Bowtie);
 
-            PolygonalFace2D? polygonalFace2D_Square = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_Square = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
             Assert.NotNull(polygonalFace2D_Square);
 
-            UnionResult2D? unionResult2D = Planar.Create.UnionResult2D(polygonalFace2D_Bowtie, polygonalFace2D_Square);
+            UnionResult2D? unionResult2D = Create.UnionResult2D(polygonalFace2D_Bowtie, polygonalFace2D_Square);
             Assert.NotNull(unionResult2D);
 
             List<PolygonalFace2D>? polygonalFace2Ds = unionResult2D.GetGeometry2Ds<PolygonalFace2D>();
@@ -181,8 +181,8 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void UnionResult2D_SerializationCheck()
         {
-            PolygonalFace2D? polygonalFace2D_1 = Planar.Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
-            PolygonalFace2D? polygonalFace2D_2 = Planar.Create.PolygonalFace2D(new Point2D(10, 10), new Point2D(12, 10), new Point2D(12, 12), new Point2D(10, 12));
+            PolygonalFace2D? polygonalFace2D_1 = Create.PolygonalFace2D(new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 2), new Point2D(0, 2));
+            PolygonalFace2D? polygonalFace2D_2 = Create.PolygonalFace2D(new Point2D(10, 10), new Point2D(12, 10), new Point2D(12, 12), new Point2D(10, 12));
             Assert.NotNull(polygonalFace2D_1);
             Assert.NotNull(polygonalFace2D_2);
 

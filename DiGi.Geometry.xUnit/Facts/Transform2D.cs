@@ -18,7 +18,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Test.Radius, 9);
 
             // 1. Apply translation transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Translate = DiGi.Geometry.Planar.Create.Transform2D.Translation(3.0, 4.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Translate = Planar.Create.Transform2D.Translation(3.0, 4.0);
             Assert.NotNull(transform2D_Translate);
 
             bool bool_SuccessTranslate = circle2D_Test.Transform(transform2D_Translate);
@@ -31,7 +31,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Test.Radius, 9);
 
             // 2. Apply uniform scaling transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = DiGi.Geometry.Planar.Create.Transform2D.Scale(2.0, 2.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0, 2.0);
             Assert.NotNull(transform2D_Scale);
 
             bool bool_SuccessScale = circle2D_Test.Transform(transform2D_Scale);
@@ -65,7 +65,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0.0, ellipse2D_Test.DirectionA.Y, 9);
 
             // 1. Apply translation transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Translate = DiGi.Geometry.Planar.Create.Transform2D.Translation(3.0, 4.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Translate = Planar.Create.Transform2D.Translation(3.0, 4.0);
             Assert.NotNull(transform2D_Translate);
 
             bool bool_SuccessTranslate = ellipse2D_Test.Transform(transform2D_Translate);
@@ -82,7 +82,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0.0, ellipse2D_Test.DirectionA.Y, 9);
 
             // 2. Apply scaling transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = DiGi.Geometry.Planar.Create.Transform2D.Scale(2.0, 2.0);
+            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0, 2.0);
             Assert.NotNull(transform2D_Scale);
 
             bool bool_SuccessScale = ellipse2D_Test.Transform(transform2D_Scale);

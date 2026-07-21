@@ -63,7 +63,7 @@ namespace DiGi.Math.xUnit
             Assert.Equal(150.0, linearInterpolation_Array.CalculateY(1.5));
 
             // Serialization Check
-            DiGi.Core.xUnit.Query.SerializationCheck(linearInterpolation_1);
+            Core.xUnit.Query.SerializationCheck(linearInterpolation_1);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace DiGi.Math.xUnit
             Assert.Equal(350.0, bilinearInterpolation_1.Calculate(2.0, 25.0));
 
             // Serialization Check
-            DiGi.Core.xUnit.Query.SerializationCheck(bilinearInterpolation_1);
+            Core.xUnit.Query.SerializationCheck(bilinearInterpolation_1);
         }
     }
 }
