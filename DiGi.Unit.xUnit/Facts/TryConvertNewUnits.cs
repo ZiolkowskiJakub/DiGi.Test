@@ -231,6 +231,31 @@ namespace DiGi.Unit.xUnit
             Assert.True(bool_Converted);
             Assert.NotNull(double_Value);
             Assert.Equal(0.01, double_Value.Value, 5);
+
+            // 16. Verify StiffnessUnit conversions
+            bool_Converted = Query.TryConvert(1.0, StiffnessUnit.KilonewtonPerMeter, StiffnessUnit.NewtonPerMeter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1000.0, double_Value.Value, 5);
+
+            // 17. Verify ComplianceUnit conversions
+            bool_Converted = Query.TryConvert(1.0, ComplianceUnit.MeterPerKilonewton, ComplianceUnit.MeterPerNewton, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.001, double_Value.Value, 5);
+
+            // 18. Verify inverse conversion between Stiffness and Compliance
+            // k = 1000 N/m -> c = 1 / 1000 = 0.001 m/N
+            bool_Converted = Query.TryConvert(1000.0, StiffnessUnit.NewtonPerMeter, ComplianceUnit.MeterPerNewton, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(0.001, double_Value.Value, 5);
+
+            // c = 0.001 m/N -> k = 1 / 0.001 = 1000 N/m
+            bool_Converted = Query.TryConvert(0.001, ComplianceUnit.MeterPerNewton, StiffnessUnit.NewtonPerMeter, out double_Value);
+            Assert.True(bool_Converted);
+            Assert.NotNull(double_Value);
+            Assert.Equal(1000.0, double_Value.Value, 5);
         }
     }
 }
