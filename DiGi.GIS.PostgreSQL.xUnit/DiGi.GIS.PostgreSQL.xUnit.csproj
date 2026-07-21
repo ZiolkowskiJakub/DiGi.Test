@@ -39,6 +39,9 @@
     <Reference Include="DiGi.Analytical.Building">
       <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.CityGML">
+      <HintPath>..\..\DiGi.CityGML\bin\DiGi.CityGML.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
