@@ -9,7 +9,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.IO.Modify.Remove{TSerializableObject}(IO.File.Classes.StorageFile{TSerializableObject}, IEnumerable{UniqueReference})"/>
+        /// Tests that <see cref="IO.File.Classes.StorageFile{TSerializableObject}.Remove(IEnumerable{UniqueReference})"/>
         /// still removes every matching reference even when a non-matching reference is processed first.
         /// Previously the removal loop used `for (int i = Count - 1; i >= 0; i--) { var x = set.ElementAt(0); ... }`
         /// without removing non-matching elements from the set, so a non-matching first element would get

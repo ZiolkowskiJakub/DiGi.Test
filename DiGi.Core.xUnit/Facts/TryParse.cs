@@ -134,7 +134,7 @@ namespace DiGi.Core.xUnit
         /// Tests that a comma-bearing string that is not a valid assembly-qualified type name - such as a JSON blob -
         /// does not throw. The discriminator branch treats a comma as a full type name and resolves it, which once
         /// threw from the underlying type lookup; parsing must stay total now that it runs on arbitrary input through
-        /// <see cref="Core.Query.TryConvert{T}(object?, out T?)"/>.
+        /// <see cref="Core.Query.TryConvert{T}(object, out T)"/>.
         /// </summary>
         [Fact]
         public void TryParse_CommaBearingNonTypeName_DoesNotThrow()
@@ -180,7 +180,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="Core.Query.TryConvert{T}(object?, out T?)"/> converts a reference string into the
+        /// Tests that <see cref="Core.Query.TryConvert{T}(object, out T)"/> converts a reference string into the
         /// requested reference type, for both a concrete type and the base interfaces, and rejects a string naming a
         /// different reference kind.
         /// </summary>
