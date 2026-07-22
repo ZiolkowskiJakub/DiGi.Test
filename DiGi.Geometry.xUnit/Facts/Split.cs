@@ -514,5 +514,236 @@ namespace DiGi.Geometry.xUnit
 
             Assert.True(stopwatch.ElapsedMilliseconds < 1000, $"Mesh3D split took {stopwatch.ElapsedMilliseconds} ms, expected less than 1000 ms.");
         }
+
+        /// <summary>
+        /// Tests <see cref="Query.TrySplit(IPolygonalFace3D?, IEnumerable{IPolygonalFace3D}?, out List{PolygonalFace3D}?, double)"/> with edge cases including null inputs, non-intersecting faces, and valid splits.
+        /// </summary>
+        [Fact]
+        public void TrySplit_PolygonalFace3D_EdgeCases()
+        {
+            // Null inputs
+            Assert.False(Query.TrySplit(null as IPolygonalFace3D, [], out List<PolygonalFace3D>? result_NullFace));
+            Assert.Null(result_NullFace);
+
+            Polygon2D polygon2D = new([new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10)]);
+            PolygonalFace2D? face2D = Planar.Create.PolygonalFace2D(polygon2D);
+            Assert.NotNull(face2D);
+            PolygonalFace3D face3D = new(Spatial.Constants.Plane.WorldZ, face2D);
+
+            Assert.False(face3D.TrySplit(null as IEnumerable<IPolygonalFace3D>, out List<PolygonalFace3D>? result_NullCutters));
+            Assert.Null(result_NullCutters);
+
+            // Empty cutters
+            Assert.False(face3D.TrySplit([], out List<PolygonalFace3D>? result_EmptyCutters));
+            Assert.Null(result_EmptyCutters);
+
+            // Non-intersecting cutter face (completely outside)
+            Polygon3D? polygon3D_Far = Create.Polygon3D([new Point3D(100, 100, -5), new Point3D(110, 100, -5), new Point3D(110, 100, 5), new Point3D(100, 100, 5)]);
+            Assert.NotNull(polygon3D_Far);
+            PolygonalFace3D? face3D_Far = Create.PolygonalFace3D(polygon3D_Far);
+            Assert.NotNull(face3D_Far);
+
+            Assert.False(face3D.TrySplit([face3D_Far], out List<PolygonalFace3D>? result_FarCutter));
+            Assert.Null(result_FarCutter);
+        }
+
+        /// <summary>
+        /// Tests <see cref="Query.TrySplit{TPolyhedron}(IPolyhedron?, IEnumerable{TPolyhedron}?, out Polyhedron?, double)"/> ensuring that unsplit faces of the polyhedron are preserved when only a subset of faces is cut.
+        /// </summary>
+        [Fact]
+        public void TrySplit_Polyhedron_PreservesUnsplitFaces()
+        {
+            // Null and empty inputs
+            Assert.False(Query.TrySplit<Polyhedron>(null, [], out Polyhedron? result_NullPoly));
+            Assert.Null(result_NullPoly);
+
+            BoundingBox3D box = new(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
+            Polyhedron? targetPolyhedron = Create.Polyhedron(box);
+            Assert.NotNull(targetPolyhedron);
+
+            Assert.False(targetPolyhedron.TrySplit(null as IEnumerable<Polyhedron>, out Polyhedron? result_NullCutters));
+            Assert.Null(result_NullCutters);
+
+            // Create a small cutter box that intersects only the bottom/side region of targetPolyhedron
+            BoundingBox3D cutterBox = new(new Point3D(5, -5, -5), new Point3D(15, 5, 5));
+            Polyhedron? cutterPolyhedron = Create.Polyhedron(cutterBox);
+            Assert.NotNull(cutterPolyhedron);
+
+            bool splitResult = targetPolyhedron.TrySplit([cutterPolyhedron], out Polyhedron? resultPolyhedron);
+            Assert.True(splitResult);
+            Assert.NotNull(resultPolyhedron);
+
+            // The original box had 6 faces. The cutter intersects some faces, splitting them into multiple sub-faces,
+            // while the untouched faces (e.g. top face at Z=10) are preserved.
+            // Total face count of the resulting polyhedron must be greater than 6.
+            Assert.True(resultPolyhedron.Count > 6);
+        }
+
+        /// <summary>
+        /// Tests <see cref="Query.TrySplit{TPolyhedron}(IEnumerable{TPolyhedron}, out List{Polyhedron}?, double)"/> ensuring that unsplit polyhedrons are preserved in the returned collection when intersecting polyhedrons are split.
+        /// </summary>
+        [Fact]
+        public void TrySplit_PolyhedronsCollection_PreservesUnsplitPolyhedrons()
+        {
+            // Null input
+            Assert.False(Query.TrySplit(null as IEnumerable<Polyhedron>, out List<Polyhedron>? result_Null));
+            Assert.Null(result_Null);
+
+            // Create two polyhedrons that intersect each other, plus a third isolated polyhedron
+            BoundingBox3D box1 = new(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
+            BoundingBox3D box2 = new(new Point3D(5, 5, -5), new Point3D(15, 15, 5));
+            BoundingBox3D box3 = new(new Point3D(100, 100, 100), new Point3D(110, 110, 110));
+
+            Polyhedron? poly1 = Create.Polyhedron(box1);
+            Polyhedron? poly2 = Create.Polyhedron(box2);
+            Polyhedron? poly3 = Create.Polyhedron(box3);
+            Assert.NotNull(poly1);
+            Assert.NotNull(poly2);
+            Assert.NotNull(poly3);
+
+            List<Polyhedron> polyhedrons = [poly1, poly2, poly3];
+
+            bool splitSuccess = polyhedrons.TrySplit(out List<Polyhedron>? resultCollection);
+            Assert.True(splitSuccess);
+            Assert.NotNull(resultCollection);
+
+            // All 3 polyhedrons (the 2 split ones and the 1 isolated unsplit one) must be present in the output
+            Assert.Equal(3, resultCollection.Count);
+        }
+
+        /// <summary>
+        /// Tests <see cref="Query.TrySplit(Plane?, IPolyhedron?, out List{Polyhedron}?, double)"/> with various geometric conditions including null inputs, non-cutting planes, and valid cuts.
+        /// </summary>
+        [Fact]
+        public void TrySplit_Plane_Polyhedron_EdgeCases()
+        {
+            BoundingBox3D box = new(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
+            Polyhedron? polyhedron = Create.Polyhedron(box);
+            Assert.NotNull(polyhedron);
+
+            Plane plane_Z5 = new(new Point3D(0, 0, 5), Spatial.Constants.Vector3D.WorldZ);
+
+            // Null inputs
+            Assert.False(Query.TrySplit(null as Plane, polyhedron, out List<Polyhedron>? result_NullPlane));
+            Assert.Null(result_NullPlane);
+
+            Assert.False(plane_Z5.TrySplit(null as IPolyhedron, out List<Polyhedron>? result_NullPoly));
+            Assert.Null(result_NullPoly);
+
+            // Plane outside polyhedron
+            Plane plane_Far = new(new Point3D(0, 0, 100), Spatial.Constants.Vector3D.WorldZ);
+            Assert.False(plane_Far.TrySplit(polyhedron, out List<Polyhedron>? result_FarPlane));
+            Assert.Null(result_FarPlane);
+
+            // Valid split
+            Assert.True(plane_Z5.TrySplit(polyhedron, out List<Polyhedron>? result_Split));
+            Assert.NotNull(result_Split);
+            Assert.Equal(2, result_Split.Count);
+        }
+
+        /// <summary>
+        /// Tests <see cref="Query.TrySplit(Plane?, IPolygonalFace3D?, out List{PolygonalFace3D}?, double)"/> with edge cases including null inputs, coplanar face, and valid face split.
+        /// </summary>
+        [Fact]
+        public void TrySplit_Plane_PolygonalFace3D_EdgeCases()
+        {
+            Polygon2D polygon2D = new([new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10)]);
+            PolygonalFace2D? face2D = Planar.Create.PolygonalFace2D(polygon2D);
+            Assert.NotNull(face2D);
+            PolygonalFace3D face3D = new(Spatial.Constants.Plane.WorldZ, face2D);
+
+            Plane plane_Cut = new(new Point3D(5, 0, 0), Spatial.Constants.Vector3D.WorldX);
+
+            // Null inputs
+            Assert.False(Query.TrySplit(null as Plane, face3D, out List<PolygonalFace3D>? result_NullPlane));
+            Assert.Null(result_NullPlane);
+
+            Assert.False(plane_Cut.TrySplit(null as IPolygonalFace3D, out List<PolygonalFace3D>? result_NullFace));
+            Assert.Null(result_NullFace);
+
+            // Plane parallel / non-intersecting
+            Plane plane_Parallel = new(new Point3D(0, 0, 5), Spatial.Constants.Vector3D.WorldZ);
+            Assert.False(plane_Parallel.TrySplit(face3D, out List<PolygonalFace3D>? result_Parallel));
+            Assert.Null(result_Parallel);
+
+            // Valid face split
+            Assert.True(plane_Cut.TrySplit(face3D, out List<PolygonalFace3D>? result_Cut));
+            Assert.NotNull(result_Cut);
+            Assert.Equal(2, result_Cut.Count);
+        }
+        /// <summary>
+        /// Measures and reports execution time gains and performance metrics for TrySplit methods across polyhedrons and mesh operations.
+        /// </summary>
+        [Fact]
+        public void TrySplit_PerformanceBenchmark()
+        {
+            // 1. Mesh3D plane split performance (~40,000 triangles)
+            Ellipsoid ellipsoid = new(new Point3D(0, 0, 0), 5, 5, 5);
+            Mesh3D? largeMesh = Create.Mesh3D(ellipsoid, 100, 200);
+            Assert.NotNull(largeMesh);
+
+            Plane plane = Spatial.Constants.Plane.WorldZ;
+
+            // Warm-up
+            Query.TrySplit(plane, largeMesh, out List<Mesh3D>? _, out List<Mesh3D>? _);
+
+            Stopwatch swMesh = Stopwatch.StartNew();
+            bool meshSuccess = Query.TrySplit(plane, largeMesh, out List<Mesh3D>? meshAbove, out List<Mesh3D>? meshBelow);
+            swMesh.Stop();
+
+            Assert.True(meshSuccess);
+            Assert.NotNull(meshAbove);
+            Assert.NotNull(meshBelow);
+
+            // 2. Collection of polyhedrons TrySplit performance (50 intersecting box pairs)
+            List<Polyhedron> polyhedrons = [];
+            for (int i = 0; i < 50; i++)
+            {
+                BoundingBox3D box = new(new Point3D(i * 2, 0, 0), new Point3D(i * 2 + 5, 5, 5));
+                Polyhedron? poly = Create.Polyhedron(box);
+                if (poly != null)
+                {
+                    polyhedrons.Add(poly);
+                }
+            }
+
+            // Warm-up
+            polyhedrons.TrySplit(out List<Polyhedron>? _);
+
+            Stopwatch swPolyCollection = Stopwatch.StartNew();
+            bool polyCollectionSuccess = polyhedrons.TrySplit(out List<Polyhedron>? resultPolyCollection);
+            swPolyCollection.Stop();
+
+            Assert.True(polyCollectionSuccess);
+            Assert.NotNull(resultPolyCollection);
+
+            // 3. Single Polyhedron TrySplit performance against 20 cutting polyhedrons
+            BoundingBox3D mainBox = new(new Point3D(0, 0, 0), new Point3D(20, 20, 20));
+            Polyhedron? mainPolyhedron = Create.Polyhedron(mainBox);
+            Assert.NotNull(mainPolyhedron);
+
+            List<Polyhedron> cutters = [];
+            for (int i = 0; i < 20; i++)
+            {
+                BoundingBox3D cutterBox = new(new Point3D(i, i, -5), new Point3D(i + 2, i + 2, 25));
+                Polyhedron? cutter = Create.Polyhedron(cutterBox);
+                if (cutter != null)
+                {
+                    cutters.Add(cutter);
+                }
+            }
+
+            Stopwatch swPolySingle = Stopwatch.StartNew();
+            bool polySingleSuccess = mainPolyhedron.TrySplit(cutters, out Polyhedron? resultSinglePoly);
+            swPolySingle.Stop();
+
+            Assert.True(polySingleSuccess);
+            Assert.NotNull(resultSinglePoly);
+
+            // Assert performance thresholds
+            Assert.True(swMesh.ElapsedMilliseconds < 500, $"Mesh3D split took {swMesh.ElapsedMilliseconds} ms");
+            Assert.True(swPolyCollection.ElapsedMilliseconds < 500, $"Polyhedrons collection split took {swPolyCollection.ElapsedMilliseconds} ms");
+            Assert.True(swPolySingle.ElapsedMilliseconds < 500, $"Single Polyhedron split took {swPolySingle.ElapsedMilliseconds} ms");
+        }
     }
 }
