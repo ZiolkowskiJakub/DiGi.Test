@@ -1,3 +1,6 @@
+using DiGi.Core.Classes;
+using DiGi.Core.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,6 +160,59 @@ namespace DiGi.Core.xUnit
             Assert.True(Core.Query.Equals(null_1, null_2));
             Assert.False(Core.Query.Equals(null_1, (IEnumerable)new ArrayList { 1 }));
             Assert.False(Core.Query.Equals((IEnumerable)new ArrayList { 1 }, null_2));
+        }
+
+        /// <summary>
+        /// Tests that <see cref="Core.Query.Equals(IReference, IReference)"/> compares references by value: two
+        /// separately constructed references describing the same object are equal, references describing different
+        /// objects are not, and two nulls are equal while a single null is not.
+        /// </summary>
+        [Fact]
+        public void Equals_Reference()
+        {
+            TypeReference typeReference = new(typeof(GuidReference));
+
+            Guid guid = Guid.NewGuid();
+
+            IUniqueReference uniqueReference_1 = new GuidReference(typeReference, guid);
+            IUniqueReference uniqueReference_2 = new GuidReference(typeReference, guid);
+            IUniqueReference uniqueReference_3 = new GuidReference(typeReference, Guid.NewGuid());
+
+            Assert.True(Core.Query.Equals(uniqueReference_1, uniqueReference_2));
+            Assert.False(Core.Query.Equals(uniqueReference_1, uniqueReference_3));
+
+            IReference? reference_Null_1 = null;
+            IReference? reference_Null_2 = null;
+
+            Assert.True(Core.Query.Equals(reference_Null_1, reference_Null_2));
+            Assert.False(Core.Query.Equals(uniqueReference_1, reference_Null_1));
+            Assert.False(Core.Query.Equals(reference_Null_1, uniqueReference_1));
+        }
+
+        /// <summary>
+        /// Tests the trap <see cref="Core.Query.Equals(IReference, IReference)"/> exists for: the equality operators
+        /// are declared on <see cref="SerializableReference"/>, so between two operands whose static type is
+        /// <see cref="IUniqueReference"/> the compiler falls back to reference equality and reports two equal
+        /// references as different, while the very same values compared through the concrete type - or through the
+        /// helper - are equal.
+        /// </summary>
+        [Fact]
+        public void Equals_Reference_OperatorDoesNotApplyToInterfaceOperands()
+        {
+            TypeReference typeReference = new(typeof(GuidReference));
+
+            Guid guid = Guid.NewGuid();
+
+            GuidReference guidReference_1 = new(typeReference, guid);
+            GuidReference guidReference_2 = new(typeReference, guid);
+
+            IUniqueReference uniqueReference_1 = guidReference_1;
+            IUniqueReference uniqueReference_2 = guidReference_2;
+
+            Assert.True(guidReference_1 == guidReference_2);
+            Assert.False(uniqueReference_1 == uniqueReference_2);
+
+            Assert.True(Core.Query.Equals(uniqueReference_1, uniqueReference_2));
         }
     }
 }
