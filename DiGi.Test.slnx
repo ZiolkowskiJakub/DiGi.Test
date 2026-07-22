@@ -197,6 +197,16 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
     </Project>
+    <Project Path="DiGi.CityGML.xUnit/DiGi.CityGML.xUnit.csproj">
+      <BuildDependency Project="../DiGi.CityGML/DiGi.CityGML/DiGi.CityGML.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Relation/DiGi.Core.Relation.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
     <Project Path="../DiGi.BDL/DiGi.BDL/DiGi.BDL.csproj" />
     <Project Path="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj">
       <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
