@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -20,8 +20,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
-    <!-- DiGi.Geometry is referenced by HintPath, so its NuGet dependencies do not flow to the test host. -->
-    <PackageReference Include="QuikGraph" Version="2.5.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -30,40 +28,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DiGi.GIS.Analytical\DiGi.GIS.Analytical\DiGi.GIS.Analytical.csproj" />
+    <ProjectReference Include="..\..\DiGi.WebAPI\DiGi.WebAPI\DiGi.WebAPI.csproj" />
     <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DiGi.Analytical">
-      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.dll</HintPath>
-    </Reference>
-    <Reference Include="DiGi.Analytical.Building">
-      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.dll</HintPath>
-    </Reference>
-    <Reference Include="DiGi.CityGML">
-      <HintPath>..\..\DiGi.CityGML\bin\DiGi.CityGML.dll</HintPath>
-    </Reference>
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DiGi.Core.IO">
-      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
+    <Reference Include="DiGi.Serilog">
+      <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
     </Reference>
-    <Reference Include="DiGi.Core.Parameter">
-      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.Parameter.dll</HintPath>
-    </Reference>
-    <Reference Include="DiGi.Core.Relation">
-      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.Relation.dll</HintPath>
-    </Reference>
-    <Reference Include="DiGi.Geometry">
-      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
-    </Reference>
-    <Reference Include="DiGi.Geometry.Object">
-      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
-    </Reference>
-    <Reference Include="DiGi.GIS">
-      <HintPath>..\..\DiGi.GIS\bin\DiGi.GIS.dll</HintPath>
+    <Reference Include="DiGi.WebAPI">
+      <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
 

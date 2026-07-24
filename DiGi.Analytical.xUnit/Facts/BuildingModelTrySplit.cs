@@ -351,6 +351,225 @@ namespace DiGi.Analytical.xUnit
         }
 
         /// <summary>
+        /// Tests splitting a <see cref="BuildingModel"/> holding a single box shaped space by several horizontal planes.
+        /// <para>Verifies that three spaces are created with one of them keeping the identifier of the original space, that every wall is split into three components keeping the wall construction, that the original floor and roof stay untouched and that a floor carrying the given construction is created on each cutting plane and shared by two spaces.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_BuildingModel_Elevations()
+        {
+            BuildingModel buildingModel = new();
+
+            Space space = new(new Point3D(5, 5, 2), "Space 1");
+
+            WallConstruction wallConstruction = new();
+            FloorConstruction floorConstruction = new();
+            RoofConstruction roofConstruction = new();
+
+            Assert.NotNull(AddBoxSpace(buildingModel, new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 12)), space, wallConstruction, floorConstruction, roofConstruction));
+
+            IFloor? floor_Source = buildingModel.GetComponents<IFloor>()?.Find(x => true);
+            Assert.NotNull(floor_Source);
+
+            FloorConstruction floorConstruction_Split = new();
+
+            Assert.True(buildingModel.TrySplit([4, 8], 1, floorConstruction_Split));
+
+            // Three spaces, one of them keeping the identifier of the original space
+            List<ISpace>? spaces = buildingModel.GetSpaces<ISpace>();
+            Assert.NotNull(spaces);
+            Assert.Equal(3, spaces.Count);
+            Assert.Contains(spaces, x => x.Guid == space.Guid);
+
+            // Every wall split into three walls, each of them keeping the wall construction
+            List<IWall>? walls = buildingModel.GetComponents<IWall>();
+            Assert.NotNull(walls);
+            Assert.Equal(12, walls.Count);
+
+            for (int i = 0; i < walls.Count; i++)
+            {
+                Assert.True(wallConstruction.Guid == buildingModel.GetWallConstruction(walls[i])?.Guid);
+            }
+
+            // Original roof untouched
+            List<IRoof>? roofs = buildingModel.GetComponents<IRoof>();
+            Assert.NotNull(roofs);
+            Assert.Single(roofs);
+
+            // Original floor plus a floor created on each cutting plane
+            List<IFloor>? floors = buildingModel.GetComponents<IFloor>();
+            Assert.NotNull(floors);
+            Assert.Equal(3, floors.Count);
+            Assert.Contains(floors, x => x.Guid == floor_Source.Guid);
+
+            List<IFloor> floors_Split = floors.FindAll(x => x.Guid != floor_Source.Guid);
+            Assert.Equal(2, floors_Split.Count);
+
+            List<double> elevations = [];
+
+            for (int i = 0; i < floors_Split.Count; i++)
+            {
+                IFloor floor_Split = floors_Split[i];
+
+                BoundingBox3D? boundingBox3D_Floor = floor_Split.GetBoundingBox();
+                Assert.NotNull(boundingBox3D_Floor);
+                Assert.True(Math.Abs(boundingBox3D_Floor.MaxZ - boundingBox3D_Floor.MinZ) < Core.Constants.Tolerance.Distance);
+
+                elevations.Add(boundingBox3D_Floor.MinZ);
+
+                // Floor created on the cutting plane carries the given construction and is shared by two spaces
+                Assert.True(floorConstruction_Split.Guid == buildingModel.GetFloorConstruction(floor_Split)?.Guid);
+
+                List<ISpace>? spaces_Floor = buildingModel.GetSpaces(floor_Split);
+                Assert.NotNull(spaces_Floor);
+                Assert.Equal(2, spaces_Floor.Count);
+            }
+
+            Assert.Contains(elevations, x => Math.Abs(x - 4) < Core.Constants.Tolerance.Distance);
+            Assert.Contains(elevations, x => Math.Abs(x - 8) < Core.Constants.Tolerance.Distance);
+
+            Core.xUnit.Query.SerializationCheck(buildingModel);
+        }
+
+        /// <summary>
+        /// Tests the minimal height taken between two consecutive cutting planes.
+        /// <para>Verifies that an elevation closer to the previous one than the given minimal height is dropped and that the same pair of elevations produces three spaces for a smaller minimal height.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_BuildingModel_Elevations_MinHeight()
+        {
+            BuildingModel buildingModel = new();
+
+            Space space = new(new Point3D(5, 5, 2), "Space 1");
+
+            Assert.NotNull(AddBoxSpace(buildingModel, new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 10)), space, null, null, null));
+
+            // The second cut is 0.5 above the first one, less than the minimal height
+            Assert.True(buildingModel.TrySplit([3, 3.5], 1));
+
+            List<ISpace>? spaces = buildingModel.GetSpaces<ISpace>();
+            Assert.NotNull(spaces);
+            Assert.Equal(2, spaces.Count);
+
+            BuildingModel buildingModel_Temp = new();
+
+            Space space_Temp = new(new Point3D(5, 5, 2), "Space 1");
+
+            Assert.NotNull(AddBoxSpace(buildingModel_Temp, new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 10)), space_Temp, null, null, null));
+
+            // Both cuts pass for a smaller minimal height
+            Assert.True(buildingModel_Temp.TrySplit([3, 3.5], 0.25));
+
+            List<ISpace>? spaces_Temp = buildingModel_Temp.GetSpaces<ISpace>();
+            Assert.NotNull(spaces_Temp);
+            Assert.Equal(3, spaces_Temp.Count);
+        }
+
+        /// <summary>
+        /// Tests the order of the elevations given on the input of the split.
+        /// <para>Verifies that elevations given in a descending order produce the same spaces and the same cutting planes as the same elevations given in an ascending order.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_BuildingModel_Elevations_Order()
+        {
+            List<double> Split(IEnumerable<double> elevations)
+            {
+                BuildingModel buildingModel = new();
+
+                Space space = new(new Point3D(5, 5, 2), "Space 1");
+
+                Assert.NotNull(AddBoxSpace(buildingModel, new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 12)), space, null, null, null));
+
+                Assert.True(buildingModel.TrySplit(elevations, 1, new FloorConstruction()));
+
+                List<ISpace>? spaces = buildingModel.GetSpaces<ISpace>();
+                Assert.NotNull(spaces);
+                Assert.Equal(3, spaces.Count);
+
+                List<IFloor>? floors = buildingModel.GetComponents<IFloor>();
+                Assert.NotNull(floors);
+
+                List<double> result = [];
+                for (int i = 0; i < floors.Count; i++)
+                {
+                    if (floors[i].GetBoundingBox() is BoundingBox3D boundingBox3D && Math.Abs(boundingBox3D.MaxZ - boundingBox3D.MinZ) < Core.Constants.Tolerance.Distance)
+                    {
+                        result.Add(boundingBox3D.MinZ);
+                    }
+                }
+
+                result.Sort();
+                return result;
+            }
+
+            List<double> elevations_Ascending = Split([4, 8]);
+            List<double> elevations_Descending = Split([8, 4]);
+
+            Assert.Equal(elevations_Ascending.Count, elevations_Descending.Count);
+
+            for (int i = 0; i < elevations_Ascending.Count; i++)
+            {
+                Assert.True(Math.Abs(elevations_Ascending[i] - elevations_Descending[i]) < Core.Constants.Tolerance.Distance);
+            }
+        }
+
+        /// <summary>
+        /// Tests splitting only the spaces given on the input of the multiple elevations overload.
+        /// <para>Verifies that the spaces created by an earlier cut are split by the following cuts and that the spaces which were not given stay untouched together with their components.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_BuildingModel_Elevations_Spaces()
+        {
+            BuildingModel buildingModel = new();
+
+            Space space_1 = new(new Point3D(5, 5, 2), "Space 1");
+            Space space_2 = new(new Point3D(35, 5, 2), "Space 2");
+
+            Assert.NotNull(AddBoxSpace(buildingModel, new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 12)), space_1, null, null, null));
+            Assert.NotNull(AddBoxSpace(buildingModel, new BoundingBox3D(new Point3D(30, 0, 0), new Point3D(40, 10, 12)), space_2, null, null, null));
+
+            Assert.True(buildingModel.TrySplit([4, 8], 1, null, [space_1]));
+
+            // Three parts of the given space plus the space which was not given
+            List<ISpace>? spaces = buildingModel.GetSpaces<ISpace>();
+            Assert.NotNull(spaces);
+            Assert.Equal(4, spaces.Count);
+
+            // Space which was not given on the input keeps its six components
+            List<IComponent>? components_2 = buildingModel.GetComponents<IComponent>(space_2);
+            Assert.NotNull(components_2);
+            Assert.Equal(6, components_2.Count);
+        }
+
+        /// <summary>
+        /// Tests the behavior of the multiple elevations overload for inputs which cannot be split.
+        /// <para>Verifies that a null model, an empty model, an empty collection of elevations and elevations outside the extents of the model return false and leave the components of the model untouched.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_BuildingModel_Elevations_NullInputs()
+        {
+            Assert.False(Modify.TrySplit(null, [5]));
+
+            BuildingModel buildingModel_Empty = new();
+            Assert.False(buildingModel_Empty.TrySplit([5]));
+
+            BuildingModel buildingModel = new();
+
+            Space space = new(new Point3D(5, 5, 2), "Space 1");
+
+            Assert.NotNull(AddBoxSpace(buildingModel, new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 10)), space, null, null, null));
+
+            Assert.False(buildingModel.TrySplit([]));
+
+            // Cutting planes above and below the model
+            Assert.False(buildingModel.TrySplit([20, 25]));
+            Assert.False(buildingModel.TrySplit([-10, -5]));
+
+            List<IComponent>? components = buildingModel.GetComponents<IComponent>();
+            Assert.NotNull(components);
+            Assert.Equal(6, components.Count);
+        }
+
+        /// <summary>
         /// Tests the behavior of the split for inputs which cannot be split.
         /// <para>Verifies that a null model, an empty model and elevations outside the extents of the model return false.</para>
         /// </summary>

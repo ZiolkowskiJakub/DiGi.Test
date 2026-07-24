@@ -207,6 +207,14 @@
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
+    <Project Path="../DiGi.WebAPI/DiGi.WebAPI/DiGi.WebAPI.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.WebAPI.xUnit/DiGi.WebAPI.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.WebAPI/DiGi.WebAPI/DiGi.WebAPI.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
     <Project Path="../DiGi.BDL/DiGi.BDL/DiGi.BDL.csproj" />
     <Project Path="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj">
       <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
