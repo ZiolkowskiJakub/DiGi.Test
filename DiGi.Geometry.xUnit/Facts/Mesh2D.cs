@@ -33,7 +33,7 @@ namespace DiGi.Geometry.xUnit
 
         /// <summary>
         /// Tests the <see cref="Mesh2D"/> query methods on a unit square mesh made of two triangles.
-        /// <para>Verifies <see cref="Mesh2D.GetArea"/>, the unique edge count from <see cref="Mesh2D.GetSegments"/>, <see cref="Mesh2D.GetTriangles"/>, the boundary polygon, the inherited <see cref="DiGi.Geometry.Core.Classes.Mesh{TPoint}.IsClosed"/> check, and the JSON serialization round-trip.</para>
+        /// <para>Verifies <see cref="Mesh2D.GetArea"/>, the unique edge count from <see cref="Mesh2D.GetSegments"/>, <see cref="Mesh2D.GetTriangles"/>, the boundary polygon, the inherited <see cref="Core.Classes.Mesh{TPoint}.IsClosed"/> check, and the JSON serialization round-trip.</para>
         /// </summary>
         [Fact]
         public void Mesh2D_Queries()

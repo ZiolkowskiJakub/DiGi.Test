@@ -9,7 +9,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="Core.Create.UniqueReference(object?)"/> produces the same reference for an
+        /// Tests that <see cref="Create.UniqueReference(object?)"/> produces the same reference for an
         /// <see cref="IUniqueIdObject"/> whether it is built from the live object or from that object's own
         /// <see cref="JsonObject"/>. Previously the JSON branch only understood the "Guid" property, so a
         /// serialized unique-id object fell through to the generic fallback and was referenced by a hash of the
@@ -41,7 +41,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that the <see cref="IGuidObject"/> branch of <see cref="Core.Create.UniqueReference(object?)"/> still
+        /// Tests that the <see cref="IGuidObject"/> branch of <see cref="Create.UniqueReference(object?)"/> still
         /// resolves a serialized object to the same <see cref="GuidReference"/> as the live object, guarding the
         /// path that already worked against regressions from the added UniqueId branch.
         /// </summary>

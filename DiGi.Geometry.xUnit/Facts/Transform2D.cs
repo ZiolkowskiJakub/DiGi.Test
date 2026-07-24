@@ -8,8 +8,8 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Circle2D_TransformMethod()
         {
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Center = new(1.0, 2.0);
-            DiGi.Geometry.Planar.Classes.Circle2D circle2D_Test = new(point2D_Center, 5.0);
+            Planar.Classes.Point2D point2D_Center = new(1.0, 2.0);
+            Planar.Classes.Circle2D circle2D_Test = new(point2D_Center, 5.0);
 
             // Verify initial state
             Assert.NotNull(circle2D_Test.Center);
@@ -18,7 +18,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Test.Radius, 9);
 
             // 1. Apply translation transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Translate = Planar.Create.Transform2D.Translation(3.0, 4.0);
+            Planar.Classes.Transform2D? transform2D_Translate = Planar.Create.Transform2D.Translation(3.0, 4.0);
             Assert.NotNull(transform2D_Translate);
 
             bool bool_SuccessTranslate = circle2D_Test.Transform(transform2D_Translate);
@@ -31,7 +31,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Test.Radius, 9);
 
             // 2. Apply uniform scaling transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0, 2.0);
+            Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0, 2.0);
             Assert.NotNull(transform2D_Scale);
 
             bool bool_SuccessScale = circle2D_Test.Transform(transform2D_Scale);
@@ -50,9 +50,9 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Ellipse2D_TransformMethod()
         {
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Center = new(1.0, 2.0);
-            DiGi.Geometry.Planar.Classes.Vector2D vector2D_DirA = new(1.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Ellipse2D ellipse2D_Test = new(point2D_Center, 5.0, 3.0, vector2D_DirA);
+            Planar.Classes.Point2D point2D_Center = new(1.0, 2.0);
+            Planar.Classes.Vector2D vector2D_DirA = new(1.0, 0.0);
+            Planar.Classes.Ellipse2D ellipse2D_Test = new(point2D_Center, 5.0, 3.0, vector2D_DirA);
 
             // Verify initial state
             Assert.NotNull(ellipse2D_Test.Center);
@@ -65,7 +65,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0.0, ellipse2D_Test.DirectionA.Y, 9);
 
             // 1. Apply translation transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Translate = Planar.Create.Transform2D.Translation(3.0, 4.0);
+            Planar.Classes.Transform2D? transform2D_Translate = Planar.Create.Transform2D.Translation(3.0, 4.0);
             Assert.NotNull(transform2D_Translate);
 
             bool bool_SuccessTranslate = ellipse2D_Test.Transform(transform2D_Translate);
@@ -82,7 +82,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0.0, ellipse2D_Test.DirectionA.Y, 9);
 
             // 2. Apply scaling transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0, 2.0);
+            Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0, 2.0);
             Assert.NotNull(transform2D_Scale);
 
             bool bool_SuccessScale = ellipse2D_Test.Transform(transform2D_Scale);

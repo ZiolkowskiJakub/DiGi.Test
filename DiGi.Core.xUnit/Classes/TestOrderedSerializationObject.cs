@@ -7,7 +7,7 @@ namespace DiGi.Core.xUnit
     {
         /// <summary>
         /// Minimal serializable type mixing <see cref="JsonPropertyOrderAttribute"/>-ordered members with
-        /// unordered members, used to exercise <see cref="DiGi.Core.Create.SerializationMethodCollection(System.Type)"/>'s
+        /// unordered members, used to exercise <see cref="Create.SerializationMethodCollection(System.Type)"/>'s
         /// member-ordering logic (ordered members sorted ascending, then placed before unordered members).
         /// </summary>
         public class TestOrderedSerializationObject : GuidObject

@@ -36,7 +36,7 @@ namespace DiGi.Analytical.xUnit
             {
                 IPolygonal3D? externalEdge = Geometry.Spatial.Create.Polygon3D(point3Ds);
 
-                Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(externalEdge);
+                PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(externalEdge);
 
                 Assert.NotNull(polygonalFace3D);
 
@@ -106,7 +106,7 @@ namespace DiGi.Analytical.xUnit
         {
             Plane? plane = Geometry.Spatial.Create.Plane(0.0);
 
-            Geometry.Spatial.Classes.PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane,
+            PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane,
             [
                 new Geometry.Planar.Classes.Point2D(0, 0),
                 new Geometry.Planar.Classes.Point2D(0, 10),

@@ -79,10 +79,10 @@ namespace DiGi.Core.xUnit
             Assert.Equal(dateTimeOffset_Val, value_DateTimeOffset.GetValue<DateTimeOffset>());
             Query.SerializationCheck(value_DateTimeOffset);
 
-            System.TimeSpan timeSpan_Val = System.TimeSpan.FromSeconds(10);
+            TimeSpan timeSpan_Val = System.TimeSpan.FromSeconds(10);
             Value value_TimeSpan = new(timeSpan_Val);
-            Assert.Equal(typeof(System.TimeSpan), value_TimeSpan.ValueType);
-            Assert.Equal(timeSpan_Val, value_TimeSpan.GetValue<System.TimeSpan>());
+            Assert.Equal(typeof(TimeSpan), value_TimeSpan.ValueType);
+            Assert.Equal(timeSpan_Val, value_TimeSpan.GetValue<TimeSpan>());
             Query.SerializationCheck(value_TimeSpan);
 
             bool boolVal = true;
@@ -231,10 +231,10 @@ namespace DiGi.Core.xUnit
             Assert.Equal(dateTimeOffsets, value_DateTimeOffsets.GetValue<DateTimeOffset[]>());
             Query.SerializationCheck(value_DateTimeOffsets);
 
-            System.TimeSpan[] timeSpans = [System.TimeSpan.FromSeconds(10), System.TimeSpan.FromSeconds(20)];
+            TimeSpan[] timeSpans = [System.TimeSpan.FromSeconds(10), System.TimeSpan.FromSeconds(20)];
             Value value_TimeSpans = new(timeSpans);
-            Assert.Equal(typeof(System.TimeSpan[]), value_TimeSpans.ValueType);
-            Assert.Equal(timeSpans, value_TimeSpans.GetValue<System.TimeSpan[]>());
+            Assert.Equal(typeof(TimeSpan[]), value_TimeSpans.ValueType);
+            Assert.Equal(timeSpans, value_TimeSpans.GetValue<TimeSpan[]>());
             Query.SerializationCheck(value_TimeSpans);
 
             byte[] bytes = [(byte)1, (byte)2];

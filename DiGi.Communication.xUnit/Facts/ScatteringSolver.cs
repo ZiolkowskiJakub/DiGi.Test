@@ -53,7 +53,7 @@ namespace DiGi.Communication.xUnit
                 ScatteringSolver warmCpu = new() { GeometricalPropagationModel = warmModel, ScatteringSolverOptions = warmOptions };
                 warmCpu.Solve();
 
-                DiGi.Communication.ComputeSharp.Classes.ScatteringSolver warmGpu = new() { GeometricalPropagationModel = warmModel, ScatteringSolverOptions = warmOptions };
+                ComputeSharp.Classes.ScatteringSolver warmGpu = new() { GeometricalPropagationModel = warmModel, ScatteringSolverOptions = warmOptions };
                 warmGpu.Solve();
             }
 
@@ -121,7 +121,7 @@ namespace DiGi.Communication.xUnit
                 cpuSw.Stop();
 
                 // GPU Solving
-                DiGi.Communication.ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
+                ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
                 {
                     GeometricalPropagationModel = model,
                     ScatteringSolverOptions = options
@@ -287,7 +287,7 @@ namespace DiGi.Communication.xUnit
             Assert.Equal("U-Shape", cpuScattering.ScatteringPointGroups[1].Reference);
 
             // GPU Solver verification
-            DiGi.Communication.ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
+            ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
             {
                 GeometricalPropagationModel = model,
                 ScatteringSolverOptions = options

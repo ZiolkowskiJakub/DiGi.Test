@@ -95,11 +95,11 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Circle2D_Transform()
         {
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Center = new(0.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Circle2D circle2D_Target = new(point2D_Center, 5.0);
+            Point2D point2D_Center = new(0.0, 0.0);
+            Circle2D circle2D_Target = new(point2D_Center, 5.0);
 
             // 1. Test Move method
-            DiGi.Geometry.Planar.Classes.Vector2D vector2D_Translation = new(10.0, -10.0);
+            Vector2D vector2D_Translation = new(10.0, -10.0);
             bool bool_MoveResult = circle2D_Target.Move(vector2D_Translation);
 
             Assert.True(bool_MoveResult);
@@ -109,7 +109,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Target.Radius, 9);
 
             // 2. Test Transform method with Translation
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(-10.0, 10.0);
+            Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(-10.0, 10.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = circle2D_Target.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);
@@ -119,7 +119,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(5.0, circle2D_Target.Radius, 9);
 
             // 3. Test Transform method with Scaling
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0);
+            Transform2D? transform2D_Scale = Planar.Create.Transform2D.Scale(2.0);
             Assert.NotNull(transform2D_Scale);
             bool bool_ScaleResult = circle2D_Target.Transform(transform2D_Scale);
             Assert.True(bool_ScaleResult);
@@ -129,7 +129,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(10.0, circle2D_Target.Radius, 9);
 
             // 4. Test state safety on transformation failure
-            DiGi.Geometry.Planar.Classes.Transform2D transform2D_Invalid = new((System.Text.Json.Nodes.JsonObject?)null);
+            Transform2D transform2D_Invalid = new((System.Text.Json.Nodes.JsonObject?)null);
             bool bool_InvalidResult = circle2D_Target.Transform(transform2D_Invalid);
             Assert.False(bool_InvalidResult);
             Assert.NotNull(circle2D_Target.Center);

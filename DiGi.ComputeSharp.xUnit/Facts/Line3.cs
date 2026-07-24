@@ -16,7 +16,7 @@ namespace DiGi.ComputeSharp.xUnit
         public void Line3_On_Tolerance()
         {
             // Segment along the X axis from (0,0,0) to (10,0,0).
-            Line3 line3 = new(new DiGi.ComputeSharp.Core.Classes.Bool(true), new Coordinate3(0, 0, 0), new Coordinate3(10, 0, 0));
+            Line3 line3 = new(new Core.Classes.Bool(true), new Coordinate3(0, 0, 0), new Coordinate3(10, 0, 0));
 
             double tolerance = 1e-6;
 

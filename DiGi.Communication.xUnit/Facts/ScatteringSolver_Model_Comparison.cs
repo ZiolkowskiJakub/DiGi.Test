@@ -35,7 +35,7 @@ namespace DiGi.Communication.xUnit
                 ScatteringSolverOptions = scatteringSolverOptions
             };
 
-            DiGi.Communication.ComputeSharp.Classes.ScatteringSolver scatteringSolver_Gpu = new()
+            ComputeSharp.Classes.ScatteringSolver scatteringSolver_Gpu = new()
             {
                 GeometricalPropagationModel = geometricalPropagationModel_Gpu,
                 ScatteringSolverOptions = scatteringSolverOptions

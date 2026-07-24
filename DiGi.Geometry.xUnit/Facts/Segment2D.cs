@@ -8,9 +8,9 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Segment2D_Inverse()
         {
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Start = new(0.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Point2D point2D_End = new(10.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Segment2D segment2D_Line = new(point2D_Start, point2D_End);
+            Planar.Classes.Point2D point2D_Start = new(0.0, 0.0);
+            Planar.Classes.Point2D point2D_End = new(10.0, 0.0);
+            Planar.Classes.Segment2D segment2D_Line = new(point2D_Start, point2D_End);
 
             // Verify initial state
             Assert.NotNull(segment2D_Line.Start);
@@ -44,12 +44,12 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Segment2D_Transform()
         {
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Start = new(0.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Point2D point2D_End = new(10.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Segment2D segment2D_Line = new(point2D_Start, point2D_End);
+            Planar.Classes.Point2D point2D_Start = new(0.0, 0.0);
+            Planar.Classes.Point2D point2D_End = new(10.0, 0.0);
+            Planar.Classes.Segment2D segment2D_Line = new(point2D_Start, point2D_End);
 
             // 1. Test Transform method with Translation
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(2.0, 3.0);
+            Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(2.0, 3.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = segment2D_Line.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);
@@ -61,7 +61,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(3.0, segment2D_Line.End.Y, 9);
 
             // 2. Test state safety on transformation failure
-            DiGi.Geometry.Planar.Classes.Transform2D transform2D_Invalid = new((DiGi.Math.Classes.Matrix3D?)null);
+            Planar.Classes.Transform2D transform2D_Invalid = new((Math.Classes.Matrix3D?)null);
             bool bool_InvalidResult = segment2D_Line.Transform(transform2D_Invalid);
             Assert.False(bool_InvalidResult);
             Assert.NotNull(segment2D_Line.Start);

@@ -178,7 +178,7 @@ namespace DiGi.ComputeSharp.xUnit
 
         /// <summary>
         /// Runs the native intersection of the reference segment against the first <paramref name="count"/> segments
-        /// across all available CPU cores using <see cref="Parallel.For(int, int, Func{int, System.Threading.Tasks.ParallelLoopState, int, int}, Func{int, int})"/>
+        /// across all available CPU cores using <see cref="Parallel.For(int, int, Func{int, ParallelLoopState, int, int}, Func{int, int})"/>
         /// thread-local accumulation, and returns the number of on-segment intersection points.
         /// </summary>
         /// <param name="reference_Segment2D">The reference segment intersected against every segment.</param>

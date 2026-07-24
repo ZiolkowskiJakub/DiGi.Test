@@ -388,7 +388,7 @@ namespace DiGi.Geometry.xUnit
 
             // Execute and measure
             Stopwatch stopwatch = Stopwatch.StartNew();
-            DiGi.Geometry.Planar.Interfaces.IPolygonal2D? polygonal2D = Planar.Create.Polygonal2D(point2Ds_Triangle);
+            Planar.Interfaces.IPolygonal2D? polygonal2D = Planar.Create.Polygonal2D(point2Ds_Triangle);
             stopwatch.Stop();
 
             // Assert Correctness
@@ -413,7 +413,7 @@ namespace DiGi.Geometry.xUnit
                 new Point3D(1, 1, 0),
                 new Point3D(0, 1, 0)
             }.Select(x => x);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Normal = Spatial.Constants.Vector3D.WorldZ;
+            Spatial.Classes.Vector3D vector3D_Normal = Spatial.Constants.Vector3D.WorldZ;
 
             // Warm up / JIT compile
             _ = Spatial.Create.Polygon3D(point3Ds_Lazy);
@@ -869,7 +869,7 @@ namespace DiGi.Geometry.xUnit
             }.Select(x => x);
             _ = Spatial.Query.Orientation(plane, point2Ds_Lazy.Take(2));
             Stopwatch stopwatch = Stopwatch.StartNew();
-            DiGi.Geometry.Core.Enums.Orientation orientation = Spatial.Query.Orientation(plane, point2Ds_Lazy);
+            Core.Enums.Orientation orientation = Spatial.Query.Orientation(plane, point2Ds_Lazy);
             stopwatch.Stop();
             Assert.NotEqual(Core.Enums.Orientation.Undefined, orientation);
             Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Spatial Orientation performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
@@ -1019,7 +1019,7 @@ namespace DiGi.Geometry.xUnit
 
             // Execute and measure
             Stopwatch stopwatch = Stopwatch.StartNew();
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Normal = Spatial.Query.Normal(point3Ds);
+            Spatial.Classes.Vector3D? vector3D_Normal = Spatial.Query.Normal(point3Ds);
             stopwatch.Stop();
 
             // Assert Correctness
@@ -1690,15 +1690,15 @@ namespace DiGi.Geometry.xUnit
             Point3D point3D_2 = new(10.0, 0.0, 0.0);
             Point3D point3D_3 = new(0.0, 10.0, 0.0);
 
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_NormalTri = Spatial.Query.Normal(point3D_1, point3D_2, point3D_3);
+            Spatial.Classes.Vector3D? vector3D_NormalTri = Spatial.Query.Normal(point3D_1, point3D_2, point3D_3);
             Assert.NotNull(vector3D_NormalTri);
             Assert.Equal(0.0, vector3D_NormalTri.X, 1e-5);
             Assert.Equal(0.0, vector3D_NormalTri.Y, 1e-5);
             Assert.True(System.Math.Abs(vector3D_NormalTri.Z) > 0.99);
 
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_AxisX = new(1.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_AxisY = new(0.0, 1.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_NormalVec = Spatial.Query.Normal(vector3D_AxisX, vector3D_AxisY);
+            Spatial.Classes.Vector3D vector3D_AxisX = new(1.0, 0.0, 0.0);
+            Spatial.Classes.Vector3D vector3D_AxisY = new(0.0, 1.0, 0.0);
+            Spatial.Classes.Vector3D? vector3D_NormalVec = Spatial.Query.Normal(vector3D_AxisX, vector3D_AxisY);
             Assert.NotNull(vector3D_NormalVec);
             Assert.Equal(0.0, vector3D_NormalVec.X, 1e-5);
             Assert.Equal(0.0, vector3D_NormalVec.Y, 1e-5);
@@ -1971,7 +1971,7 @@ namespace DiGi.Geometry.xUnit
         {
             // 2D Line Setup
             Point2D origin2D = new Point2D(0.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Vector2D direction2D = new DiGi.Geometry.Planar.Classes.Vector2D(1.0, 0.0);
+            Vector2D direction2D = new Vector2D(1.0, 0.0);
             Line2D line2D = new Line2D(origin2D, direction2D);
 
             Point2D targetPoint2D = new Point2D(5.0, 10.0);
@@ -1986,7 +1986,7 @@ namespace DiGi.Geometry.xUnit
             Assert.False(line2D.On(targetPoint2D, 1e-5));
 
             // Line-Line Intersection Correctness
-            Line2D otherLine = new Line2D(new Point2D(5.0, 5.0), new DiGi.Geometry.Planar.Classes.Vector2D(0.0, 1.0));
+            Line2D otherLine = new Line2D(new Point2D(5.0, 5.0), new Vector2D(0.0, 1.0));
             Point2D? lineIntersection = line2D.IntersectionPoint(otherLine);
             Assert.NotNull(lineIntersection);
             Assert.Equal(5.0, lineIntersection.X, 1e-5);
@@ -2001,7 +2001,7 @@ namespace DiGi.Geometry.xUnit
 
             // 3D Line Setup
             Point3D origin3D = new Point3D(0.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D direction3D = new DiGi.Geometry.Spatial.Classes.Vector3D(1.0, 0.0, 0.0);
+            Spatial.Classes.Vector3D direction3D = new Spatial.Classes.Vector3D(1.0, 0.0, 0.0);
             Line3D line3D = new Line3D(origin3D, direction3D);
 
             Point3D targetPoint3D = new Point3D(5.0, 10.0, 15.0);
@@ -2053,7 +2053,7 @@ namespace DiGi.Geometry.xUnit
         {
             // 2D Ray Setup
             Point2D point2D_Origin = new Point2D(0.0, 0.0);
-            DiGi.Geometry.Planar.Classes.Vector2D vector2D_Direction = new DiGi.Geometry.Planar.Classes.Vector2D(1.0, 0.0);
+            Vector2D vector2D_Direction = new Vector2D(1.0, 0.0);
             Ray2D ray2D_Test = new Ray2D(point2D_Origin, vector2D_Direction);
 
             Point2D point2D_TargetFront = new Point2D(5.0, 10.0);
@@ -2079,7 +2079,7 @@ namespace DiGi.Geometry.xUnit
             Assert.False(ray2D_Test.On(new Point2D(-7.5, 0.0), 1e-5));
 
             // Ray-Ray Intersection Correctness
-            Ray2D ray2D_Other = new Ray2D(new Point2D(5.0, 5.0), new DiGi.Geometry.Planar.Classes.Vector2D(0.0, -1.0));
+            Ray2D ray2D_Other = new Ray2D(new Point2D(5.0, 5.0), new Vector2D(0.0, -1.0));
             Point2D? point2D_RayIntersection = ray2D_Test.IntersectionPoint(ray2D_Other);
             Assert.NotNull(point2D_RayIntersection);
             Assert.Equal(5.0, point2D_RayIntersection.X, 1e-5);
@@ -2094,7 +2094,7 @@ namespace DiGi.Geometry.xUnit
 
             // 3D Ray Setup
             Point3D point3D_Origin = new Point3D(0.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Direction = new DiGi.Geometry.Spatial.Classes.Vector3D(1.0, 0.0, 0.0);
+            Spatial.Classes.Vector3D vector3D_Direction = new Spatial.Classes.Vector3D(1.0, 0.0, 0.0);
             Ray3D ray3D_Test = new Ray3D(point3D_Origin, vector3D_Direction);
 
             Point3D point3D_TargetFront = new Point3D(5.0, 10.0, 15.0);
@@ -2158,7 +2158,7 @@ namespace DiGi.Geometry.xUnit
         {
             // 3D Plane Setup
             Point3D point3D_Origin = new Point3D(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Normal = new DiGi.Geometry.Spatial.Classes.Vector3D(0.0, 0.0, 1.0);
+            Spatial.Classes.Vector3D vector3D_Normal = new Spatial.Classes.Vector3D(0.0, 0.0, 1.0);
             Plane plane_Test = new Plane(point3D_Origin, vector3D_Normal);
 
             Point3D point3D_Target = new Point3D(5.0, 6.0, 10.0);
@@ -2174,8 +2174,8 @@ namespace DiGi.Geometry.xUnit
             Assert.True(Spatial.Query.On(plane_Test, new Point3D(5.0, 6.0, 3.0), 1e-5));
             Assert.False(Spatial.Query.On(plane_Test, point3D_Target, 1e-5));
 
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_OnPlane = new DiGi.Geometry.Spatial.Classes.Vector3D(5.0, 5.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_OffPlane = new DiGi.Geometry.Spatial.Classes.Vector3D(5.0, 5.0, 5.0);
+            Spatial.Classes.Vector3D vector3D_OnPlane = new Spatial.Classes.Vector3D(5.0, 5.0, 0.0);
+            Spatial.Classes.Vector3D vector3D_OffPlane = new Spatial.Classes.Vector3D(5.0, 5.0, 5.0);
             Assert.True(Spatial.Query.On(plane_Test, vector3D_OnPlane, 1e-5));
             Assert.False(Spatial.Query.On(plane_Test, vector3D_OffPlane, 1e-5));
 
@@ -2253,7 +2253,7 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(2.0, point2D_Foci[1].Y, 1e-5);
 
             // Assert Correctness of Transform
-            DiGi.Geometry.Planar.Classes.Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(10.0, -10.0);
+            Transform2D? transform2D_Trans = Planar.Create.Transform2D.Translation(10.0, -10.0);
             Assert.NotNull(transform2D_Trans);
             bool bool_TransResult = ellipse2D_Test.Transform(transform2D_Trans);
             Assert.True(bool_TransResult);
@@ -2404,7 +2404,7 @@ namespace DiGi.Geometry.xUnit
 
             // Setup Segment3D
             Point3D point3D_Start = new Point3D(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Vec = new DiGi.Geometry.Spatial.Classes.Vector3D(4.0, 3.0, 0.0); // Length = 5.0
+            Spatial.Classes.Vector3D vector3D_Vec = new Spatial.Classes.Vector3D(4.0, 3.0, 0.0); // Length = 5.0
             Segment3D segment3D_Test = new Segment3D(point3D_Start, vector3D_Vec);
 
             Point3D point3D_Target = new Point3D(5.0, 0.0, 3.0);
@@ -2440,7 +2440,7 @@ namespace DiGi.Geometry.xUnit
         {
             // Setup Plane
             Point3D point3D_Origin = new Point3D(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Normal = new DiGi.Geometry.Spatial.Classes.Vector3D(0.0, 0.0, 1.0); // Normal is Z axis
+            Spatial.Classes.Vector3D vector3D_Normal = new Spatial.Classes.Vector3D(0.0, 0.0, 1.0); // Normal is Z axis
             Plane plane_Test = new Plane(point3D_Origin, vector3D_Normal);
 
             // Setup Rectangle3D on that plane
@@ -2496,7 +2496,7 @@ namespace DiGi.Geometry.xUnit
         {
             // Setup Plane
             Point3D point3D_Origin = new Point3D(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Normal = new DiGi.Geometry.Spatial.Classes.Vector3D(0.0, 0.0, 1.0); // Normal is Z axis
+            Spatial.Classes.Vector3D vector3D_Normal = new Spatial.Classes.Vector3D(0.0, 0.0, 1.0); // Normal is Z axis
             Plane plane_Test = new Plane(point3D_Origin, vector3D_Normal);
 
             // 1. Setup Polygon3D
@@ -2834,8 +2834,8 @@ namespace DiGi.Geometry.xUnit
             Point2D point2D = new(50.0, 50.0);
             Point3D point3D = new(50.0, 50.0, 50.0);
 
-            Line2D line2D = new(new Point2D(0.0, 0.0), new DiGi.Geometry.Planar.Classes.Vector2D(1.0, 0.0));
-            Ray2D ray2D = new(new Point2D(0.0, 0.0), new DiGi.Geometry.Planar.Classes.Vector2D(1.0, 0.0));
+            Line2D line2D = new(new Point2D(0.0, 0.0), new Vector2D(1.0, 0.0));
+            Ray2D ray2D = new(new Point2D(0.0, 0.0), new Vector2D(1.0, 0.0));
             Segment2D segment2D = new(0.0, 0.0, 100.0, 100.0);
             Transform2D transform2D_1 = Planar.Create.Transform2D.Translation(10.0, 20.0);
             Assert.NotNull(transform2D_1);

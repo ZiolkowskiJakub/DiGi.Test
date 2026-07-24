@@ -10,7 +10,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="Core.Query.Equals{T}(System.Collections.Generic.IEnumerable{T}, System.Collections.Generic.IEnumerable{T})"/>
+        /// Tests that <see cref="Core.Query.Equals{T}(IEnumerable{T}, IEnumerable{T})"/>
         /// still correctly compares two equal-length sequences with equal elements, after replacing the
         /// Count()+ElementAt(i) double-enumeration with a single paired-enumerator pass.
         /// </summary>
@@ -43,7 +43,7 @@ namespace DiGi.Core.xUnit
             List<int> list_1 = [1, 2, 3];
             List<int> list_2 = [1, 2, 4];
 
-            Assert.False(Core.Query.Equals<int>(list_1, list_2));
+            Assert.False(Core.Query.Equals(list_1, list_2));
         }
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace DiGi.Core.xUnit
             List<List<int>> nested_2 = [[1, 2], [3, 4]];
             List<List<int>> nested_3 = [[1, 2], [3, 5]];
 
-            Assert.True(Core.Query.Equals<List<int>>(nested_1, nested_2));
-            Assert.False(Core.Query.Equals<List<int>>(nested_1, nested_3));
+            Assert.True(Core.Query.Equals(nested_1, nested_2));
+            Assert.False(Core.Query.Equals(nested_1, nested_3));
         }
 
         /// <summary>

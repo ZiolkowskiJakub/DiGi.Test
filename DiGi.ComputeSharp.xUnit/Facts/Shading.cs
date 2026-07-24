@@ -44,7 +44,7 @@ namespace DiGi.ComputeSharp.xUnit
                     Assert.NotNull(result_GPU);
                     Assert.Equal(result_CPU!.Count, result_GPU!.Count);
                 }
-                catch (System.Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
+                catch (Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
                 {
                     testOutputHelper.WriteLine("WARNING: GPU FP64 double-precision operations are not supported on this graphics card: " + exception.Message);
                 }
@@ -92,7 +92,7 @@ namespace DiGi.ComputeSharp.xUnit
                     Assert.NotNull(result_GPU);
                     Assert.Equal(5, enumerationCount);
                 }
-                catch (System.Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
+                catch (Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
                 {
                     testOutputHelper.WriteLine("WARNING: GPU FP64 double-precision operations are not supported on this graphics card: " + exception.Message);
                 }

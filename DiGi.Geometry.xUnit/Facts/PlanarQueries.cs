@@ -9,14 +9,14 @@ namespace DiGi.Geometry.xUnit
         public void PlanarQueries_DistanceAndClosestPoint()
         {
             // Use a target point outside the rectangle to have a unique closest point on the boundary
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Target = new(5.0, -10.0);
+            Planar.Classes.Point2D point2D_Target = new(5.0, -10.0);
 
             // Create a rectangle as the segmentable shape (origin at (0,0), width 10, height 10)
-            DiGi.Geometry.Planar.Classes.Rectangle2D rectangle2D_Shape = new(10.0, 10.0);
+            Planar.Classes.Rectangle2D rectangle2D_Shape = new(10.0, 10.0);
 
             // 1. Verify generic Distance<T> with out parameter populates closestPoint2D correctly
-            System.Collections.Generic.List<DiGi.Geometry.Planar.Classes.Rectangle2D> list_Shapes = [rectangle2D_Shape];
-            DiGi.Geometry.Planar.Classes.Point2D? point2D_Closest;
+            List<Planar.Classes.Rectangle2D> list_Shapes = [rectangle2D_Shape];
+            Planar.Classes.Point2D? point2D_Closest;
             double double_Distance = Planar.Query.Distance(point2D_Target, list_Shapes, out point2D_Closest);
 
             Assert.Equal(10.0, double_Distance, 9);
@@ -29,7 +29,7 @@ namespace DiGi.Geometry.xUnit
 
             // 2. Verify generic ClosestPoint<T> with out parameter populates distance correctly
             double double_ClosestDistance;
-            DiGi.Geometry.Planar.Classes.Point2D? point2D_ClosestPoint = Planar.Query.ClosestPoint(point2D_Target, list_Shapes, out double_ClosestDistance);
+            Planar.Classes.Point2D? point2D_ClosestPoint = Planar.Query.ClosestPoint(point2D_Target, list_Shapes, out double_ClosestDistance);
 
             Assert.NotNull(point2D_ClosestPoint);
             Assert.Equal(10.0, double_ClosestDistance, 9);
@@ -40,13 +40,13 @@ namespace DiGi.Geometry.xUnit
             }
 
             // 3. Verify Distance(ISegmentable2D, BoundingBox2D) output parameter ordering
-            DiGi.Geometry.Planar.Classes.BoundingBox2D boundingBox2D_Box = new(
-                new DiGi.Geometry.Planar.Classes.Point2D(20.0, 0.0),
-                new DiGi.Geometry.Planar.Classes.Point2D(30.0, 10.0)
+            Planar.Classes.BoundingBox2D boundingBox2D_Box = new(
+                new Planar.Classes.Point2D(20.0, 0.0),
+                new Planar.Classes.Point2D(30.0, 10.0)
             );
 
-            DiGi.Geometry.Planar.Classes.Point2D? point2D_ClosestOnSegmentable;
-            DiGi.Geometry.Planar.Classes.Point2D? point2D_ClosestOnBox;
+            Planar.Classes.Point2D? point2D_ClosestOnSegmentable;
+            Planar.Classes.Point2D? point2D_ClosestOnBox;
 
             // Distance between Rectangle2D [0,10]x[0,10] and BoundingBox2D [20,30]x[0,10]
             double double_BoxDistance = Planar.Query.Distance(

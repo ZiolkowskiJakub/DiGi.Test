@@ -352,7 +352,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotEmpty(mesh3Ds_Above);
 
             Spatial.Classes.Vector3D? normal = plane.Normal;
-            Spatial.Classes.Point3D? origin = plane.Origin;
+            Point3D? origin = plane.Origin;
             Assert.NotNull(normal);
             Assert.NotNull(origin);
 

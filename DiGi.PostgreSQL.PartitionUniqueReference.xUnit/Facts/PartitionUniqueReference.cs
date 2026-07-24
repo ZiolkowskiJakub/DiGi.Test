@@ -15,10 +15,10 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
             TypeReference typeReference = new("DiGi.GIS.Classes.Building2D,DiGi.GIS");
             GuidReference guidReference = new(typeReference, Guid.NewGuid());
 
-            PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference = new("building2d", guidReference);
+            PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference = new("building2d", guidReference);
 
             Assert.True(Core.Query.TryParse(partitionUniqueReference.ToString(), out IReference? reference));
-            Assert.IsType<PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference>(reference);
+            Assert.IsType<PartitionUniqueReference.Classes.PartitionUniqueReference>(reference);
             Assert.Equal(partitionUniqueReference.ToString(), reference.ToString());
             Assert.True(partitionUniqueReference.Equals(reference));
         }
@@ -33,9 +33,9 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
             TypeReference typeReference = new("DiGi.GIS.Classes.Building2D,DiGi.GIS");
             UniqueIdReference uniqueIdReference = new(typeReference, "BLD-001");
 
-            PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference = new("building2d", uniqueIdReference);
+            PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference = new("building2d", uniqueIdReference);
 
-            Assert.True(Core.Query.TryParse(partitionUniqueReference.ToString(), out PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference? partitionUniqueReference_Parsed));
+            Assert.True(Core.Query.TryParse(partitionUniqueReference.ToString(), out PartitionUniqueReference.Classes.PartitionUniqueReference? partitionUniqueReference_Parsed));
             Assert.NotNull(partitionUniqueReference_Parsed);
             Assert.Equal("building2d", partitionUniqueReference_Parsed.Name);
             Assert.IsType<UniqueIdReference>(partitionUniqueReference_Parsed.UniqueReference);
@@ -49,13 +49,13 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
         [Fact]
         public void PartitionUniqueReference_NullUniqueReference()
         {
-            PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference_1 = new("building2d", null);
-            PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference_2 = new("building2d", new UniqueIdReference(new TypeReference("DiGi.GIS.Classes.Building2D,DiGi.GIS"), "BLD-001"));
+            PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference_1 = new("building2d", null);
+            PartitionUniqueReference.Classes.PartitionUniqueReference partitionUniqueReference_2 = new("building2d", new UniqueIdReference(new TypeReference("DiGi.GIS.Classes.Building2D,DiGi.GIS"), "BLD-001"));
 
             Assert.NotNull(partitionUniqueReference_1.ToString());
             Assert.NotEqual(partitionUniqueReference_1.ToString(), partitionUniqueReference_2.ToString());
 
-            Assert.True(Core.Query.TryParse(partitionUniqueReference_1.ToString(), out PostgreSQL.PartitionUniqueReference.Classes.PartitionUniqueReference? partitionUniqueReference_1_Parsed));
+            Assert.True(Core.Query.TryParse(partitionUniqueReference_1.ToString(), out PartitionUniqueReference.Classes.PartitionUniqueReference? partitionUniqueReference_1_Parsed));
             Assert.NotNull(partitionUniqueReference_1_Parsed);
             Assert.Null(partitionUniqueReference_1_Parsed.UniqueReference);
         }

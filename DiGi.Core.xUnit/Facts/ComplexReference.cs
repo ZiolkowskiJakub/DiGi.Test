@@ -12,9 +12,9 @@ namespace DiGi.Core.xUnit
         /// country, rooted at an external reference.
         /// </summary>
         /// <returns>The chain.</returns>
-        public static Core.Classes.ComplexReference ComplexReference_CountryToWall()
+        public static ComplexReference ComplexReference_CountryToWall()
         {
-            return new Core.Classes.ComplexReference(
+            return new ComplexReference(
             [
                 new TypeRelatedExternalReference("POLAND", new TypeReference("DiGi.GIS.Classes.Country,DiGi.GIS")),
                 new UniqueIdReference(new TypeReference("DiGi.GIS.Classes.Area,DiGi.GIS"), "Mazowieckie"),
@@ -30,9 +30,9 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void ComplexReference_RoundTrip()
         {
-            Core.Classes.ComplexReference complexReference = ComplexReference_CountryToWall();
+            ComplexReference complexReference = ComplexReference_CountryToWall();
 
-            Assert.True(Core.Query.TryParse(complexReference.ToString(), out Core.Classes.ComplexReference? complexReference_Parsed));
+            Assert.True(Core.Query.TryParse(complexReference.ToString(), out ComplexReference? complexReference_Parsed));
             Assert.NotNull(complexReference_Parsed);
 
             Assert.Equal(complexReference.ToString(), complexReference_Parsed.ToString());
@@ -58,7 +58,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void ComplexReference_IsNotUniqueReference()
         {
-            Core.Classes.ComplexReference complexReference = ComplexReference_CountryToWall();
+            ComplexReference complexReference = ComplexReference_CountryToWall();
 
             Assert.IsAssignableFrom<IComplexReference>(complexReference);
             Assert.False(complexReference is IUniqueReference);
@@ -73,13 +73,13 @@ namespace DiGi.Core.xUnit
             TypeReference typeReference = new(typeof(TestObject));
 
             List<ISerializableReference?> references_Empty = [];
-            Core.Classes.ComplexReference complexReference_Empty = new(references_Empty);
-            Assert.True(Core.Query.TryParse(complexReference_Empty.ToString(), out Core.Classes.ComplexReference? complexReference_Empty_Parsed));
+            ComplexReference complexReference_Empty = new(references_Empty);
+            Assert.True(Core.Query.TryParse(complexReference_Empty.ToString(), out ComplexReference? complexReference_Empty_Parsed));
             Assert.NotNull(complexReference_Empty_Parsed);
             Assert.Empty(complexReference_Empty_Parsed.References);
 
-            Core.Classes.ComplexReference complexReference_Single = new([typeReference]);
-            Assert.True(Core.Query.TryParse(complexReference_Single.ToString(), out Core.Classes.ComplexReference? complexReference_Single_Parsed));
+            ComplexReference complexReference_Single = new([typeReference]);
+            Assert.True(Core.Query.TryParse(complexReference_Single.ToString(), out ComplexReference? complexReference_Single_Parsed));
             Assert.NotNull(complexReference_Single_Parsed);
             Assert.Single(complexReference_Single_Parsed.References);
 
@@ -89,8 +89,8 @@ namespace DiGi.Core.xUnit
                 references.Add(new UniqueIdReference(typeReference, string.Format("STEP-{0}", i)));
             }
 
-            Core.Classes.ComplexReference complexReference_Deep = new(references);
-            Assert.True(Core.Query.TryParse(complexReference_Deep.ToString(), out Core.Classes.ComplexReference? complexReference_Deep_Parsed));
+            ComplexReference complexReference_Deep = new(references);
+            Assert.True(Core.Query.TryParse(complexReference_Deep.ToString(), out ComplexReference? complexReference_Deep_Parsed));
             Assert.NotNull(complexReference_Deep_Parsed);
             Assert.Equal(10, complexReference_Deep_Parsed.Count);
             Assert.Equal(complexReference_Deep.ToString(), complexReference_Deep_Parsed.ToString());
@@ -103,14 +103,14 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void ComplexReference_NestedComplexReference()
         {
-            Core.Classes.ComplexReference complexReference_Inner = ComplexReference_CountryToWall();
-            Core.Classes.ComplexReference complexReference = new([new TypeReference(typeof(TestObject)), complexReference_Inner]);
+            ComplexReference complexReference_Inner = ComplexReference_CountryToWall();
+            ComplexReference complexReference = new([new TypeReference(typeof(TestObject)), complexReference_Inner]);
 
-            Assert.True(Core.Query.TryParse(complexReference.ToString(), out Core.Classes.ComplexReference? complexReference_Parsed));
+            Assert.True(Core.Query.TryParse(complexReference.ToString(), out ComplexReference? complexReference_Parsed));
             Assert.NotNull(complexReference_Parsed);
             Assert.Equal(complexReference.ToString(), complexReference_Parsed.ToString());
 
-            Core.Classes.ComplexReference? complexReference_Inner_Parsed = complexReference_Parsed[1] as Core.Classes.ComplexReference;
+            ComplexReference? complexReference_Inner_Parsed = complexReference_Parsed[1] as ComplexReference;
             Assert.NotNull(complexReference_Inner_Parsed);
             Assert.Equal(complexReference_Inner.Count, complexReference_Inner_Parsed.Count);
         }
@@ -124,13 +124,13 @@ namespace DiGi.Core.xUnit
             TypeReference typeReference = new(typeof(TestObject));
             GuidReference guidReference = new(typeReference, Guid.NewGuid());
 
-            Core.Classes.ComplexReference complexReference = new(
+            ComplexReference complexReference = new(
             [
                 new UniqueIdReference(typeReference, "BLD-001"),
                 new GuidPropertyReference(guidReference, "Name"),
             ]);
 
-            Assert.True(Core.Query.TryParse(complexReference.ToString(), out Core.Classes.ComplexReference? complexReference_Parsed));
+            Assert.True(Core.Query.TryParse(complexReference.ToString(), out ComplexReference? complexReference_Parsed));
             Assert.NotNull(complexReference_Parsed);
             Assert.IsType<GuidPropertyReference>(complexReference_Parsed[1]);
         }
@@ -155,11 +155,11 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void ComplexReference_Serialization()
         {
-            Core.Classes.ComplexReference complexReference = ComplexReference_CountryToWall();
+            ComplexReference complexReference = ComplexReference_CountryToWall();
 
             Query.SerializationCheck(complexReference);
 
-            Core.Classes.ComplexReference? complexReference_Clone = complexReference.Clone() as Core.Classes.ComplexReference;
+            ComplexReference? complexReference_Clone = complexReference.Clone() as ComplexReference;
             Assert.NotNull(complexReference_Clone);
             Assert.Equal(complexReference.Count, complexReference_Clone.Count);
             Assert.Equal(complexReference.ToString(), complexReference_Clone.ToString());

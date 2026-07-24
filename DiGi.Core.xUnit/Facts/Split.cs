@@ -6,7 +6,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="Core.Query.Split{X}(System.Collections.Generic.IEnumerable{X}, int)"/> still returns
+        /// Tests that <see cref="Core.Query.Split{X}(IEnumerable{X}, int)"/> still returns
         /// a single chunk containing all elements when the sequence is no larger than maxCount, after removing the
         /// double enumeration (Count() then a separate materialization of the same sequence).
         /// </summary>

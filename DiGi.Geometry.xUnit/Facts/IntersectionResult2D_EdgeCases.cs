@@ -394,7 +394,7 @@ namespace DiGi.Geometry.xUnit
 
             for (int seed = 0; seed < 300; seed++)
             {
-                System.Random random = DiGi.Core.Create.Random(seed);
+                Random random = DiGi.Core.Create.Random(seed);
                 Segment2D? segment2D_1 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                 Segment2D? segment2D_2 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                 if (segment2D_1 == null || segment2D_2 == null)
@@ -433,7 +433,7 @@ namespace DiGi.Geometry.xUnit
 
             for (int seed = 0; seed < 300; seed++)
             {
-                System.Random random = DiGi.Core.Create.Random(seed);
+                Random random = DiGi.Core.Create.Random(seed);
                 Segment2D? segment2D_1 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                 Segment2D? segment2D_2 = Planar.Random.Create.Segment2D(boundingBox2D, random);
                 if (segment2D_1 == null || segment2D_2 == null)
@@ -485,7 +485,7 @@ namespace DiGi.Geometry.xUnit
 
             for (int seed = 0; seed < 8; seed++)
             {
-                System.Random random = DiGi.Core.Create.Random(seed);
+                Random random = DiGi.Core.Create.Random(seed);
 
                 List<Segment2D> segment2Ds_1 = [];
                 List<Segment2D> segment2Ds_2 = [];

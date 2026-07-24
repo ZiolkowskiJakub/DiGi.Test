@@ -11,10 +11,10 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
         [Fact]
         public void PartitionReference_RoundTrip()
         {
-            PostgreSQL.PartitionReference.Classes.PartitionReference partitionReference = new("building2d", Guid.NewGuid().ToString("N"));
+            PartitionReference.Classes.PartitionReference partitionReference = new("building2d", Guid.NewGuid().ToString("N"));
 
             Assert.True(Core.Query.TryParse(partitionReference.ToString(), out IReference? reference));
-            Assert.IsType<PostgreSQL.PartitionReference.Classes.PartitionReference>(reference);
+            Assert.IsType<PartitionReference.Classes.PartitionReference>(reference);
             Assert.Equal(partitionReference.ToString(), reference.ToString());
             Assert.True(partitionReference.Equals(reference));
         }
@@ -26,9 +26,9 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
         [Fact]
         public void PartitionReference_NameContainingArrow()
         {
-            PostgreSQL.PartitionReference.Classes.PartitionReference partitionReference = new("a->b", "id->1");
+            PartitionReference.Classes.PartitionReference partitionReference = new("a->b", "id->1");
 
-            Assert.True(Core.Query.TryParse(partitionReference.ToString(), out PostgreSQL.PartitionReference.Classes.PartitionReference? partitionReference_Parsed));
+            Assert.True(Core.Query.TryParse(partitionReference.ToString(), out PartitionReference.Classes.PartitionReference? partitionReference_Parsed));
             Assert.NotNull(partitionReference_Parsed);
             Assert.Equal("a->b", partitionReference_Parsed.Name);
             Assert.Equal("id->1", partitionReference_Parsed.UniqueId);
@@ -42,13 +42,13 @@ namespace DiGi.PostgreSQL.PartitionReference.xUnit
         [Fact]
         public void PartitionReference_BlankFields()
         {
-            PostgreSQL.PartitionReference.Classes.PartitionReference partitionReference_1 = new(null, null);
-            PostgreSQL.PartitionReference.Classes.PartitionReference partitionReference_2 = new("a", null);
+            PartitionReference.Classes.PartitionReference partitionReference_1 = new(null, null);
+            PartitionReference.Classes.PartitionReference partitionReference_2 = new("a", null);
 
             Assert.NotNull(partitionReference_1.ToString());
             Assert.NotEqual(partitionReference_1.ToString(), partitionReference_2.ToString());
 
-            Assert.True(Core.Query.TryParse(partitionReference_1.ToString(), out PostgreSQL.PartitionReference.Classes.PartitionReference? partitionReference_1_Parsed));
+            Assert.True(Core.Query.TryParse(partitionReference_1.ToString(), out PartitionReference.Classes.PartitionReference? partitionReference_1_Parsed));
             Assert.NotNull(partitionReference_1_Parsed);
             Assert.Null(partitionReference_1_Parsed.Name);
         }

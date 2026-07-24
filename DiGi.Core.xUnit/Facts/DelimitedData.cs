@@ -30,11 +30,11 @@ namespace DiGi.Core.xUnit
             Assert.Equal("30", row1[2]);
 
             // Try conversion on row elements
-            bool hasId = row1.TryGetValue<int>(0, out int idVal);
+            bool hasId = row1.TryGetValue(0, out int idVal);
             Assert.True(hasId);
             Assert.Equal(1, idVal);
 
-            bool hasAge = row1.TryGetValue<int>(2, out int ageVal);
+            bool hasAge = row1.TryGetValue(2, out int ageVal);
             Assert.True(hasAge);
             Assert.Equal(30, ageVal);
 

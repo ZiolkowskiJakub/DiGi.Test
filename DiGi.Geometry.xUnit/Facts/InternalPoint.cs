@@ -114,10 +114,10 @@ namespace DiGi.Geometry.xUnit
 
         /// <summary>
         /// Tests the mean-center (Average) fallback candidate. Uses an L-notched square whose bottom edge is
-        /// densely subdivided with collinear points: the area <see cref="Planar.Query.Centroid(IEnumerable{Point2D}?)"/>
+        /// densely subdivided with collinear points: the area <see cref="Query.Centroid(IEnumerable{Point2D}?)"/>
         /// is unaffected by the subdivision and falls inside the notch (invalid), while the vertex
-        /// <see cref="Planar.Query.Average(IEnumerable{Point2D}?)"/> is pulled toward the dense bottom edge and lands
-        /// strictly inside the polygon body, so <see cref="Planar.Query.InternalPoint(IEnumerable{Point2D}?, double)"/>
+        /// <see cref="Query.Average(IEnumerable{Point2D}?)"/> is pulled toward the dense bottom edge and lands
+        /// strictly inside the polygon body, so <see cref="Query.InternalPoint(IEnumerable{Point2D}?, double)"/>
         /// must return it.
         /// </summary>
         [Fact]

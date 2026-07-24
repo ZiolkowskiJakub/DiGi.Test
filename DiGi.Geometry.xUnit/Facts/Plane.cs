@@ -15,7 +15,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_ThreeNullPoints()
         {
-            Spatial.Classes.Plane plane_Null = new((Spatial.Classes.Point3D?)null, (Spatial.Classes.Point3D?)null, (Spatial.Classes.Point3D?)null);
+            Plane plane_Null = new((Point3D?)null, (Point3D?)null, (Point3D?)null);
 
             Assert.Null(plane_Null.Origin);
             Assert.Null(plane_Null.Normal);
@@ -32,11 +32,11 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_CollinearPoints()
         {
-            Spatial.Classes.Point3D point3D_1 = new(0.0, 0.0, 0.0);
-            Spatial.Classes.Point3D point3D_2 = new(1.0, 1.0, 1.0);
-            Spatial.Classes.Point3D point3D_3 = new(2.0, 2.0, 2.0);
+            Point3D point3D_1 = new(0.0, 0.0, 0.0);
+            Point3D point3D_2 = new(1.0, 1.0, 1.0);
+            Point3D point3D_3 = new(2.0, 2.0, 2.0);
 
-            Spatial.Classes.Plane plane_Collinear = new(point3D_1, point3D_2, point3D_3);
+            Plane plane_Collinear = new(point3D_1, point3D_2, point3D_3);
 
             Assert.NotNull(plane_Collinear.Origin);
             Assert.Null(plane_Collinear.Normal);
@@ -50,19 +50,19 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_CopyConstructorNullProperties()
         {
-            Spatial.Classes.Plane plane_Source = new((Spatial.Classes.Point3D?)null, (Spatial.Classes.Vector3D?)null);
+            Plane plane_Source = new((Point3D?)null, (Spatial.Classes.Vector3D?)null);
 
             Assert.Null(plane_Source.Origin);
             Assert.Null(plane_Source.Normal);
             Assert.Null(plane_Source.AxisY);
 
-            Spatial.Classes.Plane plane_Copy1 = new(plane_Source);
+            Plane plane_Copy1 = new(plane_Source);
             Assert.Null(plane_Copy1.Origin);
             Assert.Null(plane_Copy1.Normal);
             Assert.Null(plane_Copy1.AxisY);
             Assert.True(double.IsNaN(plane_Copy1.A));
 
-            Spatial.Classes.Plane plane_Copy2 = new(plane_Source, (Spatial.Classes.Point3D?)null);
+            Plane plane_Copy2 = new(plane_Source, (Point3D?)null);
             Assert.Null(plane_Copy2.Origin);
             Assert.Null(plane_Copy2.Normal);
             Assert.Null(plane_Copy2.AxisY);
@@ -75,14 +75,14 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_Serialization()
         {
-            Spatial.Classes.Point3D point3D_Origin = new(10.0, 20.0, 30.0);
+            Point3D point3D_Origin = new(10.0, 20.0, 30.0);
             Spatial.Classes.Vector3D vector3D_Normal = Spatial.Constants.Vector3D.WorldZ;
-            Spatial.Classes.Plane plane = new(point3D_Origin, vector3D_Normal);
+            Plane plane = new(point3D_Origin, vector3D_Normal);
 
             Assert.NotNull(plane.Origin);
             Assert.NotNull(plane.Normal);
 
-            global::DiGi.Core.xUnit.Query.SerializationCheck(plane);
+            DiGi.Core.xUnit.Query.SerializationCheck(plane);
         }
 
         /// <summary>
@@ -91,11 +91,11 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_ConstructorsAndEquations()
         {
-            Spatial.Classes.Point3D point3D_1 = new(0.0, 0.0, 5.0);
-            Spatial.Classes.Point3D point3D_2 = new(10.0, 0.0, 5.0);
-            Spatial.Classes.Point3D point3D_3 = new(0.0, 10.0, 5.0);
+            Point3D point3D_1 = new(0.0, 0.0, 5.0);
+            Point3D point3D_2 = new(10.0, 0.0, 5.0);
+            Point3D point3D_3 = new(0.0, 10.0, 5.0);
 
-            Spatial.Classes.Plane? plane_3Pts = Create.Plane(point3D_1, point3D_2, point3D_3);
+            Plane? plane_3Pts = Create.Plane(point3D_1, point3D_2, point3D_3);
             Assert.NotNull(plane_3Pts);
             Assert.Equal(0.0, plane_3Pts!.A, 6);
             Assert.Equal(0.0, plane_3Pts.B, 6);
@@ -103,22 +103,22 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(-5.0, plane_3Pts.D, 6);
             Assert.Equal(5.0, plane_3Pts.K, 6);
 
-            Spatial.Classes.Plane? plane_Elevation = Create.Plane(15.0);
+            Plane? plane_Elevation = Create.Plane(15.0);
             Assert.NotNull(plane_Elevation);
             Assert.Equal(15.0, plane_Elevation!.Origin!.Z, 6);
             Assert.Equal(-15.0, plane_Elevation.D, 6);
 
-            Spatial.Classes.Plane? plane_DimX = Create.Plane(3.0, 0);
+            Plane? plane_DimX = Create.Plane(3.0, 0);
             Assert.NotNull(plane_DimX);
             Assert.Equal(3.0, plane_DimX!.Origin!.X, 6);
             Assert.Equal(1.0, plane_DimX.A, 6);
 
-            Spatial.Classes.Plane? plane_DimY = Create.Plane(4.0, 1);
+            Plane? plane_DimY = Create.Plane(4.0, 1);
             Assert.NotNull(plane_DimY);
             Assert.Equal(4.0, plane_DimY!.Origin!.Y, 6);
             Assert.Equal(1.0, plane_DimY.B, 6);
 
-            Spatial.Classes.Plane? plane_DimZ = Create.Plane(5.0, 2);
+            Plane? plane_DimZ = Create.Plane(5.0, 2);
             Assert.NotNull(plane_DimZ);
             Assert.Equal(5.0, plane_DimZ!.Origin!.Z, 6);
             Assert.Equal(1.0, plane_DimZ.C, 6);
@@ -133,10 +133,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_ClosestPointAndDistance()
         {
-            Spatial.Classes.Plane plane = Spatial.Constants.Plane.WorldZ;
-            Spatial.Classes.Point3D point3D_Test = new(5.0, -10.0, 7.5);
+            Plane plane = Spatial.Constants.Plane.WorldZ;
+            Point3D point3D_Test = new(5.0, -10.0, 7.5);
 
-            Spatial.Classes.Point3D? point3D_Closest = plane.ClosestPoint(point3D_Test);
+            Point3D? point3D_Closest = plane.ClosestPoint(point3D_Test);
             Assert.NotNull(point3D_Closest);
             Assert.Equal(5.0, point3D_Closest!.X, 6);
             Assert.Equal(-10.0, point3D_Closest.Y, 6);
@@ -155,10 +155,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_Coplanar()
         {
-            Spatial.Classes.Plane plane_Z0 = Spatial.Constants.Plane.WorldZ;
-            Spatial.Classes.Plane plane_Z0_Inverted = new(new Spatial.Classes.Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ.GetInversed());
-            Spatial.Classes.Plane plane_Z10 = Create.Plane(10.0)!;
-            Spatial.Classes.Plane plane_X0 = Spatial.Constants.Plane.WorldX;
+            Plane plane_Z0 = Spatial.Constants.Plane.WorldZ;
+            Plane plane_Z0_Inverted = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ.GetInversed());
+            Plane plane_Z10 = Create.Plane(10.0)!;
+            Plane plane_X0 = Spatial.Constants.Plane.WorldX;
 
             Assert.True(plane_Z0.Coplanar(plane_Z0));
             Assert.True(plane_Z0.Coplanar(plane_Z0_Inverted));
@@ -173,9 +173,9 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_Perpendicular()
         {
-            Spatial.Classes.Plane plane_WorldX = Spatial.Constants.Plane.WorldX;
-            Spatial.Classes.Plane plane_WorldY = Spatial.Constants.Plane.WorldY;
-            Spatial.Classes.Plane plane_WorldZ = Spatial.Constants.Plane.WorldZ;
+            Plane plane_WorldX = Spatial.Constants.Plane.WorldX;
+            Plane plane_WorldY = Spatial.Constants.Plane.WorldY;
+            Plane plane_WorldZ = Spatial.Constants.Plane.WorldZ;
 
             Assert.True(plane_WorldX.Perpendicular(plane_WorldY));
             Assert.True(plane_WorldX.Perpendicular(plane_WorldZ));
@@ -191,11 +191,11 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_AboveAndOn_ToleranceBoundaries()
         {
-            Spatial.Classes.Plane plane = Spatial.Constants.Plane.WorldZ;
+            Plane plane = Spatial.Constants.Plane.WorldZ;
             double tolerance = 1e-3;
 
-            Spatial.Classes.Point3D point3D_OnInside = new(2.0, 3.0, 1e-3 - 1e-9);
-            Spatial.Classes.Point3D point3D_AboveOutside = new(2.0, 3.0, 1e-3 + 1e-9);
+            Point3D point3D_OnInside = new(2.0, 3.0, 1e-3 - 1e-9);
+            Point3D point3D_AboveOutside = new(2.0, 3.0, 1e-3 + 1e-9);
 
             Assert.True(Query.On(plane, point3D_OnInside, tolerance));
             Assert.False(Query.Above(plane, point3D_OnInside, tolerance));
@@ -203,7 +203,7 @@ namespace DiGi.Geometry.xUnit
             Assert.False(Query.On(plane, point3D_AboveOutside, tolerance));
             Assert.True(Query.Above(plane, point3D_AboveOutside, tolerance));
 
-            Spatial.Classes.Segment3D segment3D_On = new(new Spatial.Classes.Point3D(0.0, 0.0, 0.0), new Spatial.Classes.Point3D(5.0, 5.0, 0.0));
+            Segment3D segment3D_On = new(new Point3D(0.0, 0.0, 0.0), new Point3D(5.0, 5.0, 0.0));
             Assert.True(Query.On(plane, segment3D_On, tolerance));
 
             Spatial.Classes.Vector3D vector3D_Parallel = new(10.0, -5.0, 0.0);
@@ -219,15 +219,15 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_ProjectAndConvert()
         {
-            Spatial.Classes.Plane plane = Spatial.Constants.Plane.WorldZ;
-            Spatial.Classes.Point3D point3D_Spatial = new(3.0, 4.0, 10.0);
+            Plane plane = Spatial.Constants.Plane.WorldZ;
+            Point3D point3D_Spatial = new(3.0, 4.0, 10.0);
 
-            Planar.Classes.Point2D? point2D_Local = plane.Convert(point3D_Spatial);
+            Point2D? point2D_Local = plane.Convert(point3D_Spatial);
             Assert.NotNull(point2D_Local);
             Assert.Equal(3.0, point2D_Local!.X, 6);
             Assert.Equal(4.0, point2D_Local.Y, 6);
 
-            Spatial.Classes.Point3D? point3D_Reconverted = plane.Convert(point2D_Local);
+            Point3D? point3D_Reconverted = plane.Convert(point2D_Local);
             Assert.NotNull(point3D_Reconverted);
             Assert.Equal(3.0, point3D_Reconverted!.X, 6);
             Assert.Equal(4.0, point3D_Reconverted.Y, 6);
@@ -247,7 +247,7 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_Flip()
         {
-            Spatial.Classes.Plane plane = new(new Spatial.Classes.Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
+            Plane plane = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
             Spatial.Classes.Vector3D? vector3D_NormalBefore = plane.Normal;
             Assert.NotNull(vector3D_NormalBefore);
             Assert.Equal(1.0, vector3D_NormalBefore!.Z, 6);
@@ -268,13 +268,13 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Plane_Performance()
         {
-            Spatial.Classes.Plane plane = Spatial.Constants.Plane.WorldZ;
+            Plane plane = Spatial.Constants.Plane.WorldZ;
             int count = 10000;
-            List<Spatial.Classes.Point3D> point3Ds = new(count);
+            List<Point3D> point3Ds = new(count);
 
             for (int i = 0; i < count; i++)
             {
-                point3Ds.Add(new Spatial.Classes.Point3D(i * 0.1, i * 0.2, 5.0));
+                point3Ds.Add(new Point3D(i * 0.1, i * 0.2, 5.0));
             }
 
             // Warmup / JIT

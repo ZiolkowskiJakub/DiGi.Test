@@ -9,7 +9,7 @@ namespace DiGi.ComputeSharp.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Spatial.Query.Inside(System.Collections.Generic.IEnumerable{Coordinate3}, System.Collections.Generic.IEnumerable{Triangle3})"/>
+        /// Verifies that <see cref="Spatial.Query.Inside(IEnumerable{Coordinate3}, IEnumerable{Triangle3})"/>
         /// returns the containing triangle index, and -1 for points inside no triangle.
         /// Regression test for the sentinel bug where the result was initialised to 0, making a point inside
         /// triangle index 0 indistinguishable from a point inside nothing.
@@ -60,7 +60,7 @@ namespace DiGi.ComputeSharp.xUnit
         }
 
         /// <summary>
-        /// Verifies the single-point <see cref="Spatial.Query.Inside(Coordinate3, System.Collections.Generic.IEnumerable{Triangle3})"/>
+        /// Verifies the single-point <see cref="Spatial.Query.Inside(Coordinate3, IEnumerable{Triangle3})"/>
         /// overload returns the triangle index for a contained point and -1 for an uncontained one.
         /// Handles UnsupportedDoubleOperationException gracefully for FP64 unsupported GPUs.
         /// </summary>

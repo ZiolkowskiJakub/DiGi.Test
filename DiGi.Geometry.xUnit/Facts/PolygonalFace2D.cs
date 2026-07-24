@@ -8,7 +8,7 @@ namespace DiGi.Geometry.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Planar.Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/> keeps internal edges located inside the external edge and discards internal edges located outside of it.
+        /// Verifies that <see cref="Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/> keeps internal edges located inside the external edge and discards internal edges located outside of it.
         /// </summary>
         [Fact]
         public void PolygonalFace2D_Create_InternalEdgeFiltering()
@@ -32,7 +32,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Planar.Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/> removes internal edges that are nested inside or overlapping a larger internal edge, keeping only the largest one of each group.
+        /// Verifies that <see cref="Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/> removes internal edges that are nested inside or overlapping a larger internal edge, keeping only the largest one of each group.
         /// </summary>
         [Fact]
         public void PolygonalFace2D_Create_NestedInternalEdges()
@@ -58,7 +58,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies the tolerance boundary behavior of <see cref="Planar.Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/>: an internal edge farther from the external boundary than the tolerance is kept, while an internal edge closer than the tolerance is discarded.
+        /// Verifies the tolerance boundary behavior of <see cref="Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/>: an internal edge farther from the external boundary than the tolerance is kept, while an internal edge closer than the tolerance is discarded.
         /// </summary>
         [Fact]
         public void PolygonalFace2D_Create_ToleranceBoundary()
@@ -79,7 +79,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies the <see cref="Planar.Create.PolygonalFace2D(Point2D[])"/> overload: fewer than three points returns null and a valid triangle returns a face with the expected area.
+        /// Verifies the <see cref="Create.PolygonalFace2D(Point2D[])"/> overload: fewer than three points returns null and a valid triangle returns a face with the expected area.
         /// </summary>
         [Fact]
         public void PolygonalFace2D_Create_Points()
@@ -94,7 +94,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Planar.Create.PolygonalFace2Ds(IEnumerable{Segment2D}, double)"/> polygonizes segments into faces: fewer than three segments returns null, a closed square yields one face, and a square with a nested square yields a face with a hole plus the inner face.
+        /// Verifies that <see cref="Create.PolygonalFace2Ds(IEnumerable{Segment2D}, double)"/> polygonizes segments into faces: fewer than three segments returns null, a closed square yields one face, and a square with a nested square yields a face with a hole plus the inner face.
         /// </summary>
         [Fact]
         public void PolygonalFace2Ds_Segment2Ds()
@@ -132,7 +132,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Planar.Create.PolygonalFace2Ds(IEnumerable{IPolygonal2D}, double)"/> produces the same faces as the segment-based overload fed with the segments of the same polygons.
+        /// Verifies that <see cref="Create.PolygonalFace2Ds(IEnumerable{IPolygonal2D}, double)"/> produces the same faces as the segment-based overload fed with the segments of the same polygons.
         /// <para>This pins the equivalence between the direct ring conversion and the historical segment-explosion path for overlapping input polygons.</para>
         /// </summary>
         [Fact]
@@ -170,7 +170,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies the serialization round-trip and clone path of <see cref="DiGi.Geometry.Planar.Classes.PolygonalFace2D"/> built with an external edge and one internal edge.
+        /// Verifies the serialization round-trip and clone path of <see cref="PolygonalFace2D"/> built with an external edge and one internal edge.
         /// </summary>
         [Fact]
         public void PolygonalFace2D_SerializationCheck()
@@ -190,7 +190,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies both the correctness and the performance of <see cref="Planar.Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/> and <see cref="Planar.Create.PolygonalFace2Ds(IEnumerable{IPolygonal2D}, double)"/> on a large number of internal edge candidates.
+        /// Verifies both the correctness and the performance of <see cref="Create.PolygonalFace2D(IPolygonal2D, IEnumerable{IPolygonal2D}, double)"/> and <see cref="Create.PolygonalFace2Ds(IEnumerable{IPolygonal2D}, double)"/> on a large number of internal edge candidates.
         /// <para>Covers the bounding box prefilter for the inside check, the descending area sort, and the pairwise containment deduplication.</para>
         /// </summary>
         [Fact]

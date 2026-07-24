@@ -42,7 +42,7 @@ namespace DiGi.GIS.Analytical.xUnit
 
             GroundSurface groundSurface = new("GroundSurface_1", polygonalFace3D);
 
-            CityGML.Classes.Building building = new("Building_1", -1, [groundSurface]);
+            Building building = new("Building_1", -1, [groundSurface]);
 
             CityModel cityModel = new([building]);
 
@@ -69,12 +69,12 @@ namespace DiGi.GIS.Analytical.xUnit
             Assert.NotNull(building2D.PolygonalFace2D);
             Assert.False(string.IsNullOrWhiteSpace(building2D.Reference));
 
-            CityGML.Classes.Building building = Building_Offset(building2D.Reference);
+            Building building = Building_Offset(building2D.Reference);
 
             Assert.Equal(building2D.Reference, CityGML.Query.Reference(building));
 
             List<Building2D> building2Ds = [building2D];
-            List<CityGML.Classes.Building> buildings = [building];
+            List<Building> buildings = [building];
 
             List<BuildingModel>? buildingModels = Create.BuildingModels(building2Ds, buildings);
 
@@ -102,12 +102,12 @@ namespace DiGi.GIS.Analytical.xUnit
             Assert.NotNull(building2D);
             Assert.NotNull(building2D.PolygonalFace2D);
 
-            CityGML.Classes.Building building = Building_Offset("not-the-building2D-reference");
+            Building building = Building_Offset("not-the-building2D-reference");
 
             Assert.NotEqual(building2D.Reference, CityGML.Query.Reference(building));
 
             List<Building2D> building2Ds = [building2D];
-            List<CityGML.Classes.Building> buildings = [building];
+            List<Building> buildings = [building];
 
             List<BuildingModel>? buildingModels = Create.BuildingModels(building2Ds, buildings);
 
@@ -122,7 +122,7 @@ namespace DiGi.GIS.Analytical.xUnit
             Assert.Equal("Building", spaces[0].Name);
         }
 
-        private static CityGML.Classes.Building Building_Offset(string? reference)
+        private static Building Building_Offset(string? reference)
         {
             // Offset by 100m in both X and Y from the Building2D footprint so neither the bounding box nor the face covers the Building2D internal point.
             List<Point2D> point2Ds =
@@ -139,7 +139,7 @@ namespace DiGi.GIS.Analytical.xUnit
 
             GroundSurface groundSurface = new("GroundSurface_1", polygonalFace3D);
 
-            CityGML.Classes.Building result = new("Building_1", -1, [groundSurface]);
+            Building result = new("Building_1", -1, [groundSurface]);
             result.SetValue(CityGML.Enums.BuildingParameter.buildingId, reference, new Core.Parameter.Classes.SetValueSettings(true, false));
 
             return result;

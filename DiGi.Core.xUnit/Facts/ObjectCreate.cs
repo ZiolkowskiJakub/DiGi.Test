@@ -3,7 +3,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.Create.Object{T}(object[])"/> still resolves constructors correctly
+        /// Tests that <see cref="Create.Object{T}(object[])"/> still resolves constructors correctly
         /// after optimizing the constructor-argument lookup (removing a throwaway ToList().ConvertAll() allocation)
         /// and the O(n^2) parameter-matching logic (replaced List.Find/Remove with an index-based used-flags array).
         /// </summary>

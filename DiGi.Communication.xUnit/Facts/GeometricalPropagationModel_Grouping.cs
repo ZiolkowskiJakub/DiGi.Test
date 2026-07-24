@@ -36,12 +36,12 @@ namespace DiGi.Communication.xUnit
             Assert.True(geometricalPropagationModel.Update(scatteringObject_C));
 
             // Group objects A and B together
-            ScatteringGroup? scatteringGroup_AB = geometricalPropagationModel.Group<ScatteringObject>("Group_AB", [scatteringObject_A, scatteringObject_B]);
+            ScatteringGroup? scatteringGroup_AB = geometricalPropagationModel.Group("Group_AB", [scatteringObject_A, scatteringObject_B]);
             Assert.NotNull(scatteringGroup_AB);
             Assert.Equal("Group_AB", scatteringGroup_AB.Reference);
 
             // Group object C alone
-            ScatteringGroup? scatteringGroup_C = geometricalPropagationModel.Group<ScatteringObject>("Group_C", [scatteringObject_C]);
+            ScatteringGroup? scatteringGroup_C = geometricalPropagationModel.Group("Group_C", [scatteringObject_C]);
             Assert.NotNull(scatteringGroup_C);
             Assert.Equal("Group_C", scatteringGroup_C.Reference);
 

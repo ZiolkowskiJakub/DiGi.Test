@@ -8,11 +8,11 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Vector3D_Arithmetic()
         {
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_1 = new(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_2 = new(-2.0, 0.0, 4.0);
+            Spatial.Classes.Vector3D vector3D_1 = new(1.0, 2.0, 3.0);
+            Spatial.Classes.Vector3D vector3D_2 = new(-2.0, 0.0, 4.0);
 
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Sum = vector3D_1 + vector3D_2;
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Diff = vector3D_1 - vector3D_2;
+            Spatial.Classes.Vector3D? vector3D_Sum = vector3D_1 + vector3D_2;
+            Spatial.Classes.Vector3D? vector3D_Diff = vector3D_1 - vector3D_2;
             double double_Dot = vector3D_1 * vector3D_2;
             double double_Len = vector3D_1.Length;
             double double_SqLen = vector3D_1.SquaredLength;
@@ -38,10 +38,10 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Vector3D_CrossProduct()
         {
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_1 = new(1.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_2 = new(0.0, 1.0, 0.0);
+            Spatial.Classes.Vector3D vector3D_1 = new(1.0, 0.0, 0.0);
+            Spatial.Classes.Vector3D vector3D_2 = new(0.0, 1.0, 0.0);
 
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Cross = vector3D_1.CrossProduct(vector3D_2);
+            Spatial.Classes.Vector3D? vector3D_Cross = vector3D_1.CrossProduct(vector3D_2);
 
             Assert.NotNull(vector3D_Cross);
             Assert.Equal(0.0, vector3D_Cross.X);
@@ -55,8 +55,8 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Vector3D_Normalization()
         {
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Main = new(0.0, 0.0, 5.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Unit = vector3D_Main.Unit;
+            Spatial.Classes.Vector3D vector3D_Main = new(0.0, 0.0, 5.0);
+            Spatial.Classes.Vector3D? vector3D_Unit = vector3D_Main.Unit;
 
             Assert.NotNull(vector3D_Unit);
             Assert.Equal(0.0, vector3D_Unit.X);
@@ -64,8 +64,8 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(1.0, vector3D_Unit.Z);
             Assert.Equal(1.0, vector3D_Unit.Length);
 
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Zero = new(0.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_ZeroUnit = vector3D_Zero.Unit;
+            Spatial.Classes.Vector3D vector3D_Zero = new(0.0, 0.0, 0.0);
+            Spatial.Classes.Vector3D? vector3D_ZeroUnit = vector3D_Zero.Unit;
             Assert.NotNull(vector3D_ZeroUnit);
             Assert.True(double.IsNaN(vector3D_ZeroUnit.X) || vector3D_ZeroUnit.X == 0.0);
         }
@@ -76,15 +76,15 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Vector3D_Conversions()
         {
-            DiGi.Geometry.Spatial.Classes.Point3D point3D_Source = new(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_Converted = (DiGi.Geometry.Spatial.Classes.Vector3D?)point3D_Source;
+            Spatial.Classes.Point3D point3D_Source = new(1.0, 2.0, 3.0);
+            Spatial.Classes.Vector3D? vector3D_Converted = (Spatial.Classes.Vector3D?)point3D_Source;
 
             Assert.NotNull(vector3D_Converted);
             Assert.Equal(1.0, vector3D_Converted.X);
             Assert.Equal(2.0, vector3D_Converted.Y);
             Assert.Equal(3.0, vector3D_Converted.Z);
 
-            DiGi.Geometry.Spatial.Classes.Vector3D? vector3D_FromTuple = (4.0, 5.0, 6.0);
+            Spatial.Classes.Vector3D? vector3D_FromTuple = (4.0, 5.0, 6.0);
             Assert.NotNull(vector3D_FromTuple);
             Assert.Equal(4.0, vector3D_FromTuple.X);
             Assert.Equal(5.0, vector3D_FromTuple.Y);
@@ -97,24 +97,24 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Vector3D_NullCopyConstructor()
         {
-            DiGi.Geometry.Spatial.Classes.Vector3D vector3D_Null = new((DiGi.Geometry.Spatial.Classes.Vector3D?)null);
+            Spatial.Classes.Vector3D vector3D_Null = new((Spatial.Classes.Vector3D?)null);
             Assert.NotNull(vector3D_Null);
             Assert.True(double.IsNaN(vector3D_Null.X));
             Assert.True(double.IsNaN(vector3D_Null.Y));
             Assert.True(double.IsNaN(vector3D_Null.Z));
 
-            DiGi.Geometry.Spatial.Classes.Point3D point3D_Null = new((DiGi.Geometry.Spatial.Classes.Point3D?)null);
+            Spatial.Classes.Point3D point3D_Null = new((Spatial.Classes.Point3D?)null);
             Assert.NotNull(point3D_Null);
             Assert.True(double.IsNaN(point3D_Null.X));
             Assert.True(double.IsNaN(point3D_Null.Y));
             Assert.True(double.IsNaN(point3D_Null.Z));
 
-            DiGi.Geometry.Planar.Classes.Point2D point2D_Null = new((DiGi.Geometry.Planar.Classes.Point2D?)null);
+            Planar.Classes.Point2D point2D_Null = new((Planar.Classes.Point2D?)null);
             Assert.NotNull(point2D_Null);
             Assert.True(double.IsNaN(point2D_Null.X));
             Assert.True(double.IsNaN(point2D_Null.Y));
 
-            DiGi.Geometry.Planar.Classes.Vector2D vector2D_Null = new((DiGi.Geometry.Planar.Classes.Vector2D?)null);
+            Planar.Classes.Vector2D vector2D_Null = new((Planar.Classes.Vector2D?)null);
             Assert.NotNull(vector2D_Null);
             Assert.True(double.IsNaN(vector2D_Null.X));
             Assert.True(double.IsNaN(vector2D_Null.Y));

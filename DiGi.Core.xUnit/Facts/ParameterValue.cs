@@ -14,7 +14,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void GuidParameterValue_TryConvert_ConvertsStringToGuid()
         {
-            DiGi.Core.Parameter.Classes.GuidParameterValue guidParameterValue = new();
+            Parameter.Classes.GuidParameterValue guidParameterValue = new();
 
             Guid guid = Guid.NewGuid();
             string guidString = guid.ToString();
@@ -33,7 +33,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void GuidParameterValue_TryConvert_HandlesGuidAndNull()
         {
-            DiGi.Core.Parameter.Classes.GuidParameterValue guidParameterValue = new();
+            Parameter.Classes.GuidParameterValue guidParameterValue = new();
 
             Guid guid = Guid.NewGuid();
 
@@ -53,7 +53,7 @@ namespace DiGi.Core.xUnit
         [Fact]
         public void GuidParameterValue_TryConvert_InvalidInput_ReturnsFalse()
         {
-            DiGi.Core.Parameter.Classes.GuidParameterValue guidParameterValue = new();
+            Parameter.Classes.GuidParameterValue guidParameterValue = new();
 
             bool result = guidParameterValue.TryConvert("not-a-guid", out object? value_Out);
 

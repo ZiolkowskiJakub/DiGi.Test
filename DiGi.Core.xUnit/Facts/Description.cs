@@ -3,7 +3,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.Parameter.Query.Description(System.Enum)"/> returns the correct
+        /// Tests that <see cref="Parameter.Query.Description(System.Enum)"/> returns the correct
         /// [Description] attribute text for enum values.
         /// </summary>
         [Fact]
@@ -19,7 +19,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.Parameter.Query.Description(System.Type)"/> returns null for a type
+        /// Tests that <see cref="Parameter.Query.Description(System.Type)"/> returns null for a type
         /// without a [Description] attribute.
         /// </summary>
         [Fact]
@@ -30,7 +30,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.Parameter.Query.Description(System.Enum)"/> returns null for a null enum input.
+        /// Tests that <see cref="Parameter.Query.Description(System.Enum)"/> returns null for a null enum input.
         /// </summary>
         [Fact]
         public void Description_Enum_NullInput_ReturnsNull()

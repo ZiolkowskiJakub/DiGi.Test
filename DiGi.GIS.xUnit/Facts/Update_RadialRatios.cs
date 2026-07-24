@@ -14,7 +14,7 @@ namespace DiGi.GIS.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that the <see cref="DiGi.GIS.IO.Modify.Update_RadialRatios"/> method correctly computes and updates radial ratios in a table.
+        /// Verifies that the <see cref="IO.Modify.Update_RadialRatios"/> method correctly computes and updates radial ratios in a table.
         /// <para>This tests both the GMF-based model loading and a mock-based exact mathematical verification.</para>
         /// </summary>
         [Fact]

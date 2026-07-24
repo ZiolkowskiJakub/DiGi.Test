@@ -7,7 +7,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="Core.Create.SerializationMethodCollection(Type)"/> still places ordered members
+        /// Tests that <see cref="Create.SerializationMethodCollection(Type)"/> still places ordered members
         /// (by ascending <see cref="System.Text.Json.Serialization.JsonPropertyOrderAttribute"/> value) before
         /// unordered members, after replacing the O(n^2) `tuples.Insert(0, ...)` loop with a single
         /// `InsertRange(0, ...)` call.
@@ -41,7 +41,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="SerializationMethodCollection.Create(Core.Interfaces.ISerializableObject)"/> writes the runtime type of the instance
+        /// Tests that <see cref="SerializationMethodCollection.Create(Interfaces.ISerializableObject)"/> writes the runtime type of the instance
         /// into the type property, both when the collection matches the exact runtime type (cached full type name fast path)
         /// and when a base-type collection is used for a derived instance (reflection fallback).
         /// </summary>

@@ -456,7 +456,7 @@ namespace DiGi.Geometry.xUnit
 
         /// <summary>
         /// Verifies that the polyhedron and mesh closedness checks agree with each other.
-        /// <para><see cref="Query.IsClosed{TPolygonalFace3D}(Polyhedron{TPolygonalFace3D}?, bool, double)"/> with the manifold criterion and <see cref="DiGi.Geometry.Core.Classes.Mesh{TPoint}.IsClosed"/> both require every edge to be used exactly twice, so triangulating a polyhedron into a <see cref="Mesh3D"/> must not change the verdict. The two implementations are independent, so this pins them against drifting apart.</para>
+        /// <para><see cref="Query.IsClosed{TPolygonalFace3D}(Polyhedron{TPolygonalFace3D}?, bool, double)"/> with the manifold criterion and <see cref="Core.Classes.Mesh{TPoint}.IsClosed"/> both require every edge to be used exactly twice, so triangulating a polyhedron into a <see cref="Mesh3D"/> must not change the verdict. The two implementations are independent, so this pins them against drifting apart.</para>
         /// <para>Faces carrying holes are deliberately excluded. Triangulating such a face bridges the external ring to the internal one and inserts extra vertices part-way along the external ring; the adjoining faces do not carry those vertices, so the triangulated mesh acquires T-junctions and is genuinely open even though the polyhedron is watertight. That is a property of the triangulation, not a disagreement between the two closedness checks.</para>
         /// </summary>
         [Fact]

@@ -15,14 +15,14 @@ namespace DiGi.Core.xUnit
         public void Pen_PropertiesAndCloning()
         {
             Color color = new(255, 255, 0, 0); // Red
-            DiGi.Core.Drawing.Classes.Pen pen = new(color, 2.5);
+            Drawing.Classes.Pen pen = new(color, 2.5);
 
             Assert.NotNull(pen.Color);
             Assert.Equal(255, pen.Color.Red);
             Assert.Equal(2.5, pen.Thickness);
 
             // Test cloning
-            DiGi.Core.Drawing.Classes.Pen? clonedPen = (DiGi.Core.Drawing.Classes.Pen?)pen.Clone();
+            Drawing.Classes.Pen? clonedPen = (Drawing.Classes.Pen?)pen.Clone();
             Assert.NotNull(clonedPen);
             Assert.Equal(pen.Thickness, clonedPen.Thickness);
             Assert.NotNull(clonedPen.Color);
@@ -61,7 +61,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.Drawing.Query.CompareByPixels(Image, Image)"/> correctly normalizes
+        /// Tests that <see cref="Drawing.Query.CompareByPixels(Image, Image)"/> correctly normalizes
         /// bitmaps that originate from different native pixel formats (24bpp opaque RGB vs 32bpp ARGB) before
         /// comparing them, treating visually identical opaque colors as equal regardless of source format.
         /// </summary>

@@ -38,7 +38,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Tests the <see cref="DiGi.Geometry.Core.Classes.Mesh{TPoint}.IsClosed"/> topology check.
+        /// Tests the <see cref="Core.Classes.Mesh{TPoint}.IsClosed"/> topology check.
         /// <para>Verifies that a watertight mesh is reported as closed, that removing a single triangle makes it open, and that meshes below the minimum triangle count are never closed.</para>
         /// </summary>
         [Fact]
@@ -105,7 +105,7 @@ namespace DiGi.Geometry.xUnit
 
         /// <summary>
         /// Tests the performance of the ellipsoid mesh generation, the closedness check, and the area and volume calculations on a large mesh.
-        /// <para>After a warm-up call, generating a mesh with 79602 vertices and 159200 triangles plus running <see cref="DiGi.Geometry.Core.Classes.Mesh{TPoint}.IsClosed"/>, <see cref="Mesh3D.GetArea"/> and <see cref="Mesh3D.GetVolume"/> must complete within the stated threshold.</para>
+        /// <para>After a warm-up call, generating a mesh with 79602 vertices and 159200 triangles plus running <see cref="Core.Classes.Mesh{TPoint}.IsClosed"/>, <see cref="Mesh3D.GetArea"/> and <see cref="Mesh3D.GetVolume"/> must complete within the stated threshold.</para>
         /// </summary>
         [Fact]
         public void Mesh3D_Performance()

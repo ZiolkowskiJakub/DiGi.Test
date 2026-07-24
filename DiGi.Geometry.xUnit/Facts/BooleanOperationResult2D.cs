@@ -95,13 +95,13 @@ namespace DiGi.Geometry.xUnit
             UnionResult2D unionResult2D = new(polygonalFace2D);
             Assert.Equal(1, unionResult2D.Count);
 
-            DiGi.Geometry.Planar.Interfaces.IGeometry2D? geometry2D_1 = unionResult2D[0];
-            DiGi.Geometry.Planar.Interfaces.IGeometry2D? geometry2D_2 = unionResult2D[0];
+            Planar.Interfaces.IGeometry2D? geometry2D_1 = unionResult2D[0];
+            Planar.Interfaces.IGeometry2D? geometry2D_2 = unionResult2D[0];
             Assert.NotNull(geometry2D_1);
             Assert.NotNull(geometry2D_2);
             Assert.NotSame(geometry2D_1, geometry2D_2);
 
-            DiGi.Geometry.Planar.Interfaces.IGeometry2D? geometry2D_OutOfRange = unionResult2D[5];
+            Planar.Interfaces.IGeometry2D? geometry2D_OutOfRange = unionResult2D[5];
             Assert.Null(geometry2D_OutOfRange);
         }
 

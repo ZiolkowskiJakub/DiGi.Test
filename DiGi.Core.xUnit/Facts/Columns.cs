@@ -6,7 +6,7 @@ namespace DiGi.Core.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that <see cref="DiGi.Core.IO.DelimitedData.Create.Columns(IEnumerable{string})"/> still produces correctly indexed and named
+        /// Tests that <see cref="IO.DelimitedData.Create.Columns(IEnumerable{string})"/> still produces correctly indexed and named
         /// columns, in the original order, after removing the Count()+ElementAt(i) double enumeration over a
         /// single-pass IEnumerable.
         /// </summary>

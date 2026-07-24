@@ -25,7 +25,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            List<IPolygonalFace3D>? result = BooleanOpertaionType.Union.PolygonalFace3Ds<IPolygonalFace3D>(null, polyhedron_2, true, true);
+            List<IPolygonalFace3D>? result = BooleanOpertaionType.Union.PolygonalFace3Ds(null, polyhedron_2, true, true);
             Assert.Null(result);
         }
 
@@ -42,7 +42,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            List<IPolygonalFace3D>? result = BooleanOpertaionType.Union.PolygonalFace3Ds<IPolygonalFace3D>(polyhedron_1, null, true, true);
+            List<IPolygonalFace3D>? result = BooleanOpertaionType.Union.PolygonalFace3Ds(polyhedron_1, null, true, true);
             Assert.Null(result);
         }
 

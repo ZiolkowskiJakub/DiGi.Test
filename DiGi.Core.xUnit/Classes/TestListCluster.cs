@@ -7,7 +7,7 @@ namespace DiGi.Core.xUnit
     {
         /// <summary>
         /// Minimal concrete <see cref="ListClusterReference{TKey_1, TKey_2}"/> used to exercise
-        /// <see cref="DiGi.Core.Classes.List{TKey_1, TKey_2, TValue}.Remove(System.Collections.Generic.IEnumerable{ListClusterReference{TKey_1, TKey_2}})"/>.
+        /// <see cref="List{TKey_1, TKey_2, TValue}.Remove(System.Collections.Generic.IEnumerable{ListClusterReference{TKey_1, TKey_2}})"/>.
         /// </summary>
         public class TestListClusterReference : ListClusterReference<string, string>
         {
@@ -23,10 +23,10 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Minimal concrete <see cref="DiGi.Core.Classes.List{TKey_1, TKey_2, TValue}"/> grouping every value
+        /// Minimal concrete <see cref="List{TKey_1, TKey_2, TValue}"/> grouping every value
         /// under a single (key_1, key_2) pair, used to exercise removal-by-index behavior.
         /// </summary>
-        public class TestListCluster : DiGi.Core.Classes.List<string, string, string>
+        public class TestListCluster : List<string, string, string>
         {
             protected override string? GetKey_1(string? value)
             {

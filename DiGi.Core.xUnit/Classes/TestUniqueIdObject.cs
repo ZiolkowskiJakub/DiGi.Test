@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace DiGi.Core.xUnit
 {
-    /// <summary>Represents a test object whose unique identifier is a plain string rather than a GUID, inheriting from <see cref="UniqueObject"/>. Used to exercise the <see cref="Core.Classes.UniqueIdReference"/> path, which cannot be covered by <see cref="TestObject"/> because that object derives from <see cref="GuidObject"/>.</summary>
+    /// <summary>Represents a test object whose unique identifier is a plain string rather than a GUID, inheriting from <see cref="UniqueObject"/>. Used to exercise the <see cref="UniqueIdReference"/> path, which cannot be covered by <see cref="TestObject"/> because that object derives from <see cref="GuidObject"/>.</summary>
     public class TestUniqueIdObject : UniqueObject
     {
         [JsonInclude, JsonPropertyName("Name")]

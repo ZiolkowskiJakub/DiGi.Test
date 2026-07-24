@@ -15,7 +15,7 @@ namespace DiGi.Geometry.xUnit
         {
             List<IPolygonalFace3D> polygonalFace3Ds = [];
 
-            void AddSide(System.Func<double, double, Point3D> map)
+            void AddSide(Func<double, double, Point3D> map)
             {
                 double step = (max - min) / count;
                 for (int i = 0; i < count; i++)

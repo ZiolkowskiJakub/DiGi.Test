@@ -10,7 +10,7 @@ namespace DiGi.ComputeSharp.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that the chunked <see cref="Spatial.Create.Triangle3Intersections(Triangle3, System.Collections.Generic.IEnumerable{Triangle3}, double)"/>
+        /// Verifies that the chunked <see cref="Spatial.Create.Triangle3Intersections(Triangle3, IEnumerable{Triangle3}, double)"/>
         /// path covers every input triangle exactly once and produces the same set of intersections as the
         /// sequential CPU routine, for a list length that is not a round thread-group multiple.
         /// This guards the one-thread-per-triangle dispatch.

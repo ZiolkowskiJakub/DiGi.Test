@@ -76,9 +76,9 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Segment3D_Inverse()
         {
-            DiGi.Geometry.Spatial.Classes.Point3D point3D_Start = new(0.0, 0.0, 0.0);
-            DiGi.Geometry.Spatial.Classes.Point3D point3D_End = new(0.0, 0.0, 10.0);
-            DiGi.Geometry.Spatial.Classes.Segment3D segment3D_Line = new(point3D_Start, point3D_End);
+            Spatial.Classes.Point3D point3D_Start = new(0.0, 0.0, 0.0);
+            Spatial.Classes.Point3D point3D_End = new(0.0, 0.0, 10.0);
+            Spatial.Classes.Segment3D segment3D_Line = new(point3D_Start, point3D_End);
 
             // Verify initial state
             Assert.NotNull(segment3D_Line.Start);
@@ -105,11 +105,11 @@ namespace DiGi.Geometry.xUnit
         [Fact]
         public void Segment3D_TransformFailure()
         {
-            DiGi.Geometry.Spatial.Classes.Point3D point3D_Start = new(1.0, 2.0, 3.0);
-            DiGi.Geometry.Spatial.Classes.Point3D point3D_End = new(4.0, 5.0, 6.0);
-            DiGi.Geometry.Spatial.Classes.Segment3D segment3D_Line = new(point3D_Start, point3D_End);
+            Spatial.Classes.Point3D point3D_Start = new(1.0, 2.0, 3.0);
+            Spatial.Classes.Point3D point3D_End = new(4.0, 5.0, 6.0);
+            Spatial.Classes.Segment3D segment3D_Line = new(point3D_Start, point3D_End);
 
-            DiGi.Geometry.Spatial.Classes.Transform3D transform3D_Invalid = new((DiGi.Math.Classes.Matrix4D?)null);
+            Spatial.Classes.Transform3D transform3D_Invalid = new((Math.Classes.Matrix4D?)null);
             bool bool_Result = segment3D_Line.Transform(transform3D_Invalid);
 
             Assert.False(bool_Result);
