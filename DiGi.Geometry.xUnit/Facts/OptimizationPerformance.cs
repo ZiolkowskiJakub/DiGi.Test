@@ -2818,5 +2818,159 @@ namespace DiGi.Geometry.xUnit
             // Assert Performance: with the prior O(n*m) Find scan per tie-broken candidate this scaled far worse on a dense hull; the spatial hash keeps it well under the limit.
             Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"Rectangle2D tie-breaker performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
+
+        /// <summary>
+        /// A/B benchmark comparing performance of methods annotated with <see cref="System.Runtime.CompilerServices.MethodImplAttribute"/> for <see cref="MethodImplOptions.AggressiveInlining"/>.
+        /// <para>Exercises BoundingBox InRange, Line/Ray/Plane Distance and ClosestPoint, CoordinateSystem property accessors, Segment Length/Direction, and Transform indexer/operator in tight loops.</para>
+        /// </summary>
+        [Fact]
+        public void AggressiveInlining_Benchmark()
+        {
+            const int iterations = 500000;
+
+            // --- Setup geometry objects ---
+            BoundingBox2D boundingBox2D = new(new Point2D(0.0, 0.0), new Point2D(100.0, 100.0));
+            BoundingBox3D boundingBox3D = new(new Point3D(0.0, 0.0, 0.0), new Point3D(100.0, 100.0, 100.0));
+            Point2D point2D = new(50.0, 50.0);
+            Point3D point3D = new(50.0, 50.0, 50.0);
+
+            Line2D line2D = new(new Point2D(0.0, 0.0), new DiGi.Geometry.Planar.Classes.Vector2D(1.0, 0.0));
+            Ray2D ray2D = new(new Point2D(0.0, 0.0), new DiGi.Geometry.Planar.Classes.Vector2D(1.0, 0.0));
+            Segment2D segment2D = new(0.0, 0.0, 100.0, 100.0);
+            Transform2D transform2D_1 = Planar.Create.Transform2D.Translation(10.0, 20.0);
+            Assert.NotNull(transform2D_1);
+            Transform2D transform2D_2 = Planar.Create.Transform2D.Rotation(System.Math.PI / 4.0);
+            Assert.NotNull(transform2D_2);
+
+            Line3D line3D = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldX);
+            Ray3D ray3D = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldX);
+            Plane plane = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
+            Segment3D segment3D = new(0.0, 0.0, 0.0, 100.0, 100.0, 100.0);
+            CoordinateSystem2D coordinateSystem2D = new();
+            CoordinateSystem3D coordinateSystem3D = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
+            Transform3D transform3D_1 = Spatial.Create.Transform3D.Translation(10.0, 20.0, 30.0);
+            Assert.NotNull(transform3D_1);
+            Transform3D transform3D_2 = Spatial.Create.Transform3D.Rotation(Spatial.Constants.Vector3D.WorldZ, System.Math.PI / 4.0);
+            Assert.NotNull(transform3D_2);
+
+            // --- Warm up / JIT compile ---
+            _ = boundingBox2D.InRange(point2D);
+            _ = boundingBox3D.InRange(point3D);
+            _ = boundingBox2D.InRange(boundingBox2D);
+            _ = boundingBox3D.InRange(boundingBox3D);
+            _ = line2D.ClosestPoint(point2D);
+            _ = line2D.Distance(point2D);
+            _ = ray2D.ClosestPoint(point2D);
+            _ = ray2D.Distance(point2D);
+            _ = line3D.Distance(point3D);
+            _ = ray3D.ClosestPoint(point3D);
+            _ = ray3D.Distance(point3D);
+            _ = plane.ClosestPoint(point3D);
+            _ = plane.Distance(point3D);
+            _ = coordinateSystem2D.AxisX;
+            _ = coordinateSystem2D.AxisY;
+            _ = coordinateSystem2D.Origin;
+            _ = coordinateSystem3D.AxisX;
+            _ = coordinateSystem3D.AxisY;
+            _ = coordinateSystem3D.AxisZ;
+            _ = coordinateSystem3D.Origin;
+            _ = segment2D.Direction;
+            _ = segment2D.Length;
+            _ = segment2D.SquaredLength;
+            _ = segment3D.Direction;
+            _ = segment3D.Length;
+            _ = segment3D.SquaredLength;
+            _ = transform2D_1[0, 0];
+            _ = transform2D_1 * transform2D_2;
+            _ = transform3D_1[0, 0];
+            _ = transform3D_1 * transform3D_2;
+            _ = plane.D;
+            _ = plane.K;
+            _ = plane.Normal;
+            _ = plane.Origin;
+
+            // --- Benchmark ---
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            for (int i = 0; i < iterations; i++)
+            {
+                _ = boundingBox2D.InRange(point2D);
+                _ = boundingBox3D.InRange(point3D);
+                _ = boundingBox2D.InRange(boundingBox2D);
+                _ = boundingBox3D.InRange(boundingBox3D);
+                _ = line2D.ClosestPoint(point2D);
+                _ = line2D.Distance(point2D);
+                _ = ray2D.ClosestPoint(point2D);
+                _ = ray2D.Distance(point2D);
+                _ = line3D.Distance(point3D);
+                _ = ray3D.ClosestPoint(point3D);
+                _ = ray3D.Distance(point3D);
+                _ = plane.ClosestPoint(point3D);
+                _ = plane.Distance(point3D);
+            }
+            stopwatch.Stop();
+            long computationalMs = stopwatch.ElapsedMilliseconds;
+
+            stopwatch.Restart();
+            for (int i = 0; i < iterations; i++)
+            {
+                _ = coordinateSystem2D.AxisX;
+                _ = coordinateSystem2D.AxisY;
+                _ = coordinateSystem2D.Origin;
+                _ = coordinateSystem3D.AxisX;
+                _ = coordinateSystem3D.AxisY;
+                _ = coordinateSystem3D.AxisZ;
+                _ = coordinateSystem3D.Origin;
+                _ = segment2D.Direction;
+                _ = segment2D.Length;
+                _ = segment2D.SquaredLength;
+                _ = segment3D.Direction;
+                _ = segment3D.Length;
+                _ = segment3D.SquaredLength;
+                _ = transform2D_1[0, 0];
+                _ = transform3D_1[0, 0];
+                _ = plane.D;
+                _ = plane.K;
+                _ = plane.Normal;
+                _ = plane.Origin;
+            }
+            stopwatch.Stop();
+            long propertyMs = stopwatch.ElapsedMilliseconds;
+
+            stopwatch.Restart();
+            for (int i = 0; i < iterations; i++)
+            {
+                _ = transform2D_1 * transform2D_2;
+                _ = transform3D_1 * transform3D_2;
+            }
+            stopwatch.Stop();
+            long operatorMs = stopwatch.ElapsedMilliseconds;
+
+            // --- Assert correctness (spot check) ---
+            Assert.True(boundingBox2D.InRange(point2D));
+            Assert.True(boundingBox3D.InRange(point3D));
+            Point2D? closest2D = line2D.ClosestPoint(point2D);
+            Assert.NotNull(closest2D);
+            Assert.Equal(50.0, closest2D.X, 1e-5);
+            Assert.Equal(0.0, closest2D.Y, 1e-5);
+            Assert.Equal(50.0, line2D.Distance(point2D), 1e-5);
+            Assert.NotNull(plane.ClosestPoint(point3D));
+            Assert.Equal(50.0, plane.Distance(point3D), 1e-5);
+            Assert.NotNull(coordinateSystem2D.AxisX);
+            Assert.NotNull(segment2D.Direction);
+            Assert.True(segment2D.Length > 0.0);
+            Assert.NotNull(transform2D_1 * transform2D_2);
+
+            // --- Output results for manual A/B comparison ---
+            Console.WriteLine($"=== AggressiveInlining Benchmark ({iterations:N0} iterations) ===");
+            Console.WriteLine($"Computational (InRange/Distance/ClosestPoint):  {computationalMs,6} ms");
+            Console.WriteLine($"Property accessors (Axis/Origin/Length/etc):    {propertyMs,6} ms");
+            Console.WriteLine($"Operator * (Transform2D * Transform3D):        {operatorMs,6} ms");
+            Console.WriteLine($"===================================================");
+
+            // Assert performance sanity (should be fast, typically < 1000ms per category)
+            Assert.True(computationalMs < 3000, $"Computational benchmark failed! Took {computationalMs} ms.");
+            Assert.True(propertyMs < 2000, $"Property benchmark failed! Took {propertyMs} ms.");
+            Assert.True(operatorMs < 500, $"Operator benchmark failed! Took {operatorMs} ms.");
+        }
     }
 }
