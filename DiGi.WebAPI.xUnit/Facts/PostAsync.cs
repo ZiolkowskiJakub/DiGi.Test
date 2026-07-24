@@ -136,6 +136,47 @@ namespace DiGi.WebAPI.xUnit
         }
 
         /// <summary>
+        /// Tests that a timeout during a single attempt is treated as transient and retried.
+        /// </summary>
+        [Fact]
+        public async Task PostAsync_RetriesOnTimeout()
+        {
+            TimeoutHttpMessageHandler timeoutHttpMessageHandler = new(1);
+
+            using HttpClient httpClient = new(timeoutHttpMessageHandler);
+
+            PostOptions postOptions = new()
+            {
+                RetryCount = 2,
+                RetryDelay = TimeSpan.FromMilliseconds(1),
+                Delay = TimeSpan.FromMilliseconds(50),
+            };
+
+            PostResponse postResponse = await Modify.PostAsync(httpClient, "https://localhost/updateitems", HttpContentFactory(), postOptions);
+
+            Assert.True(postResponse.Succeeded);
+            Assert.Equal(2, timeoutHttpMessageHandler.RequestCount);
+        }
+
+        /// <summary>
+        /// Tests that passing invalid parameters returns a failing PostResponse without throwing.
+        /// </summary>
+        [Fact]
+        public async Task PostAsync_ReturnsFailureOnInvalidArguments()
+        {
+            using HttpClient httpClient = new();
+
+            PostResponse<bool?> postResponse_NullUri = await Modify.PostAsync<bool?>(httpClient, null, HttpContentFactory());
+            Assert.False(postResponse_NullUri.Succeeded);
+
+            PostResponse<bool?> postResponse_EmptyUri = await Modify.PostAsync<bool?>(httpClient, "   ", HttpContentFactory());
+            Assert.False(postResponse_EmptyUri.Succeeded);
+
+            PostResponse<bool?> postResponse_NullClient = await Modify.PostAsync<bool?>(null!, "https://localhost/test", HttpContentFactory());
+            Assert.False(postResponse_NullClient.Succeeded);
+        }
+
+        /// <summary>
         /// Builds post options with a retry backoff short enough to keep the tests fast.
         /// </summary>
         /// <returns>The options used by the retry facts.</returns>
@@ -157,6 +198,41 @@ namespace DiGi.WebAPI.xUnit
         private static Func<Task<HttpContent?>> HttpContentFactory(string content = "[]")
         {
             return () => Task.FromResult<HttpContent?>(new StringContent(content, Encoding.UTF8, "application/json"));
+        }
+
+        /// <summary>
+        /// An HTTP handler that delays responses past the per-attempt timeout for a set number of attempts.
+        /// </summary>
+        private sealed class TimeoutHttpMessageHandler : HttpMessageHandler
+        {
+            private readonly int timeoutAttempts;
+            private int requestCount = 0;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TimeoutHttpMessageHandler"/> class.
+            /// </summary>
+            /// <param name="timeoutAttempts">The number of initial requests that should time out.</param>
+            public TimeoutHttpMessageHandler(int timeoutAttempts)
+            {
+                this.timeoutAttempts = timeoutAttempts;
+            }
+
+            /// <summary>
+            /// Gets how many requests the handler received.
+            /// </summary>
+            public int RequestCount => requestCount;
+
+            /// <inheritdoc />
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage httpRequestMessage, CancellationToken cancellationToken)
+            {
+                requestCount++;
+                if (requestCount <= timeoutAttempts)
+                {
+                    await Task.Delay(5000, cancellationToken);
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(string.Empty) };
+            }
         }
 
         /// <summary>
