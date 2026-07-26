@@ -122,5 +122,52 @@ namespace DiGi.Geometry.xUnit
             Assert.Equal(0.0, ellipse2D_Target.DirectionA.X, 9);
             Assert.Equal(1.0, ellipse2D_Target.DirectionA.Y, 9);
         }
+
+        /// <summary>
+        /// Verifies that the tolerance overload of Project returns the true closest boundary point (satisfying the nearest-point optimality condition), that Distance reports that minimum distance rather than the radial approximation, and that GetFocalLength returns the inter-focal distance (2C).
+        /// </summary>
+        [Fact]
+        public void Ellipse2D_ClosestPoint()
+        {
+            double double_A = 10.0;
+            double double_B = 2.0;
+            Ellipse2D ellipse2D = new(new Point2D(0.0, 0.0), double_A, double_B, new Vector2D(1.0, 0.0));
+
+            // On-axis point: the closest boundary point coincides with the radial projection.
+            Point2D point2D_OnAxis = new(20.0, 0.0);
+            Point2D? point2D_OnAxisClosest = ellipse2D.Project(point2D_OnAxis, 1e-9);
+            Assert.NotNull(point2D_OnAxisClosest);
+            Assert.Equal(double_A, point2D_OnAxisClosest.X, 6);
+            Assert.Equal(0.0, point2D_OnAxisClosest.Y, 6);
+
+            // Off-axis external point: closest point differs from the radial projection.
+            Point2D point2D_Target = new(7.0, 4.0);
+            Point2D? point2D_Closest = ellipse2D.Project(point2D_Target, 1e-9);
+            Point2D? point2D_Radial = ellipse2D.Project(point2D_Target);
+            Assert.NotNull(point2D_Closest);
+            Assert.NotNull(point2D_Radial);
+
+            // The closest point lies on the boundary.
+            double double_Equation = (point2D_Closest.X / double_A) * (point2D_Closest.X / double_A) + (point2D_Closest.Y / double_B) * (point2D_Closest.Y / double_B);
+            Assert.Equal(1.0, double_Equation, 6);
+
+            // Nearest-point optimality: (target - closest) is orthogonal to the boundary tangent at the closest point.
+            double double_Cos = point2D_Closest.X / double_A;
+            double double_Sin = point2D_Closest.Y / double_B;
+            double double_TangentX = -double_A * double_Sin;
+            double double_TangentY = double_B * double_Cos;
+            double double_Dot = (point2D_Target.X - point2D_Closest.X) * double_TangentX + (point2D_Target.Y - point2D_Closest.Y) * double_TangentY;
+            Assert.Equal(0.0, double_Dot, 4);
+
+            // The closest point is at least as near as the radial approximation, and Distance reports that minimum.
+            double double_ClosestDistance = point2D_Target.Distance(point2D_Closest);
+            double double_RadialDistance = point2D_Target.Distance(point2D_Radial);
+            Assert.True(double_ClosestDistance <= double_RadialDistance + 1e-9);
+            Assert.True(double_RadialDistance - double_ClosestDistance > 1e-6);
+            Assert.Equal(double_ClosestDistance, ellipse2D.Distance(point2D_Target), 6);
+
+            // GetFocalLength is the distance between the two foci (2C).
+            Assert.Equal(2.0 * System.Math.Sqrt(double_A * double_A - double_B * double_B), ellipse2D.GetFocalLength(), 9);
+        }
     }
 }
