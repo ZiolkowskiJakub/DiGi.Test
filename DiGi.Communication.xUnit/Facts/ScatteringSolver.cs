@@ -3,6 +3,7 @@ using DiGi.Communication.Enums;
 using DiGi.Communication.Interfaces;
 using DiGi.Geometry.Spatial.Classes;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Xunit.Abstractions;
 
 namespace DiGi.Communication.xUnit
@@ -25,6 +26,7 @@ namespace DiGi.Communication.xUnit
         /// on multiple dome surface mesh sizes to verify correctness and compare performance.
         /// </summary>
         [Fact]
+        [SupportedOSPlatform("windows6.2")]
         public void ScatteringSolver_CPU_vs_GPU_Comparison()
         {
             double distance = 100.0;
@@ -47,7 +49,7 @@ namespace DiGi.Communication.xUnit
                 List<Point3D> warmPoints = [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(0, 10, 0)];
                 List<int[]> warmIndexes = [[0, 1, 2]];
                 Mesh3D warmMesh = new(warmPoints, warmIndexes);
-                warmModel.Update(new ScatteringObject("Warm", warmMesh));
+                warmModel.Update(new ScatteringObject("Warm", warmMesh, Constants.ElectricalProperties.Concrete));
 
                 ScatteringSolverOptions warmOptions = new(0.2, 0.5, 0.001);
                 ScatteringSolver warmCpu = new() { GeometricalPropagationModel = warmModel, ScatteringSolverOptions = warmOptions };
@@ -96,7 +98,7 @@ namespace DiGi.Communication.xUnit
                     }
                 }
                 Mesh3D complexMesh = new(points, indexes);
-                ScatteringObject scatteringObject = new("Dome", complexMesh);
+                ScatteringObject scatteringObject = new("Dome", complexMesh, Constants.ElectricalProperties.Concrete);
 
                 GeometricalPropagationModel model = new();
                 Assert.True(model.Assign(profile, antenna_Transmitter, antenna_Receiver));
@@ -207,7 +209,7 @@ namespace DiGi.Communication.xUnit
             List<int[]> indexArrays = [[0, 1, 2]];
             Mesh3D complexMesh = new(point3Ds, indexArrays);
 
-            ScatteringObject scatteringObject = new("Degenerate", complexMesh);
+            ScatteringObject scatteringObject = new("Degenerate", complexMesh, Constants.ElectricalProperties.Concrete);
             Assert.True(model.Update(scatteringObject));
 
             ScatteringSolverOptions options = new(0.2, 0.5, 0.001);
@@ -227,9 +229,9 @@ namespace DiGi.Communication.xUnit
         /// into separate <see cref="ScatteringPointGroup"/> instances instead of merging them.
         /// </summary>
         [Fact]
+        [SupportedOSPlatform("windows6.2")]
         public void ScatteringSolver_DisconnectedSegments_CreatesSeparateGroups()
         {
-            double distance = 20.0;
             Antenna antenna_Transmitter = new(new Point3D(0, -10, 5), Function.Transmitter);
             Antenna antenna_Receiver = new(new Point3D(0, 10, 5), Function.Receiver);
 
@@ -261,7 +263,7 @@ namespace DiGi.Communication.xUnit
             ];
             Mesh3D complexMesh = new(point3Ds, indexArrays);
 
-            ScatteringObject scatteringObject = new("U-Shape", complexMesh);
+            ScatteringObject scatteringObject = new("U-Shape", complexMesh, Constants.ElectricalProperties.Concrete);
             Assert.True(model.Update(scatteringObject));
 
             ScatteringSolverOptions options = new(0.2, 0.5, 0.001);

@@ -8,7 +8,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that every <see cref="Enums.BuildingParameter"/> member declares its own unique identifier.
+        /// Tests that every <see cref="Analytical.Enums.BuildingParameter"/> member declares its own unique identifier.
         /// <para>Parameters are stored keyed by this identifier, so two members sharing one collapse into a single slot and silently overwrite each other. Year, Code and Source once shared a single GUID; this fact exists so a copy-pasted attribute cannot reintroduce that.</para>
         /// </summary>
         [Fact]
@@ -16,9 +16,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         {
             Dictionary<string, string> dictionary = [];
 
-            foreach (Enums.BuildingParameter buildingParameter in Enum.GetValues<Enums.BuildingParameter>())
+            foreach (Analytical.Enums.BuildingParameter buildingParameter in Enum.GetValues<Analytical.Enums.BuildingParameter>())
             {
-                FieldInfo? fieldInfo = typeof(Enums.BuildingParameter).GetField(buildingParameter.ToString());
+                FieldInfo? fieldInfo = typeof(Analytical.Enums.BuildingParameter).GetField(buildingParameter.ToString());
 
                 Assert.NotNull(fieldInfo);
 
@@ -50,23 +50,23 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             SetValueSettings setValueSettings = new(true, false);
 
-            Assert.True(building.SetValue(Enums.BuildingParameter.Year, (short)2024, setValueSettings));
-            Assert.True(building.SetValue(Enums.BuildingParameter.LOD, CityGML.Enums.LOD.LOD2, setValueSettings));
-            Assert.True(building.SetValue(Enums.BuildingParameter.Source, source, setValueSettings));
-            Assert.True(building.SetValue(Enums.BuildingParameter.Code, code, setValueSettings));
+            Assert.True(building.SetValue(Analytical.Enums.BuildingParameter.Year, (short)2024, setValueSettings));
+            Assert.True(building.SetValue(Analytical.Enums.BuildingParameter.LOD, CityGML.Enums.LOD.LOD2, setValueSettings));
+            Assert.True(building.SetValue(Analytical.Enums.BuildingParameter.Source, source, setValueSettings));
+            Assert.True(building.SetValue(Analytical.Enums.BuildingParameter.Code, code, setValueSettings));
 
             GetValueSettings getValueSettings = new(true, false);
 
-            Assert.True(building.TryGetValue(Enums.BuildingParameter.Year, out short? year, getValueSettings));
+            Assert.True(building.TryGetValue(Analytical.Enums.BuildingParameter.Year, out short? year, getValueSettings));
             Assert.Equal((short)2024, year);
 
-            Assert.True(building.TryGetValue(Enums.BuildingParameter.LOD, out CityGML.Enums.LOD? lOD, getValueSettings));
+            Assert.True(building.TryGetValue(Analytical.Enums.BuildingParameter.LOD, out CityGML.Enums.LOD? lOD, getValueSettings));
             Assert.Equal(CityGML.Enums.LOD.LOD2, lOD);
 
-            Assert.True(building.TryGetValue(Enums.BuildingParameter.Code, out string? code_Actual, getValueSettings));
+            Assert.True(building.TryGetValue(Analytical.Enums.BuildingParameter.Code, out string? code_Actual, getValueSettings));
             Assert.Equal(code, code_Actual);
 
-            Assert.True(building.TryGetValue(Enums.BuildingParameter.Source, out string? source_Actual, getValueSettings));
+            Assert.True(building.TryGetValue(Analytical.Enums.BuildingParameter.Source, out string? source_Actual, getValueSettings));
             Assert.Equal(source, source_Actual);
         }
 
@@ -83,9 +83,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             SetValueSettings setValueSettings = new(true, false);
 
-            building.SetValue(Enums.BuildingParameter.Year, (short)2024, setValueSettings);
-            building.SetValue(Enums.BuildingParameter.Code, "2862", setValueSettings);
-            building.SetValue(Enums.BuildingParameter.Source, source, setValueSettings);
+            building.SetValue(Analytical.Enums.BuildingParameter.Year, (short)2024, setValueSettings);
+            building.SetValue(Analytical.Enums.BuildingParameter.Code, "2862", setValueSettings);
+            building.SetValue(Analytical.Enums.BuildingParameter.Source, source, setValueSettings);
 
             CityGML.Classes.Building? building_Actual = Core.Query.Clone(building);
 
@@ -93,10 +93,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             GetValueSettings getValueSettings = new(true, false);
 
-            Assert.True(building_Actual.TryGetValue(Enums.BuildingParameter.Source, out string? source_Actual, getValueSettings));
+            Assert.True(building_Actual.TryGetValue(Analytical.Enums.BuildingParameter.Source, out string? source_Actual, getValueSettings));
             Assert.Equal(source, source_Actual);
 
-            Assert.True(building_Actual.TryGetValue(Enums.BuildingParameter.Year, out short? year, getValueSettings));
+            Assert.True(building_Actual.TryGetValue(Analytical.Enums.BuildingParameter.Year, out short? year, getValueSettings));
             Assert.Equal((short)2024, year);
         }
     }

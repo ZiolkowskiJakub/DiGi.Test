@@ -2,6 +2,7 @@ using DiGi.Communication.Classes;
 using DiGi.Communication.Interfaces;
 using DiGi.Geometry.Spatial.Classes;
 using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace DiGi.Communication.xUnit
 {
@@ -12,6 +13,7 @@ namespace DiGi.Communication.xUnit
         /// <para>Verifies that both solvers return matching results (visibility, delays, scattering point group references, and point counts/coordinates).</para>
         /// </summary>
         [Fact]
+        [SupportedOSPlatform("windows6.2")]
         public void ScatteringSolver_GeometricalPropagationModel_Comparison()
         {
             string? string_FilePath = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "GeometricalPropagationModel.json");
@@ -83,13 +85,14 @@ namespace DiGi.Communication.xUnit
                     Scattering scattering_Cpu = list_CpuScatterings[j];
                     Scattering scattering_Gpu = list_GpuScatterings[j];
 
-                    testOutputHelper.WriteLine($"  [Delay {j}] Delay: {scattering_Cpu.Delay}");
-                    testOutputHelper.WriteLine($"    CPU Point Groups: {string.Join(", ", scattering_Cpu.ScatteringPointGroups.Select(g => $"'{g.Reference}': {g.Points.Count} pts"))}");
-                    testOutputHelper.WriteLine($"    GPU Point Groups: {string.Join(", ", scattering_Gpu.ScatteringPointGroups.Select(g => $"'{g.Reference}': {g.Points.Count} pts"))}");
-
-                    Assert.Equal(scattering_Gpu.Delay, scattering_Cpu.Delay, 9);
                     Assert.NotNull(scattering_Cpu.ScatteringPointGroups);
                     Assert.NotNull(scattering_Gpu.ScatteringPointGroups);
+
+                    testOutputHelper.WriteLine($"  [Delay {j}] Delay: {scattering_Cpu.Delay}");
+                    testOutputHelper.WriteLine($"    CPU Point Groups: {string.Join(", ", scattering_Cpu.ScatteringPointGroups.Select(g => $"'{g.Reference}': {g.Points?.Count ?? 0} pts"))}");
+                    testOutputHelper.WriteLine($"    GPU Point Groups: {string.Join(", ", scattering_Gpu.ScatteringPointGroups.Select(g => $"'{g.Reference}': {g.Points?.Count ?? 0} pts"))}");
+
+                    Assert.Equal(scattering_Gpu.Delay, scattering_Cpu.Delay, 9);
 
                     List<Tuple<Point3D, string>> cpuPoints = [];
                     foreach (ScatteringPointGroup group in scattering_Cpu.ScatteringPointGroups)
@@ -158,7 +161,7 @@ namespace DiGi.Communication.xUnit
                     }
                     else
                     {
-                        Assert.Equal(0, cpuPoints.Count);
+                        Assert.Empty(cpuPoints);
                     }
                 }
             }

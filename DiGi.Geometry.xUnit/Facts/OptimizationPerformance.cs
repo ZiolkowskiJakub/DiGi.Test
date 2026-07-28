@@ -2820,7 +2820,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// A/B benchmark comparing performance of methods annotated with <see cref="System.Runtime.CompilerServices.MethodImplAttribute"/> for <see cref="MethodImplOptions.AggressiveInlining"/>.
+        /// A/B benchmark comparing performance of methods annotated with <see cref="System.Runtime.CompilerServices.MethodImplAttribute"/> for <see cref="System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining"/>.
         /// <para>Exercises BoundingBox InRange, Line/Ray/Plane Distance and ClosestPoint, CoordinateSystem property accessors, Segment Length/Direction, and Transform indexer/operator in tight loops.</para>
         /// </summary>
         [Fact]
@@ -2837,9 +2837,9 @@ namespace DiGi.Geometry.xUnit
             Line2D line2D = new(new Point2D(0.0, 0.0), new Vector2D(1.0, 0.0));
             Ray2D ray2D = new(new Point2D(0.0, 0.0), new Vector2D(1.0, 0.0));
             Segment2D segment2D = new(0.0, 0.0, 100.0, 100.0);
-            Transform2D transform2D_1 = Planar.Create.Transform2D.Translation(10.0, 20.0);
+            Transform2D? transform2D_1 = Planar.Create.Transform2D.Translation(10.0, 20.0);
             Assert.NotNull(transform2D_1);
-            Transform2D transform2D_2 = Planar.Create.Transform2D.Rotation(System.Math.PI / 4.0);
+            Transform2D? transform2D_2 = Planar.Create.Transform2D.Rotation(System.Math.PI / 4.0);
             Assert.NotNull(transform2D_2);
 
             Line3D line3D = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldX);
@@ -2848,9 +2848,9 @@ namespace DiGi.Geometry.xUnit
             Segment3D segment3D = new(0.0, 0.0, 0.0, 100.0, 100.0, 100.0);
             CoordinateSystem2D coordinateSystem2D = new();
             CoordinateSystem3D coordinateSystem3D = new(new Point3D(0.0, 0.0, 0.0), Spatial.Constants.Vector3D.WorldZ);
-            Transform3D transform3D_1 = Spatial.Create.Transform3D.Translation(10.0, 20.0, 30.0);
+            Transform3D? transform3D_1 = Spatial.Create.Transform3D.Translation(10.0, 20.0, 30.0);
             Assert.NotNull(transform3D_1);
-            Transform3D transform3D_2 = Spatial.Create.Transform3D.Rotation(Spatial.Constants.Vector3D.WorldZ, System.Math.PI / 4.0);
+            Transform3D? transform3D_2 = Spatial.Create.Transform3D.Rotation(Spatial.Constants.Vector3D.WorldZ, System.Math.PI / 4.0);
             Assert.NotNull(transform3D_2);
 
             // --- Warm up / JIT compile ---

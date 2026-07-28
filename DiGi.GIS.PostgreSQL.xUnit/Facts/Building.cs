@@ -13,8 +13,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         {
             CityGML.Classes.Building building = new("B_001", 0, null);
             SetValueSettings setValueSettings = new(true, false);
-            building.SetValue(Enums.BuildingParameter.Year, (short)2024, setValueSettings);
-            building.SetValue(Enums.BuildingParameter.LOD, CityGML.Enums.LOD.LOD2, setValueSettings);
+            building.SetValue(Analytical.Enums.BuildingParameter.Year, (short)2024, setValueSettings);
+            building.SetValue(Analytical.Enums.BuildingParameter.LOD, CityGML.Enums.LOD.LOD2, setValueSettings);
 
             Building? postgresBuilding = building.ToPostgreSQL();
             Assert.NotNull(postgresBuilding);

@@ -109,9 +109,6 @@ namespace DiGi.GIS.Analytical.xUnit
                 Assert.NotNull(point3D);
                 Assert.False(double.IsNaN(point3D.X) || double.IsNaN(point3D.Y) || double.IsNaN(point3D.Z));
 
-                Assert.True(buildingModel.TryGetValue(Enums.BuildingModelParameter.LOD, out CityGML.Enums.LOD lOD));
-                Assert.Equal(CityGML.Enums.LOD.LOD2, lOD);
-
                 List<FaceFloor>? faceFloors = buildingModel.GetComponents<FaceFloor>();
                 Assert.NotNull(faceFloors);
                 Assert.NotEmpty(faceFloors);

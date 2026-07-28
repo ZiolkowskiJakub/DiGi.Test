@@ -18,17 +18,17 @@ namespace DiGi.Communication.xUnit
             // Object A: triangle at (0,0,0)-(10,0,0)-(0,5,5) with centroid ≈ (3.33, 1.67, 1.67)
             ScatteringObject scatteringObject_A = new("ObjectA", new Mesh3D(
                 [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(0, 5, 5)],
-                [[0, 1, 2]]));
+                [[0, 1, 2]]), Constants.ElectricalProperties.Concrete);
 
             // Object B: triangle at (20,0,0)-(30,0,0)-(20,5,5) with centroid ≈ (23.33, 1.67, 1.67)
             ScatteringObject scatteringObject_B = new("ObjectB", new Mesh3D(
                 [new Point3D(20, 0, 0), new Point3D(30, 0, 0), new Point3D(20, 5, 5)],
-                [[0, 1, 2]]));
+                [[0, 1, 2]]), Constants.ElectricalProperties.Concrete);
 
             // Object C: triangle at (0,10,0)-(10,10,0)-(0,15,5) with centroid ≈ (3.33, 11.67, 1.67)
             ScatteringObject scatteringObject_C = new("ObjectC", new Mesh3D(
                 [new Point3D(0, 10, 0), new Point3D(10, 10, 0), new Point3D(0, 15, 5)],
-                [[0, 1, 2]]));
+                [[0, 1, 2]]), Constants.ElectricalProperties.Concrete);
 
             GeometricalPropagationModel geometricalPropagationModel = new();
             Assert.True(geometricalPropagationModel.Update(scatteringObject_A));

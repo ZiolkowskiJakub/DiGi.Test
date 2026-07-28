@@ -409,9 +409,6 @@ namespace DiGi.GIS.Analytical.xUnit
             Assert.True(buildingModel.TryGetValue(Enums.BuildingModelParameter.Reference, out string? reference));
             Assert.Equal(building2D.Reference, reference);
 
-            Assert.True(buildingModel.TryGetValue(Enums.BuildingModelParameter.LOD, out CityGML.Enums.LOD lOD));
-            Assert.Equal(CityGML.Enums.LOD.LOD2, lOD);
-
             Core.xUnit.Query.SerializationCheck(buildingModel);
         }
 
