@@ -50,6 +50,15 @@ namespace DiGi.Communication.xUnit
             Assert.Equal("Vacuum", electricalProperties_3.Name);
             Assert.False(electricalProperties_1 == electricalProperties_3);
 
+            ElectricalProperties electricalProperties_DistinctInstance = new(name, a, b, c, d, new Range<double>(1, 100));
+            Assert.True(electricalProperties_1.Equals(electricalProperties_DistinctInstance));
+            Assert.Equal(electricalProperties_1.GetHashCode(), electricalProperties_DistinctInstance.GetHashCode());
+
+            Dictionary<ElectricalProperties, string> testDictionary = [];
+            testDictionary[electricalProperties_1] = "Value1";
+            Assert.True(testDictionary.TryGetValue(electricalProperties_DistinctInstance, out string? dictValue));
+            Assert.Equal("Value1", dictValue);
+
             Core.xUnit.Query.SerializationCheck(electricalProperties_1);
         }
     }
