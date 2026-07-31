@@ -24,11 +24,11 @@ namespace DiGi.Communication.xUnit
             Assert.True(geometricalPropagationModel.Update(scatteringObject_1));
             Assert.True(geometricalPropagationModel.Update(scatteringObject_2));
 
-            Ray3D ray3D_1 = new(new Point3D(0, 0, 0), new Vector3D(1, 0, 0));
-            Ray3D ray3D_2 = new(new Point3D(1, 1, 1), new Vector3D(0, 1, 0));
+            Point3D location_Tx = new(0, 0, 10);
+            Point3D location_Rx = new(10, 0, 0);
 
-            ScatteringHit hit_1 = new("Ref_Building", ray3D_1);
-            ScatteringHit hit_2 = new("Ref_Window", ray3D_2);
+            ScatteringHit hit_1 = new("Ref_Building", electricalProperties_Concrete, 2.4e9, location_Tx, location_Rx, new Point3D(0, 0, 0));
+            ScatteringHit hit_2 = new("Ref_Window", electricalProperties_Custom, 2.4e9, location_Tx, location_Rx, new Point3D(1, 1, 1));
 
             SphericalDistributionScatteringHitCollection hitCollection = new();
             double azimuth = 0.5;
@@ -83,13 +83,12 @@ namespace DiGi.Communication.xUnit
             Assert.True(model.Update(obj2));
             Assert.True(model.Update(obj3));
 
-            Ray3D ray1 = new(new Point3D(0, 0, 0), new Vector3D(1, 0, 0));
-            Ray3D ray2 = new(new Point3D(0, 0, 0), new Vector3D(0, 1, 0));
-            Ray3D ray3 = new(new Point3D(0, 0, 0), new Vector3D(0, 0, 1));
+            Point3D tx = new(0, 0, 10);
+            Point3D rx = new(10, 0, 0);
 
-            ScatteringHit hit1 = new("Ref_WallA", ray1);
-            ScatteringHit hit2 = new("Ref_WallB", ray2);
-            ScatteringHit hit3_UnknownRef = new("Ref_Unknown", ray3);
+            ScatteringHit hit1 = new("Ref_WallA", concrete_1, 2.4e9, tx, rx, new Point3D(0, 0, 0));
+            ScatteringHit hit2 = new("Ref_WallB", concrete_2, 2.4e9, tx, rx, new Point3D(1, 0, 0));
+            ScatteringHit hit3_UnknownRef = new("Ref_Unknown", concrete_1, 2.4e9, tx, rx, new Point3D(2, 0, 0));
 
             SphericalDistributionScatteringHitCollection hitCollection = new();
             double azimuth = 1.5;

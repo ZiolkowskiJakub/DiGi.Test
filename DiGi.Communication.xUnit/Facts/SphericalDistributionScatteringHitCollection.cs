@@ -17,11 +17,13 @@ namespace DiGi.Communication.xUnit
 
             Assert.Equal(0, collection_1.Count);
 
-            Point3D point3D_Origin = new(0, 0, 0);
-            Vector3D vector3D_Direction = new(1, 0, 0);
-            Ray3D ray3D = new(point3D_Origin, vector3D_Direction);
+            ElectricalProperties electricalProperties = Constants.ElectricalProperties.Concrete;
+            double frequency = 2.4e9;
+            Point3D point3D_Tx = new(0, 0, 10);
+            Point3D point3D_Rx = new(10, 0, 0);
+            Point3D point3D_Hit = new(0, 0, 0);
 
-            ScatteringHit scatteringHit = new("Ref_1", ray3D);
+            ScatteringHit scatteringHit = new("Ref_1", electricalProperties, frequency, point3D_Tx, point3D_Rx, point3D_Hit);
 
             double azimuth = 0.5;
             double elevation = 1.0;
