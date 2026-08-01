@@ -64,5 +64,30 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(string2);
             Assert.Equal("2.5-j3.8", string2);
         }
+
+        /// <summary>
+        /// Tests average calculation of complex number sequences including null, empty, single, and multiple element cases.
+        /// </summary>
+        [Fact]
+        public void Complex_Average()
+        {
+            System.Collections.Generic.IEnumerable<System.Numerics.Complex>? complexes_Null = null;
+            Assert.Null(complexes_Null.Average());
+
+            System.Numerics.Complex[] complexes_Empty = [];
+            Assert.Null(complexes_Empty.Average());
+
+            System.Numerics.Complex[] complexes_Single = [new(3, 4)];
+            System.Numerics.Complex? complex_AverageSingle = complexes_Single.Average();
+            Assert.NotNull(complex_AverageSingle);
+            Assert.Equal(3, complex_AverageSingle.Value.Real);
+            Assert.Equal(4, complex_AverageSingle.Value.Imaginary);
+
+            System.Numerics.Complex[] complexes_Multiple = [new(1, 2), new(3, 4), new(5, 6)];
+            System.Numerics.Complex? complex_AverageMultiple = complexes_Multiple.Average();
+            Assert.NotNull(complex_AverageMultiple);
+            Assert.Equal(3, complex_AverageMultiple.Value.Real);
+            Assert.Equal(4, complex_AverageMultiple.Value.Imaginary);
+        }
     }
 }
