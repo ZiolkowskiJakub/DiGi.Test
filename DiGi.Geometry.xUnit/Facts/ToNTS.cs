@@ -107,6 +107,29 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Verifies that the three and four point shortcuts of <see cref="Polygon2D.Triangulate(double)"/> apply the same non-finite coordinate guard as the NetTopologySuite path.
+        /// <para>Rings of three and four points are turned into triangles directly and never reach <see cref="DiGi.Geometry.Planar.Convert.ToNTS(IPolygonal2D)"/>, so the guard added there does not cover them. This failure mode is quieter than the reported one - no exception is thrown, the NaN simply travels on into the mesh and corrupts the glTF payload - which is why it is pinned separately.</para>
+        /// </summary>
+        [Theory]
+        [InlineData(3)]
+        [InlineData(4)]
+        public void Triangulate_Polygon2D_NaNCoordinate_Shortcuts(int count)
+        {
+            List<Point2D> point2Ds_Valid = [new Point2D(0, 0), new Point2D(4, 0), new Point2D(5, 3), new Point2D(2, 5)];
+
+            List<Point2D> point2Ds = point2Ds_Valid.GetRange(0, count);
+
+            List<Triangle2D>? triangle2Ds_Valid = new Polygon2D(point2Ds).Triangulate(DiGi.Core.Constants.Tolerance.Distance);
+            Assert.NotNull(triangle2Ds_Valid);
+            Assert.NotEmpty(triangle2Ds_Valid);
+
+            List<Point2D> point2Ds_NaN = [new Point2D(double.NaN, double.NaN), .. point2Ds.GetRange(1, count - 1)];
+
+            List<Triangle2D>? triangle2Ds_NaN = new Polygon2D(point2Ds_NaN).Triangulate(DiGi.Core.Constants.Tolerance.Distance);
+            Assert.Null(triangle2Ds_NaN);
+        }
+
+        /// <summary>
         /// Full-pipeline regression matching the reported stack trace (<see cref="PolygonalFace3D.Triangulate"/> reached through <see cref="DiGi.Geometry.Spatial.Create.Mesh3D(IPolygonalFace3D, double)"/>): a wall or roof face whose stored geometry carries a NaN coordinate must be reported as not convertible (a null mesh) instead of crashing the whole scene it belongs to.
         /// </summary>
         [Fact]

@@ -74,6 +74,16 @@ namespace DiGi.Communication.xUnit
             double grazingAngle = scatteringHit_1.GetGrazingAngle();
             Assert.Equal(Math.PI / 4, grazingAngle, 6);
 
+            // Vertical polarization reflection check
+            System.Numerics.Complex reflection_Vertical = scatteringHit_1.GetVerticalPolarizationReflection();
+            Assert.False(double.IsNaN(reflection_Vertical.Real));
+            Assert.False(double.IsNaN(reflection_Vertical.Imaginary));
+
+            ScatteringHit scatteringHit_Invalid = new(reference, electricalProperties, 0, point3D_Tx, point3D_Rx, point3D_Hit);
+            System.Numerics.Complex reflection_Invalid = scatteringHit_Invalid.GetVerticalPolarizationReflection();
+            Assert.True(double.IsNaN(reflection_Invalid.Real));
+            Assert.True(double.IsNaN(reflection_Invalid.Imaginary));
+
             // Normal incidence test (0 deg reflection angle from surface normal, 90 deg grazing angle)
             Point3D point3D_TxNormal = new(0, 0, 10);
             Point3D point3D_RxNormal = new(0, 0, 10);
