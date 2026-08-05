@@ -56,6 +56,9 @@
     <Reference Include="DiGi.Geometry.Object">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.GIS">
+      <HintPath>..\..\DiGi.GIS\bin\DiGi.GIS.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
