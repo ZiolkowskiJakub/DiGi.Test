@@ -85,7 +85,7 @@ namespace DiGi.GIS.Analytical.xUnit
 
                 // The storey split is the only step this overload adds over the single argument one, so the
                 // geometry has to survive both the split and the path that leaves the model whole.
-                BuildingModel? buildingModel_Fine = Create.BuildingModel(building, building2D, Core.Constants.Tolerance.Distance);
+                BuildingModel? buildingModel_Fine = Create.BuildingModel(building, building2D, tolerance: Core.Constants.Tolerance.Distance);
                 Assert.NotNull(buildingModel_Fine);
                 Assert.Equal(0, Components_NonFinitePlane(buildingModel_Fine));
                 Assert.True(buildingModel_Fine.IsValid());

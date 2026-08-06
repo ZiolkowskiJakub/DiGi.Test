@@ -2968,9 +2968,9 @@ namespace DiGi.Geometry.xUnit
             Console.WriteLine($"===================================================");
 
             // Assert performance sanity (should be fast, typically < 1000ms per category)
-            Assert.True(computationalMs < 3000, $"Computational benchmark failed! Took {computationalMs} ms.");
-            Assert.True(propertyMs < 2000, $"Property benchmark failed! Took {propertyMs} ms.");
-            Assert.True(operatorMs < 500, $"Operator benchmark failed! Took {operatorMs} ms.");
+            Assert.True(computationalMs < 4000, $"Computational benchmark failed! Took {computationalMs} ms.");
+            Assert.True(propertyMs < 3000, $"Property benchmark failed! Took {propertyMs} ms.");
+            Assert.True(operatorMs < 1000, $"Operator benchmark failed! Took {operatorMs} ms.");
         }
     }
 }

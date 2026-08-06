@@ -141,7 +141,7 @@ namespace DiGi.GIS.Analytical.xUnit
                 Assert.Equal(building2D.Storeys, spaces.Count);
 
                 // Passing the finer distance tolerance leaves the ring open at the corners, so no cut is made - the reason the overload does not default to it.
-                BuildingModel? buildingModel_Fine = Create.BuildingModel(building, building2D, Core.Constants.Tolerance.Distance);
+                BuildingModel? buildingModel_Fine = Create.BuildingModel(building, building2D, tolerance: Core.Constants.Tolerance.Distance);
                 Assert.NotNull(buildingModel_Fine);
 
                 List<Space>? spaces_Fine = buildingModel_Fine.GetSpaces<Space>();

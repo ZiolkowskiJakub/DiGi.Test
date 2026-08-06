@@ -39,7 +39,7 @@ namespace DiGi.GIS.Analytical.xUnit
 
         /// <summary>
         /// Tests that a null CityGML building falls back to the model extruded from the footprint of the 2D building.
-        /// <para>Guards the overload resolution of the fallback - the extruded overload takes the storey height ahead of the tolerance, so passing the tolerance positionally would produce a model of a micrometre in height instead of one storey height per storey.</para>
+        /// <para>Guards the overload resolution of the fallback - the extruded overload takes the base elevation and then the storey height ahead of the tolerance, and all three are doubles, so shifting the arguments by one silently compiles and produces a model of a micrometre in height instead of one storey height per storey. The elevation was inserted at the front of that list after the fact, which is exactly the mutation this asserts against, so the height is measured rather than merely the model being non null.</para>
         /// </summary>
         [Fact]
         public void BuildingModel_BuildingAndBuilding2D_NullBuilding()
