@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/Analytical/">
     <Project Path="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj">
       <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
@@ -108,6 +108,11 @@
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
     </Project>
+    <Project Path="../DiGi.Geometry.PointCloud/DiGi.Geometry.PointCloud/DiGi.Geometry.PointCloud.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Math/DiGi.Math/DiGi.Math.csproj" />
+    </Project>
     <Project Path="../DiGi.Geometry/DiGi.Geometry.Drawing/DiGi.Geometry.Drawing.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.Drawing/DiGi.Core.Drawing.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
@@ -123,6 +128,7 @@
     </Project>
     <Project Path="DiGi.Geometry.xUnit/DiGi.Geometry.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry.PointCloud/DiGi.Geometry.PointCloud/DiGi.Geometry.PointCloud.csproj" />
       <BuildDependency Project="../DiGi.Geometry.Random/DiGi.Geometry.Random/DiGi.Geometry.Random.csproj" />
       <BuildDependency Project="../DiGi.Geometry.Visual/DiGi.Geometry.Visual/DiGi.Geometry.Visual.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Drawing/DiGi.Geometry.Drawing.csproj" />

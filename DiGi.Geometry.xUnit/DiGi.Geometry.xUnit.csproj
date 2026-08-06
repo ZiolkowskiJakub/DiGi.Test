@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 	<ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+	<ProjectReference Include="..\..\DiGi.Geometry.PointCloud\DiGi.Geometry.PointCloud\DiGi.Geometry.PointCloud.csproj" />
 	<ProjectReference Include="..\..\DiGi.Geometry.Random\DiGi.Geometry.Random\DiGi.Geometry.Random.csproj" />
 	<ProjectReference Include="..\..\DiGi.Geometry.Visual\DiGi.Geometry.Visual\DiGi.Geometry.Visual.csproj" />
 	<ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry.Drawing\DiGi.Geometry.Drawing.csproj" />
