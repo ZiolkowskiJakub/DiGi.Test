@@ -1,6 +1,7 @@
 using DiGi.CityGML.Classes;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace DiGi.CityGML.xUnit
@@ -44,7 +45,13 @@ namespace DiGi.CityGML.xUnit
                         continue;
                     }
 
-                    buildings.AddRange(cityModel.Buildings);
+                    foreach (Building building in cityModel.Buildings)
+                    {
+                        if (building?.UniqueId != null && !buildings.Any(b => b.UniqueId == building.UniqueId))
+                        {
+                            buildings.Add(building);
+                        }
+                    }
                 }
             }
 

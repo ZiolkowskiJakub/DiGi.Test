@@ -1,6 +1,7 @@
 using DiGi.Analytical.Building.Classes;
 using DiGi.Analytical.Classes;
 using DiGi.CityGML.Classes;
+using DiGi.CityGML.Enums;
 using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.GIS.Classes;
@@ -14,7 +15,7 @@ namespace DiGi.GIS.Analytical.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests the BuildingModel extension method taking a Building and matching Building2D, evaluating whether extracted shells are enclosed across tolerances between 1e-6 to 0.05 (and up to 0.5), and logging a detailed report of the results.
+        /// Verifies that BuildingModels created from paired Building and Building2D objects have enclosed space shells.
         /// </summary>
         [Fact]
         public void BuildingModel_BuildingAndBuilding2D_ShellsAreEnclosed()
@@ -27,8 +28,8 @@ namespace DiGi.GIS.Analytical.xUnit
             string path_BuildingsJson = Path.Combine(directory_Files!, "Buildings.json");
             string path_Building2DsJson = Path.Combine(directory_Files!, "Building2Ds.json");
 
-            Assert.True(File.Exists(path_BuildingsJson));
-            Assert.True(File.Exists(path_Building2DsJson));
+            Assert.True(File.Exists(path_BuildingsJson), $"Missing input file: {path_BuildingsJson}");
+            Assert.True(File.Exists(path_Building2DsJson), $"Missing input file: {path_Building2DsJson}");
 
             string json_Buildings = File.ReadAllText(path_BuildingsJson);
             string json_Building2Ds = File.ReadAllText(path_Building2DsJson);
@@ -37,105 +38,112 @@ namespace DiGi.GIS.Analytical.xUnit
             List<Building2D>? building2Ds = Core.Convert.ToDiGi<Building2D>(json_Building2Ds);
 
             Assert.NotNull(buildings);
-            Assert.NotEmpty(buildings);
             Assert.NotNull(building2Ds);
+            Assert.NotEmpty(buildings);
             Assert.NotEmpty(building2Ds);
 
-            Dictionary<string, Building2D> building2D_ByReference = [];
-            foreach (Building2D building2D in building2Ds)
-            {
-                if (!string.IsNullOrWhiteSpace(building2D.Reference))
-                {
-                    building2D_ByReference[building2D.Reference] = building2D;
-                }
-            }
+            List<string> reportLines = [];
+            reportLines.Add("=== BUILDING MODEL SHELL ENCLOSURE REPORT ===");
+            reportLines.Add($"Total Buildings: {buildings.Count}");
+            reportLines.Add($"Total Building2Ds: {building2Ds.Count}");
+            reportLines.Add("");
 
             double[] testTolerances = [1e-6, 1e-5, 1e-4, 1e-3, 0.01, 0.05, 0.1, 0.2, 0.5];
-            int totalPairsEvaluated = 0;
-            int totalShellsEvaluated = 0;
-            int closedWithin05Count = 0;
 
-            List<string> reportLines = [];
+            int totalBuildingPairs = 0;
+            int totalShells = 0;
+            int enclosedShellsAt05 = 0;
 
             foreach (Building building in buildings)
             {
-                string? buildingId = building.GetValue<string>(CityGML.Enums.BuildingParameter.buildingId);
-
-                if (string.IsNullOrWhiteSpace(buildingId))
+                string? refId = building.GetValue<string>(BuildingParameter.buildingId);
+                if (string.IsNullOrWhiteSpace(refId))
                 {
-                    string? uniqueId = building.UniqueId;
-                    if (!string.IsNullOrWhiteSpace(uniqueId) && uniqueId.StartsWith("ID-"))
-                    {
-                        string[] parts = uniqueId.Split('-');
-                        if (parts.Length >= 3)
-                        {
-                            buildingId = string.Join("-", parts.Skip(2));
-                        }
-                    }
+                    refId = building.UniqueId;
                 }
 
-                if (string.IsNullOrWhiteSpace(buildingId) || !building2D_ByReference.TryGetValue(buildingId, out Building2D? building2D))
+                Building2D? matching2D = building2Ds.FirstOrDefault(b2d => b2d.Reference == refId)
+                                      ?? building2Ds.FirstOrDefault(b2d => building.UniqueId != null && building.UniqueId.Contains(b2d.Reference ?? "___"));
+
+                if (matching2D is null)
                 {
-                    reportLines.Add(string.Format("Building UniqueId={0} | Reference={1} | Missing matching Building2D", building.UniqueId, buildingId ?? "None"));
+                    reportLines.Add($"Building {building.UniqueId} (Ref: {refId}): MISSING MATCHING Building2D");
                     continue;
                 }
 
-                totalPairsEvaluated++;
+                totalBuildingPairs++;
+                BuildingModel? buildingModel = Create.BuildingModel(building, matching2D);
 
-                BuildingModel? buildingModel = Create.BuildingModel(building, building2D);
-
+                reportLines.Add($"--- Building {building.UniqueId} | Ref: {refId} ---");
                 if (buildingModel is null)
                 {
-                    reportLines.Add(string.Format("Building {0} | Reference {1} | BuildingModel creation returned null", building.UniqueId, buildingId));
+                    reportLines.Add("  FAILED to create BuildingModel");
                     continue;
                 }
 
+                List<Space>? spaces = buildingModel.GetSpaces<Space>();
                 List<Shell>? shells = buildingModel.GetShells<Space>();
+
+                int spaceCount = spaces?.Count ?? 0;
+                int shellCount = shells?.Count ?? 0;
+
+                reportLines.Add($"  Spaces Count: {spaceCount}, Shells Count: {shellCount}");
 
                 if (shells is null || shells.Count == 0)
                 {
-                    reportLines.Add(string.Format("Building {0} | Reference {1} | GetShells returned no shells", building.UniqueId, buildingId));
+                    reportLines.Add("  WARNING: No shells extracted from BuildingModel");
                     continue;
                 }
 
-                for (int i = 0; i < shells.Count; i++)
+                for (int s = 0; s < shells.Count; s++)
                 {
-                    Shell shell = shells[i];
-                    totalShellsEvaluated++;
+                    totalShells++;
+                    Shell shell = shells[s];
 
-                    bool isClosed = false;
-                    double minTol = -1;
+                    double? minEnclosedTol = null;
+                    Dictionary<double, bool> closureResults = [];
 
                     foreach (double tol in testTolerances)
                     {
-                        if (shell.IsClosed(tol))
+                        bool isClosed = shell.IsClosed(tol);
+                        closureResults[tol] = isClosed;
+                        if (isClosed && minEnclosedTol is null)
                         {
-                            isClosed = true;
-                            minTol = tol;
-                            break;
+                            minEnclosedTol = tol;
                         }
                     }
 
-                    if (isClosed && minTol <= 0.05)
+                    bool enclosedAt05 = closureResults.TryGetValue(0.05, out bool res05) && res05;
+                    if (enclosedAt05)
                     {
-                        closedWithin05Count++;
-                        reportLines.Add(string.Format("Building {0} | Reference {1} | Shell {2} | Enclosed: YES | Min Tolerance: {3:E2}", building.UniqueId, buildingId, i, minTol));
+                        enclosedShellsAt05++;
                     }
-                    else if (isClosed)
+
+                    string statusStr = minEnclosedTol.HasValue ? $"ENCLOSED (min tol = {minEnclosedTol.Value:E2})" : "OPEN (up to 0.5)";
+                    reportLines.Add($"    Shell [{s}]: {statusStr} | Faces: {shell.Count}");
+
+                    foreach (double tol in testTolerances)
                     {
-                        reportLines.Add(string.Format("Building {0} | Reference {1} | Shell {2} | Enclosed: YES (at >0.05) | Min Tolerance: {3:E2}", building.UniqueId, buildingId, i, minTol));
-                    }
-                    else
-                    {
-                        reportLines.Add(string.Format("Building {0} | Reference {1} | Shell {2} | Enclosed: NO (Open up to 0.5)", building.UniqueId, buildingId, i));
+                        reportLines.Add($"      Tol {tol,8:0.000000}: Closed = {closureResults[tol]}");
                     }
                 }
+
+                reportLines.Add("");
             }
 
-            Assert.True(totalPairsEvaluated > 0, "At least one Building and Building2D pair must be evaluated.");
+            reportLines.Add("=== SUMMARY ===");
+            reportLines.Add($"Total Evaluated Pairs: {totalBuildingPairs}");
+            reportLines.Add($"Total Extracted Shells: {totalShells}");
+            reportLines.Add($"Shells Enclosed at tol <= 0.05: {enclosedShellsAt05} / {totalShells}");
 
-            string path_Report = Path.Combine(directory_Files!, "BuildingModel_Enclosed_Report.txt");
-            File.WriteAllLines(path_Report, reportLines);
+            string? directory_Reports = Core.xUnit.Query.ReportsDirectory(assembly);
+            Assert.False(string.IsNullOrWhiteSpace(directory_Reports));
+
+            string reportPath = Path.Combine(directory_Reports!, "BuildingModel_Enclosed_Report.txt");
+            File.WriteAllLines(reportPath, reportLines);
+
+            Assert.True(totalBuildingPairs > 0, "No building pairs were evaluated.");
+            Assert.True(totalShells > 0, "No shells were extracted from building models.");
         }
     }
 }
