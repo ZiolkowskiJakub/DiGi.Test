@@ -288,6 +288,31 @@ namespace DiGi.Geometry.xUnit
             stringBuilder_Summary.AppendLine("Points      | Average (us/call) | Centroid (us/call) | Ratio (Centroid/Average)");
             stringBuilder_Summary.AppendLine("----------- | ------------------ | ------------------- | -------------------------");
 
+            // Warm up / JIT compile, once, before any measurement.
+            // The comparison below is only meaningful if both methods are measured in the same
+            // compilation tier. Tiered compilation delays call counting by roughly a tenth of a second,
+            // and at the smallest scale the entire measurement of the first method finishes inside that
+            // window, so only the method that runs second reaches optimised code. That made the result
+            // depend on what had already run in the process rather than on the two implementations, and
+            // the same benchmark would pass alone and fail in a full test run. Warming both on the
+            // concrete list type that is actually measured, for longer than the promotion delay, puts
+            // them on equal footing.
+            List<Point2D> point2Ds_WarmUp = new(1000);
+            for (int i = 0; i < 1000; i++)
+            {
+                double angle_WarmUp = i * 2.0 * System.Math.PI / 1000;
+                point2Ds_WarmUp.Add(new Point2D(System.Math.Cos(angle_WarmUp) * 10.0, System.Math.Sin(angle_WarmUp) * 10.0));
+            }
+
+            Stopwatch stopwatch_WarmUp = Stopwatch.StartNew();
+            while (stopwatch_WarmUp.ElapsedMilliseconds < 400)
+            {
+                _ = Planar.Query.Average(point2Ds_WarmUp);
+                _ = Planar.Query.Centroid(point2Ds_WarmUp);
+            }
+
+            stopwatch_WarmUp.Stop();
+
             foreach (int count in counts)
             {
                 List<Point2D> point2Ds = new(count);
@@ -296,10 +321,6 @@ namespace DiGi.Geometry.xUnit
                     double angle = i * 2.0 * System.Math.PI / count;
                     point2Ds.Add(new Point2D(System.Math.Cos(angle) * 10.0, System.Math.Sin(angle) * 10.0));
                 }
-
-                // Warm up / JIT compile
-                _ = Planar.Query.Average(point2Ds.Take(10));
-                _ = Planar.Query.Centroid(point2Ds.Take(10));
 
                 // Assert Correctness (both must resolve to the origin for a symmetric point set)
                 Point2D? point2D_Average = Planar.Query.Average(point2Ds);

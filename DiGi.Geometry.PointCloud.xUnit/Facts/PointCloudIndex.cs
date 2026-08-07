@@ -2,7 +2,7 @@ using DiGi.Geometry.PointCloud.Spatial.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using System.Threading.Tasks;
 
-namespace DiGi.Geometry.xUnit
+namespace DiGi.Geometry.PointCloud.xUnit
 {
     public partial class Facts
     {
@@ -154,7 +154,7 @@ namespace DiGi.Geometry.xUnit
             Assert.True(pointCloud3D.IsIndexed);
 
             // Shift the whole cloud far outside the query box.
-            Assert.True(pointCloud3D.Move(new Spatial.Classes.Vector3D(1000, 1000, 1000)));
+            Assert.True(pointCloud3D.Move(new DiGi.Geometry.Spatial.Classes.Vector3D(1000, 1000, 1000)));
 
             Assert.False(pointCloud3D.IsIndexed);
 

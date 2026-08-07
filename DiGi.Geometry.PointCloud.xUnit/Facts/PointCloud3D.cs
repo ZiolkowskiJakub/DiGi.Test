@@ -1,7 +1,7 @@
 using DiGi.Geometry.PointCloud.Spatial.Classes;
 using DiGi.Geometry.Spatial.Classes;
 
-namespace DiGi.Geometry.xUnit
+namespace DiGi.Geometry.PointCloud.xUnit
 {
     public partial class Facts
     {
@@ -124,7 +124,7 @@ namespace DiGi.Geometry.xUnit
             PointCloud3D pointCloud3D = new(x, y, z);
 
             // Fully qualified: this test project declares its own Vector3D struct, which shadows the geometry one.
-            Assert.True(pointCloud3D.Move(new Spatial.Classes.Vector3D(10, -20, 30)));
+            Assert.True(pointCloud3D.Move(new DiGi.Geometry.Spatial.Classes.Vector3D(10, -20, 30)));
 
             for (int i = 0; i < count; i++)
             {
@@ -170,9 +170,9 @@ namespace DiGi.Geometry.xUnit
             // while the per-point path replays the whole group for every point. The results must still agree.
             TransformGroup3D transformGroup3D = new(
             [
-                Spatial.Create.Transform3D.RotationZ(0.7),
-                Spatial.Create.Transform3D.Scale(2.0, 3.0, 0.5),
-                Spatial.Create.Transform3D.Translation(3.0, -4.0, 5.0)
+                DiGi.Geometry.Spatial.Create.Transform3D.RotationZ(0.7),
+                DiGi.Geometry.Spatial.Create.Transform3D.Scale(2.0, 3.0, 0.5),
+                DiGi.Geometry.Spatial.Create.Transform3D.Translation(3.0, -4.0, 5.0)
             ]);
 
             Assert.True(pointCloud3D.Transform(transformGroup3D));

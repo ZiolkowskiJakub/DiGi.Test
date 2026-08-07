@@ -2,7 +2,7 @@ using DiGi.Geometry.PointCloud.Spatial.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using System.Diagnostics;
 
-namespace DiGi.Geometry.xUnit
+namespace DiGi.Geometry.PointCloud.xUnit
 {
     public partial class Facts
     {

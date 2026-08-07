@@ -4,7 +4,7 @@ using DiGi.Geometry.PointCloud.Spatial.Classes;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
 
-namespace DiGi.Geometry.xUnit
+namespace DiGi.Geometry.PointCloud.xUnit
 {
     public partial class Facts
     {

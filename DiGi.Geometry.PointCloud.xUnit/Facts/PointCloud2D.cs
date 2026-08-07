@@ -1,7 +1,7 @@
 using DiGi.Geometry.PointCloud.Planar.Classes;
 using DiGi.Geometry.Planar.Classes;
 
-namespace DiGi.Geometry.xUnit
+namespace DiGi.Geometry.PointCloud.xUnit
 {
     public partial class Facts
     {
@@ -86,8 +86,8 @@ namespace DiGi.Geometry.xUnit
 
             TransformGroup2D transformGroup2D = new(
             [
-                Planar.Create.Transform2D.Rotation(0.6),
-                Planar.Create.Transform2D.Translation(new Vector2D(3, -4))
+                DiGi.Geometry.Planar.Create.Transform2D.Rotation(0.6),
+                DiGi.Geometry.Planar.Create.Transform2D.Translation(new Vector2D(3, -4))
             ]);
 
             Assert.True(pointCloud2D_Transform.Transform(transformGroup2D));
