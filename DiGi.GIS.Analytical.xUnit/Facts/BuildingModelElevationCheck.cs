@@ -64,16 +64,16 @@ namespace DiGi.GIS.Analytical.xUnit
         /// <summary>
         /// Verifies that extruding a Building2D using BuildingModelAsync queries terrain elevation and sets the base elevation to the retrieved ground height.
         /// <para>Depends on the live GUGiK terrain service and will fail when it cannot be reached - the offline behaviour of the same creator is covered by <see cref="BuildingModelAsync_ElevationUnavailable"/>, which asserts that an unreachable service falls back to an elevation of zero rather than losing the building.</para>
-        /// <para>The coordinate is a point in the PL-1992 grid whose terrain is well above ten metres, so the assertion distinguishes a resolved elevation from the zero the fallback would produce without pinning an exact ground height that the service may revise.</para>
+        /// <para>The footprint is taken from a real building in county 0201, in the easting-northing order a <see cref="Point2D"/> holds and the database stores, so the test exercises the axis order the terrain service is actually queried with. A literal chosen the other way round passes whichever way the query is built and hides the swap. The terrain there is around 190 metres, so the assertion distinguishes a resolved elevation from the zero the fallback would produce without pinning an exact ground height that the service may revise.</para>
         /// </summary>
         [Fact]
         public async Task BuildingModel_2DExtrusion_WithElevationAsync()
         {
             PolygonalFace2D? polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(
-                new Point2D(489012, 630012),
-                new Point2D(489022, 630012),
-                new Point2D(489022, 630022),
-                new Point2D(489012, 630022));
+                new Point2D(250450, 390650),
+                new Point2D(250460, 390650),
+                new Point2D(250460, 390660),
+                new Point2D(250450, 390660));
             Assert.NotNull(polygonalFace2D);
 
             Building2D building2D = new(Guid.NewGuid(), "REF123", polygonalFace2D, 2, null, null, []);
