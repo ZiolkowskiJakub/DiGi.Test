@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <LangVersion>latest</LangVersion>
+    <OutputPath>..\bin\$(MSBuildProjectName)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- The controllers under test derive from ControllerBase, so the ASP.NET Core framework assemblies
+       have to be on the reference set even though this is a plain test project, not a web app. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiGi.WebAPI\DiGi.WebAPI\DiGi.WebAPI.csproj" />
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiGi.Core">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.WebAPI">
+      <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Serilog">
+      <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.WebAPI">
+      <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
