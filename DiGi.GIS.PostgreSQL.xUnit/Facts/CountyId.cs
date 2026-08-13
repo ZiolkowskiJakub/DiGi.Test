@@ -1,4 +1,5 @@
 using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Planar.Interfaces;
 using DiGi.GIS.PostgreSQL.Classes;
 using System;
 using System.Collections.Generic;
@@ -69,8 +70,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Equal(10, Query.CountyId([administrativeAreal2D], polygon2D));
 
             Assert.Null(Query.CountyId([], polygon2D));
-            Assert.Null(Query.CountyId(null, polygon2D));
             Assert.Null(Query.CountyId([administrativeAreal2D], null));
+
+            // A bare null cannot pick between the two overloads, so each null case names the one it is testing.
+            Assert.Null(Query.CountyId((IEnumerable<AdministrativeAreal2D>?)null, polygon2D));
+            Assert.Null(Query.CountyId((IDictionary<int, IPolygonal2D>?)null, polygon2D));
+            Assert.Null(Query.CountyId(new Dictionary<int, IPolygonal2D>(), polygon2D));
         }
 
         /// <summary>
@@ -99,6 +104,33 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 UniqueId = administrativeAreal2D_GIS.UniqueId,
                 Object = administrativeAreal2D_GIS.ToJsonObject()
             };
+        }
+
+        /// <summary>
+        /// Verifies that deciding from pre-derived polygons gives the same answer as deciding from the county rows themselves.
+        /// <para>The pre-derived overload exists only so a caller testing many buildings against the same parts does not deserialize a county-sized geometry per building. It is a performance path, so the answer has to be identical - including where the footprint lies outside every part and the nearest one wins.</para>
+        /// </summary>
+        [Fact]
+        public void CountyId_PolygonalsMatchAdministrativeAreal2Ds()
+        {
+            AdministrativeAreal2D administrativeAreal2D_A = AdministrativeAreal2D_Square(10, "2405", 0, 0, 100);
+            AdministrativeAreal2D administrativeAreal2D_B = AdministrativeAreal2D_Square(20, "2405", 1000, 0, 100);
+
+            List<AdministrativeAreal2D> administrativeAreal2Ds = [administrativeAreal2D_A, administrativeAreal2D_B];
+
+            Dictionary<int, IPolygonal2D> polygonal2Ds_ByCountyId = administrativeAreal2Ds.Polygonal2DsByCountyId();
+
+            Assert.Equal(2, polygonal2Ds_ByCountyId.Count);
+
+            // Inside part B, inside part A, and outside both.
+            double[][] coordinates = [[1040, 40], [40, 40], [500, 5000]];
+
+            foreach (double[] coordinate in coordinates)
+            {
+                IPolygonal2D_Square(coordinate[0], coordinate[1], 10, out Polygon2D polygon2D);
+
+                Assert.Equal(Query.CountyId(administrativeAreal2Ds, polygon2D), Query.CountyId(polygonal2Ds_ByCountyId, polygon2D));
+            }
         }
 
         /// <summary>
