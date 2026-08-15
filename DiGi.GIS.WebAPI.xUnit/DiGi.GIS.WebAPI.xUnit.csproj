@@ -20,6 +20,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <!-- The converters under test expose Npgsql types on their public surface, so the package has to be
+         declared here at the same version the libraries were built against - a HintPath reference does
+         not carry its own NuGet dependencies. -->
+    <PackageReference Include="Npgsql" Version="10.0.2" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -42,11 +46,34 @@
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Core.IO">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.EPW">
+      <HintPath>..\..\DiGi.EPW\bin\DiGi.EPW.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Geometry">
+      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS">
+      <HintPath>..\..\DiGi.GIS\bin\DiGi.GIS.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.PostgreSQL">
+      <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.GIS.PostgreSQL.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.GIS.WebAPI">
       <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.PostgreSQL">
+      <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Serilog">
       <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
+    </Reference>
+    <!-- Required only to bind the EPWFile constructor: its optional parameters are typed from this
+         assembly, so overload resolution needs it even though no argument here is a Weather type. -->
+    <Reference Include="DiGi.Weather">
+      <HintPath>..\..\DiGi.Weather\bin\DiGi.Weather.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.WebAPI">
       <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
