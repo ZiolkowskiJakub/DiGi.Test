@@ -1,7 +1,10 @@
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiGi.GIS.xUnit
@@ -45,6 +48,178 @@ namespace DiGi.GIS.xUnit
             IEnumerable<Point2D>? points2D_Null = null;
             List<Point3D>? points3D_Result = await httpClient_Null.ElevationsAsync(points2D_Null);
             Assert.Null(points3D_Result);
+        }
+
+        /// <summary>
+        /// Tests that the index aligned overload returns one entry per input point, at the same position, holding null where the elevation could not be retrieved.
+        /// <para>The stub answers each request with the easting it was asked for, so asserting that every resolved point carries its own easting as its elevation proves the answers did not merely arrive in the right number but reached the point that asked for them. The overload this replaces dropped the unresolved entries, which shifted every answer after them.</para>
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_IndexAlignment()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000), new(480010, 550000), new(480020, 550000), new(480030, 550000), new(480040, 550000)];
+
+            string url_Failing = point2Ds[2].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => url == url_Failing ? Response_NotFound() : Response_Easting(url));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 4, 2, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Equal(point2Ds.Count, point3Ds.Count);
+            Assert.Null(point3Ds[2]);
+
+            for (int i = 0; i < point2Ds.Count; i++)
+            {
+                if (i == 2)
+                {
+                    continue;
+                }
+
+                Point3D? point3D = point3Ds[i];
+                Assert.NotNull(point3D);
+                Assert.Equal(point2Ds[i].X, point3D.X);
+                Assert.Equal(point2Ds[i].Y, point3D.Y);
+                Assert.Equal(point2Ds[i].X, point3D.Z);
+            }
+        }
+
+        /// <summary>
+        /// Tests that a transient failure is retried and that the point resolves once the service answers, rather than being recorded as a point that has no elevation.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_RetriesTransient()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000)];
+            string url = point2Ds[0].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string requestUrl, int attempt) => attempt < 3 ? Response_ServiceUnavailable() : Response_Easting(requestUrl));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 1, 3, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Single(point3Ds);
+            Assert.NotNull(point3Ds[0]);
+            Assert.Equal(480000d, point3Ds[0]!.Z);
+            Assert.Equal(3, elevationHttpMessageHandler.CountByUrl(url));
+        }
+
+        /// <summary>
+        /// Tests that a failure which is not transient is not retried, so a point genuinely outside the coverage of the service costs one request rather than several.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_DoesNotRetryNonTransient()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000)];
+            string url = point2Ds[0].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string requestUrl, int attempt) => Response_NotFound());
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 1, 3, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Single(point3Ds);
+            Assert.Null(point3Ds[0]);
+            Assert.Equal(1, elevationHttpMessageHandler.CountByUrl(url));
+        }
+
+        /// <summary>
+        /// Tests that no more requests are in flight at once than the caller allowed, which is what keeps a large run from overwhelming a public service.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_RespectsConcurrencyLimit()
+        {
+            List<Point2D> point2Ds = [];
+            for (int i = 0; i < 40; i++)
+            {
+                point2Ds.Add(new Point2D(480000 + (i * 10), 550000));
+            }
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => Response_Easting(url), TimeSpan.FromMilliseconds(20));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 4, 0, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Equal(40, point3Ds.Count);
+            Assert.DoesNotContain(point3Ds, x => x is null);
+            Assert.True(elevationHttpMessageHandler.CountInFlightMax <= 4, $"Peak in flight was {elevationHttpMessageHandler.CountInFlightMax}, limit was 4.");
+        }
+
+        /// <summary>
+        /// Tests that a cancelled run stops rather than working through the remaining points.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_Cancellation()
+        {
+            List<Point2D> point2Ds = [];
+            for (int i = 0; i < 20; i++)
+            {
+                point2Ds.Add(new Point2D(480000 + (i * 10), 550000));
+            }
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => Response_Easting(url));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            using CancellationTokenSource cancellationTokenSource = new();
+            cancellationTokenSource.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await httpClient.ElevationsAsync(point2Ds, 4, 0, TimeSpan.Zero, cancellationTokenSource.Token));
+        }
+
+        /// <summary>
+        /// Tests that the collection overload that predates the aligned one still drops the points it could not resolve, so its existing callers are unaffected by the rewrite behind it.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_LegacyOverloadStillDropsNulls()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000), new(480010, 550000), new(480020, 550000)];
+
+            string url_Failing = point2Ds[1].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => url == url_Failing ? Response_NotFound() : Response_Easting(url));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 4);
+
+            Assert.NotNull(point3Ds);
+            Assert.Equal(2, point3Ds.Count);
+            Assert.Equal(480000d, point3Ds[0].X);
+            Assert.Equal(480020d, point3Ds[1].X);
+        }
+
+        /// <summary>
+        /// Builds a successful response whose body is the easting the request asked for, so a fact can tell which point an answer belongs to.
+        /// </summary>
+        /// <param name="url">The request URL, which carries the easting in its y parameter.</param>
+        /// <returns>A response holding the easting as its content.</returns>
+        private static HttpResponseMessage Response_Easting(string url)
+        {
+            int index = url.LastIndexOf("y=", StringComparison.Ordinal);
+            string easting = index < 0 ? "0" : url.Substring(index + 2);
+
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(easting) };
+        }
+
+        /// <summary>
+        /// Builds a response for a condition that is worth retrying.
+        /// </summary>
+        /// <returns>A service unavailable response.</returns>
+        private static HttpResponseMessage Response_ServiceUnavailable()
+        {
+            return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+        }
+
+        /// <summary>
+        /// Builds a response for a condition that is not worth retrying.
+        /// </summary>
+        /// <returns>A not found response.</returns>
+        private static HttpResponseMessage Response_NotFound()
+        {
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
     }
 }
