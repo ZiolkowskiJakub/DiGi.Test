@@ -44,7 +44,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 references.Add(references_Distinct[i % 7]);
             }
 
-            PointCloudReferenceCollection? pointCloudReferenceCollection = PointCloud.Core.Create.PointCloudReferenceCollection(references, out int[]? referenceIndexes);
+            PointCloudReferenceCollection? pointCloudReferenceCollection = Core.Create.PointCloudReferenceCollection(references, out int[]? referenceIndexes);
 
             Assert.NotNull(pointCloudReferenceCollection);
             Assert.NotNull(referenceIndexes);
@@ -181,7 +181,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
         {
             ReferencedPointCloud3D referencedPointCloud3D = ReferencedPointCloud3D_Derivable(500);
 
-            byte[]? bytes = PointCloud.Spatial.Convert.ToSystem_Bytes(referencedPointCloud3D, PointCloudFormat.Binary);
+            byte[]? bytes = Spatial.Convert.ToSystem_Bytes(referencedPointCloud3D, PointCloudFormat.Binary);
 
             Assert.NotNull(bytes);
 
@@ -201,7 +201,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Assert.Equal(4, bytes[length_Coordinates + 6]);
             Assert.Equal(1, bytes[length_Coordinates + 16]);
 
-            ReferencedPointCloud3D? referencedPointCloud3D_Actual = PointCloud.Spatial.Create.ReferencedPointCloud3D(bytes);
+            ReferencedPointCloud3D? referencedPointCloud3D_Actual = Create.ReferencedPointCloud3D(bytes);
 
             Assert.NotNull(referencedPointCloud3D_Actual);
             Assert.Equal(500, referencedPointCloud3D_Actual.Count);
@@ -212,15 +212,15 @@ namespace DiGi.Geometry.PointCloud.xUnit
             // A cloud carrying no links must encode to the coordinate block alone, byte-identical to a plain cloud.
             ReferencedPointCloud3D referencedPointCloud3D_Unlinked = new([0.0, 1.0], [2.0, 3.0], [4.0, 5.0], null, null);
 
-            byte[]? bytes_Unlinked = PointCloud.Spatial.Convert.ToSystem_Bytes(referencedPointCloud3D_Unlinked, PointCloudFormat.Binary);
-            byte[]? bytes_Plain = PointCloud.Spatial.Convert.ToSystem_Bytes(new PointCloud3D([0.0, 1.0], [2.0, 3.0], [4.0, 5.0]), PointCloudFormat.Binary);
+            byte[]? bytes_Unlinked = Spatial.Convert.ToSystem_Bytes(referencedPointCloud3D_Unlinked, PointCloudFormat.Binary);
+            byte[]? bytes_Plain = Spatial.Convert.ToSystem_Bytes(new PointCloud3D([0.0, 1.0], [2.0, 3.0], [4.0, 5.0]), PointCloudFormat.Binary);
 
             Assert.NotNull(bytes_Unlinked);
             Assert.NotNull(bytes_Plain);
             Assert.Equal(bytes_Plain, bytes_Unlinked);
 
             // A buffer holding coordinates alone decodes to a cloud with no links rather than failing.
-            ReferencedPointCloud3D? referencedPointCloud3D_FromPlain = PointCloud.Spatial.Create.ReferencedPointCloud3D(bytes_Plain);
+            ReferencedPointCloud3D? referencedPointCloud3D_FromPlain = Create.ReferencedPointCloud3D(bytes_Plain);
 
             Assert.NotNull(referencedPointCloud3D_FromPlain);
             Assert.Equal(2, referencedPointCloud3D_FromPlain.Count);
@@ -232,7 +232,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             byte[] bytes_TruncatedCollection = new byte[bytes.Length - 8];
             Array.Copy(bytes, bytes_TruncatedCollection, bytes_TruncatedCollection.Length);
 
-            ReferencedPointCloud3D? referencedPointCloud3D_TruncatedCollection = PointCloud.Spatial.Create.ReferencedPointCloud3D(bytes_TruncatedCollection);
+            ReferencedPointCloud3D? referencedPointCloud3D_TruncatedCollection = Create.ReferencedPointCloud3D(bytes_TruncatedCollection);
 
             Assert.NotNull(referencedPointCloud3D_TruncatedCollection);
             Assert.Equal(500, referencedPointCloud3D_TruncatedCollection.Count);
@@ -245,14 +245,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
             byte[] bytes_TruncatedIndexes = new byte[length_Coordinates + 32 + 100];
             Array.Copy(bytes, bytes_TruncatedIndexes, bytes_TruncatedIndexes.Length);
 
-            ReferencedPointCloud3D? referencedPointCloud3D_TruncatedIndexes = PointCloud.Spatial.Create.ReferencedPointCloud3D(bytes_TruncatedIndexes);
+            ReferencedPointCloud3D? referencedPointCloud3D_TruncatedIndexes = Create.ReferencedPointCloud3D(bytes_TruncatedIndexes);
 
             Assert.NotNull(referencedPointCloud3D_TruncatedIndexes);
             Assert.Equal(500, referencedPointCloud3D_TruncatedIndexes.Count);
             Assert.False(referencedPointCloud3D_TruncatedIndexes.IsReferenced);
             Assert.Null(referencedPointCloud3D_TruncatedIndexes.GetReferenceIndexes());
 
-            Assert.Null(PointCloud.Spatial.Create.ReferencedPointCloud3D((byte[]?)null));
+            Assert.Null(Create.ReferencedPointCloud3D((byte[]?)null));
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
         {
             ReferencedPointCloud3D referencedPointCloud3D = ReferencedPointCloud3D_Derivable(250);
 
-            byte[]? bytes = PointCloud.Spatial.Convert.ToSystem_Bytes(referencedPointCloud3D, PointCloudFormat.Binary);
+            byte[]? bytes = Spatial.Convert.ToSystem_Bytes(referencedPointCloud3D, PointCloudFormat.Binary);
 
             Assert.NotNull(bytes);
 
@@ -275,7 +275,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             File.WriteAllBytes(path, bytes);
 
-            ReferencedPointCloud3D? referencedPointCloud3D_Actual = PointCloud.Spatial.Create.ReferencedPointCloud3D(new FileInfo(path));
+            ReferencedPointCloud3D? referencedPointCloud3D_Actual = Create.ReferencedPointCloud3D(new FileInfo(path));
 
             Assert.NotNull(referencedPointCloud3D_Actual);
             Assert.Equal(250, referencedPointCloud3D_Actual.Count);
@@ -283,7 +283,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             ReferencedPointCloud3D_AssertDerivable(referencedPointCloud3D_Actual);
 
-            Assert.Null(PointCloud.Spatial.Create.ReferencedPointCloud3D(new FileInfo(System.IO.Path.Combine(directory, "Absent.dgpc"))));
+            Assert.Null(Create.ReferencedPointCloud3D(new FileInfo(System.IO.Path.Combine(directory, "Absent.dgpc"))));
         }
 
         /// <summary>
@@ -348,7 +348,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             {
                 ReferencedPointCloud3D referencedPointCloud3D = ReferencedPointCloud3D_Derivable(count);
 
-                PointCloud3D? pointCloud3D_InRange = PointCloud.Spatial.Query.InRange((PointCloud3D)referencedPointCloud3D, boundingBox3D);
+                PointCloud3D? pointCloud3D_InRange = Query.InRange((PointCloud3D)referencedPointCloud3D, boundingBox3D);
                 List<int>? indexes = referencedPointCloud3D.InRangeIndexes(boundingBox3D);
                 ReferencedPointCloud3D? referencedPointCloud3D_InRange = referencedPointCloud3D.InRange(boundingBox3D);
 

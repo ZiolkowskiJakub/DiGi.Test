@@ -35,9 +35,9 @@ namespace DiGi.Geometry.PointCloud.xUnit
             {
                 Point3D point3D = new(random.NextDouble() * 100.0, random.NextDouble() * 100.0, random.NextDouble() * 100.0);
 
-                Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
+                Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
 
-                Triangle3D? triangle3D = PointCloud.Spatial.Create.Triangle3D(pointCloud3D, point3D);
+                Triangle3D? triangle3D = Spatial.Create.Triangle3D(pointCloud3D, point3D);
 
                 Assert.NotNull(triangle3D);
 
@@ -99,12 +99,12 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             Point3D point3D = new(50, 1.5, 0);
 
-            Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
+            Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
 
             // The premise of the test: the three nearest points really are collinear.
             Assert.Equal(0.0, PointCloudTriangle_Area(x, y, z, index_1, index_2, index_3));
 
-            Triangle3D? triangle3D = PointCloud.Spatial.Create.Triangle3D(pointCloud3D, point3D);
+            Triangle3D? triangle3D = Spatial.Create.Triangle3D(pointCloud3D, point3D);
 
             Assert.NotNull(triangle3D);
             Assert.True(triangle3D.GetArea() > 0);
@@ -138,19 +138,19 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud3D pointCloud3D_Collinear = new(x, y, z);
 
-            Assert.Null(PointCloud.Spatial.Create.Triangle3D(pointCloud3D_Collinear, new Point3D(10, 0, 0)));
+            Assert.Null(Spatial.Create.Triangle3D(pointCloud3D_Collinear, new Point3D(10, 0, 0)));
 
             // Every point in the same place: no pair even spans an edge.
             PointCloud3D pointCloud3D_Coincident = new(new double[count], new double[count], new double[count]);
 
-            Assert.Null(PointCloud.Spatial.Create.Triangle3D(pointCloud3D_Coincident, new Point3D(0, 0, 0)));
+            Assert.Null(Spatial.Create.Triangle3D(pointCloud3D_Coincident, new Point3D(0, 0, 0)));
 
             // Fewer than three points cannot make a triangle at all.
             PointCloud3D pointCloud3D_Pair = new([0.0, 1.0], [0.0, 1.0], [0.0, 0.0]);
 
-            Assert.Null(PointCloud.Spatial.Create.Triangle3D(pointCloud3D_Pair, new Point3D(0, 0, 0)));
-            Assert.Null(PointCloud.Spatial.Create.Triangle3D(null, new Point3D(0, 0, 0)));
-            Assert.Null(PointCloud.Spatial.Create.Triangle3D(pointCloud3D_Pair, null));
+            Assert.Null(Spatial.Create.Triangle3D(pointCloud3D_Pair, new Point3D(0, 0, 0)));
+            Assert.Null(Spatial.Create.Triangle3D(null, new Point3D(0, 0, 0)));
+            Assert.Null(Spatial.Create.Triangle3D(pointCloud3D_Pair, null));
         }
 
         /// <summary>
@@ -194,14 +194,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud3D pointCloud3D_Query = new(x_Query, y_Query, z_Query);
 
-            List<Triangle3D?>? triangle3Ds = PointCloud.Spatial.Create.Triangle3Ds(pointCloud3D, pointCloud3D_Query);
+            List<Triangle3D?>? triangle3Ds = Spatial.Create.Triangle3Ds(pointCloud3D, pointCloud3D_Query);
 
             Assert.NotNull(triangle3Ds);
             Assert.Equal(count_Query, triangle3Ds.Count);
 
             for (int i = 0; i < count_Query; i++)
             {
-                Triangle3D? triangle3D_Expected = PointCloud.Spatial.Create.Triangle3D(pointCloud3D, x_Query[i], y_Query[i], z_Query[i]);
+                Triangle3D? triangle3D_Expected = Spatial.Create.Triangle3D(pointCloud3D, x_Query[i], y_Query[i], z_Query[i]);
                 Triangle3D? triangle3D = triangle3Ds[i];
 
                 Assert.NotNull(triangle3D_Expected);
@@ -221,8 +221,8 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 }
             }
 
-            Assert.Null(PointCloud.Spatial.Create.Triangle3Ds(pointCloud3D, null));
-            Assert.Null(PointCloud.Spatial.Create.Triangle3Ds(null, pointCloud3D_Query));
+            Assert.Null(Spatial.Create.Triangle3Ds(pointCloud3D, null));
+            Assert.Null(Spatial.Create.Triangle3Ds(null, pointCloud3D_Query));
 
             PointCloudPerformance_Settle();
         }
@@ -252,9 +252,9 @@ namespace DiGi.Geometry.PointCloud.xUnit
             {
                 Point2D point2D = new(random.NextDouble() * 100.0, random.NextDouble() * 100.0);
 
-                Assert.True(PointCloud.Planar.Query.TryGetNearestIndexes(pointCloud2D, point2D.X, point2D.Y, out int index_1, out int index_2, out int index_3));
+                Assert.True(Planar.Query.TryGetNearestIndexes(pointCloud2D, point2D.X, point2D.Y, out int index_1, out int index_2, out int index_3));
 
-                Triangle2D? triangle2D = PointCloud.Planar.Create.Triangle2D(pointCloud2D, point2D);
+                Triangle2D? triangle2D = Planar.Create.Triangle2D(pointCloud2D, point2D);
 
                 Assert.NotNull(triangle2D);
 
@@ -294,7 +294,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud2D pointCloud2D_Grid = new(x_Grid, y_Grid);
 
-            Triangle2D? triangle2D_Grid = PointCloud.Planar.Create.Triangle2D(pointCloud2D_Grid, new Point2D(50, 1.5));
+            Triangle2D? triangle2D_Grid = Planar.Create.Triangle2D(pointCloud2D_Grid, new Point2D(50, 1.5));
 
             Assert.NotNull(triangle2D_Grid);
             Assert.True(System.Math.Abs(triangle2D_Grid.GetArea()) > 0);
@@ -307,7 +307,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 x_Collinear[i] = i * 0.5;
             }
 
-            Assert.Null(PointCloud.Planar.Create.Triangle2D(new PointCloud2D(x_Collinear, y_Collinear), new Point2D(10, 0)));
+            Assert.Null(Planar.Create.Triangle2D(new PointCloud2D(x_Collinear, y_Collinear), new Point2D(10, 0)));
 
             PointCloudPerformance_Settle();
         }

@@ -35,7 +35,7 @@ namespace DiGi.GIS.Analytical.xUnit
                 return null;
             }
 
-            List<Building>? buildings = DiGi.Core.Convert.ToDiGi<Building>((DiGi.Core.Classes.Path)path);
+            List<Building>? buildings = Core.Convert.ToDiGi<Building>((DiGi.Core.Classes.Path)path);
             if (buildings is null)
             {
                 return null;
@@ -167,7 +167,7 @@ namespace DiGi.GIS.Analytical.xUnit
                         continue;
                     }
 
-                    List<Triangle3D>? triangle3Ds = polygonalFace3D.Triangulate(DiGi.Core.Constants.Tolerance.Distance);
+                    List<Triangle3D>? triangle3Ds = polygonalFace3D.Triangulate(Core.Constants.Tolerance.Distance);
 
                     if (NonFinite(polygonalFace3D.Plane?.Normal))
                     {

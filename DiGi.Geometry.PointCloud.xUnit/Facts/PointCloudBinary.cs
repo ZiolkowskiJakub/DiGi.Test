@@ -32,7 +32,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud3D pointCloud3D = new(x, y, z);
 
-            byte[]? bytes = PointCloud.Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Binary);
+            byte[]? bytes = Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Binary);
 
             Assert.NotNull(bytes);
             Assert.Equal(32 + (count * 3 * 8), bytes.Length);
@@ -48,7 +48,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Assert.Equal((byte)(count & 0xFF), bytes[8]);
             Assert.Equal((byte)((count >> 8) & 0xFF), bytes[9]);
 
-            PointCloud3D? pointCloud3D_Actual = PointCloud.Spatial.Create.PointCloud3D(bytes);
+            PointCloud3D? pointCloud3D_Actual = Spatial.Create.PointCloud3D(bytes);
 
             Assert.NotNull(pointCloud3D_Actual);
             Assert.Equal(count, pointCloud3D_Actual.Count);
@@ -74,13 +74,13 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud2D pointCloud2D = new(x, y);
 
-            byte[]? bytes = PointCloud.Planar.Convert.ToSystem_Bytes(pointCloud2D, PointCloudFormat.Binary);
+            byte[]? bytes = Planar.Convert.ToSystem_Bytes(pointCloud2D, PointCloudFormat.Binary);
 
             Assert.NotNull(bytes);
             Assert.Equal(2, bytes[6]);
             Assert.Equal(32 + (4 * 2 * 8), bytes.Length);
 
-            PointCloud2D? pointCloud2D_Actual = PointCloud.Planar.Create.PointCloud2D(bytes);
+            PointCloud2D? pointCloud2D_Actual = Planar.Create.PointCloud2D(bytes);
 
             Assert.NotNull(pointCloud2D_Actual);
             Assert.Equal(4, pointCloud2D_Actual.Count);
@@ -89,7 +89,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Assert.Equal(8.0, y_Actual);
 
             // A two-dimensional payload must not be accepted as a three-dimensional cloud.
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes));
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud3D pointCloud3D = new(x, y, z);
 
-            byte[]? bytes = PointCloud.Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Binary);
+            byte[]? bytes = Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Binary);
 
             Assert.NotNull(bytes);
 
@@ -114,29 +114,29 @@ namespace DiGi.Geometry.PointCloud.xUnit
             byte[] bytes_Empty = [];
             byte[] bytes_TooShort = [1, 2, 3, 4, 5];
 
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D((byte[]?)null));
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_Empty));
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_TooShort));
+            Assert.Null(Spatial.Create.PointCloud3D((byte[]?)null));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_Empty));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_TooShort));
 
             byte[] bytes_WrongMagic = (byte[])bytes.Clone();
             bytes_WrongMagic[0] = (byte)'X';
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_WrongMagic));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_WrongMagic));
 
             byte[] bytes_WrongVersion = (byte[])bytes.Clone();
             bytes_WrongVersion[4] = 99;
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_WrongVersion));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_WrongVersion));
 
             byte[] bytes_Truncated = new byte[bytes.Length - 8];
             Array.Copy(bytes, bytes_Truncated, bytes_Truncated.Length);
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_Truncated));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_Truncated));
 
             byte[] bytes_Misaligned = new byte[bytes.Length - 3];
             Array.Copy(bytes, bytes_Misaligned, bytes_Misaligned.Length);
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_Misaligned));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_Misaligned));
 
             byte[] bytes_WrongCount = (byte[])bytes.Clone();
             bytes_WrongCount[8] = 99;
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(bytes_WrongCount));
+            Assert.Null(Spatial.Create.PointCloud3D(bytes_WrongCount));
         }
 
         /// <summary>
@@ -151,8 +151,8 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud3D pointCloud3D = new(x, y, z);
 
-            byte[]? bytes_Binary = PointCloud.Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Binary);
-            byte[]? bytes_Json = PointCloud.Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Json);
+            byte[]? bytes_Binary = Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Binary);
+            byte[]? bytes_Json = Spatial.Convert.ToSystem_Bytes(pointCloud3D, PointCloudFormat.Json);
 
             Assert.NotNull(bytes_Binary);
             Assert.NotNull(bytes_Json);
@@ -160,7 +160,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Assert.Equal((byte)'D', bytes_Binary[0]);
             Assert.Equal((byte)'{', bytes_Json[0]);
 
-            Assert.Null(PointCloud.Spatial.Convert.ToSystem_Bytes(null, PointCloudFormat.Binary));
+            Assert.Null(Spatial.Convert.ToSystem_Bytes(null, PointCloudFormat.Binary));
         }
     }
 }

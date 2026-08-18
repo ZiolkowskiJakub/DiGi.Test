@@ -170,9 +170,9 @@ namespace DiGi.Geometry.PointCloud.xUnit
             // while the per-point path replays the whole group for every point. The results must still agree.
             TransformGroup3D transformGroup3D = new(
             [
-                DiGi.Geometry.Spatial.Create.Transform3D.RotationZ(0.7),
-                DiGi.Geometry.Spatial.Create.Transform3D.Scale(2.0, 3.0, 0.5),
-                DiGi.Geometry.Spatial.Create.Transform3D.Translation(3.0, -4.0, 5.0)
+                Geometry.Spatial.Create.Transform3D.RotationZ(0.7),
+                Geometry.Spatial.Create.Transform3D.Scale(2.0, 3.0, 0.5),
+                Geometry.Spatial.Create.Transform3D.Translation(3.0, -4.0, 5.0)
             ]);
 
             Assert.True(pointCloud3D.Transform(transformGroup3D));
@@ -202,7 +202,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             double[] y = [1, 2, double.PositiveInfinity, 4, 5];
             double[] z = [1, 2, 3, double.NegativeInfinity, 5];
 
-            PointCloud3D? pointCloud3D = PointCloud.Spatial.Create.PointCloud3D(x, y, z);
+            PointCloud3D? pointCloud3D = Spatial.Create.PointCloud3D(x, y, z);
 
             Assert.NotNull(pointCloud3D);
             Assert.Equal(2, pointCloud3D.Count);
@@ -217,10 +217,10 @@ namespace DiGi.Geometry.PointCloud.xUnit
             double[] y_AllBad = [1, 2];
             double[] z_AllBad = [1, 2];
 
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(x_AllBad, y_AllBad, z_AllBad));
+            Assert.Null(Spatial.Create.PointCloud3D(x_AllBad, y_AllBad, z_AllBad));
 
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D(null, y, z));
-            Assert.Null(PointCloud.Spatial.Create.PointCloud3D([1, 2], [1, 2, 3], [1, 2, 3]));
+            Assert.Null(Spatial.Create.PointCloud3D(null, y, z));
+            Assert.Null(Spatial.Create.PointCloud3D([1, 2], [1, 2, 3], [1, 2, 3]));
         }
 
         /// <summary>

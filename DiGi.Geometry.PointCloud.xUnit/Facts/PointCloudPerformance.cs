@@ -39,7 +39,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
         {
             PointCloud3D pointCloud3D_WarmUp = PointCloudPerformance_Create(200000);
             BoundingBox3D boundingBox3D_WarmUp = new(new Point3D(0, 0, 0), new Point3D(1, 1, 1));
-            PointCloud.Spatial.Query.InRange(pointCloud3D_WarmUp, boundingBox3D_WarmUp, 0);
+            Spatial.Query.InRange(pointCloud3D_WarmUp, boundingBox3D_WarmUp, 0);
 
             PointCloud3D pointCloud3D = PointCloudPerformance_Create(1000000);
 
@@ -47,7 +47,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0);
+            Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0);
 
             stopwatch.Stop();
 
@@ -69,7 +69,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             BoundingBox3D boundingBox3D_WarmUp = new(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
 
             // Warm up, and force the index to be built outside the measured region.
-            PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D_WarmUp, 0);
+            Spatial.Query.InRange(pointCloud3D, boundingBox3D_WarmUp, 0);
 
             Assert.True(pointCloud3D.IsIndexed);
 
@@ -89,7 +89,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             for (int i = 0; i < boundingBox3Ds.Length; i++)
             {
-                PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3Ds[i], 0);
+                Spatial.Query.InRange(pointCloud3D, boundingBox3Ds[i], 0);
             }
 
             stopwatch.Stop();

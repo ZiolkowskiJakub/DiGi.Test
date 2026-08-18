@@ -148,7 +148,7 @@ namespace DiGi.Geometry.xUnit
                     new Point2D(-1, 3)
                 ]);
 
-                return DiGi.Geometry.Planar.Create.PolygonalFace2D(polygon2D);
+                return Planar.Create.PolygonalFace2D(polygon2D);
             }
 
             PolygonalFace2D? polygonalFace2D_Valid = Face(false);

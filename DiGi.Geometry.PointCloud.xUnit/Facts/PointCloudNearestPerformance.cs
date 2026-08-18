@@ -17,7 +17,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             PointCloud3D pointCloud3D = PointCloudPerformance_Create(1000000);
 
             // Warm up, and build the index outside the measured region.
-            Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, 50, 50, 50, out int _, out int _, out int _));
+            Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, 50, 50, 50, out int _, out int _, out int _));
             Assert.True(pointCloud3D.IsIndexed);
 
             Random random = new(999);
@@ -40,7 +40,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             int sum = 0;
             for (int i = 0; i < count; i++)
             {
-                if (PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, x[i], y[i], z[i], out int index_1, out int _, out int _))
+                if (Spatial.Query.TryGetNearestIndexes(pointCloud3D, x[i], y[i], z[i], out int index_1, out int _, out int _))
                 {
                     sum += index_1;
                 }
@@ -83,7 +83,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             PointCloud3D pointCloud3D_Query = new(x, y, z);
 
             // Warm up, and build the index outside both measured regions.
-            PointCloud.Spatial.Create.Triangle3D(pointCloud3D, 50, 50, 50);
+            Spatial.Create.Triangle3D(pointCloud3D, 50, 50, 50);
 
             Assert.True(pointCloud3D.IsIndexed);
 
@@ -92,14 +92,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Triangle3D?[] triangle3Ds_Serial = new Triangle3D?[count];
             for (int i = 0; i < count; i++)
             {
-                triangle3Ds_Serial[i] = PointCloud.Spatial.Create.Triangle3D(pointCloud3D, x[i], y[i], z[i]);
+                triangle3Ds_Serial[i] = Spatial.Create.Triangle3D(pointCloud3D, x[i], y[i], z[i]);
             }
 
             stopwatch_Serial.Stop();
 
             Stopwatch stopwatch_Parallel = Stopwatch.StartNew();
 
-            List<Triangle3D?>? triangle3Ds = PointCloud.Spatial.Create.Triangle3Ds(pointCloud3D, pointCloud3D_Query);
+            List<Triangle3D?>? triangle3Ds = Spatial.Create.Triangle3Ds(pointCloud3D, pointCloud3D_Query);
 
             stopwatch_Parallel.Stop();
 

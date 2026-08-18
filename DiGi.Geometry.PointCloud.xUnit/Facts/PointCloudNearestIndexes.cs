@@ -71,14 +71,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 query[1] = point3D.Y;
                 query[2] = point3D.Z;
 
-                Assert.Equal(3, PointCloud.Core.Query.NearestIndexes(coordinates, query, indexes_Exhaustive, distancesSquared_Exhaustive));
+                Assert.Equal(3, Core.Query.NearestIndexes(coordinates, query, indexes_Exhaustive, distancesSquared_Exhaustive));
 
                 for (int j = 0; j < 3; j++)
                 {
                     Assert.Equal(indexes_Expected[j], indexes_Exhaustive[j]);
                 }
 
-                Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
+                Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
 
                 Assert.Equal(indexes_Expected[0], index_1);
                 Assert.Equal(indexes_Expected[1], index_2);
@@ -129,7 +129,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
                 List<int> indexes_Expected = PointCloudNearestIndexes_Reference(x, y, z, point3D, indexes_Reference, distancesSquared_Reference, 3);
 
-                Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
+                Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, point3D.X, point3D.Y, point3D.Z, out int index_1, out int index_2, out int index_3));
 
                 Assert.Equal(indexes_Expected[0], index_1);
                 Assert.Equal(indexes_Expected[1], index_2);
@@ -183,14 +183,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Span<double> distancesSquared = stackalloc double[3];
             Span<double> query = stackalloc double[3];
 
-            Assert.Equal(3, PointCloud.Core.Query.NearestIndexes(coordinates, query, indexes, distancesSquared));
+            Assert.Equal(3, Core.Query.NearestIndexes(coordinates, query, indexes, distancesSquared));
 
             // The three lowest indexes among the tied duplicates, and nothing else.
             Assert.Equal(17, indexes[0]);
             Assert.Equal(4096, indexes[1]);
             Assert.Equal(12000, indexes[2]);
 
-            Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, 0, 0, 0, out int index_1, out int index_2, out int index_3));
+            Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, 0, 0, 0, out int index_1, out int index_2, out int index_3));
 
             Assert.True(pointCloud3D.IsIndexed);
 
@@ -208,14 +208,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
         public void PointCloudNearestIndexes_Degenerate()
         {
             PointCloud3D pointCloud3D_Empty = new((IEnumerable<Point3D?>?)null);
-            Assert.False(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D_Empty, 0, 0, 0, out int _, out int _, out int _));
+            Assert.False(Spatial.Query.TryGetNearestIndexes(pointCloud3D_Empty, 0, 0, 0, out int _, out int _, out int _));
 
             // Two points cannot answer a request for three, and must say so rather than reporting two.
             PointCloud3D pointCloud3D_Pair = new([0.0, 1.0], [0.0, 0.0], [0.0, 0.0]);
-            Assert.False(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D_Pair, 0, 0, 0, out int _, out int _, out int _));
+            Assert.False(Spatial.Query.TryGetNearestIndexes(pointCloud3D_Pair, 0, 0, 0, out int _, out int _, out int _));
 
             PointCloud3D pointCloud3D_Triple = new([0.0, 1.0, 2.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]);
-            Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D_Triple, 0, 0, 0, out int index_1, out int index_2, out int index_3));
+            Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D_Triple, 0, 0, 0, out int index_1, out int index_2, out int index_3));
             Assert.Equal(0, index_1);
             Assert.Equal(1, index_2);
             Assert.Equal(2, index_3);
@@ -223,7 +223,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             // Coincident points are a legitimate answer, distinguished only by index.
             int count = 70000;
             PointCloud3D pointCloud3D_Coincident = new(new double[count], new double[count], new double[count]);
-            Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D_Coincident, 0, 0, 0, out int index_Coincident_1, out int index_Coincident_2, out int index_Coincident_3));
+            Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D_Coincident, 0, 0, 0, out int index_Coincident_1, out int index_Coincident_2, out int index_Coincident_3));
             Assert.Equal(0, index_Coincident_1);
             Assert.Equal(1, index_Coincident_2);
             Assert.Equal(2, index_Coincident_3);
@@ -241,7 +241,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             PointCloud3D pointCloud3D = PointCloudPerformance_Create(200000);
 
             // Warm up, and build the index outside the measured region: the build itself allocates.
-            Assert.True(PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, 50, 50, 50, out int _, out int _, out int _));
+            Assert.True(Spatial.Query.TryGetNearestIndexes(pointCloud3D, 50, 50, 50, out int _, out int _, out int _));
             Assert.True(pointCloud3D.IsIndexed);
 
             long allocated_Before = GC.GetAllocatedBytesForCurrentThread();
@@ -251,7 +251,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             {
                 double value = i * 0.1;
 
-                if (PointCloud.Spatial.Query.TryGetNearestIndexes(pointCloud3D, value, value, value, out int index_1, out int _, out int _))
+                if (Spatial.Query.TryGetNearestIndexes(pointCloud3D, value, value, value, out int index_1, out int _, out int _))
                 {
                     sum += index_1;
                 }

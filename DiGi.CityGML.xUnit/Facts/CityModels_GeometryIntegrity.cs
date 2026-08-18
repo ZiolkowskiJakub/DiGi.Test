@@ -191,7 +191,7 @@ namespace DiGi.CityGML.xUnit
                     area_Converted += areas_Converted[i];
                     area_Source += areas_Source[i];
 
-                    double difference = System.Math.Abs(areas_Converted[i] - areas_Source[i]) / areas_Source[i];
+                    double difference = Math.Abs(areas_Converted[i] - areas_Source[i]) / areas_Source[i];
 
                     // Measured worst case across the three fixtures: 5.4E-12 for 0201, 2.6E-09 for 2862 and 2.8E-05 for
                     // 2476, the last of these on a face of four square metres losing 0.115 square millimetres. The bound
@@ -201,7 +201,7 @@ namespace DiGi.CityGML.xUnit
                 }
 
                 // Over a whole building the deviations cancel rather than accumulate - the measured worst case is 1.7E-07.
-                Assert.True(System.Math.Abs(area_Converted - area_Source) / area_Source < 1E-06, string.Format("Total area of building {0} in {1} changed - source {2}, converted {3}.", uniqueId, fileName, area_Source, area_Converted));
+                Assert.True(Math.Abs(area_Converted - area_Source) / area_Source < 1E-06, string.Format("Total area of building {0} in {1} changed - source {2}, converted {3}.", uniqueId, fileName, area_Source, area_Converted));
             }
         }
 
@@ -493,7 +493,7 @@ namespace DiGi.CityGML.xUnit
                 z += (point3D_Current.X - point3D_Next.X) * (point3D_Current.Y + point3D_Next.Y);
             }
 
-            return System.Math.Sqrt((x * x) + (y * y) + (z * z)) / 2.0;
+            return Math.Sqrt((x * x) + (y * y) + (z * z)) / 2.0;
         }
 
         /// <summary>
@@ -645,9 +645,9 @@ namespace DiGi.CityGML.xUnit
         /// <returns>True when the points coincide; otherwise, false.</returns>
         private static bool CityGML_AlmostEquals(Point3D point3D_1, Point3D point3D_2)
         {
-            return System.Math.Abs(point3D_1.X - point3D_2.X) < Core.Constants.Tolerance.Distance
-                && System.Math.Abs(point3D_1.Y - point3D_2.Y) < Core.Constants.Tolerance.Distance
-                && System.Math.Abs(point3D_1.Z - point3D_2.Z) < Core.Constants.Tolerance.Distance;
+            return Math.Abs(point3D_1.X - point3D_2.X) < Core.Constants.Tolerance.Distance
+                && Math.Abs(point3D_1.Y - point3D_2.Y) < Core.Constants.Tolerance.Distance
+                && Math.Abs(point3D_1.Z - point3D_2.Z) < Core.Constants.Tolerance.Distance;
         }
     }
 }

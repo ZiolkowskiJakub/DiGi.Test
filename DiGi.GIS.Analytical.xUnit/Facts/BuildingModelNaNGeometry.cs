@@ -18,13 +18,13 @@ namespace DiGi.GIS.Analytical.xUnit
         /// <returns>The building models, or <see langword="null"/> when the file is not available.</returns>
         private static List<BuildingModel>? BuildingModels_File(string fileName)
         {
-            string? path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), fileName);
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), fileName);
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
                 return null;
             }
 
-            return DiGi.Core.Convert.ToDiGi<BuildingModel>((DiGi.Core.Classes.Path)path);
+            return Core.Convert.ToDiGi<BuildingModel>((DiGi.Core.Classes.Path)path);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace DiGi.GIS.Analytical.xUnit
                 }
 
                 // Triangulate is the frame that threw. It must report the failure instead.
-                List<Triangle3D>? triangle3Ds = polygonalFace3D.Triangulate(DiGi.Core.Constants.Tolerance.Distance);
+                List<Triangle3D>? triangle3Ds = polygonalFace3D.Triangulate(Core.Constants.Tolerance.Distance);
 
                 if (naN)
                 {
@@ -145,7 +145,7 @@ namespace DiGi.GIS.Analytical.xUnit
             {
                 Assert.False(NaNNormal(polygonalFace3D));
 
-                List<Triangle3D>? triangle3Ds = polygonalFace3D.Triangulate(DiGi.Core.Constants.Tolerance.Distance);
+                List<Triangle3D>? triangle3Ds = polygonalFace3D.Triangulate(Core.Constants.Tolerance.Distance);
                 Assert.NotNull(triangle3Ds);
                 Assert.NotEmpty(triangle3Ds);
 

@@ -44,7 +44,7 @@ namespace DiGi.Analytical.xUnit
             Assert.Equal(StructurePosition.Internal, faceFloor_Copy.StructurePosition);
             Assert.Equal(StructurePosition.Internal, faceFloor.StructurePosition);
 
-            FaceFloor faceFloor_Copy_Guid = new(System.Guid.NewGuid(), faceFloor);
+            FaceFloor faceFloor_Copy_Guid = new(Guid.NewGuid(), faceFloor);
             Assert.Equal(StructurePosition.Internal, faceFloor_Copy_Guid.StructurePosition);
             Assert.Equal(StructurePosition.Internal, faceFloor.StructurePosition);
 
@@ -73,7 +73,7 @@ namespace DiGi.Analytical.xUnit
             Assert.Equal(StructurePosition.External, surfaceAir_Copy.StructurePosition);
             Assert.Equal(StructurePosition.External, surfaceAir.StructurePosition);
 
-            SurfaceAir surfaceAir_Copy_Guid = new(System.Guid.NewGuid(), surfaceAir);
+            SurfaceAir surfaceAir_Copy_Guid = new(Guid.NewGuid(), surfaceAir);
             Assert.Equal(StructurePosition.External, surfaceAir_Copy_Guid.StructurePosition);
             Assert.Equal(StructurePosition.External, surfaceAir.StructurePosition);
 

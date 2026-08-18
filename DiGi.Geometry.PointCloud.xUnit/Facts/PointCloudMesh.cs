@@ -31,7 +31,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             DelaunayPointCloud2DMeshSolver delaunayPointCloud2DMeshSolver = new();
 
-            Mesh2D? mesh2D = PointCloud.Planar.Create.Mesh2D(pointCloud2D, delaunayPointCloud2DMeshSolver);
+            Mesh2D? mesh2D = Planar.Create.Mesh2D(pointCloud2D, delaunayPointCloud2DMeshSolver);
 
             Assert.NotNull(mesh2D);
             Assert.Equal(count, mesh2D.PointsCount);
@@ -49,8 +49,8 @@ namespace DiGi.Geometry.PointCloud.xUnit
             // close to the area of the square the points were drawn from.
             Assert.True(mesh2D.GetArea() > 9000.0, $"Triangulated area was {mesh2D.GetArea()}.");
 
-            Assert.Null(PointCloud.Planar.Create.Mesh2D(pointCloud2D, null));
-            Assert.Null(PointCloud.Planar.Create.Mesh2D(null, delaunayPointCloud2DMeshSolver));
+            Assert.Null(Planar.Create.Mesh2D(pointCloud2D, null));
+            Assert.Null(Planar.Create.Mesh2D(null, delaunayPointCloud2DMeshSolver));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             HeightFieldPointCloud3DMeshSolver heightFieldPointCloud3DMeshSolver = new(2.0, 0, PointCloudHeightSelection.Lowest);
 
-            Mesh3D? mesh3D = PointCloud.Spatial.Create.Mesh3D(pointCloud3D, heightFieldPointCloud3DMeshSolver);
+            Mesh3D? mesh3D = Spatial.Create.Mesh3D(pointCloud3D, heightFieldPointCloud3DMeshSolver);
 
             Assert.NotNull(mesh3D);
             Assert.True(mesh3D.TrianglesCount > 0);
@@ -125,8 +125,8 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud2D pointCloud2D = new([.. x_Values], [.. y_Values]);
 
-            Mesh2D? mesh2D_Unfiltered = PointCloud.Planar.Create.Mesh2D(pointCloud2D, new DelaunayPointCloud2DMeshSolver(1.0));
-            Mesh2D? mesh2D_Filtered = PointCloud.Planar.Create.Mesh2D(pointCloud2D, new DelaunayPointCloud2DMeshSolver(1.0, 5.0));
+            Mesh2D? mesh2D_Unfiltered = Planar.Create.Mesh2D(pointCloud2D, new DelaunayPointCloud2DMeshSolver(1.0));
+            Mesh2D? mesh2D_Filtered = Planar.Create.Mesh2D(pointCloud2D, new DelaunayPointCloud2DMeshSolver(1.0, 5.0));
 
             Assert.NotNull(mesh2D_Unfiltered);
             Assert.NotNull(mesh2D_Filtered);
@@ -174,7 +174,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             IsosurfacePointCloud3DMeshSolver isosurfacePointCloud3DMeshSolver = new(1.5, 0.5, 1);
 
-            Mesh3D? mesh3D = PointCloud.Spatial.Create.Mesh3D(pointCloud3D, isosurfacePointCloud3DMeshSolver);
+            Mesh3D? mesh3D = Spatial.Create.Mesh3D(pointCloud3D, isosurfacePointCloud3DMeshSolver);
 
             Assert.NotNull(mesh3D);
             Assert.True(mesh3D.TrianglesCount > 0);
@@ -199,7 +199,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             Assert.InRange(mesh3D.GetArea(), area_Sphere * 1.4, area_Sphere * 2.8);
 
-            Assert.Null(PointCloud.Spatial.Create.Mesh3D(pointCloud3D, null));
+            Assert.Null(Spatial.Create.Mesh3D(pointCloud3D, null));
         }
     }
 }

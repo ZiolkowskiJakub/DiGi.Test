@@ -30,7 +30,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            List<Polyhedron>? polyhedrons = Spatial.Query.Union(polyhedron_1, polyhedron_2);
+            List<Polyhedron>? polyhedrons = Query.Union(polyhedron_1, polyhedron_2);
             Assert.NotNull(polyhedrons);
             Assert.Single(polyhedrons);
 
@@ -70,7 +70,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            List<Polyhedron>? polyhedrons = Spatial.Query.Difference(polyhedron_1, polyhedron_2);
+            List<Polyhedron>? polyhedrons = Query.Difference(polyhedron_1, polyhedron_2);
             Assert.NotNull(polyhedrons);
             Assert.Single(polyhedrons);
         }
@@ -98,7 +98,7 @@ namespace DiGi.Geometry.xUnit
                 return;
             }
 
-            List<Polyhedron>? polyhedrons = Spatial.Query.Intersection(polyhedron_1, polyhedron_2);
+            List<Polyhedron>? polyhedrons = Query.Intersection(polyhedron_1, polyhedron_2);
             Assert.NotNull(polyhedrons);
             Assert.Single(polyhedrons);
         }
@@ -123,7 +123,7 @@ namespace DiGi.Geometry.xUnit
             }
 
             List<Polyhedron> list = [poly1, poly2, poly3];
-            List<Polyhedron>? result = Spatial.Query.Union(list);
+            List<Polyhedron>? result = Query.Union(list);
 
             Assert.NotNull(result);
             Assert.Equal(3, result.Count);
@@ -151,7 +151,7 @@ namespace DiGi.Geometry.xUnit
             }
 
             List<Polyhedron> list = [poly1, poly2, poly3, poly4];
-            List<Polyhedron>? result = Spatial.Query.Union(list);
+            List<Polyhedron>? result = Query.Union(list);
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);

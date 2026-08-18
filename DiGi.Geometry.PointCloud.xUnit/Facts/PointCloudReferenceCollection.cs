@@ -55,7 +55,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             UniqueIdReference uniqueIdReference_1 = new(typeReference, "One");
             UniqueIdReference uniqueIdReference_2 = new(typeReference, "Two");
 
-            PointCloudReferenceCollection? pointCloudReferenceCollection = PointCloud.Core.Create.PointCloudReferenceCollection([uniqueIdReference_1, uniqueIdReference_2, new UniqueIdReference(typeReference, "One")]);
+            PointCloudReferenceCollection? pointCloudReferenceCollection = Core.Create.PointCloudReferenceCollection([uniqueIdReference_1, uniqueIdReference_2, new UniqueIdReference(typeReference, "One")]);
 
             Assert.NotNull(pointCloudReferenceCollection);
             Assert.Equal(2, pointCloudReferenceCollection.Count);
@@ -66,7 +66,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Assert.True(pointCloudReferenceCollection.TryGetId(uniqueIdReference_2, out int id_2));
             Assert.Equal(1, id_2);
 
-            Assert.Null(PointCloud.Core.Create.PointCloudReferenceCollection((IEnumerable<ISerializableReference>?)null));
+            Assert.Null(Core.Create.PointCloudReferenceCollection((IEnumerable<ISerializableReference>?)null));
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             List<ISerializableReference> references = [uniqueIdReference_1, uniqueIdReference_2, uniqueIdReference_1, null!, uniqueIdReference_2];
 
-            PointCloudReferenceCollection? pointCloudReferenceCollection = PointCloud.Core.Create.PointCloudReferenceCollection(references, out int[]? referenceIndexes);
+            PointCloudReferenceCollection? pointCloudReferenceCollection = Core.Create.PointCloudReferenceCollection(references, out int[]? referenceIndexes);
 
             Assert.NotNull(pointCloudReferenceCollection);
             Assert.Equal(2, pointCloudReferenceCollection.Count);

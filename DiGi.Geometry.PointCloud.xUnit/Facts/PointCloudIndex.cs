@@ -62,14 +62,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
                     }
                 }
 
-                List<int>? indexes_Actual = PointCloud.Spatial.Query.InRangeIndexes(pointCloud3D, boundingBox3D, 0);
+                List<int>? indexes_Actual = Spatial.Query.InRangeIndexes(pointCloud3D, boundingBox3D, 0);
 
                 Assert.NotNull(indexes_Actual);
                 Assert.Equal(indexes_Expected, indexes_Actual);
 
-                Assert.Equal(indexes_Expected.Count, PointCloud.Spatial.Query.InRangeCount(pointCloud3D, boundingBox3D, 0));
+                Assert.Equal(indexes_Expected.Count, Spatial.Query.InRangeCount(pointCloud3D, boundingBox3D, 0));
 
-                PointCloud3D? pointCloud3D_InRange = PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0);
+                PointCloud3D? pointCloud3D_InRange = Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0);
 
                 if (indexes_Expected.Count == 0)
                 {
@@ -112,7 +112,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             PointCloud3D pointCloud3D = new(x, y, z);
 
-            List<int>? indexes = PointCloud.Spatial.Query.InRangeIndexes(pointCloud3D, boundingBox3D, tolerance);
+            List<int>? indexes = Spatial.Query.InRangeIndexes(pointCloud3D, boundingBox3D, tolerance);
 
             Assert.NotNull(indexes);
             Assert.Single(indexes);
@@ -148,7 +148,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             BoundingBox3D boundingBox3D = new(new Point3D(0, 0, 0), new Point3D(10, 10, 10));
 
-            int count_Before = PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0)?.Count ?? 0;
+            int count_Before = Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0)?.Count ?? 0;
 
             Assert.True(count_Before > 0);
             Assert.True(pointCloud3D.IsIndexed);
@@ -158,11 +158,11 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             Assert.False(pointCloud3D.IsIndexed);
 
-            Assert.Null(PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0));
+            Assert.Null(Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0));
 
             BoundingBox3D boundingBox3D_Moved = new(new Point3D(1000, 1000, 1000), new Point3D(1010, 1010, 1010));
 
-            Assert.Equal(count_Before, PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D_Moved, 0)?.Count ?? 0);
+            Assert.Equal(count_Before, Spatial.Query.InRange(pointCloud3D, boundingBox3D_Moved, 0)?.Count ?? 0);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             Parallel.For(0, 32, i =>
             {
-                counts[i] = PointCloud.Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0)?.Count ?? -1;
+                counts[i] = Spatial.Query.InRange(pointCloud3D, boundingBox3D, 0)?.Count ?? -1;
             });
 
             for (int i = 0; i < counts.Length; i++)
@@ -223,18 +223,18 @@ namespace DiGi.Geometry.PointCloud.xUnit
             BoundingBox3D boundingBox3D = new(new Point3D(-1, -1, -1), new Point3D(1, 1, 1));
 
             PointCloud3D pointCloud3D_Empty = new((IEnumerable<Point3D?>?)null);
-            Assert.Null(PointCloud.Spatial.Query.InRange(pointCloud3D_Empty, boundingBox3D, 0));
-            Assert.Equal(-1, PointCloud.Spatial.Query.InRangeCount(pointCloud3D_Empty, boundingBox3D, 0));
+            Assert.Null(Spatial.Query.InRange(pointCloud3D_Empty, boundingBox3D, 0));
+            Assert.Equal(-1, Spatial.Query.InRangeCount(pointCloud3D_Empty, boundingBox3D, 0));
 
             PointCloud3D pointCloud3D_Single = new([0.0], [0.0], [0.0]);
-            Assert.Equal(1, PointCloud.Spatial.Query.InRange(pointCloud3D_Single, boundingBox3D, 0)?.Count ?? 0);
+            Assert.Equal(1, Spatial.Query.InRange(pointCloud3D_Single, boundingBox3D, 0)?.Count ?? 0);
 
             int count = 70000;
 
             double[] x_Coincident = new double[count];
             double[] y_Coincident = new double[count];
             double[] z_Coincident = new double[count];
-            Assert.Equal(count, PointCloud.Spatial.Query.InRange(new PointCloud3D(x_Coincident, y_Coincident, z_Coincident), boundingBox3D, 0)?.Count ?? 0);
+            Assert.Equal(count, Spatial.Query.InRange(new PointCloud3D(x_Coincident, y_Coincident, z_Coincident), boundingBox3D, 0)?.Count ?? 0);
 
             double[] x_Collinear = new double[count];
             double[] y_Collinear = new double[count];
@@ -255,7 +255,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 }
             }
 
-            Assert.Equal(count_Expected, PointCloud.Spatial.Query.InRange(pointCloud3D_Collinear, boundingBox3D, 0)?.Count ?? 0);
+            Assert.Equal(count_Expected, Spatial.Query.InRange(pointCloud3D_Collinear, boundingBox3D, 0)?.Count ?? 0);
 
             double[] x_Tiny = new double[count];
             double[] y_Tiny = new double[count];
@@ -265,7 +265,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 x_Tiny[i] = i * 1e-9 / count;
             }
 
-            Assert.Equal(count, PointCloud.Spatial.Query.InRange(new PointCloud3D(x_Tiny, y_Tiny, z_Tiny), boundingBox3D, 0)?.Count ?? 0);
+            Assert.Equal(count, Spatial.Query.InRange(new PointCloud3D(x_Tiny, y_Tiny, z_Tiny), boundingBox3D, 0)?.Count ?? 0);
 
             double[] x_Huge = new double[count];
             double[] y_Huge = new double[count];
@@ -286,7 +286,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 }
             }
 
-            Assert.Equal(count_Expected_Huge, PointCloud.Spatial.Query.InRange(new PointCloud3D(x_Huge, y_Huge, z_Huge), boundingBox3D_Huge, 0)?.Count ?? 0);
+            Assert.Equal(count_Expected_Huge, Spatial.Query.InRange(new PointCloud3D(x_Huge, y_Huge, z_Huge), boundingBox3D_Huge, 0)?.Count ?? 0);
         }
     }
 }

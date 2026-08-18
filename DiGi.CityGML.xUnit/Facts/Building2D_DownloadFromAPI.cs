@@ -40,7 +40,7 @@ namespace DiGi.CityGML.xUnit
 
             foreach (Building building in buildings)
             {
-                string? buildingId = building.GetValue<string>(CityGML.Enums.BuildingParameter.buildingId);
+                string? buildingId = building.GetValue<string>(Enums.BuildingParameter.buildingId);
 
                 if (string.IsNullOrWhiteSpace(buildingId))
                 {

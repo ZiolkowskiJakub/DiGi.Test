@@ -86,8 +86,8 @@ namespace DiGi.Geometry.PointCloud.xUnit
 
             TransformGroup2D transformGroup2D = new(
             [
-                DiGi.Geometry.Planar.Create.Transform2D.Rotation(0.6),
-                DiGi.Geometry.Planar.Create.Transform2D.Translation(new Vector2D(3, -4))
+                Geometry.Planar.Create.Transform2D.Rotation(0.6),
+                Geometry.Planar.Create.Transform2D.Translation(new Vector2D(3, -4))
             ]);
 
             Assert.True(pointCloud2D_Transform.Transform(transformGroup2D));
@@ -135,14 +135,14 @@ namespace DiGi.Geometry.PointCloud.xUnit
                 }
             }
 
-            Assert.Equal(count_Expected, PointCloud.Planar.Query.InRangeCount(pointCloud2D, boundingBox2D, 0));
+            Assert.Equal(count_Expected, Planar.Query.InRangeCount(pointCloud2D, boundingBox2D, 0));
 
-            PointCloud2D? pointCloud2D_InRange = PointCloud.Planar.Query.InRange(pointCloud2D, boundingBox2D, 0);
+            PointCloud2D? pointCloud2D_InRange = Planar.Query.InRange(pointCloud2D, boundingBox2D, 0);
 
             Assert.NotNull(pointCloud2D_InRange);
             Assert.Equal(count_Expected, pointCloud2D_InRange.Count);
 
-            List<int>? indexes = PointCloud.Planar.Query.InRangeIndexes(pointCloud2D, boundingBox2D, 0);
+            List<int>? indexes = Planar.Query.InRangeIndexes(pointCloud2D, boundingBox2D, 0);
 
             Assert.NotNull(indexes);
             Assert.Equal(count_Expected, indexes.Count);
