@@ -224,6 +224,55 @@ namespace DiGi.Geometry.PointCloud.xUnit
         }
 
         /// <summary>
+        /// Tests that the factory concatenates several clouds into one, preserving the order of the clouds and of the points inside each.
+        /// <para>Order is the whole contract here. The caller that motivated this gathers one cloud per county partition and the points carry no identifier of their own, so a reordering would be invisible at the call site and wrong everywhere downstream.</para>
+        /// </summary>
+        [Fact]
+        public void PointCloud3D_Create_Concatenate()
+        {
+            PointCloud3D pointCloud3D_1 = new([new Point3D(1, 0, 0), new Point3D(2, 0, 0)]);
+            PointCloud3D pointCloud3D_2 = new([new Point3D(3, 0, 0)]);
+            PointCloud3D pointCloud3D_Empty = new((IEnumerable<Point3D?>?)null);
+
+            List<PointCloud3D?> pointCloud3Ds = [pointCloud3D_1, null, pointCloud3D_Empty, pointCloud3D_2];
+
+            PointCloud3D? pointCloud3D = Spatial.Create.PointCloud3D(pointCloud3Ds);
+
+            Assert.NotNull(pointCloud3D);
+            Assert.Equal(3, pointCloud3D.Count);
+
+            List<Point3D>? point3Ds = pointCloud3D.GetPoints();
+
+            Assert.NotNull(point3Ds);
+            Assert.Equal(1.0, point3Ds[0].X);
+            Assert.Equal(2.0, point3Ds[1].X);
+            Assert.Equal(3.0, point3Ds[2].X);
+
+            // The sources are untouched: they are read without cloning, so a copy back into them would
+            // corrupt the caller's own clouds rather than the result.
+            Assert.Equal(2, pointCloud3D_1.Count);
+            Assert.Equal(1, pointCloud3D_2.Count);
+
+            PointCloud3D? pointCloud3D_Single = Spatial.Create.PointCloud3D([pointCloud3D_2]);
+
+            Assert.NotNull(pointCloud3D_Single);
+            Assert.Equal(1, pointCloud3D_Single.Count);
+            Assert.Equal(3.0, pointCloud3D_Single.GetPoints()![0].X);
+
+            // Consistent with every other overload of the factory, a non-finite point is dropped.
+            PointCloud3D pointCloud3D_NonFinite = new([new Point3D(4, 0, 0), new Point3D(double.NaN, 0, 0)]);
+
+            PointCloud3D? pointCloud3D_Filtered = Spatial.Create.PointCloud3D([pointCloud3D_2, pointCloud3D_NonFinite]);
+
+            Assert.NotNull(pointCloud3D_Filtered);
+            Assert.Equal(2, pointCloud3D_Filtered.Count);
+
+            Assert.Null(Spatial.Create.PointCloud3D((IEnumerable<PointCloud3D?>?)null));
+            Assert.Null(Spatial.Create.PointCloud3D((IEnumerable<PointCloud3D?>?)[]));
+            Assert.Null(Spatial.Create.PointCloud3D([null, pointCloud3D_Empty]));
+        }
+
+        /// <summary>
         /// Tests that the calculated bounding box matches a straightforward scalar reference over the same data.
         /// <para>The production path is vectorised with a scalar tail, so the sample length is chosen to leave a partial final vector.</para>
         /// </summary>
