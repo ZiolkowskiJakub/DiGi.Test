@@ -1,3 +1,8 @@
+// TODO [BuildingModelRowIdentity]: these facts cover the one-off unique_id migration of issue
+// ZiolkowskiJakub/DiGi.GIS.PostgreSQL#5 and are temporary with it. Delete this file once every
+// deployed database has run PostgreSQLBuildingModelUniqueIdMigrationTask and it reports zero
+// pending rows nationally, together with the migration members the facts exercise.
+
 using DiGi.Core.Parameter.Classes;
 using DiGi.GIS.Analytical.Enums;
 using DiGi.GIS.PostgreSQL.Classes;
