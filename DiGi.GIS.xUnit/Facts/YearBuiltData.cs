@@ -7,6 +7,7 @@ namespace DiGi.GIS.xUnit
     {
         /// <summary>
         /// Tests the serialization and deserialization of year built data to ensure that the object can be correctly converted from a JSON string and back again without loss of information.
+        /// <para>The copy is checked as well: a stored year built row is addressed by the reference of the building it describes together with the unique identifier of the object itself, so a copy that reissues either one can no longer be matched to the row it came from.</para>
         /// </summary>
         [Fact]
         public void YearBuiltData()
@@ -19,6 +20,17 @@ namespace DiGi.GIS.xUnit
             Core.xUnit.Query.SerializationCheck(yearBuiltData);
 
             Assert.Equal(json, yearBuiltData.ToSystem_String());
+
+            //Copy
+
+            Classes.YearBuiltData? yearBuiltData_Source = yearBuiltData as Classes.YearBuiltData;
+            Assert.NotNull(yearBuiltData_Source);
+
+            Classes.YearBuiltData yearBuiltData_Copy = new(yearBuiltData_Source);
+
+            Assert.Equal(yearBuiltData_Source.Reference, yearBuiltData_Copy.Reference);
+            Assert.Equal(yearBuiltData_Source.UniqueId, yearBuiltData_Copy.UniqueId);
+            Assert.Equal(json, yearBuiltData_Copy.ToSystem_String());
         }
     }
 }

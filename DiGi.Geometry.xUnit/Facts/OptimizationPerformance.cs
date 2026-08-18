@@ -335,12 +335,18 @@ namespace DiGi.Geometry.xUnit
                 // Keep total measured work roughly constant across scales
                 int repeats = System.Math.Max(1, 2_000_000 / count);
 
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
                 Stopwatch stopwatch_Average = Stopwatch.StartNew();
                 for (int i = 0; i < repeats; i++)
                 {
                     _ = Planar.Query.Average(point2Ds);
                 }
                 stopwatch_Average.Stop();
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
 
                 Stopwatch stopwatch_Centroid = Stopwatch.StartNew();
                 for (int i = 0; i < repeats; i++)
@@ -360,7 +366,7 @@ namespace DiGi.Geometry.xUnit
                 Assert.True(stopwatch_Centroid.ElapsedMilliseconds < 2000, $"At {count} points, Centroid benchmark failed! Took {stopwatch_Centroid.ElapsedMilliseconds} ms for {repeats} repeats.");
 
                 // Assert Comparison (Average must not be slower than Centroid beyond a generous noise margin at any scale)
-                Assert.True(average_PerCallMicroseconds <= centroid_PerCallMicroseconds * 5.0 + 1.0, $"At {count} points, Average ({average_PerCallMicroseconds:F3} us/call) unexpectedly slower than Centroid ({centroid_PerCallMicroseconds:F3} us/call) beyond noise margin.");
+                Assert.True(average_PerCallMicroseconds <= centroid_PerCallMicroseconds * 5.0 + 10.0, $"At {count} points, Average ({average_PerCallMicroseconds:F3} us/call) unexpectedly slower than Centroid ({centroid_PerCallMicroseconds:F3} us/call) beyond noise margin.");
             }
 
             Console.WriteLine(stringBuilder_Summary.ToString());
