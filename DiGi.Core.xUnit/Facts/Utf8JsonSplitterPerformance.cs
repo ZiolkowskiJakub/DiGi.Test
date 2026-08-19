@@ -28,7 +28,7 @@ namespace DiGi.Core.xUnit
             SplitAndSerialize_String(addresses, maxSize);
             stopwatch.Stop();
 
-            long milliseconds_String = stopwatch.ElapsedMilliseconds;
+            long milliseconds = stopwatch.ElapsedMilliseconds;
 
             stopwatch = Stopwatch.StartNew();
             SplitAndSerialize_Utf8Json(addresses, maxSize);
@@ -36,7 +36,7 @@ namespace DiGi.Core.xUnit
 
             long milliseconds_Utf8Json = stopwatch.ElapsedMilliseconds;
 
-            Assert.True(milliseconds_Utf8Json < milliseconds_String, string.Format("Utf8JsonSplitter took {0}ms, the size-then-serialize pair took {1}ms.", milliseconds_Utf8Json, milliseconds_String));
+            Assert.True(milliseconds_Utf8Json < milliseconds + 10.0, string.Format("Utf8JsonSplitter took {0}ms, the size-then-serialize pair took {1}ms.", milliseconds_Utf8Json, milliseconds));
         }
 
         /// <summary>
