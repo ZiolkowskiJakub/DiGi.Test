@@ -236,6 +236,20 @@
     <Project Path="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj">
       <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
     </Project>
+    <Project Path="../DiGi.BDOT10k/DiGi.BDOT10k.Geometry/DiGi.BDOT10k.Geometry.csproj">
+      <BuildDependency Project="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
+    </Project>
+    <Project Path="DiGi.BDOT10k.Geometry.xUnit/DiGi.BDOT10k.Geometry.xUnit.csproj">
+      <BuildDependency Project="../DiGi.BDOT10k/DiGi.BDOT10k.Geometry/DiGi.BDOT10k.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
     <Project Path="../DiGi.GIS.IO/DiGi.GIS.IO/DiGi.GIS.IO.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
