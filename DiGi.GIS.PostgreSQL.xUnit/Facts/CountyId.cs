@@ -134,6 +134,42 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
+        /// Verifies that a footprint straddling two county parts is assigned to the part with the larger overlap area, regardless of candidate order.
+        /// </summary>
+        [Fact]
+        public void CountyId_FootprintStraddlingParts_SelectsLargerOverlap()
+        {
+            AdministrativeAreal2D administrativeAreal2D_A = AdministrativeAreal2D_Square(10, "2405", 0, 0, 100);
+            AdministrativeAreal2D administrativeAreal2D_B = AdministrativeAreal2D_Square(20, "2405", 100, 0, 100);
+
+            // Footprint spanning [60, 110] in X: 80% in Part A (id 10), 20% in Part B (id 20).
+            List<Point2D> point2Ds_MajorA =
+            [
+                new Point2D(60, 40),
+                new Point2D(110, 40),
+                new Point2D(110, 50),
+                new Point2D(60, 50)
+            ];
+            Polygon2D polygon2D_MajorA = new(point2Ds_MajorA);
+
+            Assert.Equal(10, Query.CountyId([administrativeAreal2D_A, administrativeAreal2D_B], polygon2D_MajorA));
+            Assert.Equal(10, Query.CountyId([administrativeAreal2D_B, administrativeAreal2D_A], polygon2D_MajorA));
+
+            // Footprint spanning [90, 140] in X: 20% in Part A (id 10), 80% in Part B (id 20).
+            List<Point2D> point2Ds_MajorB =
+            [
+                new Point2D(90, 40),
+                new Point2D(140, 40),
+                new Point2D(140, 50),
+                new Point2D(90, 50)
+            ];
+            Polygon2D polygon2D_MajorB = new(point2Ds_MajorB);
+
+            Assert.Equal(20, Query.CountyId([administrativeAreal2D_A, administrativeAreal2D_B], polygon2D_MajorB));
+            Assert.Equal(20, Query.CountyId([administrativeAreal2D_B, administrativeAreal2D_A], polygon2D_MajorB));
+        }
+
+        /// <summary>
         /// Builds a square polygon.
         /// </summary>
         /// <param name="x">The X coordinate of the lower left corner.</param>
