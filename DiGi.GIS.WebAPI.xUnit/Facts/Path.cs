@@ -8,16 +8,16 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// <summary>
         /// Asserts the route templates of the county-keyed write endpoints.
         /// <para>These routes are resolved by reflection at runtime through <c>GISWebAPIManager.CreateHttpClient</c>. A renamed or mistyped template does not throw - the manager hands back a null path and the upload returns <see langword="false"/> with nothing logged - so the templates are pinned here rather than discovered in production.</para>
-        /// <para>The <c>bycountyid</c> routes are the unambiguous ones: a county code maps to one row per polygon part of a multi-part county, so a code-keyed upload lets the server choose a part.</para>
+        /// <para>The <c>bycountyids</c> routes are the ones that take the parts themselves: a county code maps to one row per polygon part of a multi-part county, so it only names the candidates.</para>
         /// </summary>
         [Fact]
-        public void Path_UpdateItemsByCountyId()
+        public void Path_UpdateItemsByCountyIds()
         {
-            Assert.Equal("gis/buildingmodel/updateitemsbycountyid", DiGi.WebAPI.Query.Path<BuildingModelController>(nameof(BuildingModelController.UpdateItemsByCountyIdAsync)));
-            Assert.Equal("gis/building/updateitemsbycountyid", DiGi.WebAPI.Query.Path<BuildingController>(nameof(BuildingController.UpdateItemsByCountyIdAsync)));
-            Assert.Equal("gis/ortodatas/updateitemsbycountyid", DiGi.WebAPI.Query.Path<OrtoDatasController>(nameof(OrtoDatasController.UpdateItemsByCountyIdAsync)));
-            Assert.Equal("gis/yearbuiltdata/updateitemsbycountyid", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.UpdateItemsByCountyIdAsync)));
-            Assert.Equal("gis/occupancydata/building2d/updateitemsbycountyid", DiGi.WebAPI.Query.Path<OccupancyDataController>(nameof(OccupancyDataController.Building2DUpdateItemsByCountyIdAsync)));
+            Assert.Equal("gis/buildingmodel/updateitemsbycountyids", DiGi.WebAPI.Query.Path<BuildingModelController>(nameof(BuildingModelController.UpdateItemsByCountyIdsAsync)));
+            Assert.Equal("gis/building/updateitemsbycountyids", DiGi.WebAPI.Query.Path<BuildingController>(nameof(BuildingController.UpdateItemsByCountyIdsAsync)));
+            Assert.Equal("gis/ortodatas/updateitemsbycountyids", DiGi.WebAPI.Query.Path<OrtoDatasController>(nameof(OrtoDatasController.UpdateItemsByCountyIdsAsync)));
+            Assert.Equal("gis/yearbuiltdata/updateitemsbycountyids", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.UpdateItemsByCountyIdsAsync)));
+            Assert.Equal("gis/occupancydata/building2d/updateitemsbycountyids", DiGi.WebAPI.Query.Path<OccupancyDataController>(nameof(OccupancyDataController.Building2DUpdateItemsByCountyIdsAsync)));
         }
 
         /// <summary>
@@ -44,15 +44,15 @@ namespace DiGi.GIS.WebAPI.xUnit
             string?[] paths =
             [
                 DiGi.WebAPI.Query.Path<BuildingModelController>(nameof(BuildingModelController.UpdateItemsAsync)),
-                DiGi.WebAPI.Query.Path<BuildingModelController>(nameof(BuildingModelController.UpdateItemsByCountyIdAsync)),
+                DiGi.WebAPI.Query.Path<BuildingModelController>(nameof(BuildingModelController.UpdateItemsByCountyIdsAsync)),
                 DiGi.WebAPI.Query.Path<BuildingController>(nameof(BuildingController.UpdateItemsAsync)),
-                DiGi.WebAPI.Query.Path<BuildingController>(nameof(BuildingController.UpdateItemsByCountyIdAsync)),
+                DiGi.WebAPI.Query.Path<BuildingController>(nameof(BuildingController.UpdateItemsByCountyIdsAsync)),
                 DiGi.WebAPI.Query.Path<OrtoDatasController>(nameof(OrtoDatasController.UpdateItemsByCodeAsync)),
-                DiGi.WebAPI.Query.Path<OrtoDatasController>(nameof(OrtoDatasController.UpdateItemsByCountyIdAsync)),
+                DiGi.WebAPI.Query.Path<OrtoDatasController>(nameof(OrtoDatasController.UpdateItemsByCountyIdsAsync)),
                 DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.UpdateItemsAsync)),
-                DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.UpdateItemsByCountyIdAsync)),
+                DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.UpdateItemsByCountyIdsAsync)),
                 DiGi.WebAPI.Query.Path<OccupancyDataController>(nameof(OccupancyDataController.Building2DUpdateItemsAsync)),
-                DiGi.WebAPI.Query.Path<OccupancyDataController>(nameof(OccupancyDataController.Building2DUpdateItemsByCountyIdAsync)),
+                DiGi.WebAPI.Query.Path<OccupancyDataController>(nameof(OccupancyDataController.Building2DUpdateItemsByCountyIdsAsync)),
             ];
 
             HashSet<string?> paths_Distinct = [.. paths];

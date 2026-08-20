@@ -1,5 +1,6 @@
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Planar.Interfaces;
+using DiGi.Geometry.Spatial.Classes;
 using DiGi.GIS.PostgreSQL.Classes;
 using System;
 using System.Collections.Generic;
@@ -170,6 +171,39 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
+        /// Verifies that a footprint covered whole by more than one candidate is assigned to the smallest of them.
+        /// <para>Overlap cannot separate candidates that each hold every square metre of the building - all of their overlaps equal the building - so without this rule the answer falls to the lowest identifier, which is a property of import order rather than of geography. The identifiers are therefore assigned both ways round here: a pass that came from the identifier tie-break would fail one of the two.</para>
+        /// <para>Nesting reaches this method for real. A candidate polygon is a stored area's external edge, so an area with a hole punched in it arrives solid and contains whatever sits in that hole, and the bounding box search feeding the converters answers with areas that overlap rather than sibling parts of one code.</para>
+        /// </summary>
+        [Fact]
+        public void CountyId_FootprintCoveredBySeveralParts_SelectsSmallestPart()
+        {
+            // Well inside both the large square and the small one nested in it.
+            IPolygonal2D_Square(60, 60, 10, out Polygon2D polygon2D);
+
+            AdministrativeAreal2D administrativeAreal2D_Large = AdministrativeAreal2D_Square(10, "2412", 0, 0, 200);
+            AdministrativeAreal2D administrativeAreal2D_Small = AdministrativeAreal2D_Square(20, "2412", 50, 50, 50);
+
+            Assert.Equal(20, Query.CountyId([administrativeAreal2D_Large, administrativeAreal2D_Small], polygon2D));
+            Assert.Equal(20, Query.CountyId([administrativeAreal2D_Small, administrativeAreal2D_Large], polygon2D));
+
+            // The same geometry with the identifiers swapped, so the smallest still answers when it is also
+            // the lowest identifier - and the previous pair cannot have come from the identifier alone.
+            AdministrativeAreal2D administrativeAreal2D_Large_Swapped = AdministrativeAreal2D_Square(20, "2412", 0, 0, 200);
+            AdministrativeAreal2D administrativeAreal2D_Small_Swapped = AdministrativeAreal2D_Square(10, "2412", 50, 50, 50);
+
+            Assert.Equal(10, Query.CountyId([administrativeAreal2D_Large_Swapped, administrativeAreal2D_Small_Swapped], polygon2D));
+            Assert.Equal(10, Query.CountyId([administrativeAreal2D_Small_Swapped, administrativeAreal2D_Large_Swapped], polygon2D));
+
+            // Only the large square covers this one whole - the small square holds half of it - so the rule
+            // does not apply and the larger overlap decides, which is the large square.
+            IPolygonal2D_Square(95, 60, 10, out Polygon2D polygon2D_Straddling);
+
+            Assert.Equal(10, Query.CountyId([administrativeAreal2D_Large, administrativeAreal2D_Small], polygon2D_Straddling));
+            Assert.Equal(10, Query.CountyId([administrativeAreal2D_Small, administrativeAreal2D_Large], polygon2D_Straddling));
+        }
+
+        /// <summary>
         /// Builds a square polygon.
         /// </summary>
         /// <param name="x">The X coordinate of the lower left corner.</param>
@@ -187,6 +221,50 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             ];
 
             polygon2D = new Polygon2D(point2Ds);
+        }
+
+        /// <summary>
+        /// Verifies that a building tested as the rectangle of its 3D bounding box is assigned the same part its footprint would be.
+        /// <para>A <see cref="CityGML.Classes.Building"/> carries no footprint, so <see cref="BuildingPostgreSQLConverter"/> tests it as the X and Y extent of the <see cref="BoundingBox3D"/> it already stores - the shape this fact builds. County parts lie kilometres apart, so the rectangle and a true footprint can only disagree for a building sitting on a part boundary, and even then the larger overlap still decides.</para>
+        /// </summary>
+        [Fact]
+        public void CountyId_BuildingBoundingBoxSelectsPart()
+        {
+            AdministrativeAreal2D administrativeAreal2D_A = AdministrativeAreal2D_Square(10, "2412", 0, 0, 100);
+            AdministrativeAreal2D administrativeAreal2D_B = AdministrativeAreal2D_Square(20, "2412", 100, 0, 100);
+
+            Dictionary<int, IPolygonal2D> polygonal2Ds_ByCountyId = new List<AdministrativeAreal2D>([administrativeAreal2D_A, administrativeAreal2D_B]).Polygonal2DsByCountyId();
+
+            // Well inside part B, at an elevation that must not reach the decision.
+            Assert.Equal(20, polygonal2Ds_ByCountyId.CountyId(Polygonal2D_BoundingBox3D(140, 40, 150, 50, 120, 135)));
+
+            // Spanning [60, 110] in X: four fifths of it lies in part A.
+            Assert.Equal(10, polygonal2Ds_ByCountyId.CountyId(Polygonal2D_BoundingBox3D(60, 40, 110, 50, 120, 135)));
+
+            // Spanning [90, 140] in X: four fifths of it lies in part B.
+            Assert.Equal(20, polygonal2Ds_ByCountyId.CountyId(Polygonal2D_BoundingBox3D(90, 40, 140, 50, 120, 135)));
+
+            // Beyond the right edge of part B and far from part A - the nearest part answers rather than nothing.
+            Assert.Equal(20, polygonal2Ds_ByCountyId.CountyId(Polygonal2D_BoundingBox3D(300, 40, 310, 50, 120, 135)));
+        }
+
+        /// <summary>
+        /// Builds the shape a building is tested as: the X and Y extent of its 3D bounding box.
+        /// </summary>
+        /// <param name="minX">The lower X coordinate.</param>
+        /// <param name="minY">The lower Y coordinate.</param>
+        /// <param name="maxX">The upper X coordinate.</param>
+        /// <param name="maxY">The upper Y coordinate.</param>
+        /// <param name="minZ">The lower Z coordinate, which the decision must ignore.</param>
+        /// <param name="maxZ">The upper Z coordinate, which the decision must ignore.</param>
+        /// <returns>The rectangle of the bounding box in X and Y.</returns>
+        private static IPolygonal2D? Polygonal2D_BoundingBox3D(double minX, double minY, double maxX, double maxY, double minZ, double maxZ)
+        {
+            BoundingBox3D boundingBox3D = new(new Point3D(minX, minY, minZ), new Point3D(maxX, maxY, maxZ));
+
+            BoundingBox2D boundingBox2D = new(new Point2D(boundingBox3D.MinX, boundingBox3D.MinY), new Point2D(boundingBox3D.MaxX, boundingBox3D.MaxY));
+
+            return (Polygon2D?)boundingBox2D;
         }
     }
 }

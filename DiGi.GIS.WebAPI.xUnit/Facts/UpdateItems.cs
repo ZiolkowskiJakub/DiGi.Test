@@ -30,15 +30,15 @@ namespace DiGi.GIS.WebAPI.xUnit
                 EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
                 AssertInternalServerError(await ePWFileController.UpdateItemsAsync(JsonArray(new DiGi.EPW.Classes.EPWFile((DiGi.EPW.Classes.Location?)null))));
 
-                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                AssertInternalServerError(await occupancyDataController.Building2DUpdateItemsByCountyIdAsync(JsonArray(OccupancyData()), 1));
+                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AssertInternalServerError(await occupancyDataController.Building2DUpdateItemsByCountyIdsAsync(JsonArray(OccupancyData()), [1]));
                 AssertInternalServerError(await occupancyDataController.AdministrativeAreal2DUpdateItemsAsync(JsonArray(OccupancyData())));
 
                 OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                AssertInternalServerError(await ortoDatasController.UpdateItemsByCountyIdAsync(JsonArray(new DiGi.GIS.Classes.OrtoDatas("reference", null)), 1));
+                AssertInternalServerError(await ortoDatasController.UpdateItemsByCountyIdsAsync(JsonArray(new DiGi.GIS.Classes.OrtoDatas("reference", null)), [1]));
 
-                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdAsync(JsonArray(new DiGi.GIS.Classes.YearBuiltData("reference")), 1));
+                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new DiGi.GIS.Classes.YearBuiltData("reference")), [1]));
             }
             finally
             {
@@ -67,15 +67,15 @@ namespace DiGi.GIS.WebAPI.xUnit
                 EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await ePWFileController.UpdateItemsAsync(jsonArray));
 
-                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                Assert.IsType<NoContentResult>(await occupancyDataController.Building2DUpdateItemsByCountyIdAsync(jsonArray, 1));
+                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                Assert.IsType<NoContentResult>(await occupancyDataController.Building2DUpdateItemsByCountyIdsAsync(jsonArray, [1]));
                 Assert.IsType<NoContentResult>(await occupancyDataController.AdministrativeAreal2DUpdateItemsAsync(jsonArray));
 
                 OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                Assert.IsType<NoContentResult>(await ortoDatasController.UpdateItemsByCountyIdAsync(jsonArray, 1));
+                Assert.IsType<NoContentResult>(await ortoDatasController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
-                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                Assert.IsType<NoContentResult>(await yearBuiltDataController.UpdateItemsByCountyIdAsync(jsonArray, 1));
+                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                Assert.IsType<NoContentResult>(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
             }
             finally
             {
