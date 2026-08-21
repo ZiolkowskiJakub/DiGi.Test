@@ -19,6 +19,8 @@ namespace DiGi.Core.xUnit
             AnyOf anyGuid = guid;
             DateTime now = DateTime.Now;
             AnyOf anyDateTime = now;
+            DateTimeOffset nowOffset = DateTimeOffset.UtcNow;
+            AnyOf anyDateTimeOffset = nowOffset;
             AnyOf anyLong = 1234567890L;
             AnyOf anyBool = true;
 
@@ -28,6 +30,7 @@ namespace DiGi.Core.xUnit
             Assert.Equal(3.14159, anyDouble.Value);
             Assert.Equal(guid, anyGuid.Value);
             Assert.Equal(now, anyDateTime.Value);
+            Assert.Equal(nowOffset, anyDateTimeOffset.Value);
             Assert.Equal(1234567890L, anyLong.Value);
             Assert.Equal(true, anyBool.Value);
 
@@ -37,6 +40,7 @@ namespace DiGi.Core.xUnit
             Assert.Equal(typeof(double), anyDouble.GetType());
             Assert.Equal(typeof(Guid), anyGuid.GetType());
             Assert.Equal(typeof(DateTime), anyDateTime.GetType());
+            Assert.Equal(typeof(DateTimeOffset), anyDateTimeOffset.GetType());
             Assert.Equal(typeof(long), anyLong.GetType());
             Assert.Equal(typeof(bool), anyBool.GetType());
         }
