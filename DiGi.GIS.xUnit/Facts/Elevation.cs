@@ -192,6 +192,119 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
+        /// Tests that a success carrying an empty body is asked again rather than recorded as a point that has no elevation.
+        /// <para>An empty two hundred is a body cut short or a success with nothing behind it, not a considered answer, and it is one of the ways single points went missing from a sampling run: nodes the service answers for perfectly well when asked a second time were absent from the store afterwards.</para>
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_RetriesEmptyBody()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000)];
+            string url = point2Ds[0].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string requestUrl, int attempt) => attempt < 3 ? Response_Empty() : Response_Easting(requestUrl));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 1, 3, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Single(point3Ds);
+            Assert.NotNull(point3Ds[0]);
+            Assert.Equal(480000d, point3Ds[0]!.Z);
+            Assert.Equal(3, elevationHttpMessageHandler.CountByUrl(url));
+        }
+
+        /// <summary>
+        /// Tests that a success carrying content which is not a number is not asked again, because a considered answer will not read differently next time.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_DoesNotRetryUnreadableBody()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000)];
+            string url = point2Ds[0].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string requestUrl, int attempt) => Response_Unreadable());
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 1, 3, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Single(point3Ds);
+            Assert.Null(point3Ds[0]);
+            Assert.Equal(1, elevationHttpMessageHandler.CountByUrl(url));
+        }
+
+        /// <summary>
+        /// Tests that an internal server error is asked again on this path, even though the shared transient policy does not count it as one.
+        /// <para>A public elevation service asked for hundreds of thousands of single points answers 500 to load and answers correctly moments later, so giving up on the first one loses a point that was never really unavailable. <see cref="DiGi.GIS.Query.IsTransient(HttpStatusCode)"/> itself is deliberately left alone, because DiGi.WebAPI keeps a copy of it in step.</para>
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_RetriesInternalServerError()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000)];
+            string url = point2Ds[0].Url_Elevation() ?? string.Empty;
+
+            Assert.False(HttpStatusCode.InternalServerError.IsTransient());
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string requestUrl, int attempt) => attempt < 3 ? Response_InternalServerError() : Response_Easting(requestUrl));
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 1, 3, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Single(point3Ds);
+            Assert.NotNull(point3Ds[0]);
+            Assert.Equal(480000d, point3Ds[0]!.Z);
+            Assert.Equal(3, elevationHttpMessageHandler.CountByUrl(url));
+        }
+
+        /// <summary>
+        /// Tests that a body which never becomes readable still gives up once the attempts are spent.
+        /// </summary>
+        [Fact]
+        public async Task ElevationsAsync_EmptyBodyGivesUp()
+        {
+            List<Point2D> point2Ds = [new(480000, 550000)];
+            string url = point2Ds[0].Url_Elevation() ?? string.Empty;
+
+            using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string requestUrl, int attempt) => Response_Empty());
+            using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+            List<Point3D?>? point3Ds = await httpClient.ElevationsAsync(point2Ds, 1, 2, TimeSpan.Zero);
+
+            Assert.NotNull(point3Ds);
+            Assert.Single(point3Ds);
+            Assert.Null(point3Ds[0]);
+            Assert.Equal(3, elevationHttpMessageHandler.CountByUrl(url));
+        }
+
+        /// <summary>
+        /// Builds a successful response carrying nothing, which is what a body cut short looks like.
+        /// </summary>
+        /// <returns>A success response with an empty body.</returns>
+        private static HttpResponseMessage Response_Empty()
+        {
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(string.Empty) };
+        }
+
+        /// <summary>
+        /// Builds a successful response carrying content that is not a number.
+        /// </summary>
+        /// <returns>A success response whose body cannot be read as an elevation.</returns>
+        private static HttpResponseMessage Response_Unreadable()
+        {
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("poza zakresem") };
+        }
+
+        /// <summary>
+        /// Builds an internal server error response, which the shared transient policy does not count as worth retrying.
+        /// </summary>
+        /// <returns>An internal server error response.</returns>
+        private static HttpResponseMessage Response_InternalServerError()
+        {
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+        }
+
+        /// <summary>
         /// Builds a successful response whose body is the easting the request asked for, so a fact can tell which point an answer belongs to.
         /// </summary>
         /// <param name="url">The request URL, which carries the easting in its y parameter.</param>
