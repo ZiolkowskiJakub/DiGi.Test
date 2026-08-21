@@ -19,16 +19,28 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences(IEnumerable{Building2DReference}, bool, int)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(IEnumerable{Building2DReference}, bool, int, System.Threading.CancellationToken)"/>
         /// returns an empty list when given an empty collection of references.
         /// </summary>
         [Fact]
-        public async Task GetBuilding2DsByBuilding2DReferences_EmptyReferences_ReturnsEmptyList()
+        public async Task GetBuilding2DsByBuilding2DReferencesAsync_EmptyReferences_ReturnsEmptyList()
         {
             Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
-            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences([]);
+            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync([]);
             Assert.NotNull(building2Ds);
             Assert.Empty(building2Ds);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DReferencesAsync(IEnumerable{Building2DReference}, bool, int, System.Threading.CancellationToken)"/>
+        /// returns null when input is null.
+        /// </summary>
+        [Fact]
+        public async Task GetBuilding2DReferencesAsync_NullInputs_ReturnsNull()
+        {
+            Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
+            List<Building2DReference>? building2DReferences = await building2DPostgreSQLConverter.GetBuilding2DReferencesAsync(null);
+            Assert.Null(building2DReferences);
         }
 
         /// <summary>
