@@ -25,6 +25,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
                 AssertInternalServerError(await building2DController.UpdateItemsAsync(JsonArray(Building2D()), null));
+                AssertInternalServerError(await building2DController.UpdateItemsByCountyIdsAsync(JsonArray(Building2D()), [1]));
                 AssertInternalServerError(await building2DController.UpdateItemAsync(Building2D().ToJsonObject(), null));
 
                 EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
@@ -63,6 +64,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await building2DController.UpdateItemsAsync(jsonArray, null));
+                Assert.IsType<NoContentResult>(await building2DController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
                 EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await ePWFileController.UpdateItemsAsync(jsonArray));
