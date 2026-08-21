@@ -105,6 +105,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
             System.IO.File.WriteAllLines(result,
             [
+                $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateAdministrativeAreal2D)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateBuilding2D)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateEPWFile)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateOrtoDatas)}=true",
