@@ -24,7 +24,7 @@ namespace DiGi.GIS.Analytical.xUnit
                 return null;
             }
 
-            return Core.Convert.ToDiGi<BuildingModel>((DiGi.Core.Classes.Path)path);
+            return Core.Convert.ToDiGi<BuildingModel>((Core.Classes.Path)path);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace DiGi.GIS.Analytical.xUnit
         /// <returns><see langword="true"/> when the normal of the plane is not finite; otherwise, <see langword="false"/>.</returns>
         private static bool NaNNormal(IPolygonalFace3D polygonalFace3D)
         {
-            DiGi.Geometry.Spatial.Classes.Vector3D? normal = polygonalFace3D?.Plane?.Normal;
+            Vector3D? normal = polygonalFace3D?.Plane?.Normal;
             if (normal is null)
             {
                 return false;

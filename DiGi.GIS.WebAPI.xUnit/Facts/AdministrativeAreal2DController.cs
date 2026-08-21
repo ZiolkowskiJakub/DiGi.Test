@@ -21,7 +21,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             try
             {
                 using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
-                AdministrativeAreal2DController controller = new(gISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AdministrativeAreal2DController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
 
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferenceByCodeAsync(string.Empty, null));
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferenceByCodeAsync("2212", AdministrativeArealType.Undefined));
@@ -106,7 +106,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 ]);
 
                 using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
-                AdministrativeAreal2DController controller = new(gISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AdministrativeAreal2DController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
 
                 Assert.IsType<UnauthorizedResult>(await controller.UpdateItemAsync(new JsonObject()));
                 Assert.IsType<UnauthorizedResult>(await controller.UpdateItemsAsync(new JsonArray()));

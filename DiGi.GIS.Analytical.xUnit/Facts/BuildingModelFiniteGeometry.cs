@@ -100,7 +100,7 @@ namespace DiGi.GIS.Analytical.xUnit
 
         /// <summary>
         /// Tests that a building model holds one component carrying geometry for every boundary surface of the CityGML building it was created from.
-        /// <para>Nothing may be dropped on the way: <see cref="Convert.ToAnalytical(DiGi.CityGML.Interfaces.ISurface)"/> returns null for a surface type it does not recognise and <see cref="Create.Component(IPolygonalFace3D, DiGi.Geometry.Spatial.Classes.Polyhedron, double)"/> returns null for a face without a plane, and the creator used to move on to the next surface in both cases. A component is also stored under its own identifier, so two components sharing one identifier collapse into a single entry.</para>
+        /// <para>Nothing may be dropped on the way: <see cref="Convert.ToAnalytical(CityGML.Interfaces.ISurface)"/> returns null for a surface type it does not recognise and <see cref="Create.Component(IPolygonalFace3D, Polyhedron, double)"/> returns null for a face without a plane, and the creator used to move on to the next surface in both cases. A component is also stored under its own identifier, so two components sharing one identifier collapse into a single entry.</para>
         /// <para>Measured against the source of the national 3D building model this invariant holds exactly - 2,182,201 boundary surfaces produced 2,182,201 components across three LOD2 and two LOD1 counties - and this fact keeps it that way.</para>
         /// </summary>
         [Fact]
@@ -113,7 +113,7 @@ namespace DiGi.GIS.Analytical.xUnit
             {
                 Building building = keyValuePair.Value;
 
-                List<DiGi.CityGML.Interfaces.ISurface>? surfaces = building.Surfaces?.ToList();
+                List<CityGML.Interfaces.ISurface>? surfaces = building.Surfaces?.ToList();
                 Assert.NotNull(surfaces);
                 Assert.NotEmpty(surfaces);
 

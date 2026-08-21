@@ -35,7 +35,7 @@ namespace DiGi.GIS.Analytical.xUnit
                 return null;
             }
 
-            List<Building>? buildings = Core.Convert.ToDiGi<Building>((DiGi.Core.Classes.Path)path);
+            List<Building>? buildings = Core.Convert.ToDiGi<Building>((Core.Classes.Path)path);
             if (buildings is null)
             {
                 return null;

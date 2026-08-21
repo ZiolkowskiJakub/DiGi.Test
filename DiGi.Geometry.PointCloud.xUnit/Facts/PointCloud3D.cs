@@ -124,7 +124,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             PointCloud3D pointCloud3D = new(x, y, z);
 
             // Fully qualified: this test project declares its own Vector3D struct, which shadows the geometry one.
-            Assert.True(pointCloud3D.Move(new DiGi.Geometry.Spatial.Classes.Vector3D(10, -20, 30)));
+            Assert.True(pointCloud3D.Move(new Vector3D(10, -20, 30)));
 
             for (int i = 0; i < count; i++)
             {

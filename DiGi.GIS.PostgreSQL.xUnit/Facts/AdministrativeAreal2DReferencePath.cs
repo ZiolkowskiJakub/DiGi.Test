@@ -132,7 +132,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencePathsAsync(System.Collections.Generic.IEnumerable{AdministrativeAreal2DReference}, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencePathsAsync(IEnumerable{AdministrativeAreal2DReference}, System.Threading.CancellationToken)"/>
         /// retrieves valid reference paths for a collection of references.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>

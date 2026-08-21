@@ -23,23 +23,23 @@ namespace DiGi.GIS.WebAPI.xUnit
             {
                 using GISWebAPIConfigurationFileWatcher GISWebAPIConfigurationFileWatcher = new(path);
 
-                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
                 AssertInternalServerError(await building2DController.UpdateItemsAsync(JsonArray(Building2D()), null));
                 AssertInternalServerError(await building2DController.UpdateItemsByCountyIdsAsync(JsonArray(Building2D()), [1]));
                 AssertInternalServerError(await building2DController.UpdateItemAsync(Building2D().ToJsonObject(), null));
 
-                EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
-                AssertInternalServerError(await ePWFileController.UpdateItemsAsync(JsonArray(new DiGi.EPW.Classes.EPWFile((DiGi.EPW.Classes.Location?)null))));
+                EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
+                AssertInternalServerError(await ePWFileController.UpdateItemsAsync(JsonArray(new EPW.Classes.EPWFile((EPW.Classes.Location?)null))));
 
-                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 AssertInternalServerError(await occupancyDataController.Building2DUpdateItemsByCountyIdsAsync(JsonArray(OccupancyData()), [1]));
                 AssertInternalServerError(await occupancyDataController.AdministrativeAreal2DUpdateItemsAsync(JsonArray(OccupancyData())));
 
-                OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                AssertInternalServerError(await ortoDatasController.UpdateItemsByCountyIdsAsync(JsonArray(new DiGi.GIS.Classes.OrtoDatas("reference", null)), [1]));
+                OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AssertInternalServerError(await ortoDatasController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.OrtoDatas("reference", null)), [1]));
 
-                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
-                AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new DiGi.GIS.Classes.YearBuiltData("reference")), [1]));
+                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.YearBuiltData("reference")), [1]));
             }
             finally
             {
@@ -62,21 +62,21 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 JsonArray jsonArray = [];
 
-                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await building2DController.UpdateItemsAsync(jsonArray, null));
                 Assert.IsType<NoContentResult>(await building2DController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
-                EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
+                EPWFileController ePWFileController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.EPWFilePostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await ePWFileController.UpdateItemsAsync(jsonArray));
 
-                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                OccupancyDataController occupancyDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DOccupancyDataPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DOccupancyDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await occupancyDataController.Building2DUpdateItemsByCountyIdsAsync(jsonArray, [1]));
                 Assert.IsType<NoContentResult>(await occupancyDataController.AdministrativeAreal2DUpdateItemsAsync(jsonArray));
 
-                OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await ortoDatasController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
-                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
             }
             finally
@@ -92,7 +92,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.Equal(500, objectResult.StatusCode);
         }
 
-        private static DiGi.GIS.Classes.Building2D Building2D()
+        private static GIS.Classes.Building2D Building2D()
         {
             return new(Guid.NewGuid(), "reference", null, 1, null, null, []);
         }
@@ -120,7 +120,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             return [serializableObject.ToJsonObject()];
         }
 
-        private static DiGi.GIS.Classes.OccupancyData OccupancyData()
+        private static GIS.Classes.OccupancyData OccupancyData()
         {
             return new("reference", 100, 4);
         }

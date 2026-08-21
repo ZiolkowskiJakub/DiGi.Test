@@ -11,7 +11,7 @@ namespace DiGi.Geometry.xUnit
     {
         /// <summary>
         /// Regression guard for "System.ArgumentException: 'points must form a closed linestring'", thrown when building models loaded from the database (carrying non-finite coordinates left over from prior corrupt writes) were converted to NetTopologySuite primitives.
-        /// <para>NetTopologySuite closes a ring by comparing the first and last coordinate with <c>==</c>; NaN never equals itself, so a ring that <see cref="DiGi.Geometry.Planar.Convert.ToNTS_Coordinates(Segmentable2D, bool)"/> closed correctly by re-appending its first point was still rejected and threw. <see cref="DiGi.Geometry.Planar.Convert.ToNTS(IPolygonal2D)"/> must detect non-finite coordinates itself and report failure (null) rather than let NetTopologySuite throw.</para>
+        /// <para>NetTopologySuite closes a ring by comparing the first and last coordinate with <c>==</c>; NaN never equals itself, so a ring that <see cref="Planar.Convert.ToNTS_Coordinates(Segmentable2D, bool)"/> closed correctly by re-appending its first point was still rejected and threw. <see cref="Planar.Convert.ToNTS(IPolygonal2D)"/> must detect non-finite coordinates itself and report failure (null) rather than let NetTopologySuite throw.</para>
         /// </summary>
         [Fact]
         public void ToNTS_LinearRing_NaNCoordinates()
@@ -40,8 +40,8 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Same non-finite coordinate guard as <see cref="ToNTS_LinearRing_NaNCoordinates"/>, exercising the other conversion branch of <see cref="DiGi.Geometry.Planar.Convert.ToNTS(IPolygonal2D)"/>, used by <see cref="IPolygonal2D"/> implementations that are not <see cref="Segmentable2D"/>.
-        /// <para><see cref="Rectangle2D"/> is such a type: a NaN width propagates into a NaN point through <see cref="Rectangle2D.GetPoints"/>, without ever going through <see cref="DiGi.Geometry.Planar.Convert.ToNTS_Coordinates(Segmentable2D, bool)"/>.</para>
+        /// Same non-finite coordinate guard as <see cref="ToNTS_LinearRing_NaNCoordinates"/>, exercising the other conversion branch of <see cref="Planar.Convert.ToNTS(IPolygonal2D)"/>, used by <see cref="IPolygonal2D"/> implementations that are not <see cref="Segmentable2D"/>.
+        /// <para><see cref="Rectangle2D"/> is such a type: a NaN width propagates into a NaN point through <see cref="Rectangle2D.GetPoints"/>, without ever going through <see cref="Planar.Convert.ToNTS_Coordinates(Segmentable2D, bool)"/>.</para>
         /// </summary>
         [Fact]
         public void ToNTS_LinearRing_NaNCoordinates_NonSegmentable2D()
@@ -54,7 +54,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="DiGi.Geometry.Planar.Convert.ToNTS_Polygon(IPolygonal2D)"/> propagates the same non-finite coordinate guard instead of constructing a <see cref="NetTopologySuite.Geometries.Polygon"/> around a null exterior ring.
+        /// Verifies that <see cref="Planar.Convert.ToNTS_Polygon(IPolygonal2D)"/> propagates the same non-finite coordinate guard instead of constructing a <see cref="NetTopologySuite.Geometries.Polygon"/> around a null exterior ring.
         /// </summary>
         [Fact]
         public void ToNTS_Polygon_NaNCoordinates()
@@ -108,7 +108,7 @@ namespace DiGi.Geometry.xUnit
 
         /// <summary>
         /// Verifies that the three and four point shortcuts of <see cref="Polygon2D.Triangulate(double)"/> apply the same non-finite coordinate guard as the NetTopologySuite path.
-        /// <para>Rings of three and four points are turned into triangles directly and never reach <see cref="DiGi.Geometry.Planar.Convert.ToNTS(IPolygonal2D)"/>, so the guard added there does not cover them. This failure mode is quieter than the reported one - no exception is thrown, the NaN simply travels on into the mesh and corrupts the glTF payload - which is why it is pinned separately.</para>
+        /// <para>Rings of three and four points are turned into triangles directly and never reach <see cref="Planar.Convert.ToNTS(IPolygonal2D)"/>, so the guard added there does not cover them. This failure mode is quieter than the reported one - no exception is thrown, the NaN simply travels on into the mesh and corrupts the glTF payload - which is why it is pinned separately.</para>
         /// </summary>
         [Theory]
         [InlineData(3)]
@@ -130,7 +130,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Full-pipeline regression matching the reported stack trace (<see cref="PolygonalFace3D.Triangulate"/> reached through <see cref="DiGi.Geometry.Spatial.Create.Mesh3D(IPolygonalFace3D, double)"/>): a wall or roof face whose stored geometry carries a NaN coordinate must be reported as not convertible (a null mesh) instead of crashing the whole scene it belongs to.
+        /// Full-pipeline regression matching the reported stack trace (<see cref="PolygonalFace3D.Triangulate"/> reached through <see cref="Spatial.Create.Mesh3D(IPolygonalFace3D, double)"/>): a wall or roof face whose stored geometry carries a NaN coordinate must be reported as not convertible (a null mesh) instead of crashing the whole scene it belongs to.
         /// </summary>
         [Fact]
         public void Mesh3D_PolygonalFace3D_NaNCoordinate_DoesNotThrow()

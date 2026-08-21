@@ -20,7 +20,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             try
             {
                 using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
-                Building2DController controller = new(gISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Building2DController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
 
                 Assert.IsType<BadRequestResult>(await controller.CountAsync(null!));
                 Assert.IsType<BadRequestResult>(await controller.GetBuilding2DReferenceByIdAsync(0, null));
@@ -65,7 +65,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 ]);
 
                 using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
-                Building2DController controller = new(gISWebAPIConfigurationFileWatcher, new DiGi.GIS.PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Building2DController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
 
                 Assert.IsType<UnauthorizedResult>(await controller.UpdateItemAsync(new JsonObject(), "code"));
                 Assert.IsType<UnauthorizedResult>(await controller.UpdateItemsAsync(new JsonArray(), "code"));

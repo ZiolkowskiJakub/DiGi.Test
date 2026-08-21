@@ -154,7 +154,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
             Assert.True(pointCloud3D.IsIndexed);
 
             // Shift the whole cloud far outside the query box.
-            Assert.True(pointCloud3D.Move(new DiGi.Geometry.Spatial.Classes.Vector3D(1000, 1000, 1000)));
+            Assert.True(pointCloud3D.Move(new Vector3D(1000, 1000, 1000)));
 
             Assert.False(pointCloud3D.IsIndexed);
 
