@@ -23,7 +23,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             {
                 using GISWebAPIConfigurationFileWatcher GISWebAPIConfigurationFileWatcher = new(path);
 
-                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 AssertInternalServerError(await building2DController.UpdateItemsAsync(JsonArray(Building2D()), null));
                 AssertInternalServerError(await building2DController.UpdateItemsByCountyIdsAsync(JsonArray(Building2D()), [1]));
                 AssertInternalServerError(await building2DController.UpdateItemAsync(Building2D().ToJsonObject(), null));
@@ -62,7 +62,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 JsonArray jsonArray = [];
 
-                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Building2DController building2DController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await building2DController.UpdateItemsAsync(jsonArray, null));
                 Assert.IsType<NoContentResult>(await building2DController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
