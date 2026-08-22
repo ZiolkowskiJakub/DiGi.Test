@@ -106,5 +106,40 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Single(building2Ds_MismatchedWithFallback);
             Assert.Equal("28A8E11F-6255-8A99-E053-CA2BA8C0EC21", building2Ds_MismatchedWithFallback[0].Reference);
         }
+
+        /// <summary>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(int, int?, IEnumerable{string}?, int, System.Threading.CancellationToken)"/>
+        /// returns null when connection data is null.
+        /// </summary>
+        [Fact]
+        public async Task GetBuilding2DsByCountyIdAsync_NullConnection_ReturnsNull()
+        {
+            Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
+            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(73485, 100);
+            Assert.Null(building2Ds);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(int, IEnumerable{int}?, int, System.Threading.CancellationToken)"/>
+        /// returns null when connection data is null.
+        /// </summary>
+        [Fact]
+        public async Task GetBuilding2DsByCountyIdAsync_SubdivisionIds_NullConnection_ReturnsNull()
+        {
+            Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
+            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(73485, [100, 101]);
+            Assert.Null(building2Ds);
+        }
+
+        /// <summary>
+        /// Verifies that static <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(Npgsql.NpgsqlConnection, int, IEnumerable{int}?, int, System.Threading.CancellationToken)"/>
+        /// returns null when connection is null.
+        /// </summary>
+        [Fact]
+        public async Task GetBuilding2DsByCountyIdAsync_Static_NullConnection_ReturnsNull()
+        {
+            List<Building2D>? building2Ds = await Building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(null, 73485);
+            Assert.Null(building2Ds);
+        }
     }
 }
