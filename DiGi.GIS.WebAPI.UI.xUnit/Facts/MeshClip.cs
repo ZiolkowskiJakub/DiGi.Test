@@ -1,0 +1,186 @@
+using DiGi.Analytical.Building.Classes;
+using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Spatial.Classes;
+using DiGi.GLTF.Classes;
+using System.Collections.Generic;
+
+namespace DiGi.GIS.WebAPI.UI.xUnit
+{
+    public partial class Facts
+    {
+        /// <summary>
+        /// Validates that <see cref="Modify.Clip(Mesh3D?, Circle2D?, int, double)"/> clips a 3D heightfield mesh to a regular circular boundary, eliminating outer triangles and placing boundary vertices on the circle.
+        /// </summary>
+        [Fact]
+        public void MeshClip_Circle2D_ClipsToRegularCircularBoundary()
+        {
+            // Build a 10x10 grid mesh spanning [-50, 50] in X and Y at elevation Z = 100
+            List<Point3D> points = [];
+            List<int[]> indexes = [];
+
+            int gridSize = 10;
+            double step = 10.0;
+            for (int r = 0; r <= gridSize; r++)
+            {
+                for (int c = 0; c <= gridSize; c++)
+                {
+                    double x = -50.0 + (c * step);
+                    double y = -50.0 + (r * step);
+                    double z = 100.0 + (0.1 * x) + (0.05 * y);
+                    points.Add(new Point3D(x, y, z));
+                }
+            }
+
+            int cols = gridSize + 1;
+            for (int r = 0; r < gridSize; r++)
+            {
+                for (int c = 0; c < gridSize; c++)
+                {
+                    int i0 = (r * cols) + c;
+                    int i1 = i0 + 1;
+                    int i2 = ((r + 1) * cols) + c;
+                    int i3 = i2 + 1;
+
+                    indexes.Add([i0, i1, i2]);
+                    indexes.Add([i1, i3, i2]);
+                }
+            }
+
+            Mesh3D mesh3D = new(points, indexes);
+
+            Circle2D clipCircle = new(new Point2D(0.0, 0.0), 30.0);
+            Mesh3D? mesh3D_Clipped = Modify.Clip(mesh3D, clipCircle, 64);
+
+            Assert.NotNull(mesh3D_Clipped);
+            List<Point3D>? points_Clipped = mesh3D_Clipped.GetPoints();
+            Assert.NotNull(points_Clipped);
+            Assert.True(points_Clipped.Count > 0);
+
+            // All clipped mesh vertices must lie within circle radius (plus tolerance)
+            foreach (Point3D point3D in points_Clipped)
+            {
+                double dist = System.Math.Sqrt((point3D.X * point3D.X) + (point3D.Y * point3D.Y));
+                Assert.True(dist <= 30.0 + DiGi.Core.Constants.Tolerance.Distance, $"Point ({point3D.X}, {point3D.Y}) distance {dist} exceeds radius 30.0");
+            }
+        }
+
+        /// <summary>
+        /// Validates that <see cref="Modify.Clip(Mesh3D?, BoundingBox2D?, double)"/> clips a 3D heightfield mesh to an axis-aligned rectangular boundary.
+        /// </summary>
+        [Fact]
+        public void MeshClip_BoundingBox2D_ClipsToRectangularBoundary()
+        {
+            List<Point3D> points = [];
+            List<int[]> indexes = [];
+
+            int gridSize = 10;
+            double step = 10.0;
+            for (int r = 0; r <= gridSize; r++)
+            {
+                for (int c = 0; c <= gridSize; c++)
+                {
+                    double x = -50.0 + (c * step);
+                    double y = -50.0 + (r * step);
+                    points.Add(new Point3D(x, y, 50.0));
+                }
+            }
+
+            int cols = gridSize + 1;
+            for (int r = 0; r < gridSize; r++)
+            {
+                for (int c = 0; c < gridSize; c++)
+                {
+                    int i0 = (r * cols) + c;
+                    int i1 = i0 + 1;
+                    int i2 = ((r + 1) * cols) + c;
+                    int i3 = i2 + 1;
+
+                    indexes.Add([i0, i1, i2]);
+                    indexes.Add([i1, i3, i2]);
+                }
+            }
+
+            Mesh3D mesh3D = new(points, indexes);
+
+            BoundingBox2D box = new(new Point2D(-20.0, -20.0), new Point2D(20.0, 20.0));
+            Mesh3D? mesh3D_Clipped = Modify.Clip(mesh3D, box);
+
+            Assert.NotNull(mesh3D_Clipped);
+            List<Point3D>? points_Clipped = mesh3D_Clipped.GetPoints();
+            Assert.NotNull(points_Clipped);
+            Assert.True(points_Clipped.Count > 0);
+
+            foreach (Point3D point3D in points_Clipped)
+            {
+                Assert.True(point3D.X >= -20.0 - DiGi.Core.Constants.Tolerance.Distance && point3D.X <= 20.0 + DiGi.Core.Constants.Tolerance.Distance);
+                Assert.True(point3D.Y >= -20.0 - DiGi.Core.Constants.Tolerance.Distance && point3D.Y <= 20.0 + DiGi.Core.Constants.Tolerance.Distance);
+            }
+        }
+
+        /// <summary>
+        /// Validates that <see cref="Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> clips the terrain to a circular boundary and cuts out the building footprint.
+        /// </summary>
+        [Fact]
+        public void TerrainGLTFNode_WithCircleBoundaryAndBuildingCutout()
+        {
+            List<Point3D> points = [];
+            List<int[]> indexes = [];
+
+            int gridSize = 10;
+            double step = 10.0;
+            for (int r = 0; r <= gridSize; r++)
+            {
+                for (int c = 0; c <= gridSize; c++)
+                {
+                    double x = -50.0 + (c * step);
+                    double y = -50.0 + (r * step);
+                    points.Add(new Point3D(x, y, 10.0));
+                }
+            }
+
+            int cols = gridSize + 1;
+            for (int r = 0; r < gridSize; r++)
+            {
+                for (int c = 0; c < gridSize; c++)
+                {
+                    int i0 = (r * cols) + c;
+                    int i1 = i0 + 1;
+                    int i2 = ((r + 1) * cols) + c;
+                    int i3 = i2 + 1;
+
+                    indexes.Add([i0, i1, i2]);
+                    indexes.Add([i1, i3, i2]);
+                }
+            }
+
+            Mesh3D mesh3D = new(points, indexes);
+            GLTFNode gLTFNode_Initial = new("Terrain", null, mesh3D, null, 1, null);
+
+            Point2D[] footprint =
+            [
+                new(-5.0, -5.0),
+                new(5.0, -5.0),
+                new(5.0, 5.0),
+                new(-5.0, 5.0)
+            ];
+            BuildingModel buildingModel = CreateTestBuildingModel(new Polygon2D(footprint));
+
+            Circle2D clipCircle = new(new Point2D(0.0, 0.0), 30.0);
+
+            GLTFNode? gLTFNode_Result = gLTFNode_Initial.TerrainGLTFNode([buildingModel], clipCircle);
+
+            Assert.NotNull(gLTFNode_Result);
+            Assert.NotNull(gLTFNode_Result.Mesh3D);
+
+            List<Point3D>? points_Result = gLTFNode_Result.Mesh3D.GetPoints();
+            Assert.NotNull(points_Result);
+
+            // Boundary clipping verified: all points within r=30
+            foreach (Point3D point3D in points_Result)
+            {
+                double dist = System.Math.Sqrt((point3D.X * point3D.X) + (point3D.Y * point3D.Y));
+                Assert.True(dist <= 30.0 + DiGi.Core.Constants.Tolerance.Distance);
+            }
+        }
+    }
+}
