@@ -278,6 +278,66 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
+        /// Tests that zero and negative-zero responses from the elevation service are treated as no-data sentinels and return null.
+        /// </summary>
+        [Fact]
+        public async Task ElevationAsync_ZeroSentinelReturnsNull()
+        {
+            Point2D point2D = new(480000, 550000);
+            string[] sentinels = ["0", "-0", "0.0", "-0.00", "0.000"];
+
+            foreach (string sentinel in sentinels)
+            {
+                using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(sentinel) });
+                using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+                Point3D? point3D_Single = await httpClient.ElevationAsync(point2D);
+                Assert.Null(point3D_Single);
+
+                Point3D? point3D_Retry = await httpClient.ElevationAsync(point2D, 2, TimeSpan.Zero);
+                Assert.Null(point3D_Retry);
+
+                List<Point3D?>? point3Ds = await httpClient.ElevationsAsync([point2D], 1, 0, TimeSpan.Zero);
+                Assert.NotNull(point3Ds);
+                Assert.Single(point3Ds);
+                Assert.Null(point3Ds[0]);
+            }
+        }
+
+        /// <summary>
+        /// Tests that positive and negative elevations returned by the elevation service are parsed correctly into 3D points.
+        /// </summary>
+        [Fact]
+        public async Task ElevationAsync_ValidElevations()
+        {
+            Point2D point2D = new(480000, 550000);
+
+            // Test positive elevation (e.g. standard terrain)
+            {
+                using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("112.5") });
+                using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+                Point3D? point3D = await httpClient.ElevationAsync(point2D);
+                Assert.NotNull(point3D);
+                Assert.Equal(480000d, point3D.X);
+                Assert.Equal(550000d, point3D.Y);
+                Assert.Equal(112.5d, point3D.Z);
+            }
+
+            // Test negative elevation (e.g. Polish depression terrain at Raczki Elbląskie)
+            {
+                using ElevationHttpMessageHandler elevationHttpMessageHandler = new((string url, int attempt) => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("-1.8") });
+                using HttpClient httpClient = new(elevationHttpMessageHandler);
+
+                Point3D? point3D = await httpClient.ElevationAsync(point2D);
+                Assert.NotNull(point3D);
+                Assert.Equal(480000d, point3D.X);
+                Assert.Equal(550000d, point3D.Y);
+                Assert.Equal(-1.8d, point3D.Z);
+            }
+        }
+
+        /// <summary>
         /// Builds a successful response carrying nothing, which is what a body cut short looks like.
         /// </summary>
         /// <returns>A success response with an empty body.</returns>
