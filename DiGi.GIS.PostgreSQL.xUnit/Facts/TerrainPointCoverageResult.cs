@@ -91,5 +91,32 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             Core.xUnit.Query.SerializationCheck(terrainPointCoverageResult);
         }
+
+        /// <summary>
+        /// Verifies that <see cref="TerrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(Npgsql.NpgsqlConnection?, int, Dictionary{int, PolygonalFace2D}?, BoundingBox2D?, double, Point2D?, double, int, long, int, int, System.Threading.CancellationToken)"/>
+        /// and its instance overload return null when connection or critical inputs are null or invalid.
+        /// </summary>
+        [Fact]
+        public async System.Threading.Tasks.Task TerrainPointPostgreSQLConverter_GetCoverageByCountyIdAsync_NullOrInvalid_ReturnsExpected()
+        {
+            TerrainPointCoverageResult? result_NullConnection = await TerrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(null, 10, [], null, 100, new Point2D(0, 0), 0.001, 1000, 0);
+            Assert.Null(result_NullConnection);
+
+            TerrainPointPostgreSQLConverter terrainPointPostgreSQLConverter = new(null);
+            TerrainPointCoverageResult? result_InstanceNullConnectionData = await terrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(10, [], null, 100, new Point2D(0, 0), 0.001, 1000, 0);
+            Assert.Null(result_InstanceNullConnectionData);
+
+            TerrainPointCoverageResult? result_NullPolygons = await terrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(10, null, null, 100, new Point2D(0, 0), 0.001, 1000, 0);
+            Assert.Null(result_NullPolygons);
+
+            TerrainPointCoverageResult? result_NullOrigin = await terrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(10, [], null, 100, null, 0.001, 1000, 0);
+            Assert.Null(result_NullOrigin);
+
+            TerrainPointCoverageResult? result_InvalidGridSize = await terrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(10, [], null, 0, new Point2D(0, 0), 0.001, 1000, 0);
+            Assert.Null(result_InvalidGridSize);
+
+            TerrainPointCoverageResult? result_InvalidTileSize = await terrainPointPostgreSQLConverter.GetCoverageByCountyIdAsync(10, [], null, 100, new Point2D(0, 0), 0.001, 1000, 0, tileSize: 0);
+            Assert.Null(result_InvalidTileSize);
+        }
     }
 }
