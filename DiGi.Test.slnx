@@ -363,6 +363,10 @@
       <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
+    <Project Path="DiGi.GIS.PostgreSQL.UI.xUnit/DiGi.GIS.PostgreSQL.UI.xUnit.csproj">
+      <BuildDependency Project="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
     <Project Path="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj">
       <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
       <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
