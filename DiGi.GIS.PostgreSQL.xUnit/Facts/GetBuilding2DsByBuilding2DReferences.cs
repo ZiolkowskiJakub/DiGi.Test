@@ -7,19 +7,19 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences(IEnumerable{Building2DReference}, bool, int)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(IEnumerable{Building2DReference}?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when the input collection is null.
         /// </summary>
         [Fact]
-        public async Task GetBuilding2DsByBuilding2DReferences_NullInputs_ReturnsNull()
+        public async Task GetBuilding2DsByBuilding2DReferencesAsync_NullInputs_ReturnsNull()
         {
             Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
-            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences(null);
+            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(null);
             Assert.Null(building2Ds);
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(IEnumerable{Building2DReference}, bool, int, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(IEnumerable{Building2DReference}?, bool, int, System.Threading.CancellationToken)"/>
         /// returns an empty list when given an empty collection of references.
         /// </summary>
         [Fact]
@@ -32,7 +32,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DReferencesAsync(IEnumerable{Building2DReference}, bool, int, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DReferencesAsync(IEnumerable{Building2DReference}?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when input is null.
         /// </summary>
         [Fact]
@@ -44,11 +44,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences(IEnumerable{Building2DReference}, bool, int)"/>
-        /// returns an empty list when connection data is null and references are provided.
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(IEnumerable{Building2DReference}?, bool, int, System.Threading.CancellationToken)"/>
+        /// returns null when connection data is null and references are provided.
         /// </summary>
         [Fact]
-        public async Task GetBuilding2DsByBuilding2DReferences_NullConnection_ReturnsEmptyList()
+        public async Task GetBuilding2DsByBuilding2DReferencesAsync_NullConnection_ReturnsNull()
         {
             Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
             Building2DReference building2DReference = new()
@@ -57,18 +57,34 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 CountyId = 73485
             };
 
-            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences([building2DReference]);
-            Assert.NotNull(building2Ds);
-            Assert.Empty(building2Ds);
+            List<Building2D>? building2Ds = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync([building2DReference]);
+            Assert.Null(building2Ds);
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences(IEnumerable{Building2DReference}, bool, int)"/>
+        /// Verifies that static <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{Building2DReference}?, bool, int, System.Threading.CancellationToken)"/>
+        /// returns null when the connection is null and references are provided.
+        /// </summary>
+        [Fact]
+        public async Task GetBuilding2DsByBuilding2DReferencesAsync_Static_NullConnection_ReturnsNull()
+        {
+            Building2DReference building2DReference = new()
+            {
+                Reference = "28A8E11F-6255-8A99-E053-CA2BA8C0EC21",
+                CountyId = 73485
+            };
+
+            List<Building2D>? building2Ds = await Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(null, [building2DReference]);
+            Assert.Null(building2Ds);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync(IEnumerable{Building2DReference}?, bool, int, System.Threading.CancellationToken)"/>
         /// retrieves buildings for existing references, and demonstrates that setting <c>fallbackByReference = true</c> enables fallback resolution for references whose county identifier was mismatched or omitted.
         /// <para>Skipped by default: requires a live, populated PostgreSQL database.</para>
         /// </summary>
         [Fact(Skip = "Executes an integration query. Point GIS_PostgreSQL_Main.conf at a database before running.")]
-        public async Task GetBuilding2DsByBuilding2DReferences_Integration()
+        public async Task GetBuilding2DsByBuilding2DReferencesAsync_Integration()
         {
             GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
             Assert.NotNull(gISPostgreSQLConverterManager);
@@ -91,17 +107,17 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             };
 
             // 1. Query with valid county ID
-            List<Building2D>? building2Ds_Direct = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences([building2DReference_Valid]);
+            List<Building2D>? building2Ds_Direct = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync([building2DReference_Valid]);
             Assert.NotNull(building2Ds_Direct);
             Assert.Single(building2Ds_Direct);
 
-            // 2. Query with mismatched county ID and referenceOnlyCheck = false (should find nothing)
-            List<Building2D>? building2Ds_MismatchedNoFallback = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences([building2DReference_MismatchedCounty], false);
+            // 2. Query with mismatched county ID and fallbackByReference = false (should find nothing)
+            List<Building2D>? building2Ds_MismatchedNoFallback = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync([building2DReference_MismatchedCounty], false);
             Assert.NotNull(building2Ds_MismatchedNoFallback);
             Assert.Empty(building2Ds_MismatchedNoFallback);
 
-            // 3. Query with mismatched county ID and referenceOnlyCheck = true (should find matching building via fallback)
-            List<Building2D>? building2Ds_MismatchedWithFallback = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferences([building2DReference_MismatchedCounty], true);
+            // 3. Query with mismatched county ID and fallbackByReference = true (should find matching building via fallback)
+            List<Building2D>? building2Ds_MismatchedWithFallback = await building2DPostgreSQLConverter.GetBuilding2DsByBuilding2DReferencesAsync([building2DReference_MismatchedCounty], true);
             Assert.NotNull(building2Ds_MismatchedWithFallback);
             Assert.Single(building2Ds_MismatchedWithFallback);
             Assert.Equal("28A8E11F-6255-8A99-E053-CA2BA8C0EC21", building2Ds_MismatchedWithFallback[0].Reference);
@@ -132,7 +148,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that static <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(Npgsql.NpgsqlConnection, int, IEnumerable{int}?, int, System.Threading.CancellationToken)"/>
+        /// Verifies that static <see cref="Building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(Npgsql.NpgsqlConnection?, int, IEnumerable{int}?, int, System.Threading.CancellationToken)"/>
         /// returns null when connection is null.
         /// </summary>
         [Fact]
