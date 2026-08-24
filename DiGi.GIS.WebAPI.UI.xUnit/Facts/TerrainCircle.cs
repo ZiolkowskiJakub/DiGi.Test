@@ -139,5 +139,18 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal(20.0, circle2D.Center.Y, 3);
             Assert.Equal(50.0, circle2D.Radius, 3);
         }
+
+        /// <summary>
+        /// Validates that <see cref="Query.TerrainRequestUri(Circle2D?, double?)"/> clamps the query radius to <see cref="Constants.Default.TerrainRadiusMax"/> to prevent exceeding the terrain service ceiling.
+        /// </summary>
+        [Fact]
+        public void TerrainRequestUri_ClampsToTerrainRadiusMax()
+        {
+            Circle2D circle2D = new(new Point2D(629671.3, 489136.8), 2500.0);
+            string? uri = circle2D.TerrainRequestUri();
+
+            Assert.NotNull(uri);
+            Assert.Contains($"radius={Constants.Default.TerrainRadiusMax}", uri);
+        }
     }
 }

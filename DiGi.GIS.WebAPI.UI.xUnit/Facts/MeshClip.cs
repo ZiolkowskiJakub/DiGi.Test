@@ -3,6 +3,7 @@ using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.GLTF.Classes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DiGi.GIS.WebAPI.UI.xUnit
 {
@@ -181,6 +182,49 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
                 double dist = System.Math.Sqrt((point3D.X * point3D.X) + (point3D.Y * point3D.Y));
                 Assert.True(dist <= 30.0 + DiGi.Core.Constants.Tolerance.Distance);
             }
+        }
+
+        /// <summary>
+        /// Validates that <see cref="Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> cuts building footprints under the threshold and skips cutting above the threshold.
+        /// </summary>
+        [Fact]
+        public void TerrainGLTFNode_ThresholdLimit()
+        {
+            Point3D[] points =
+            [
+                new(-50.0, -50.0, 0.0),
+                new(50.0, -50.0, 0.0),
+                new(-50.0, 50.0, 0.0),
+                new(50.0, 50.0, 0.0)
+            ];
+            List<int[]> indexes = [[0, 1, 2], [1, 3, 2]];
+            Mesh3D mesh3D = new(points, indexes);
+            GLTFNode gLTFNode = new("Terrain", null, mesh3D, null, 1, null);
+
+            List<BuildingModel> buildings = [];
+            for (int i = 0; i < Constants.Default.TerrainCuttingMaxBuildingCount + 10; i++)
+            {
+                Point2D[] footprint =
+                [
+                    new(i * 0.1, 0.0),
+                    new((i * 0.1) + 0.05, 0.0),
+                    new((i * 0.1) + 0.05, 0.05),
+                    new(i * 0.1, 0.05)
+                ];
+                buildings.Add(CreateTestBuildingModel(new Polygon2D(footprint)));
+            }
+
+            // Under threshold: cutting runs
+            List<BuildingModel> underThreshold = buildings.Take(1).ToList();
+            GLTFNode? result_Under = gLTFNode.TerrainGLTFNode(underThreshold, (Circle2D?)null);
+            Assert.NotNull(result_Under);
+            Assert.NotNull(result_Under.Mesh3D);
+
+            // Over threshold: cutting is safely skipped, intact mesh returned
+            GLTFNode? result_Over = gLTFNode.TerrainGLTFNode(buildings, (Circle2D?)null);
+            Assert.NotNull(result_Over);
+            Assert.NotNull(result_Over.Mesh3D);
+            Assert.Equal(points.Length, result_Over.Mesh3D.GetPoints()?.Count);
         }
     }
 }
