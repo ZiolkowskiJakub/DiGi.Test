@@ -337,6 +337,11 @@ namespace DiGi.Geometry.xUnit
             long elapsed_Coarse = Mesh3D_Difference_Measure(50, 20, 250, lines);
             Assert.True(elapsed_Coarse < 500, $"Cutting a 50 m lattice failed the threshold! Elapsed: {elapsed_Coarse} ms.");
 
+            // The reported case: a thousand outlines in touching terraced runs on a lattice far coarser
+            // than they are, so whole runs sit inside single triangles and every remainder carries holes.
+            long elapsed_Dense = Mesh3D_Difference_MeasureDense(lines);
+            Assert.True(elapsed_Dense < 1000, $"Cutting dense terraced runs failed the threshold! Elapsed: {elapsed_Dense} ms.");
+
             string? path_Reports = DiGi.Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
             if (!string.IsNullOrWhiteSpace(path_Reports))
             {

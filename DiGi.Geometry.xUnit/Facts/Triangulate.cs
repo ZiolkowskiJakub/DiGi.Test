@@ -88,6 +88,46 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Tests that every triangle a polygonal face is cut into turns the same way round.
+        /// <para>The triangles feed the meshes the 3D views are drawn from, where the way a triangle turns is the side of it that is lit. The holes of a face are joined onto its outline before it is cut up, and that join fixes the direction the resulting ring runs in, so this guards the whole face coming back inside out or, worse, half of it.</para>
+        /// </summary>
+        [Fact]
+        public void Triangulate_Winding()
+        {
+            string? path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "PolygonalFace2D_CourtyardBuilding.json");
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                return;
+            }
+
+            PolygonalFace2D? polygonalFace2D = DiGi.Core.Convert.ToDiGi<PolygonalFace2D>((DiGi.Core.Classes.Path)path)?.FirstOrDefault();
+            Assert.NotNull(polygonalFace2D);
+
+            List<NetTopologySuite.Geometries.Polygon>? polygons = Planar.Query.Triangulate(Planar.Convert.ToNTS(polygonalFace2D), DiGi.Core.Constants.Tolerance.Distance);
+            Assert.NotNull(polygons);
+            Assert.NotEmpty(polygons);
+
+            int sign = 0;
+            foreach (NetTopologySuite.Geometries.Polygon polygon in polygons)
+            {
+                NetTopologySuite.Geometries.Coordinate[] coordinates = polygon.Coordinates;
+                Assert.Equal(4, coordinates.Length);
+
+                double cross = ((coordinates[1].X - coordinates[0].X) * (coordinates[2].Y - coordinates[0].Y)) - ((coordinates[1].Y - coordinates[0].Y) * (coordinates[2].X - coordinates[0].X));
+                Assert.True(System.Math.Abs(cross) > 0, "A triangle with no area was handed back.");
+
+                int sign_Triangle = cross > 0 ? 1 : -1;
+                if (sign == 0)
+                {
+                    sign = sign_Triangle;
+                    continue;
+                }
+
+                Assert.Equal(sign, sign_Triangle);
+            }
+        }
+
+        /// <summary>
         /// Tests that a ring carrying corners closer together than the tolerance is triangulated rather than taking the process down.
         /// <para>Regression guard for a stack overflow, which is not a catchable exception: the triangulation snaps to a grid of the tolerance it is given, so a ring whose corners sit a fraction of that apart came back out of the overlay unchanged and the routine recursed on it until the stack gave out. The fixture is a real remainder, in PL-1992 coordinates, left by cutting the outlines of several neighbouring buildings out of one terrain triangle - it carries three such clusters, the closest pair 3e-7 apart.</para>
         /// </summary>
