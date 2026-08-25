@@ -671,6 +671,43 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(result_Cut);
             Assert.Equal(2, result_Cut.Count);
         }
+
+        /// <summary>
+        /// Tests splitting a 3D polygonal face with custom tolerance larger than default.
+        /// <para>Verifies that when a custom tolerance is specified, all split faces are preserved without dropping pieces due to nodalization precision mismatches.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_PolygonalFace3D_CustomTolerance()
+        {
+            // Face with vertices having slight misalignments within custom tolerance 0.05
+            Polygon2D polygon2D = new(
+            [
+                new Point2D(0, 0),
+                new Point2D(10, 0.02),
+                new Point2D(10.02, 10),
+                new Point2D(0, 9.98)
+            ]);
+
+            PolygonalFace2D? face2D = Planar.Create.PolygonalFace2D(polygon2D, null, 0.05);
+            Assert.NotNull(face2D);
+
+            PolygonalFace3D face3D = new(Spatial.Constants.Plane.WorldZ, face2D);
+            Plane plane_Cut = new(new Point3D(5, 0, 0), Spatial.Constants.Vector3D.WorldX);
+
+            Assert.True(plane_Cut.TrySplit(face3D, out List<PolygonalFace3D>? result_Cut, tolerance: 0.05));
+            Assert.NotNull(result_Cut);
+            Assert.Equal(2, result_Cut.Count);
+
+            double faceArea = face3D.GetArea();
+            double totalArea = 0;
+            foreach (PolygonalFace3D piece in result_Cut)
+            {
+                totalArea += piece.GetArea();
+            }
+
+            Assert.True(System.Math.Abs(totalArea - faceArea) < 0.5, $"totalArea={totalArea}, faceArea={faceArea}");
+        }
+
         /// <summary>
         /// Measures and reports execution time gains and performance metrics for TrySplit methods across polyhedrons and mesh operations.
         /// </summary>
