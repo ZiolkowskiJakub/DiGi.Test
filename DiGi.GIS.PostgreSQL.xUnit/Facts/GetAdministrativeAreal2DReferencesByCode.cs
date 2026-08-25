@@ -47,6 +47,15 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             AdministrativeAreal2DPostgreSQLConverter? administrativeAreal2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
             Assert.NotNull(administrativeAreal2DPostgreSQLConverter);
 
+            List<AdministrativeAreal2DReference>? administrativeAreal2DReferences_Counties = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync("02", AdministrativeArealType.County);
+            Assert.NotNull(administrativeAreal2DReferences_Counties);
+            Assert.NotEmpty(administrativeAreal2DReferences_Counties);
+
+            foreach (AdministrativeAreal2DReference administrativeAreal2DReference in administrativeAreal2DReferences_Counties)
+            {
+                Assert.Equal(AdministrativeArealType.County, administrativeAreal2DReference.AdministrativeArealType);
+            }
+
             List<AdministrativeAreal2DReference>? administrativeAreal2DReferences_ParentCode = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync("02", AdministrativeArealType.Municipality);
             Assert.NotNull(administrativeAreal2DReferences_ParentCode);
             Assert.NotEmpty(administrativeAreal2DReferences_ParentCode);
