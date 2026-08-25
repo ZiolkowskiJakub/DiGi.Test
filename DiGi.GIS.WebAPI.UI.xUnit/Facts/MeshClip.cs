@@ -185,10 +185,12 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         }
 
         /// <summary>
-        /// Validates that <see cref="Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> cuts building footprints under the threshold and skips cutting above the threshold.
+        /// Validates that <see cref="Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> cuts a dense set of footprints rather than stepping over it.
+        /// <para>This case used to be refused. A <c>TerrainCuttingMaxBuildingCount</c> of 250 skipped the cut entirely above that many buildings, to work around a constraint enforcement failure in the triangulation underneath, and the cap was removed once that was fixed upstream (ZiolkowskiJakub/DiGi.Geometry#2).</para>
+        /// <para>What makes this worth asserting is that the cut is wrapped in a catch that falls back to the uncut surface, so a regression upstream would not throw here - it would quietly return the terrain whole again, exactly as the cap used to. Comparing against the input mesh is the only thing that tells the two apart.</para>
         /// </summary>
         [Fact]
-        public void TerrainGLTFNode_ThresholdLimit()
+        public void TerrainGLTFNode_DenseFootprints_AreCut()
         {
             Point3D[] points =
             [
@@ -201,8 +203,10 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Mesh3D mesh3D = new(points, indexes);
             GLTFNode gLTFNode = new("Terrain", null, mesh3D, null, 1, null);
 
-            List<BuildingModel> buildings = [];
-            for (int i = 0; i < Constants.Default.TerrainCuttingMaxBuildingCount + 10; i++)
+            // Comfortably past the count the removed cap refused at, and packed tightly enough that the
+            // offset outlines nearly touch - which is what made the triangulation fail in the first place.
+            List<BuildingModel> buildingModels = [];
+            for (int i = 0; i < 260; i++)
             {
                 Point2D[] footprint =
                 [
@@ -211,20 +215,23 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
                     new((i * 0.1) + 0.05, 0.05),
                     new(i * 0.1, 0.05)
                 ];
-                buildings.Add(CreateTestBuildingModel(new Polygon2D(footprint)));
+                buildingModels.Add(CreateTestBuildingModel(new Polygon2D(footprint)));
             }
 
-            // Under threshold: cutting runs
-            List<BuildingModel> underThreshold = buildings.Take(1).ToList();
-            GLTFNode? result_Under = gLTFNode.TerrainGLTFNode(underThreshold, (Circle2D?)null);
-            Assert.NotNull(result_Under);
-            Assert.NotNull(result_Under.Mesh3D);
+            // One building establishes that cutting works at all on this surface, so a failure below is read
+            // as the density rather than the setup.
+            GLTFNode? gLTFNode_Single = gLTFNode.TerrainGLTFNode(buildingModels.Take(1).ToList(), (Circle2D?)null);
+            Assert.NotNull(gLTFNode_Single);
+            Assert.NotNull(gLTFNode_Single.Mesh3D);
+            Assert.True(gLTFNode_Single.Mesh3D.GetPoints()?.Count > points.Length);
 
-            // Over threshold: cutting is safely skipped, intact mesh returned
-            GLTFNode? result_Over = gLTFNode.TerrainGLTFNode(buildings, (Circle2D?)null);
-            Assert.NotNull(result_Over);
-            Assert.NotNull(result_Over.Mesh3D);
-            Assert.Equal(points.Length, result_Over.Mesh3D.GetPoints()?.Count);
+            GLTFNode? gLTFNode_Dense = gLTFNode.TerrainGLTFNode(buildingModels, (Circle2D?)null);
+            Assert.NotNull(gLTFNode_Dense);
+            Assert.NotNull(gLTFNode_Dense.Mesh3D);
+
+            // The surface came back with more vertices than it went in with, so the cut ran. Equality with
+            // the four input corners would mean the fallback fired and the footprints were stepped over.
+            Assert.True(gLTFNode_Dense.Mesh3D.GetPoints()?.Count > points.Length);
         }
     }
 }
