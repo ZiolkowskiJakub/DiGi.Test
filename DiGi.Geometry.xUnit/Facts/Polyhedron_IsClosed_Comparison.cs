@@ -12,6 +12,245 @@ namespace DiGi.Geometry.xUnit
     public partial class Facts
     {
         /// <summary>
+        /// Method 1: the vertex-welding implementation that shipped before the weld-free rewrite, kept verbatim so the benchmark can still measure what was replaced.
+        /// <para>Face vertices are welded into shared indices using a tolerance-sized spatial hash and each resulting edge is counted. This is the algorithm whose non-monotonicity is the subject of DiGi.Geometry issue 1 - it is retained for comparison only and must never be called outside this file.</para>
+        /// </summary>
+        /// <typeparam name="TPolygonalFace3D">The type of the polygonal face.</typeparam>
+        /// <param name="polyhedron">The polyhedron to evaluate.</param>
+        /// <param name="manifold">When true, every edge must be used exactly twice.</param>
+        /// <param name="tolerance">The distance tolerance used to weld coincident vertices.</param>
+        /// <returns>True if the polyhedron is closed.</returns>
+        private static bool IsClosed_VertexWeld<TPolygonalFace3D>(Polyhedron<TPolygonalFace3D>? polyhedron, bool manifold, double tolerance = DiGi.Core.Constants.Tolerance.Distance) where TPolygonalFace3D : IPolygonalFace3D
+        {
+            if (polyhedron is null || polyhedron.Count < 4)
+            {
+                return false;
+            }
+
+            double tolerance_Temp = tolerance > 0.0 ? tolerance : DiGi.Core.Constants.Tolerance.MicroDistance;
+
+            double invTolerance = 1.0 / tolerance_Temp;
+            double toleranceSquared = tolerance_Temp * tolerance_Temp;
+
+            // The cell grid is only an accelerator that narrows which vertices get compared - a match is always confirmed
+            // by the squared-distance test below. An extreme coordinate-to-tolerance ratio can therefore degrade the grid
+            // (in the limit every vertex lands in one cell, or coincident vertices land more than one cell apart) and
+            // cost time or report open, but it can never fabricate a match and report a false closure.
+            // Welded vertices are held as flat X, Y, Z triplets so no Point3D is allocated per vertex. Cells hold the
+            // head of a chain threaded through indexes_Next rather than a List per cell, which would allocate one list
+            // object for every occupied cell - and cells are mostly occupied by a single vertex.
+            List<double> coordinates = new(polyhedron.Count * 3);
+            List<int> indexes_Next = new(polyhedron.Count);
+            Dictionary<(long X, long Y, long Z), int> index_ByCell = [];
+
+            int IndexInCell(long cellX, long cellY, long cellZ, double x, double y, double z)
+            {
+                if (!index_ByCell.TryGetValue((cellX, cellY, cellZ), out int index))
+                {
+                    return -1;
+                }
+
+                while (index >= 0)
+                {
+                    int offset = index * 3;
+
+                    double dx = coordinates[offset] - x;
+                    double dy = coordinates[offset + 1] - y;
+                    double dz = coordinates[offset + 2] - z;
+
+                    if ((dx * dx) + (dy * dy) + (dz * dz) <= toleranceSquared)
+                    {
+                        return index;
+                    }
+
+                    index = indexes_Next[index];
+                }
+
+                return -1;
+            }
+
+            int Index(double x, double y, double z)
+            {
+                long cellX = (long)System.Math.Floor(x * invTolerance);
+                long cellY = (long)System.Math.Floor(y * invTolerance);
+                long cellZ = (long)System.Math.Floor(z * invTolerance);
+
+                // Nearly every match lands in the centre cell, so it is probed before the 26 neighbours.
+                int index = IndexInCell(cellX, cellY, cellZ, x, y, z);
+                if (index >= 0)
+                {
+                    return index;
+                }
+
+                for (long neighbourX = cellX - 1; neighbourX <= cellX + 1; neighbourX++)
+                {
+                    for (long neighbourY = cellY - 1; neighbourY <= cellY + 1; neighbourY++)
+                    {
+                        for (long neighbourZ = cellZ - 1; neighbourZ <= cellZ + 1; neighbourZ++)
+                        {
+                            if (neighbourX == cellX && neighbourY == cellY && neighbourZ == cellZ)
+                            {
+                                continue;
+                            }
+
+                            index = IndexInCell(neighbourX, neighbourY, neighbourZ, x, y, z);
+                            if (index >= 0)
+                            {
+                                return index;
+                            }
+                        }
+                    }
+                }
+
+                int index_New = indexes_Next.Count;
+                coordinates.Add(x);
+                coordinates.Add(y);
+                coordinates.Add(z);
+
+                // The new vertex becomes the head of its cell's chain, pointing at whatever was there before.
+                (long X, long Y, long Z) cell = (cellX, cellY, cellZ);
+                indexes_Next.Add(index_ByCell.TryGetValue(cell, out int index_Head) ? index_Head : -1);
+                index_ByCell[cell] = index_New;
+
+                return index_New;
+            }
+
+            // ValueTuple keys are used deliberately: their seeded rotate-combine hash distributes the highly regular edge
+            // index pairs of structured models far better than a packed 64-bit key, whose default hash (low ^ high)
+            // degenerates into long collision chains.
+            Dictionary<(int, int), int> counts_ByEdge = new(polyhedron.Count * 2);
+
+            // One buffer grown on demand and reused by every ring of every face.
+            int[] indexes_Ring = new int[16];
+
+            for (int i = 0; i < polyhedron.Count; i++)
+            {
+                TPolygonalFace3D? polygonalFace3D = polyhedron.GetPolygonalFace3D<TPolygonalFace3D>(i);
+                if (polygonalFace3D is null)
+                {
+                    return false;
+                }
+
+                Plane? plane = polygonalFace3D.Plane;
+                if (plane is null)
+                {
+                    return false;
+                }
+
+                Point3D? point3D_Origin = plane.Origin;
+                Spatial.Classes.Vector3D? vector3D_AxisX = plane.AxisX;
+                Spatial.Classes.Vector3D? vector3D_AxisY = plane.AxisY;
+
+                if (point3D_Origin is null || vector3D_AxisX is null || vector3D_AxisY is null)
+                {
+                    return false;
+                }
+
+                // Plane components are cached once per face in locals, keeping the projection below allocation free.
+                double originX = point3D_Origin.X;
+                double originY = point3D_Origin.Y;
+                double originZ = point3D_Origin.Z;
+
+                double axisXX = vector3D_AxisX.X;
+                double axisXY = vector3D_AxisX.Y;
+                double axisXZ = vector3D_AxisX.Z;
+
+                double axisYX = vector3D_AxisY.X;
+                double axisYY = vector3D_AxisY.Y;
+                double axisYZ = vector3D_AxisY.Z;
+
+                IPolygonalFace2D? polygonalFace2D = polygonalFace3D.Geometry2D;
+                if (polygonalFace2D is null)
+                {
+                    return false;
+                }
+
+                List<IPolygonal2D>? polygonal2Ds = polygonalFace2D.Edges;
+                if (polygonal2Ds is null || polygonal2Ds.Count == 0)
+                {
+                    return false;
+                }
+
+                for (int j = 0; j < polygonal2Ds.Count; j++)
+                {
+                    IPolygonal2D? polygonal2D = polygonal2Ds[j];
+                    if (polygonal2D is null)
+                    {
+                        return false;
+                    }
+
+                    // Segmentable2D exposes a non-cloning GetPoints overload, avoiding one full copy of the ring.
+                    // Rectangle2D implements IPolygonal2D without deriving from Segmentable2D, hence the fallback.
+                    // The returned list is owned by the geometry and is only read here.
+                    List<Point2D>? point2Ds = polygonal2D is Segmentable2D segmentable2D ? segmentable2D.GetPoints(false) : polygonal2D.GetPoints();
+                    if (point2Ds is null || point2Ds.Count < 3)
+                    {
+                        return false;
+                    }
+
+                    if (indexes_Ring.Length < point2Ds.Count)
+                    {
+                        indexes_Ring = new int[point2Ds.Count];
+                    }
+
+                    for (int k = 0; k < point2Ds.Count; k++)
+                    {
+                        Point2D? point2D = point2Ds[k];
+                        if (point2D is null)
+                        {
+                            return false;
+                        }
+
+                        double x = point2D.X;
+                        double y = point2D.Y;
+
+                        indexes_Ring[k] = Index(
+                            originX + (axisYX * y) + (axisXX * x),
+                            originY + (axisYY * y) + (axisXY * x),
+                            originZ + (axisYZ * y) + (axisXZ * x));
+                    }
+
+                    for (int k = 0; k < point2Ds.Count; k++)
+                    {
+                        int index_Start = indexes_Ring[k];
+                        int index_End = indexes_Ring[k == point2Ds.Count - 1 ? 0 : k + 1];
+
+                        // Welding collapses a degenerate edge onto a single vertex.
+                        if (index_Start == index_End)
+                        {
+                            continue;
+                        }
+
+                        (int, int) key = index_Start < index_End ? (index_Start, index_End) : (index_End, index_Start);
+
+                        counts_ByEdge.TryGetValue(key, out int count);
+                        if (manifold && count >= 2)
+                        {
+                            return false;
+                        }
+
+                        counts_ByEdge[key] = count + 1;
+                    }
+                }
+            }
+
+            if (counts_ByEdge.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<(int, int), int> keyValuePair in counts_ByEdge)
+            {
+                if (manifold ? keyValuePair.Value != 2 : (keyValuePair.Value & 1) != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Latest Proposal (§5): Single uniform weld-free edge compatibility predicate with component perfect matching.
         /// <para>1. Emits each face-ring edge as a half-edge; zero-length in-face edges are pruned at MicroDistance.</para>
         /// <para>2. Broad-phase midpoint spatial hash (27-cell neighborhood).</para>
@@ -1000,161 +1239,229 @@ namespace DiGi.Geometry.xUnit
             Assert.False(IsClosed_ComponentMatching(poly_Slot, true, 0.20));
         }
 
+
         /// <summary>
-        /// Comprehensive benchmark comparing Existing Vertex Hash, Previous Greedy Edge Matching, and Latest Proposal (§5 Component Matching).
+        /// Pins the defect reported on DiGi.Geometry issue 1 against the implementation that carried it, and its absence from the shipped one.
+        /// <para>The vertex-welding algorithm reports a watertight 9 800-face ellipsoid as open from a tolerance of 0.01 upwards, having reported it closed at every finer value: welding at a tolerance past the edge length of the tessellation collapses whole triangles, and the edge counts stop pairing. The same happens to a solid with a 0.1 m slot once the tolerance passes 0.15.</para>
+        /// <para>Neither is a borderline case - both solids are exactly watertight and closed at 1E-06 - which is what makes the old result wrong rather than merely different. The shipped predicate welds nothing and reports both closed at every tolerance on the ladder.</para>
         /// </summary>
         [Fact]
-        public void Polyhedron_IsClosed_Comparison_SpeedBenchmark_LatestProposal()
+        public void Polyhedron_IsClosed_Comparison_Monotonicity()
         {
-            // 1. 500-gon Extrusion (3,000 half-edges)
-            Polyhedron? poly_Extrusion = Polyhedron_IsClosed_Extrusion(500);
-            Assert.NotNull(poly_Extrusion);
-
-            int repeats_500gon = 100;
-
-            // Warm-up
-            _ = poly_Extrusion.IsClosed();
-            _ = IsClosed_Greedy(poly_Extrusion, false);
-            _ = IsClosed_ComponentMatching(poly_Extrusion, false);
-
-            Stopwatch sw_Extrusion_Existing = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_500gon; i++)
-            {
-                _ = poly_Extrusion.IsClosed();
-            }
-            sw_Extrusion_Existing.Stop();
-
-            Stopwatch sw_Extrusion_Greedy = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_500gon; i++)
-            {
-                _ = IsClosed_Greedy(poly_Extrusion, false);
-            }
-            sw_Extrusion_Greedy.Stop();
-
-            Stopwatch sw_Extrusion_Component = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_500gon; i++)
-            {
-                _ = IsClosed_ComponentMatching(poly_Extrusion, false);
-            }
-            sw_Extrusion_Component.Stop();
-
-            double us_Extrusion_Existing = sw_Extrusion_Existing.Elapsed.TotalMilliseconds * 1000.0 / repeats_500gon;
-            double us_Extrusion_Greedy = sw_Extrusion_Greedy.Elapsed.TotalMilliseconds * 1000.0 / repeats_500gon;
-            double us_Extrusion_Component = sw_Extrusion_Component.Elapsed.TotalMilliseconds * 1000.0 / repeats_500gon;
-
-            // 2. 9,800-face Ellipsoid (29,400 half-edges)
             Ellipsoid ellipsoid = new(new Point3D(1, 2, 3), 3, 2, 1);
-            Polyhedron? poly_Ellipsoid = Create.Polyhedron(ellipsoid, 50, 100);
-            Assert.NotNull(poly_Ellipsoid);
+            Polyhedron? polyhedron_Ellipsoid = Create.Polyhedron(ellipsoid, 50, 100);
+            Assert.NotNull(polyhedron_Ellipsoid);
 
-            // Warm-up
-            _ = poly_Ellipsoid.IsClosed();
-            _ = IsClosed_Greedy(poly_Ellipsoid, false);
-            _ = IsClosed_ComponentMatching(poly_Ellipsoid, false);
+            // Both agree the solid is watertight when nothing is welded away.
+            Assert.True(IsClosed_VertexWeld(polyhedron_Ellipsoid, false, 0.001));
+            Assert.True(polyhedron_Ellipsoid.IsClosed(0.001));
 
-            Stopwatch sw_Ellipsoid_Existing = Stopwatch.StartNew();
-            _ = poly_Ellipsoid.IsClosed();
-            sw_Ellipsoid_Existing.Stop();
+            // The previous implementation loses it as the tolerance is broadened; the shipped one does not.
+            Assert.False(IsClosed_VertexWeld(polyhedron_Ellipsoid, false, 0.01));
+            Assert.False(IsClosed_VertexWeld(polyhedron_Ellipsoid, false, 0.5));
 
-            Stopwatch sw_Ellipsoid_Greedy = Stopwatch.StartNew();
-            _ = IsClosed_Greedy(poly_Ellipsoid, false);
-            sw_Ellipsoid_Greedy.Stop();
+            Assert.True(polyhedron_Ellipsoid.IsClosed(0.01));
+            Assert.True(polyhedron_Ellipsoid.IsClosed(0.5));
 
-            Stopwatch sw_Ellipsoid_Component = Stopwatch.StartNew();
-            _ = IsClosed_ComponentMatching(poly_Ellipsoid, false);
-            sw_Ellipsoid_Component.Stop();
+            Polyhedron? polyhedron_Slot = Polyhedron_IsClosed_SlotExtrusion();
+            Assert.NotNull(polyhedron_Slot);
 
-            // 3. Open Model (Cube missing 1 face)
-            List<IPolygonalFace3D> openFaces = Polyhedron_IsClosed_BoxFaces(0, 10, 0);
-            openFaces.RemoveAt(0);
-            Polyhedron? poly_Open = Create.Polyhedron(openFaces);
-            Assert.NotNull(poly_Open);
+            Assert.True(IsClosed_VertexWeld(polyhedron_Slot, false, 0.15));
+            Assert.False(IsClosed_VertexWeld(polyhedron_Slot, false, 0.2));
 
-            int repeats_Open = 500;
-            Stopwatch sw_Open_Existing = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_Open; i++)
+            Assert.True(polyhedron_Slot.IsClosed(0.15));
+            Assert.True(polyhedron_Slot.IsClosed(0.2));
+        }
+
+        /// <summary>
+        /// Total half-edge evaluations each benchmark scenario aims for. The repeat count of every row is scaled from it, so all timings are reported per call.
+        /// </summary>
+        private const int Polyhedron_IsClosed_Benchmark_Operations = 600000;
+
+        /// <summary>
+        /// The number of timed batches each measurement takes, of which the fastest is reported.
+        /// </summary>
+        private const int Polyhedron_IsClosed_Benchmark_Batches = 5;
+
+        /// <summary>
+        /// The smallest number of warm-up calls made before a measurement, enough to carry every implementation past the call count at which the runtime promotes it to optimised code. Measuring without it moved the same figure by a factor of three between runs.
+        /// </summary>
+        private const int Polyhedron_IsClosed_Benchmark_WarmUp = 60;
+
+        /// <summary>
+        /// Benchmarks the shipped closure query against the implementation it replaced and the two designs proposed on DiGi.Geometry issue 1.
+        /// <para>Four implementations on identical inputs: the vertex welding that shipped previously, the greedy two-pass edge matching of the first proposal, the component perfect matching of the second, and the shipped weld-free predicate.</para>
+        /// <para>Each implementation is warmed up before it is timed and the repeat count is scaled by the size of the input. Results are asserted to agree before any timing is taken on the solids that carry no feature at the scale of the tolerance; on the ones that do, the divergence is the point of the exercise and is asserted explicitly instead.</para>
+        /// <para>Writes IsClosed_Benchmark.md to the reports directory. Run in Release for figures worth quoting.</para>
+        /// </summary>
+        [Fact]
+        public void Polyhedron_IsClosed_Benchmark()
+        {
+            System.Text.StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine("# Benchmark - Polyhedron closure");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Per call, microseconds. Lower is better.");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("| Scenario | Half-edges | Vertex weld (previous) | Greedy edge matching | Component matching | Shipped | Shipped / previous |");
+            stringBuilder.AppendLine("| :--- | ---: | ---: | ---: | ---: | ---: | ---: |");
+
+            double Best(System.Func<bool> function, int repeats)
             {
-                _ = poly_Open.IsClosed();
-            }
-            sw_Open_Existing.Stop();
+                int repeats_WarmUp = System.Math.Max(repeats, Polyhedron_IsClosed_Benchmark_WarmUp);
+                for (int i = 0; i < repeats_WarmUp; i++)
+                {
+                    _ = function();
+                }
 
-            Stopwatch sw_Open_Greedy = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_Open; i++)
-            {
-                _ = IsClosed_Greedy(poly_Open, false);
-            }
-            sw_Open_Greedy.Stop();
+                double microseconds_Best = double.MaxValue;
 
-            Stopwatch sw_Open_Component = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_Open; i++)
-            {
-                _ = IsClosed_ComponentMatching(poly_Open, false);
-            }
-            sw_Open_Component.Stop();
+                for (int batch = 0; batch < Polyhedron_IsClosed_Benchmark_Batches; batch++)
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    for (int i = 0; i < repeats; i++)
+                    {
+                        _ = function();
+                    }
+                    stopwatch.Stop();
 
-            double us_Open_Existing = sw_Open_Existing.Elapsed.TotalMilliseconds * 1000.0 / repeats_Open;
-            double us_Open_Greedy = sw_Open_Greedy.Elapsed.TotalMilliseconds * 1000.0 / repeats_Open;
-            double us_Open_Component = sw_Open_Component.Elapsed.TotalMilliseconds * 1000.0 / repeats_Open;
+                    double microseconds = stopwatch.Elapsed.TotalMilliseconds * 1000.0 / repeats;
+                    if (microseconds < microseconds_Best)
+                    {
+                        microseconds_Best = microseconds;
+                    }
+                }
 
-            // 4. 0.03 m Step Extrusion at tol = 0.05 (Issue #1)
-            Plane plane = Create.Plane(0)!;
-            PolygonalFace3D? face_Step = Create.PolygonalFace3D(
-                plane,
-                new Point2D(0, 0),
-                new Point2D(10, 0),
-                new Point2D(10, 10),
-                new Point2D(5, 10),
-                new Point2D(5, 9.97),
-                new Point2D(0, 9.97));
-            Assert.NotNull(face_Step);
-            Polyhedron? poly_Step = Create.Polyhedron(face_Step, new Spatial.Classes.Vector3D(0, 0, 3));
-            Assert.NotNull(poly_Step);
-
-            int repeats_Step = 500;
-            Stopwatch sw_Step_Existing = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_Step; i++)
-            {
-                _ = poly_Step.IsClosed(0.05);
-            }
-            sw_Step_Existing.Stop();
-
-            Stopwatch sw_Step_Greedy = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_Step; i++)
-            {
-                _ = IsClosed_Greedy(poly_Step, false, 0.05);
-            }
-            sw_Step_Greedy.Stop();
-
-            Stopwatch sw_Step_Component = Stopwatch.StartNew();
-            for (int i = 0; i < repeats_Step; i++)
-            {
-                _ = IsClosed_ComponentMatching(poly_Step, false, 0.05);
-            }
-            sw_Step_Component.Stop();
-
-            double us_Step_Existing = sw_Step_Existing.Elapsed.TotalMilliseconds * 1000.0 / repeats_Step;
-            double us_Step_Greedy = sw_Step_Greedy.Elapsed.TotalMilliseconds * 1000.0 / repeats_Step;
-            double us_Step_Component = sw_Step_Component.Elapsed.TotalMilliseconds * 1000.0 / repeats_Step;
-
-            // Write report to user files/reports/
-            string? dir_Reports = DiGi.Core.xUnit.Query.ReportsDirectory(System.Reflection.Assembly.GetExecutingAssembly());
-            if (dir_Reports != null && System.IO.Directory.Exists(dir_Reports))
-            {
-                string reportPath = System.IO.Path.Combine(dir_Reports, "IsClosed_LatestProposal_Benchmark.md");
-                string reportContent = $"# Benchmark Comparison: Existing vs. Greedy vs. Latest §5 Proposal\n\n" +
-                    $"| Benchmark Geometry | Method 1: Existing Vertex Hash | Method 2: Greedy Edge Matching | Method 3: Latest §5 Proposal (Component Perfect Matching) | §5 Monotonicity |\n" +
-                    $"| :--- | :--- | :--- | :--- | :--- |\n" +
-                    $"| **500-gon Extrusion** (3,000 half-edges) | {us_Extrusion_Existing:F1} us | {us_Extrusion_Greedy:F1} us | **{us_Extrusion_Component:F1} us** | True (Closed) |\n" +
-                    $"| **9,800-face Ellipsoid** (29,400 half-edges) | {sw_Ellipsoid_Existing.ElapsedMilliseconds} ms | {sw_Ellipsoid_Greedy.ElapsedMilliseconds} ms | **{sw_Ellipsoid_Component.ElapsedMilliseconds} ms** | True (Closed) |\n" +
-                    $"| **Open Cube (5 faces)** (missing roof) | {us_Open_Existing:F1} us | {us_Open_Greedy:F1} us | **{us_Open_Component:F1} us** | False (Open) |\n" +
-                    $"| **0.03 m Step Extrusion (tol = 0.05)** (Issue #1) | {us_Step_Existing:F1} us (False!) | {us_Step_Greedy:F1} us (True) | **{us_Step_Component:F1} us (True)** | True (Closed) |\n";
-
-                System.IO.File.WriteAllText(reportPath, reportContent);
+                return microseconds_Best;
             }
 
-            // Assert performance thresholds
-            Assert.True(us_Extrusion_Component < 8000.0, $"Component Matching took {us_Extrusion_Component:F1} us on 500-gon");
-            Assert.True(sw_Ellipsoid_Component.ElapsedMilliseconds < 1000, $"Ellipsoid took {sw_Ellipsoid_Component.ElapsedMilliseconds} ms");
+            void Measure(string name, Polyhedron polyhedron, int count_HalfEdges, double tolerance)
+            {
+                int repeats = System.Math.Max(1, Polyhedron_IsClosed_Benchmark_Operations / count_HalfEdges);
+
+                double microseconds_VertexWeld = Best(() => IsClosed_VertexWeld(polyhedron, false, tolerance), repeats);
+                double microseconds_Greedy = Best(() => IsClosed_Greedy(polyhedron, false, tolerance), repeats);
+                double microseconds_Component = Best(() => IsClosed_ComponentMatching(polyhedron, false, tolerance), repeats);
+                double microseconds_Shipped = Best(() => polyhedron.IsClosed(tolerance), repeats);
+
+                stringBuilder.AppendLine($"| {name} | {count_HalfEdges} | {microseconds_VertexWeld:F1} | {microseconds_Greedy:F1} | {microseconds_Component:F1} | {microseconds_Shipped:F1} | {microseconds_Shipped / microseconds_VertexWeld:F2} |");
+            }
+
+            // 1. Extrusion of a 500-gon - a clean solid where every half-edge has an exact partner.
+            Polyhedron? polyhedron_Extrusion = Polyhedron_IsClosed_Extrusion(500);
+            Assert.NotNull(polyhedron_Extrusion);
+
+            Assert.True(IsClosed_VertexWeld(polyhedron_Extrusion, false));
+            Assert.True(IsClosed_Greedy(polyhedron_Extrusion, false));
+            Assert.True(IsClosed_ComponentMatching(polyhedron_Extrusion, false));
+            Assert.True(polyhedron_Extrusion.IsClosed());
+
+            Measure("500-gon extrusion", polyhedron_Extrusion, 3000, DiGi.Core.Constants.Tolerance.Distance);
+
+            // 2. A finely tessellated ellipsoid - the largest input, 9 800 triangular faces.
+            Ellipsoid ellipsoid = new(new Point3D(1, 2, 3), 3, 2, 1);
+            Polyhedron? polyhedron_Ellipsoid = Create.Polyhedron(ellipsoid, 50, 100);
+            Assert.NotNull(polyhedron_Ellipsoid);
+
+            Assert.True(IsClosed_VertexWeld(polyhedron_Ellipsoid, false));
+            Assert.True(IsClosed_Greedy(polyhedron_Ellipsoid, false));
+            Assert.True(IsClosed_ComponentMatching(polyhedron_Ellipsoid, false));
+            Assert.True(polyhedron_Ellipsoid.IsClosed());
+
+            Measure("9 800-face ellipsoid", polyhedron_Ellipsoid, 29400, DiGi.Core.Constants.Tolerance.Distance);
+
+            // 3. A cube missing one face - the cost of rejecting an open solid.
+            List<IPolygonalFace3D> polygonalFace3Ds_Open = Polyhedron_IsClosed_BoxFaces(0, 10, 0);
+            polygonalFace3Ds_Open.RemoveAt(0);
+
+            Polyhedron? polyhedron_Open = Create.Polyhedron(polygonalFace3Ds_Open);
+            Assert.NotNull(polyhedron_Open);
+
+            Assert.False(IsClosed_VertexWeld(polyhedron_Open, false));
+            Assert.False(IsClosed_Greedy(polyhedron_Open, false));
+            Assert.False(IsClosed_ComponentMatching(polyhedron_Open, false));
+            Assert.False(polyhedron_Open.IsClosed());
+
+            Measure("Open cube, 5 faces", polyhedron_Open, 20, DiGi.Core.Constants.Tolerance.Distance);
+
+            // 4. The offline reproduction from the report - a 0.03 m step judged at a tolerance of 0.05.
+            Polyhedron? polyhedron_Step = Polyhedron_IsClosed_StepExtrusion();
+            Assert.NotNull(polyhedron_Step);
+
+            Assert.True(polyhedron_Step.IsClosed(0.05));
+
+            Measure("0.03 m step, tolerance 0.05", polyhedron_Step, 36, 0.05);
+
+            // 5. A 0.1 m deep slot judged at a tolerance of 0.15, above the feature size.
+            Polyhedron? polyhedron_Slot = Polyhedron_IsClosed_SlotExtrusion();
+            Assert.NotNull(polyhedron_Slot);
+
+            Assert.True(polyhedron_Slot.IsClosed(0.15));
+
+            Measure("0.1 m slot, tolerance 0.15", polyhedron_Slot, 48, 0.15);
+
+            // 6. Two thin slabs 0.02 m apart, judged at a tolerance spanning both of them.
+            Polyhedron? polyhedron_Slabs = Polyhedron_IsClosed_ThinSlabSolid();
+            Assert.NotNull(polyhedron_Slabs);
+
+            Assert.True(polyhedron_Slabs.IsClosed(0.05));
+
+            Measure("Two thin slabs, tolerance 0.05", polyhedron_Slabs, 48, 0.05);
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Monotonicity of the default criterion across the tolerance ladder (T = closed):");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("| Scenario | Vertex weld (previous) | Shipped |");
+            stringBuilder.AppendLine("| :--- | :--- | :--- |");
+
+            void Sweep(string name, Polyhedron polyhedron)
+            {
+                System.Text.StringBuilder stringBuilder_Weld = new();
+                System.Text.StringBuilder stringBuilder_Shipped = new();
+
+                for (int i = 0; i < Polyhedron_IsClosed_Tolerances.Length; i++)
+                {
+                    stringBuilder_Weld.Append(IsClosed_VertexWeld(polyhedron, false, Polyhedron_IsClosed_Tolerances[i]) ? "T" : ".");
+                    stringBuilder_Shipped.Append(polyhedron.IsClosed(Polyhedron_IsClosed_Tolerances[i]) ? "T" : ".");
+                }
+
+                stringBuilder.AppendLine($"| {name} | `{stringBuilder_Weld}` | `{stringBuilder_Shipped}` |");
+            }
+
+            Sweep("500-gon extrusion", polyhedron_Extrusion);
+            Sweep("9 800-face ellipsoid", polyhedron_Ellipsoid);
+            Sweep("Open cube, 5 faces", polyhedron_Open);
+            Sweep("0.03 m step", polyhedron_Step);
+            Sweep("0.1 m slot", polyhedron_Slot);
+            Sweep("Two thin slabs", polyhedron_Slabs);
+
+            List<IPolygonalFace3D> polygonalFace3Ds_Stack = Polyhedron_IsClosed_BoxFaces(0.0, 10.0, 0.0);
+            polygonalFace3Ds_Stack.AddRange(Polyhedron_IsClosed_BoxFaces(0.0, 10.0, 10.0));
+            Polyhedron? polyhedron_Stack = Create.Polyhedron(polygonalFace3Ds_Stack);
+            Assert.NotNull(polyhedron_Stack);
+            Sweep("Two stacked boxes", polyhedron_Stack);
+
+            Polyhedron? polyhedron_Lifted = Create.Polyhedron(Polyhedron_IsClosed_BoxFacesWithLiftedTop(0.0, 10.0, 0.05));
+            Assert.NotNull(polyhedron_Lifted);
+            Sweep("Box, top lifted 0.05", polyhedron_Lifted);
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"Ladder: {string.Join(", ", Polyhedron_IsClosed_Tolerances)}");
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Verdicts where the implementations disagree:");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("| Scenario | Criterion | Vertex weld (previous) | Shipped |");
+            stringBuilder.AppendLine("| :--- | :--- | :--- | :--- |");
+            stringBuilder.AppendLine($"| 0.03 m step, tolerance 0.05 | default | {IsClosed_VertexWeld(polyhedron_Step, false, 0.05)} | {polyhedron_Step.IsClosed(0.05)} |");
+            stringBuilder.AppendLine($"| 0.03 m step, tolerance 0.05 | manifold | {IsClosed_VertexWeld(polyhedron_Step, true, 0.05)} | {polyhedron_Step.IsClosed(true, 0.05)} |");
+            stringBuilder.AppendLine($"| 0.1 m slot, tolerance 0.15 | default | {IsClosed_VertexWeld(polyhedron_Slot, false, 0.15)} | {polyhedron_Slot.IsClosed(0.15)} |");
+            stringBuilder.AppendLine($"| Two thin slabs, tolerance 0.05 | default | {IsClosed_VertexWeld(polyhedron_Slabs, false, 0.05)} | {polyhedron_Slabs.IsClosed(0.05)} |");
+            stringBuilder.AppendLine($"| Two thin slabs, tolerance 0.05 | manifold | {IsClosed_VertexWeld(polyhedron_Slabs, true, 0.05)} | {polyhedron_Slabs.IsClosed(true, 0.05)} |");
+
+            string? directory_Reports = DiGi.Core.xUnit.Query.ReportsDirectory(System.Reflection.Assembly.GetExecutingAssembly());
+            Assert.NotNull(directory_Reports);
+
+            System.IO.File.WriteAllText(System.IO.Path.Combine(directory_Reports, "IsClosed_Benchmark.md"), stringBuilder.ToString());
         }
     }
 }
