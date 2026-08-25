@@ -37,7 +37,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemsByReferencesAsync(IEnumerable{string}?, int?, long?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemsByReferencesAsync(IEnumerable{string}?, int?, long?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when given null references.
         /// </summary>
         [Fact]
@@ -49,7 +49,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemsByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, long?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemsByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, long?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when connection is null.
         /// </summary>
         [Fact]
