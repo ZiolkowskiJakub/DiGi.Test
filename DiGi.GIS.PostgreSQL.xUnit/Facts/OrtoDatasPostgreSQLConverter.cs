@@ -1,5 +1,7 @@
 using DiGi.GIS.PostgreSQL.Classes;
+using Npgsql;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiGi.GIS.PostgreSQL.xUnit
@@ -145,6 +147,82 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             List<Building2DReference>? result_Mixed = await ortoDatasPostgreSQLConverter.UpdateSubdivisionIdsAsync(building2DReferences_Mixed);
             Assert.Null(result_Mixed);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
+        /// and its instance overload return null when inputs or connection are null.
+        /// </summary>
+        [Fact]
+        public async Task OrtoDatasPostgreSQLConverter_GetOrtoDatasReferencesByReferencesAsync_NullOrEmpty_ReturnsExpected()
+        {
+            List<OrtoDatasReference>? result_NullConn = await OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByReferencesAsync(null, ["ref_1"], 10, fallbackByReference: true);
+            Assert.Null(result_NullConn);
+
+            List<OrtoDatasReference>? result_NullRefs = await OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByReferencesAsync(null, null, 10, fallbackByReference: true);
+            Assert.Null(result_NullRefs);
+
+            OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
+            List<OrtoDatasReference>? result_InstanceNull = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferencesByReferencesAsync(null, 10, fallbackByReference: true);
+            Assert.Null(result_InstanceNull);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferenceByReferenceAsync(string, int?, bool, System.Threading.CancellationToken)"/>
+        /// returns null when the reference is null or whitespace.
+        /// </summary>
+        [Fact]
+        public async Task OrtoDatasPostgreSQLConverter_GetOrtoDatasReferenceByReferenceAsync_NullOrWhiteSpace_ReturnsNull()
+        {
+            OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
+            OrtoDatasReference? result_Null = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferenceByReferenceAsync(null!, 10, fallbackByReference: true);
+            Assert.Null(result_Null);
+
+            OrtoDatasReference? result_WhiteSpace = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferenceByReferenceAsync("   ", 10, fallbackByReference: true);
+            Assert.Null(result_WhiteSpace);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByBuilding2DReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{Building2DReference}?, bool, System.Threading.CancellationToken)"/>
+        /// and its instance overloads return null when inputs or connection are null.
+        /// </summary>
+        [Fact]
+        public async Task OrtoDatasPostgreSQLConverter_GetOrtoDatasReferencesByBuilding2DReferencesAsync_NullOrEmpty_ReturnsExpected()
+        {
+            List<OrtoDatasReference>? result_NullConn = await OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByBuilding2DReferencesAsync(null, [new Building2DReference { Reference = "ref_1" }], fallbackByReference: true);
+            Assert.Null(result_NullConn);
+
+            List<OrtoDatasReference>? result_NullList = await OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByBuilding2DReferencesAsync(null, null, fallbackByReference: true);
+            Assert.Null(result_NullList);
+
+            OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
+            List<OrtoDatasReference>? result_InstanceNull = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferencesByBuilding2DReferencesAsync(null, fallbackByReference: true);
+            Assert.Null(result_InstanceNull);
+
+            OrtoDatasReference? result_SingleNull = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferenceByBuilding2DReferenceAsync(null, fallbackByReference: true);
+            Assert.Null(result_SingleNull);
+
+            OrtoDatasReference? result_SingleEmptyRef = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferenceByBuilding2DReferenceAsync(new Building2DReference { Reference = "  " }, fallbackByReference: true);
+            Assert.Null(result_SingleEmptyRef);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByCountyIdAsync(NpgsqlConnection?, int, IEnumerable{int}?, CancellationToken)"/>
+        /// and <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferenceByIdAsync(long, int?, CancellationToken)"/>
+        /// return null when connection is null.
+        /// </summary>
+        [Fact]
+        public async Task OrtoDatasPostgreSQLConverter_GetOrtoDatasReferencesByCountyIdAndIdAsync_NullConnection_ReturnsNull()
+        {
+            List<OrtoDatasReference>? result_NullCounty = await OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByCountyIdAsync(null, 55417);
+            Assert.Null(result_NullCounty);
+
+            OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
+            List<OrtoDatasReference>? result_InstanceNullCounty = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferencesByCountyIdAsync(55417);
+            Assert.Null(result_InstanceNullCounty);
+
+            OrtoDatasReference? result_InstanceNullId = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferenceByIdAsync(12345);
+            Assert.Null(result_InstanceNullId);
         }
     }
 }

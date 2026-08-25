@@ -36,6 +36,16 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(0));
                 Assert.IsType<BadRequestObjectResult>(await controller.GetItemByReferenceAsync(" "));
                 Assert.IsType<BadRequestObjectResult>(await controller.GetImageByReferenceAsync(" ", 2024));
+
+                // OrtoDatasReference endpoints validation
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferenceByReferenceAsync(string.Empty));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferenceByReferenceAsync("  "));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByReferencesAsync(null!));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByReferencesAsync([]));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByBuilding2DReferencesAsync(null!));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByBuilding2DReferencesAsync([]));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByCountyIdAsync(0));
+                Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByCountyIdAsync(-1));
             }
             finally
             {
