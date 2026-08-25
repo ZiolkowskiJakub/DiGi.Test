@@ -709,6 +709,52 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Tests that splitting a collection of segments hands back one shared position where two segments meet within the tolerance.
+        /// <para>The four segments of this fact carry a square whose corners were each recorded twice, two centimetres apart, which is the shape survey data arrives in. Splitting them at a tolerance that covers the gap has to draw both readings onto one position, because a ring whose corners still differ cannot be polygonized and the face assembled from it is dropped - the defect behind issue 3 of DiGi.Geometry, where a roof surface and the walls beside it went missing from a building model cut into storeys.</para>
+        /// <para>The polygonization is left on its own default tolerance on purpose: it is the segments which have to come out consistent, not the polygonizer which has to be told to snap them together.</para>
+        /// </summary>
+        [Fact]
+        public void Split_Segment2Ds_SharedEndsAreWelded()
+        {
+            List<Segment2D> segment2Ds =
+            [
+                new(new Point2D(0, 0), new Point2D(10, 0.01)),
+                new(new Point2D(10.02, 0), new Point2D(10, 10.01)),
+                new(new Point2D(10.01, 10.02), new Point2D(0.02, 10)),
+                new(new Point2D(0, 10.02), new Point2D(0.01, 0.02))
+            ];
+
+            List<Segment2D>? segment2Ds_Split = Planar.Query.Split(segment2Ds, 0.05);
+
+            Assert.NotNull(segment2Ds_Split);
+            Assert.Equal(4, segment2Ds_Split.Count);
+
+            List<Point2D> point2Ds = [];
+            for (int i = 0; i < segment2Ds_Split.Count; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Point2D? point2D = segment2Ds_Split[i][j];
+                    Assert.NotNull(point2D);
+
+                    if (!point2Ds.Contains(point2D))
+                    {
+                        point2Ds.Add(point2D);
+                    }
+                }
+            }
+
+            // Eight ends against four corners, so every corner is one position rather than the two it was given as.
+            Assert.Equal(4, point2Ds.Count);
+
+            List<PolygonalFace2D>? polygonalFace2Ds = Planar.Create.PolygonalFace2Ds(segment2Ds_Split);
+
+            Assert.NotNull(polygonalFace2Ds);
+            Assert.Single(polygonalFace2Ds);
+            Assert.True(System.Math.Abs(polygonalFace2Ds[0].GetArea() - 100) < 1, $"The face carries {polygonalFace2Ds[0].GetArea()} square metres instead of about 100.");
+        }
+
+        /// <summary>
         /// Measures and reports execution time gains and performance metrics for TrySplit methods across polyhedrons and mesh operations.
         /// </summary>
         [Fact]

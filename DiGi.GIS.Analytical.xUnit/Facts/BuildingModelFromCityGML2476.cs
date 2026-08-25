@@ -105,7 +105,8 @@ namespace DiGi.GIS.Analytical.xUnit
 
         /// <summary>
         /// Tests the storey split of real LOD2 buildings against the tolerance it is given.
-        /// <para>Both buildings are three storey residential buildings of about eleven metres, so the derived storey height passes both gates and the model is cut into three storeys. The coordinates of the source data carry two decimal places, so the boundary surfaces of a building meet only within <see cref="Constants.Tolerance.Coordinate"/>, which is the default of the overload and cuts the model correctly. Passing the finer <see cref="Core.Constants.Tolerance.Distance"/> leaves the ring the cutting plane assembles open at the corners, so no cut is made and the model is returned whole - the reason the overload does not default to that value.</para>
+        /// <para>Both buildings are three storey residential buildings of about eleven metres, so the derived storey height passes both gates and the model is cut into three storeys. The coordinates of the source data carry two decimal places, so the boundary surfaces of a building meet only within <see cref="Constants.Tolerance.Coordinate"/>, which is the default of the overload and cuts the model correctly.</para>
+        /// <para>Passing the finer <see cref="Core.Constants.Tolerance.Distance"/> cuts the model just the same, because the overload does not split on the tolerance it is given but on the finest one of its candidate ladder the building actually closes at. Handing it an empty ladder holds it on the value it was given, and there the cutting plane meets the boundary surfaces no closer than the coordinate precision of the source data, so the ring it assembles stays open and no cut is made - the reason the overload does not default to that value.</para>
         /// </summary>
         [Fact]
         public void BuildingModel_FromCityGMLFile_2476_SplitTolerance()
@@ -140,13 +141,23 @@ namespace DiGi.GIS.Analytical.xUnit
                 Assert.NotNull(spaces);
                 Assert.Equal(building2D.Storeys, spaces.Count);
 
-                // Passing the finer distance tolerance leaves the ring open at the corners, so no cut is made - the reason the overload does not default to it.
+                // The candidate ladder takes the split off the tolerance the caller passed and onto the finest one the
+                // building closes at, so the finer distance tolerance reaches the very same cut.
                 BuildingModel? buildingModel_Fine = Create.BuildingModel(building, building2D, tolerance: Core.Constants.Tolerance.Distance);
                 Assert.NotNull(buildingModel_Fine);
 
                 List<Space>? spaces_Fine = buildingModel_Fine.GetSpaces<Space>();
                 Assert.NotNull(spaces_Fine);
-                Assert.Single(spaces_Fine);
+                Assert.Equal(building2D.Storeys, spaces_Fine.Count);
+
+                // An empty ladder holds the split on the tolerance it was given, and at a micrometre the ring the
+                // cutting plane assembles stays open, so no cut is made.
+                BuildingModel? buildingModel_NoLadder = Create.BuildingModel(building, building2D, tolerance: Core.Constants.Tolerance.Distance, candidateTolerances: []);
+                Assert.NotNull(buildingModel_NoLadder);
+
+                List<Space>? spaces_NoLadder = buildingModel_NoLadder.GetSpaces<Space>();
+                Assert.NotNull(spaces_NoLadder);
+                Assert.Single(spaces_NoLadder);
             }
         }
 
@@ -254,6 +265,43 @@ namespace DiGi.GIS.Analytical.xUnit
                 List<Space>? spaces = buildingModel.GetSpaces<Space>();
                 Assert.NotNull(spaces);
                 Assert.Equal(keyValuePair.Value, spaces.Count);
+            }
+        }
+
+        /// <summary>
+        /// Tests that the storey split keeps every boundary surface of the real LOD2 buildings of the "2476_CityGML.zip" fixture.
+        /// <para>A cut only ever adds surface - it divides a face into pieces which sum back to it and lays a floor on the cutting plane - so no plane of a building may come out of a cut carrying less area than it went in with. The same invariant is measured on the building of county 55417 the defect was reported on; this fact holds it over the six buildings of the fixture, three of which are not planar within <see cref="Core.Constants.Tolerance.Distance"/> and are the ones the split has the hardest time with.</para>
+        /// </summary>
+        [Fact]
+        public void BuildingModel_FromCityGMLFile_2476_SplitKeepsSurfaces()
+        {
+            Dictionary<string, Building> buildings = CityGML_Buildings_2476();
+
+            string[] references = [reference_NonPlanar_1, reference_NonPlanar_2, reference_NonPlanar_3, reference_Residential_1, reference_Residential_2, reference_NonResidential];
+
+            Dictionary<string, Building2D> building2Ds = Building2Ds_2476(references);
+
+            for (int i = 0; i < references.Length; i++)
+            {
+                Building building = buildings[references[i]];
+                Building2D building2D = building2Ds[references[i]];
+
+                BuildingModel? buildingModel_Uncut = Create.BuildingModel(building, Constants.Tolerance.Enclosure);
+                Assert.NotNull(buildingModel_Uncut);
+
+                BuildingModel? buildingModel = Create.BuildingModel(building, building2D);
+                Assert.NotNull(buildingModel);
+
+                Dictionary<string, double> areas_Uncut = AreasByPlane(Surface3Ds(buildingModel_Uncut));
+                Dictionary<string, double> areas = AreasByPlane(Surface3Ds(buildingModel));
+
+                foreach (KeyValuePair<string, double> keyValuePair in areas_Uncut)
+                {
+                    double slack = Math.Max(Constants.Tolerance.Enclosure, keyValuePair.Value * 0.01);
+
+                    Assert.True(areas.TryGetValue(keyValuePair.Key, out double area), $"Building {references[i]} lost the plane {keyValuePair.Key} carrying {keyValuePair.Value} square metres.");
+                    Assert.True(area >= keyValuePair.Value - slack, $"Building {references[i]} carries {area} square metres on the plane {keyValuePair.Key} against the {keyValuePair.Value} it was given.");
+                }
             }
         }
 
