@@ -34,6 +34,10 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestObjectResult>(await controller.ContainsByReferencesAsync(null, null, null));
                 Assert.IsType<BadRequestObjectResult>(await controller.ContainsByReferencesAsync([" "], null, null));
                 Assert.IsType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(0));
+                Assert.IsType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(10, 0));
+                Assert.IsType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(10, -1));
+                Assert.IsType<BadRequestObjectResult>(await controller.AcknowledgeBuilding2DReferencesAsync(null));
+                Assert.IsType<BadRequestObjectResult>(await controller.AcknowledgeBuilding2DReferencesAsync([]));
                 Assert.IsType<BadRequestObjectResult>(await controller.GetItemByReferenceAsync(" "));
                 Assert.IsType<BadRequestObjectResult>(await controller.GetImageByReferenceAsync(" ", 2024));
 
@@ -72,6 +76,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsNotType<BadRequestObjectResult>(await controller.GetSummariesByCountyIdsAsync([.. System.Linq.Enumerable.Range(0, Constants.OrtoDatas.MaximumSummaryCountyCount)]));
                 Assert.IsNotType<BadRequestObjectResult>(await controller.GetSummariesByCountyIdsAsync(null));
                 Assert.IsNotType<BadRequestObjectResult>(await controller.GetQueueSummariesByCountyIdsAsync(null));
+                Assert.IsNotType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(1, 1));
             }
             finally
             {
