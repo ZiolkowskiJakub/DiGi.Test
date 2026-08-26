@@ -224,5 +224,21 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             OrtoDatasReference? result_InstanceNullId = await ortoDatasPostgreSQLConverter.GetOrtoDatasReferenceByIdAsync(12345);
             Assert.Null(result_InstanceNullId);
         }
+
+        /// <summary>
+        /// Verifies that <see cref="Convert.ToPostgreSQL(GIS.Classes.OrtoDatas?, int?, int?)"/>
+        /// populates the <see cref="OrtoDatas.SubdivisionId"/> property when provided.
+        /// </summary>
+        [Fact]
+        public void OrtoDatas_ToPostgreSQL_WithSubdivisionId_ReturnsExpected()
+        {
+            GIS.Classes.OrtoDatas ortoDatas = new("ref_123", null);
+
+            OrtoDatas? result = ortoDatas.ToPostgreSQL(55417, 3064);
+            Assert.NotNull(result);
+            Assert.Equal("ref_123", result.Reference);
+            Assert.Equal(55417, result.CountyId);
+            Assert.Equal(3064, result.SubdivisionId);
+        }
     }
 }
