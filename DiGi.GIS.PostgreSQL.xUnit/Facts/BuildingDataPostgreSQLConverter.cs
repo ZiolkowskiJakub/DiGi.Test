@@ -42,7 +42,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingDataPostgreSQLConverter buildingDataPostgreSQLConverter = new(null);
 
             Assert.Equal(-1, await buildingDataPostgreSQLConverter.GetCountAsync(55417));
-            Assert.Equal(-1, await buildingDataPostgreSQLConverter.GetEstimatedCountAsync(55417));
+            Assert.Null(await buildingDataPostgreSQLConverter.GetEstimatedCountAsync(55417));
             Assert.Null(await buildingDataPostgreSQLConverter.GetReferencesByCountyIdAsync(55417));
             Assert.Null(await buildingDataPostgreSQLConverter.GetDuplicateReferencesAsync());
             Assert.Null(await buildingDataPostgreSQLConverter.GetCountyIdsByReferenceAsync("some_reference"));
@@ -73,10 +73,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <para>These queries are written by hand rather than built from the column metadata, so a wrong column name or a malformed clause would only ever surface here or in production. A county holding no rows is still a complete check of that: the server parses and plans the statement either way.</para>
         /// <para>Skipped by default: it executes integration queries requiring the confs to point at a database.</para>
         /// </summary>
-        [Fact(Skip = "Executes integration queries. Point GIS_PostgreSQL_Main.conf and GIS_PostgreSQL_Storage.conf at a database before running.")]
-        public async Task BuildingDataPostgreSQLConverter_NewReads_Integration()
+        [Fact(Skip = "Requires database connection")]
+        public async Task BuildingDataPostgreSQLConverter_NewReads_Database_AcceptsStatements()
         {
-            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            GISPostgreSQLConverterManager gISPostgreSQLConverterManager = new();
             Assert.NotNull(gISPostgreSQLConverterManager);
 
             BuildingDataPostgreSQLConverter? buildingDataPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<BuildingDataPostgreSQLConverter>();
@@ -93,8 +93,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             // The estimate reads pg_class.reltuples, which a partitioned parent carries as -1 until it is
             // analysed. What is being checked here is that the statement runs, not that the answer is a count.
-            long count_Estimated = await buildingDataPostgreSQLConverter.GetEstimatedCountAsync(null);
-            Assert.True(count_Estimated >= -1);
+            long? count_Estimated = await buildingDataPostgreSQLConverter.GetEstimatedCountAsync(null);
+            Assert.True(count_Estimated is null || count_Estimated.Value >= -1);
 
             HashSet<string>? references = await buildingDataPostgreSQLConverter.GetReferencesByCountyIdAsync(countyId);
             Assert.NotNull(references);
