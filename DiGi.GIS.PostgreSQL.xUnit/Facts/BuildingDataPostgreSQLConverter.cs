@@ -53,6 +53,19 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             Assert.Null(await BuildingDataPostgreSQLConverter.GetDuplicateReferencesAsync(null));
             Assert.Equal(-1, await Building2DPostgreSQLConverter.GetCountWithoutSubdivisionAsync(null, 55417));
+            Assert.Null(await Building2DPostgreSQLConverter.GetBuilding2DsWithoutSubdivisionAsync(null, 55417));
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="PostgreSQLBuildingDataUpdateTask.UnassignedSubdivisionBuildingCount"/> starts at 0 upon instantiation.
+        /// </summary>
+        [Fact]
+        public void PostgreSQLBuildingDataUpdateTask_UnassignedSubdivisionBuildingCount_InitialState()
+        {
+            GISPostgreSQLConverterManager gISPostgreSQLConverterManager = new();
+            PostgreSQLBuildingDataUpdateTask task = new(gISPostgreSQLConverterManager);
+
+            Assert.Equal(0, task.UnassignedSubdivisionBuildingCount);
         }
 
         /// <summary>
