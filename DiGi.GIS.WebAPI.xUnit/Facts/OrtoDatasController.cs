@@ -77,6 +77,10 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsNotType<BadRequestObjectResult>(await controller.GetSummariesByCountyIdsAsync(null));
                 Assert.IsNotType<BadRequestObjectResult>(await controller.GetQueueSummariesByCountyIdsAsync(null));
                 Assert.IsNotType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(1, 1));
+
+                // The claim is the one endpoint whose DDL can need a real timeout, so the parameter must exist
+                // and must be accepted. Pre-fix this line does not compile - the signature is the defect.
+                Assert.IsNotType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(1, 1, 600));
             }
             finally
             {
