@@ -278,14 +278,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
         /// <param name="distancesSquared">A scratch buffer the length of the cloud, supplied by the caller and reused across queries.</param>
         /// <param name="count">The number of neighbours to return.</param>
         /// <returns>A <see cref="List{T}"/> of point indexes ordered nearest first.</returns>
-        private static List<int> PointCloudNearestIndexes_Reference(
-            double[] x,
-            double[] y,
-            double[] z,
-            Point3D point3D,
-            int[] indexes,
-            double[] distancesSquared,
-            int count)
+        private static List<int> PointCloudNearestIndexes_Reference(double[] x, double[] y, double[] z, Point3D point3D, int[] indexes, double[] distancesSquared, int count)
         {
             for (int i = 0; i < x.Length; i++)
             {

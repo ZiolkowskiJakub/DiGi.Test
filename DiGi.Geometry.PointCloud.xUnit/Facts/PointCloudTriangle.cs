@@ -322,13 +322,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
         /// <param name="index_2">The index of the second corner.</param>
         /// <param name="index_3">The index of the third corner.</param>
         /// <returns>A <see cref="double"/> holding the length of the cross product of the two edges, which is zero exactly when the three points are collinear.</returns>
-        private static double PointCloudTriangle_Area(
-            double[] x,
-            double[] y,
-            double[] z,
-            int index_1,
-            int index_2,
-            int index_3)
+        private static double PointCloudTriangle_Area(double[] x, double[] y, double[] z, int index_1, int index_2, int index_3)
         {
             double dx_1 = x[index_2] - x[index_1];
             double dy_1 = y[index_2] - y[index_1];

@@ -19,13 +19,7 @@ namespace DiGi.Analytical.xUnit
         /// <param name="floorConstruction">The construction assigned to the created floor.</param>
         /// <param name="roofConstruction">The construction assigned to the created roof.</param>
         /// <returns>A <see cref="List{IComponent}"/> containing the created components, or null if the box could not be converted.</returns>
-        private static List<IComponent>? AddBoxSpace(
-            BuildingModel buildingModel,
-            BoundingBox3D boundingBox3D,
-            ISpace space,
-            IWallConstruction? wallConstruction,
-            IFloorConstruction? floorConstruction,
-            IRoofConstruction? roofConstruction)
+        private static List<IComponent>? AddBoxSpace(BuildingModel buildingModel, BoundingBox3D boundingBox3D, ISpace space, IWallConstruction? wallConstruction, IFloorConstruction? floorConstruction, IRoofConstruction? roofConstruction)
         {
             Polyhedron? polyhedron = Geometry.Spatial.Create.Polyhedron(boundingBox3D);
             if (polyhedron?.PolygonalFaces is not List<IPolygonalFace3D> polygonalFace3Ds)
