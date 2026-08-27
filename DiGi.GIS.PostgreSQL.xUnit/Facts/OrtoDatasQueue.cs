@@ -25,6 +25,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             List<Building2DReference>? result_NegativeCount = await OrtoDatasPostgreSQLConverter.GetNextBuilding2DReferencesAsync(null, -1);
             Assert.Null(result_NegativeCount);
+
+            List<Building2DReference>? result_ZeroMaxAttempts = await OrtoDatasPostgreSQLConverter.GetNextBuilding2DReferencesAsync(null, 5, 30, 0);
+            Assert.Null(result_ZeroMaxAttempts);
+
+            List<Building2DReference>? result_NegativeMaxAttempts = await OrtoDatasPostgreSQLConverter.GetNextBuilding2DReferencesAsync(null, 5, 30, -1);
+            Assert.Null(result_NegativeMaxAttempts);
         }
 
         /// <summary>
