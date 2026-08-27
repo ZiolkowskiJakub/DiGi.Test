@@ -98,5 +98,32 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Assert.StartsWith("02", administrativeAreal2D.Code);
             }
         }
+
+        /// <summary>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(Npgsql.NpgsqlConnection, AdministrativeArealType, IEnumerable{int}, bool, System.Threading.CancellationToken)"/>
+        /// resolves sibling part identifiers using batched parent code lookups when given parent identifiers (such as Country level), returning all child references.
+        /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
+        /// </summary>
+        [Fact(Skip = "Executes an integration query. Point GIS_PostgreSQL_Main.conf at a database before running.")]
+        public async Task GetAdministrativeAreal2DReferencesByAdministrativeArealType_ParentIds_MultipleCodes_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            AdministrativeAreal2DPostgreSQLConverter? administrativeAreal2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
+            Assert.NotNull(administrativeAreal2DPostgreSQLConverter);
+
+            using Npgsql.NpgsqlConnection? npgsqlConnection = DiGi.PostgreSQL.Create.NpgsqlConnection(administrativeAreal2DPostgreSQLConverter.ConnectionData);
+            Assert.NotNull(npgsqlConnection);
+            await npgsqlConnection.OpenAsync();
+
+            List<AdministrativeAreal2DReference>? administrativeAreal2DReferences_AllParts = await AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(npgsqlConnection, AdministrativeArealType.County, [7], false);
+            Assert.NotNull(administrativeAreal2DReferences_AllParts);
+            Assert.Equal(406, administrativeAreal2DReferences_AllParts.Count);
+
+            List<AdministrativeAreal2DReference>? administrativeAreal2DReferences_UniqueCodes = await AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(npgsqlConnection, AdministrativeArealType.County, [7], true);
+            Assert.NotNull(administrativeAreal2DReferences_UniqueCodes);
+            Assert.Equal(380, administrativeAreal2DReferences_UniqueCodes.Count);
+        }
     }
 }
