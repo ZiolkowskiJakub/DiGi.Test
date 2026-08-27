@@ -47,6 +47,45 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
+        /// Reproduces the Issue #44 mixed state: one named county unanalysed, the other analysed.
+        /// <para>Against the unfixed overload the plural sum silently keeps the analysed county's figure - a lower bound; the fixed overload answers -1 instead. The two scratch partitions are created and dropped around the read, so the fact is self-contained.</para>
+        /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database. That conf resolves to a development database, so these figures describe that database and not the deployed estate.</para>
+        /// </summary>
+        [Fact(Skip = "Executes an integration query. Point GIS_PostgreSQL_Main.conf at a database before running.")]
+        public async Task GetEstimatedCountAsync_MixedAnalysedState_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            OrtoDatasPostgreSQLConverter? ortoDatasPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<OrtoDatasPostgreSQLConverter>();
+            Assert.NotNull(ortoDatasPostgreSQLConverter);
+
+            const int countyId_Unanalysed = 99998;
+            const int countyId_Analysed = 99999;
+
+            await using NpgsqlConnection? npgsqlConnection = DiGi.PostgreSQL.Create.NpgsqlConnection(ortoDatasPostgreSQLConverter.ConnectionData);
+            Assert.NotNull(npgsqlConnection);
+            await npgsqlConnection.OpenAsync();
+
+            // Two scratch partitions: one created but never analysed (answers -1), one analysed and holding one row.
+            await new NpgsqlCommand("DROP TABLE IF EXISTS \"orto_datas_99998\"; DROP TABLE IF EXISTS \"orto_datas_99999\"; CREATE TABLE \"orto_datas_99998\" (x integer); CREATE TABLE \"orto_datas_99999\" (x integer); INSERT INTO \"orto_datas_99999\" VALUES (1); ANALYZE \"orto_datas_99999\";", npgsqlConnection).ExecuteNonQueryAsync();
+
+            try
+            {
+                long? count_Single = await ortoDatasPostgreSQLConverter.GetEstimatedCountAsync(countyId_Analysed);
+                Assert.NotNull(count_Single);
+                Assert.True(count_Single >= 1);
+
+                // Against the unfixed overload this fails with the analysed county's count (a lower bound); the fixed overload answers -1.
+                Assert.Equal(-1, await ortoDatasPostgreSQLConverter.GetEstimatedCountAsync([countyId_Unanalysed, countyId_Analysed]));
+            }
+            finally
+            {
+                await new NpgsqlCommand("DROP TABLE IF EXISTS \"orto_datas_99998\"; DROP TABLE IF EXISTS \"orto_datas_99999\";", npgsqlConnection).ExecuteNonQueryAsync();
+            }
+        }
+
+        /// <summary>
         /// Verifies that the batched read agrees with the per-county singular read for the same counties, including the counties that have no partition and the counties whose partition has never been analysed.
         /// <para>This is the fact that establishes the rewrite is behaviour-preserving: the endpoints divide one of these sums by another, so an estimate that moved would move a published coverage factor.</para>
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database. That conf resolves to a development database, so these figures describe that database and not the deployed estate.</para>
