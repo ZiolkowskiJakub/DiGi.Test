@@ -428,6 +428,12 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
   </Folder>
+  <Folder Name="/Serilog/">
+    <Project Path="../DiGi.Serilog/DiGi.Serilog/DiGi.Serilog.csproj" />
+    <Project Path="DiGi.Serilog.xUnit/DiGi.Serilog.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Serilog/DiGi.Serilog/DiGi.Serilog.csproj" />
+    </Project>
+  </Folder>
   <Folder Name="/SQLite/">
     <Project Path="../DiGi.SQLite/DiGi.SQLite/DiGi.SQLite.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
