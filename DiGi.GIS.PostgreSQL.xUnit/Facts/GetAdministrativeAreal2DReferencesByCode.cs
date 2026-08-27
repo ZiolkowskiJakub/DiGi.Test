@@ -34,7 +34,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, AdministrativeArealType?, System.Threading.CancellationToken)"/>
         /// retrieves child administrative areal references belonging to parents identified by the specified parent code.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>
@@ -64,6 +64,35 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             {
                 Assert.Equal(AdministrativeArealType.Municipality, administrativeAreal2DReference.AdministrativeArealType);
             }
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, AdministrativeArealType?, System.Threading.CancellationToken)"/>
+        /// filters parent entities by parent type when specified, preventing code collisions across levels (such as code 10 for country vs voivodeship).
+        /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
+        /// </summary>
+        [Fact(Skip = "Executes an integration query. Point GIS_PostgreSQL_Main.conf at a database before running.")]
+        public async Task GetAdministrativeAreal2DReferencesByParentCode_TypeFilter_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            AdministrativeAreal2DPostgreSQLConverter? administrativeAreal2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
+            Assert.NotNull(administrativeAreal2DPostgreSQLConverter);
+
+            List<AdministrativeAreal2DReference>? administrativeAreal2DReferences_Lodzkie = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync("10", AdministrativeArealType.County, AdministrativeArealType.Voivodeship);
+            Assert.NotNull(administrativeAreal2DReferences_Lodzkie);
+            Assert.NotEmpty(administrativeAreal2DReferences_Lodzkie);
+
+            foreach (AdministrativeAreal2DReference administrativeAreal2DReference in administrativeAreal2DReferences_Lodzkie)
+            {
+                Assert.Equal(AdministrativeArealType.County, administrativeAreal2DReference.AdministrativeArealType);
+            }
+
+            List<AdministrativeAreal2DReference>? administrativeAreal2DReferences_Poland = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync("10", AdministrativeArealType.County, AdministrativeArealType.Country);
+            Assert.NotNull(administrativeAreal2DReferences_Poland);
+            Assert.NotEmpty(administrativeAreal2DReferences_Poland);
+            Assert.True(administrativeAreal2DReferences_Poland.Count > administrativeAreal2DReferences_Lodzkie.Count);
         }
     }
 }
