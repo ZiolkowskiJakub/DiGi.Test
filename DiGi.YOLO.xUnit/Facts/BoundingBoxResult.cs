@@ -59,5 +59,38 @@ namespace DiGi.YOLO.xUnit
                 CultureInfo.CurrentCulture = cultureInfo;
             }
         }
+
+        /// <summary>
+        /// Verifies that <see cref="Classes.BoundingBoxResult.ToString()"/> includes confidence and invariant decimal formatting, and can be parsed back by <see cref="Create.BoundingBoxResult(string?)"/>.
+        /// </summary>
+        [Fact]
+        public void BoundingBoxResult_ToString()
+        {
+            Classes.BoundingBoxResult boundingBoxResult = new("0207_2021", 0, 12.5, 20.25, 40.5, 60.75, 0.93);
+            string formatted = boundingBoxResult.ToString();
+
+            Assert.Equal("0207_2021\t0\t12.5\t20.25\t40.5\t60.75\t0.93", formatted);
+
+            Classes.BoundingBoxResult? parsed = Create.BoundingBoxResult(formatted);
+            Assert.NotNull(parsed);
+            Assert.Equal(boundingBoxResult, parsed);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Classes.BoundingBoxResult.Equals(object?)"/> and <see cref="Classes.BoundingBoxResult.GetHashCode()"/> accurately evaluate member equality.
+        /// </summary>
+        [Fact]
+        public void BoundingBoxResult_Equals()
+        {
+            Classes.BoundingBoxResult result1 = new("box1", 1, 10.0, 20.0, 30.0, 40.0, 0.85);
+            Classes.BoundingBoxResult result2 = new("box1", 1, 10.0, 20.0, 30.0, 40.0, 0.85);
+            Classes.BoundingBoxResult resultDifferentConfidence = new("box1", 1, 10.0, 20.0, 30.0, 40.0, 0.95);
+            Classes.BoundingBoxResult resultDifferentName = new("box2", 1, 10.0, 20.0, 30.0, 40.0, 0.85);
+
+            Assert.Equal(result1, result2);
+            Assert.Equal(result1.GetHashCode(), result2.GetHashCode());
+            Assert.NotEqual(result1, resultDifferentConfidence);
+            Assert.NotEqual(result1, resultDifferentName);
+        }
     }
 }

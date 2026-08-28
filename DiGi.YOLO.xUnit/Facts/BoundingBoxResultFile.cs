@@ -44,5 +44,18 @@ namespace DiGi.YOLO.xUnit
 
             Assert.Null(Create.BoundingBoxResultFile(Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Test_" + Path.GetRandomFileName())));
         }
+
+        /// <summary>
+        /// Verifies that <see cref="Classes.BoundingBoxResultFile.ToString()"/> renders bounding box results from the collection rather than returning an empty string.
+        /// </summary>
+        [Fact]
+        public void BoundingBoxResultFile_ToString()
+        {
+            Classes.BoundingBoxResultFile file = [new Classes.BoundingBoxResult("img1", 0, 10.0, 20.0, 30.0, 40.0, 0.9)];
+            string? result = file.ToString();
+
+            Assert.False(string.IsNullOrWhiteSpace(result));
+            Assert.Contains("img1\t0\t10\t20\t30\t40\t0.9", result);
+        }
     }
 }
