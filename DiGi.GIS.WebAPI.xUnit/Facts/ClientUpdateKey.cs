@@ -64,7 +64,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         public void SerializableObjectsPostTask_Key_Propagation()
         {
             ServiceCollection serviceCollection = new();
-            serviceCollection.AddHttpClient(Constants.Name.Client);
+            serviceCollection.AddHttpClient(Constants.Name.Client.GIS);
             ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
             IHttpClientFactory httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
             GISWebAPIManager gISWebAPIManager = new(httpClientFactory);
