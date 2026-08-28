@@ -6,7 +6,8 @@ namespace DiGi.YOLO.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Modify.WriteScripts(string?)"/> copies all Python scripts and configuration files from output YOLO folder into the specified directory.
+        /// Verifies that <see cref="Modify.WriteScripts(string?)"/> writes all Python scripts and configuration files into the specified directory.
+        /// <para>Run from a test assembly there is no YOLO folder beside DiGi.YOLO.dll, so this exercises the embedded resource path - the one that has to work in a deployed host.</para>
         /// </summary>
         [Fact]
         public void WriteScripts()
@@ -43,8 +44,9 @@ namespace DiGi.YOLO.xUnit
                 Assert.Contains("isdigit()", utilsContent);
                 Assert.Contains("model.pt", utilsContent);
 
+                //The detector is frozen, so ultralytics is pinned to the version the checkpoint records as having written it
                 string requirementsContent = File.ReadAllText(requirementsPath);
-                Assert.Contains("ultralytics", requirementsContent);
+                Assert.Contains("ultralytics==8.3.130", requirementsContent);
                 Assert.Contains("torch", requirementsContent);
 
                 string confContent = File.ReadAllText(confPath);
