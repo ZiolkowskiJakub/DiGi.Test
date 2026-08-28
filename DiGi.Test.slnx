@@ -499,4 +499,14 @@
       <BuildDependency Project="../DiGi.Unit/DiGi.Unit/DiGi.Unit.csproj" />
     </Project>
   </Folder>
+  <Folder Name="/YOLO/">
+    <Project Path="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.YOLO.xUnit/DiGi.YOLO.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
+  </Folder>
 </Solution>
