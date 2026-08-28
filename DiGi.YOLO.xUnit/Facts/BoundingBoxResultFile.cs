@@ -33,6 +33,9 @@ namespace DiGi.YOLO.xUnit
                 Assert.Equal("0207_2021", boundingBoxResultFile[0].Name);
                 Assert.Equal(0, boundingBoxResultFile[0].LabelIndex);
                 Assert.Equal(1043.2799072265625, boundingBoxResultFile[0].X);
+                Assert.Equal(612.5626831054688, boundingBoxResultFile[0].Y);
+                Assert.Equal(97.753173828125, boundingBoxResultFile[0].Width);
+                Assert.Equal(99.9208374023437, boundingBoxResultFile[0].Height);
                 Assert.Equal(0.9153577089309692, boundingBoxResultFile[0].Confidence);
                 Assert.Equal(1, boundingBoxResultFile[1].LabelIndex);
                 Assert.Equal("0209_2021", boundingBoxResultFile[2].Name);
