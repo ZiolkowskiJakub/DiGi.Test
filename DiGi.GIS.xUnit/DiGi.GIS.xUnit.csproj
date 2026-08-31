@@ -45,6 +45,15 @@
     <Reference Include="DiGi.GIS.IO">
       <HintPath>..\..\DiGi.GIS.IO\bin\DiGi.GIS.IO.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.GIS.ML">
+      <HintPath>..\..\DiGi.GIS.ML\DiGi.GIS.ML\bin\Release\net10.0\DiGi.GIS.ML.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Unit">
+      <HintPath>..\..\DiGi.Unit\bin\DiGi.Unit.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Unit.IO">
+      <HintPath>..\..\DiGi.Unit\bin\DiGi.Unit.IO.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
