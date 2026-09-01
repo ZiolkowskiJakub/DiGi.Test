@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DiGi.GIS.YOLO.xUnit
+namespace DiGi.GIS.PostgreSQL.UI.xUnit
 {
     public partial class Facts
     {
@@ -36,7 +36,7 @@ namespace DiGi.GIS.YOLO.xUnit
         }
 
         /// <summary>
-        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync"/>) and file-based prediction image export (<see cref="UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
+        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync"/>) and file-based prediction image export (<see cref="DiGi.GIS.UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
@@ -69,7 +69,7 @@ namespace DiGi.GIS.YOLO.xUnit
             Directory.CreateDirectory(directory_UIExport);
 
             // 1. Export prediction images via DiGi.GIS.UI prediction export pipeline
-            bool result_UI = UI.Modify.WriteImages(ortoDatas, directory_UIExport);
+            bool result_UI = DiGi.GIS.UI.Modify.WriteImages(ortoDatas, directory_UIExport);
             Assert.True(result_UI);
 
             // 2. Export prediction images via DiGi.GIS.YOLO database export pipeline using stubbed WebAPI response

@@ -89,6 +89,10 @@
     <Reference Include="DiGi.GIS.PostgreSQL.UI">
       <HintPath>..\..\DiGi.GIS.PostgreSQL.UI\bin\DiGi.GIS.PostgreSQL.UI.dll</HintPath>
     </Reference>
+    <!-- Needed by ExportPredictionImages_ByteParity for DiGi.GIS.UI.Modify.WriteImages, the file-based export pipeline it compares against. -->
+    <Reference Include="DiGi.GIS.UI">
+      <HintPath>..\..\DiGi.GIS.UI\bin\DiGi.GIS.UI.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.GIS.WebAPI">
       <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
     </Reference>
