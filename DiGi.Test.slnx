@@ -229,6 +229,8 @@
     </Project>
     <Project Path="DiGi.GIS.WebAPI.xUnit/DiGi.GIS.WebAPI.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj" />
+      <BuildDependency Project="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj" />
       <BuildDependency Project="../DiGi.WebAPI/DiGi.WebAPI/DiGi.WebAPI.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
@@ -236,15 +238,20 @@
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
-    <Project Path="../DiGi.BDL/DiGi.BDL/DiGi.BDL.csproj" />
+    <Project Path="../DiGi.BDL/DiGi.BDL/DiGi.BDL.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
     <Project Path="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj">
       <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
     </Project>
     <Project Path="../DiGi.BDOT10k/DiGi.BDOT10k.Geometry/DiGi.BDOT10k.Geometry.csproj">
       <BuildDependency Project="../DiGi.BDOT10k/DiGi.BDOT10k/DiGi.BDOT10k.csproj" />
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry.Visual/DiGi.Geometry.Visual/DiGi.Geometry.Visual.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
       <BuildDependency Project="../DiGi.GML/DiGi.GML/DiGi.GML.csproj" />
+      <BuildDependency Project="../DiGi.Math/DiGi.Math/DiGi.Math.csproj" />
     </Project>
     <Project Path="DiGi.BDOT10k.Geometry.xUnit/DiGi.BDOT10k.Geometry.xUnit.csproj">
       <BuildDependency Project="../DiGi.BDOT10k/DiGi.BDOT10k.Geometry/DiGi.BDOT10k.Geometry.csproj" />
@@ -502,8 +509,17 @@
     </Project>
   </Folder>
   <Folder Name="/YOLO/">
-    <Project Path="../DiGi.GIS.YOLO/DiGi.GIS.YOLO/DiGi.GIS.YOLO.csproj" />
+    <Project Path="../DiGi.GIS.YOLO/DiGi.GIS.YOLO/DiGi.GIS.YOLO.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.CityGML/DiGi.CityGML/DiGi.CityGML.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj" />
+      <BuildDependency Project="../DiGi.GIS.IO/DiGi.GIS.IO/DiGi.GIS.IO.csproj" />
+      <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
+    </Project>
     <Project Path="DiGi.GIS.YOLO.xUnit/DiGi.GIS.YOLO.xUnit.csproj">
+      <BuildDependency Project="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj" />
       <BuildDependency Project="../DiGi.GIS.YOLO/DiGi.GIS.YOLO/DiGi.GIS.YOLO.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
@@ -515,9 +531,10 @@
       <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
-    <Project Path="../DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI.csproj" />
     <Project Path="DiGi.GIS.YOLO.UI.xUnit/DiGi.GIS.YOLO.UI.xUnit.csproj">
-      <BuildDependency Project="../DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI.csproj" />
+      <BuildDependency Project="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj" />
+      <BuildDependency Project="../DiGi.GIS.YOLO/DiGi.GIS.YOLO/DiGi.GIS.YOLO.csproj" />
+      <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
   </Folder>
