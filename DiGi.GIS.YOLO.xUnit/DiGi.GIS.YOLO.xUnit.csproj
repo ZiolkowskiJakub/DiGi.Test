@@ -69,6 +69,9 @@
     <Reference Include="DiGi.WebAPI">
       <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.YOLO">
+      <HintPath>..\..\DiGi.YOLO\bin\DiGi.YOLO.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
