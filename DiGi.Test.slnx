@@ -365,6 +365,8 @@
     </Project>
     <Project Path="DiGi.GIS.PostgreSQL.UI.xUnit/DiGi.GIS.PostgreSQL.UI.xUnit.csproj">
       <BuildDependency Project="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj" />
+      <BuildDependency Project="../DiGi.GIS.YOLO/DiGi.GIS.YOLO/DiGi.GIS.YOLO.csproj" />
+      <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
     <Project Path="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj">

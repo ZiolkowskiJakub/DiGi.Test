@@ -96,6 +96,12 @@
     <Reference Include="DiGi.GIS.WebAPI">
       <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.GIS.YOLO">
+      <HintPath>..\..\DiGi.GIS.YOLO\bin\DiGi.GIS.YOLO.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.YOLO">
+      <HintPath>..\..\DiGi.YOLO\bin\DiGi.YOLO.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.PostgreSQL">
       <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.dll</HintPath>
     </Reference>
