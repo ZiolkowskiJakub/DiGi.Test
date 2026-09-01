@@ -76,5 +76,31 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             string? key = Query.Key("non_existent_config.conf");
             Assert.Null(key);
         }
+
+        /// <summary>
+        /// Tests that <see cref="Query.ModelPath(string?)"/> returns null when given null or empty path, and returns a resolved path for existing weights.
+        /// </summary>
+        [Fact]
+        public void ConsoleApp_QueryModelPath_ResolvesExpectedly()
+        {
+            Assert.Null(Query.ModelPath(null));
+            Assert.Null(Query.ModelPath("   "));
+
+            string tempFile = Path.Combine(Path.GetTempPath(), $"model_{System.Guid.NewGuid()}.pt");
+            try
+            {
+                File.WriteAllText(tempFile, "fake-weights");
+                string? resolved = Query.ModelPath(tempFile);
+                Assert.NotNull(resolved);
+                Assert.True(File.Exists(resolved));
+            }
+            finally
+            {
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+            }
+        }
     }
 }
