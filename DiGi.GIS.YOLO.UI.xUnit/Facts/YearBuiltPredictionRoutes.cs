@@ -1,6 +1,6 @@
 using DiGi.GIS.WebAPI.Classes;
 
-namespace DiGi.GIS.PostgreSQL.UI.xUnit
+namespace DiGi.GIS.YOLO.UI.xUnit
 {
     public partial class Facts
     {

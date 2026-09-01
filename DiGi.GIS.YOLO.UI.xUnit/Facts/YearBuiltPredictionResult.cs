@@ -1,8 +1,8 @@
-using DiGi.GIS.PostgreSQL.UI.Classes;
+using DiGi.GIS.YOLO.UI.Classes;
 using System;
 using System.Linq;
 
-namespace DiGi.GIS.PostgreSQL.UI.xUnit
+namespace DiGi.GIS.YOLO.UI.xUnit
 {
     public partial class Facts
     {

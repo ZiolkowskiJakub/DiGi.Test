@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DiGi.GIS.PostgreSQL.UI.xUnit
+namespace DiGi.GIS.YOLO.UI.xUnit
 {
     public partial class Facts
     {

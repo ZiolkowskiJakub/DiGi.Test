@@ -515,5 +515,10 @@
       <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
+    <Project Path="../DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI.csproj" />
+    <Project Path="DiGi.GIS.YOLO.UI.xUnit/DiGi.GIS.YOLO.UI.xUnit.csproj">
+      <BuildDependency Project="../DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI/DiGi.GIS.YOLO.UI.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
   </Folder>
 </Solution>

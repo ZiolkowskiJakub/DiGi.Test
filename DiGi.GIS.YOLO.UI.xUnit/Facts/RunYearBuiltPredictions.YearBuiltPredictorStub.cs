@@ -1,7 +1,7 @@
 using DiGi.Core.IO.Table.Classes;
 using DiGi.GIS.IO.Interfaces;
 
-namespace DiGi.GIS.PostgreSQL.UI.xUnit
+namespace DiGi.GIS.YOLO.UI.xUnit
 {
     public partial class Facts
     {

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DiGi.GIS.PostgreSQL.UI.xUnit
+namespace DiGi.GIS.YOLO.UI.xUnit
 {
     public partial class Facts
     {

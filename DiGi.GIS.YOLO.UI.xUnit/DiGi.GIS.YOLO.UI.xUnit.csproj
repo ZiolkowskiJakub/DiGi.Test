@@ -1,0 +1,116 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+
+    <LangVersion>latest</LangVersion>
+    <OutputPath>..\bin\$(MSBuildProjectName)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <PackageReference Include="Npgsql" Version="10.0.2" />
+    <PackageReference Include="ProjNET4GeoAPI" Version="1.4.1" />
+    <PackageReference Include="QuikGraph" Version="2.5.0" />
+    
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiGi.Analytical">
+      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Analytical.Building">
+      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.CityGML">
+      <HintPath>..\..\DiGi.CityGML\bin\DiGi.CityGML.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Core">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Core.IO">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.EPW">
+      <HintPath>..\..\DiGi.EPW\bin\DiGi.EPW.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Geometry">
+      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS">
+      <HintPath>..\..\DiGi.GIS\bin\DiGi.GIS.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.IO">
+      <HintPath>..\..\DiGi.GIS.IO\bin\DiGi.GIS.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.ML">
+      <HintPath>..\..\DiGi.GIS.ML\DiGi.GIS.ML\bin\Release\net10.0\DiGi.GIS.ML.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.PostgreSQL">
+      <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.GIS.PostgreSQL.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.UI">
+      <HintPath>..\..\DiGi.GIS.UI\bin\DiGi.GIS.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.WebAPI">
+      <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.YOLO">
+      <HintPath>..\..\DiGi.GIS.YOLO\bin\DiGi.GIS.YOLO.dll</HintPath>
+    </Reference>
+        <Reference Include="DiGi.GIS.YOLO.UI.ConsoleApp">
+      <HintPath>..\..\DiGi.GIS.YOLO.UI\bin\DiGi.GIS.YOLO.UI.ConsoleApp.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.YOLO.UI">
+      <HintPath>..\..\DiGi.GIS.YOLO.UI\bin\DiGi.GIS.YOLO.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.PostgreSQL.Table">
+      <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.PostgreSQL.Table.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Serilog">
+      <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.WebAPI">
+      <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.YOLO">
+      <HintPath>..\..\DiGi.YOLO\bin\DiGi.YOLO.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
+
