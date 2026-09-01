@@ -9,30 +9,34 @@ namespace DiGi.GIS.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that YearBuiltPredictionColumns never includes PredictedYearBuilt or its unique identifier, preventing target leakage.
+        /// Verifies that YearBuiltPredictionInputColumns never includes any column from YearBuiltPredictionOutputColumns or their unique identifiers, preventing target leakage.
         /// </summary>
         [Fact]
         public void YearBuiltPredictionColumns_Disjointness()
         {
-            List<Column> columns = ML.Query.YearBuiltPredictionColumns();
-            Assert.NotNull(columns);
-            Assert.NotEmpty(columns);
+            List<Column> inputColumns = GIS.IO.Query.YearBuiltPredictionInputColumns();
+            Assert.NotNull(inputColumns);
+            Assert.NotEmpty(inputColumns);
 
-            Column outputColumn = GIS.IO.Constants.Column.PredictedYearBuilt;
-            Assert.NotNull(outputColumn);
+            List<Column> outputColumns = GIS.IO.Query.YearBuiltPredictionOutputColumns();
+            Assert.NotNull(outputColumns);
+            Assert.NotEmpty(outputColumns);
 
-            Assert.DoesNotContain(outputColumn, columns);
-            Assert.DoesNotContain(columns, c => c.Name == outputColumn.Name);
-            Assert.DoesNotContain(columns, c => c.UniqueId() == outputColumn.UniqueId());
+            foreach (Column outputColumn in outputColumns)
+            {
+                Assert.DoesNotContain(outputColumn, inputColumns);
+                Assert.DoesNotContain(inputColumns, c => c.Name == outputColumn.Name);
+                Assert.DoesNotContain(inputColumns, c => c.UniqueId() == outputColumn.UniqueId());
+            }
         }
 
         /// <summary>
-        /// Verifies that YearBuiltPredictionColumns includes all expected geometric, administrative, grid cell, and detection features.
+        /// Verifies that YearBuiltPredictionInputColumns includes all expected geometric, administrative, grid cell, and detection features.
         /// </summary>
         [Fact]
         public void YearBuiltPredictionColumns_Completeness()
         {
-            List<Column> columns = ML.Query.YearBuiltPredictionColumns();
+            List<Column> columns = GIS.IO.Query.YearBuiltPredictionInputColumns();
             Assert.NotNull(columns);
 
             // 31 core features + 25 grid cells + (18 years * 5 detections) + 18 population = 164 columns
@@ -65,12 +69,12 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
-        /// Verifies that all columns returned by YearBuiltPredictionColumns have valid and distinct unique identifiers.
+        /// Verifies that all columns returned by YearBuiltPredictionInputColumns have valid and distinct unique identifiers.
         /// </summary>
         [Fact]
         public void YearBuiltPredictionColumns_UniqueIds()
         {
-            List<Column> columns = ML.Query.YearBuiltPredictionColumns();
+            List<Column> columns = GIS.IO.Query.YearBuiltPredictionInputColumns();
             Assert.NotNull(columns);
 
             HashSet<string> uniqueIds = [];
