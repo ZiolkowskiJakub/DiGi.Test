@@ -1,3 +1,4 @@
+using DiGi.Core.IO.Table.Classes;
 using DiGi.GIS.WebAPI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -40,6 +41,21 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.YearBuiltData("reference")), [1]));
+
+                BuildingDataController buildingDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Table table = new();
+                Column? column_Reference = table.AddColumn("Reference", typeof(string));
+                Column? column_CountyId = table.AddColumn("County Id", typeof(int));
+                Row? row = table.AddRow();
+                if (row is not null && column_Reference is not null && column_CountyId is not null)
+                {
+                    row[column_Reference.Index] = "reference";
+                    row[column_CountyId.Index] = 1;
+                }
+                string? json = Core.IO.Table.Convert.ToSystem_String<Table, Column, Row>(table);
+                Assert.NotNull(json);
+                JsonObject? jsonObject = JsonNode.Parse(json) as JsonObject;
+                AssertInternalServerError(await buildingDataController.UpdateItemsByCountyIdsAsync(jsonObject, [1]));
             }
             finally
             {
@@ -78,6 +94,10 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
+
+                BuildingDataController buildingDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
+                Assert.IsType<NoContentResult>(await buildingDataController.UpdateItemsByCountyIdsAsync(null, [1]));
+                Assert.IsType<NoContentResult>(await buildingDataController.UpdateItemsByCountyIdsAsync(new JsonObject(), [1]));
             }
             finally
             {
@@ -108,6 +128,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 $"{nameof(GISWebAPIConfigurationFileWatcher.Open)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateAdministrativeAreal2D)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateBuilding2D)}=true",
+                $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateBuildingData)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateEPWFile)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateOrtoDatas)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateYearBuiltData)}=true",
