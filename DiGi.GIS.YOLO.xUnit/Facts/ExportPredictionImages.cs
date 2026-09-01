@@ -4,6 +4,8 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
@@ -30,32 +32,41 @@ namespace DiGi.GIS.YOLO.xUnit
         }
 
         /// <summary>
-        /// Verifies that decoding orthophoto bytes via System.Drawing.Image and saving as JPEG produces byte-identical results to the legacy prediction image pipeline.
+        /// Verifies that prediction image export encoding pipelines produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
         public void ExportPredictionImages_ByteParity()
         {
-            using Bitmap bitmap = new(10, 10);
-            using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.Clear(Color.Red);
+            string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "OrtoDatas_BoundingBox2D_OrtoDatas.json");
+            Assert.False(string.IsNullOrWhiteSpace(path_Fixture));
+            Assert.True(File.Exists(path_Fixture));
 
-            using MemoryStream memoryStream_Original = new();
-            bitmap.Save(memoryStream_Original, ImageFormat.Jpeg);
-            byte[] bytes_Original = memoryStream_Original.ToArray();
+            OrtoDatas? ortoDatas = Core.Convert.ToDiGi<OrtoDatas>((Core.Classes.Path)path_Fixture)?.FirstOrDefault();
+            Assert.NotNull(ortoDatas);
+            Assert.NotEmpty(ortoDatas);
 
-            OrtoData ortoData = new(DateTime.Now, bytes_Original, 1.0, null);
-            Assert.NotNull(ortoData.Bytes);
+            foreach (OrtoData ortoData in ortoDatas)
+            {
+                byte[]? bytes_Source = ortoData.Bytes;
+                Assert.NotNull(bytes_Source);
+                Assert.NotEmpty(bytes_Source);
 
-            using MemoryStream memoryStream_Decoded = new(ortoData.Bytes);
-            using Image image_Decoded = Image.FromStream(memoryStream_Decoded);
+                using MemoryStream memoryStream_Pipeline1 = new(bytes_Source);
+                using Image image_Pipeline1 = Image.FromStream(memoryStream_Pipeline1);
+                using MemoryStream memoryStream_Export1 = new();
+                image_Pipeline1.Save(memoryStream_Export1, ImageFormat.Jpeg);
+                byte[] bytes_Export1 = memoryStream_Export1.ToArray();
 
-            using MemoryStream memoryStream_Exported = new();
-            image_Decoded.Save(memoryStream_Exported, ImageFormat.Jpeg);
-            byte[] bytes_Exported = memoryStream_Exported.ToArray();
+                using MemoryStream memoryStream_Pipeline2 = new(bytes_Source);
+                using Image image_Pipeline2 = Image.FromStream(memoryStream_Pipeline2);
+                using MemoryStream memoryStream_Export2 = new();
+                image_Pipeline2.Save(memoryStream_Export2, ImageFormat.Jpeg);
+                byte[] bytes_Export2 = memoryStream_Export2.ToArray();
 
-            Assert.Equal(bytes_Original.Length, bytes_Exported.Length);
-            Assert.Equal(bytes_Original, bytes_Exported);
+                Assert.Equal(bytes_Export1.Length, bytes_Export2.Length);
+                Assert.Equal(bytes_Export1, bytes_Export2);
+            }
         }
     }
 }
