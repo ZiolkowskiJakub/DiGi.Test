@@ -1,12 +1,16 @@
 using DiGi.GIS.Classes;
+using DiGi.GIS.PostgreSQL.Classes;
 using DiGi.GIS.WebAPI.Classes;
+using DiGi.WebAPI.Classes;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiGi.GIS.YOLO.xUnit
@@ -32,40 +36,116 @@ namespace DiGi.GIS.YOLO.xUnit
         }
 
         /// <summary>
-        /// Verifies that prediction image export encoding pipelines produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
+        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync"/>) and file-based prediction image export (<see cref="UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
-        public void ExportPredictionImages_ByteParity()
+        public async Task ExportPredictionImages_ByteParity()
         {
             string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "OrtoDatas_BoundingBox2D_OrtoDatas.json");
             Assert.False(string.IsNullOrWhiteSpace(path_Fixture));
             Assert.True(File.Exists(path_Fixture));
 
-            OrtoDatas? ortoDatas = Core.Convert.ToDiGi<OrtoDatas>((Core.Classes.Path)path_Fixture)?.FirstOrDefault();
+            DiGi.GIS.Classes.OrtoDatas? ortoDatas = Core.Convert.ToDiGi<DiGi.GIS.Classes.OrtoDatas>((Core.Classes.Path)path_Fixture!)?.FirstOrDefault();
             Assert.NotNull(ortoDatas);
             Assert.NotEmpty(ortoDatas);
 
-            foreach (OrtoData ortoData in ortoDatas)
+            string? path_ReportsDir = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            Assert.False(string.IsNullOrWhiteSpace(path_ReportsDir));
+
+            string directory_YoloExport = Path.Combine(path_ReportsDir!, "ByteParity_YOLO");
+            string directory_UIExport = Path.Combine(path_ReportsDir!, "ByteParity_UI");
+
+            if (Directory.Exists(directory_YoloExport))
             {
-                byte[]? bytes_Source = ortoData.Bytes;
-                Assert.NotNull(bytes_Source);
-                Assert.NotEmpty(bytes_Source);
+                Directory.Delete(directory_YoloExport, true);
+            }
+            if (Directory.Exists(directory_UIExport))
+            {
+                Directory.Delete(directory_UIExport, true);
+            }
 
-                using MemoryStream memoryStream_Pipeline1 = new(bytes_Source);
-                using Image image_Pipeline1 = Image.FromStream(memoryStream_Pipeline1);
-                using MemoryStream memoryStream_Export1 = new();
-                image_Pipeline1.Save(memoryStream_Export1, ImageFormat.Jpeg);
-                byte[] bytes_Export1 = memoryStream_Export1.ToArray();
+            Directory.CreateDirectory(directory_YoloExport);
+            Directory.CreateDirectory(directory_UIExport);
 
-                using MemoryStream memoryStream_Pipeline2 = new(bytes_Source);
-                using Image image_Pipeline2 = Image.FromStream(memoryStream_Pipeline2);
-                using MemoryStream memoryStream_Export2 = new();
-                image_Pipeline2.Save(memoryStream_Export2, ImageFormat.Jpeg);
-                byte[] bytes_Export2 = memoryStream_Export2.ToArray();
+            // 1. Export prediction images via DiGi.GIS.UI prediction export pipeline
+            bool result_UI = UI.Modify.WriteImages(ortoDatas, directory_UIExport);
+            Assert.True(result_UI);
 
-                Assert.Equal(bytes_Export1.Length, bytes_Export2.Length);
-                Assert.Equal(bytes_Export1, bytes_Export2);
+            // 2. Export prediction images via DiGi.GIS.YOLO database export pipeline using stubbed WebAPI response
+            string json_References = Core.Convert.ToSystem_String(
+                new List<OrtoDatasReference> { new OrtoDatasReference { Reference = ortoDatas.Reference, CountyId = 1 } }) ?? string.Empty;
+
+            string json_Item = Core.Convert.ToSystem_String((DiGi.Core.Interfaces.ISerializableObject)ortoDatas) ?? string.Empty;
+            StubHttpClientFactory stubHttpClientFactory = new((request) =>
+            {
+                string requestUrl = request.RequestUri?.ToString() ?? string.Empty;
+                string responseJson = requestUrl.Contains("itembyreference", StringComparison.OrdinalIgnoreCase)
+                    ? json_Item
+                    : json_References;
+
+                return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                {
+                    Content = new StringContent(responseJson, System.Text.Encoding.UTF8, "application/json")
+                };
+            });
+
+            GISWebAPIManager gisWebAPIManager = new(stubHttpClientFactory);
+            bool result_YOLO = await gisWebAPIManager.ExportPredictionImagesAsync(1, directory_YoloExport, resume: false);
+            Assert.True(result_YOLO);
+
+            // 3. Compare exported JPEG files byte-for-byte across both pipelines
+            string[] files_Yolo = Directory.GetFiles(directory_YoloExport, "*.jpeg");
+            string[] files_UI = Directory.GetFiles(directory_UIExport, "*.jpeg");
+
+            Assert.NotEmpty(files_Yolo);
+            Assert.Equal(files_Yolo.Length, files_UI.Length);
+
+            foreach (string file_Yolo in files_Yolo)
+            {
+                string fileName = Path.GetFileName(file_Yolo);
+                string file_UI = Path.Combine(directory_UIExport, fileName);
+
+                Assert.True(File.Exists(file_UI), $"Corresponding UI export file missing: {fileName}");
+
+                byte[] bytes_Yolo = File.ReadAllBytes(file_Yolo);
+                byte[] bytes_UI = File.ReadAllBytes(file_UI);
+
+                Assert.Equal(bytes_Yolo.Length, bytes_UI.Length);
+                Assert.Equal(bytes_Yolo, bytes_UI);
+            }
+        }
+
+        private class StubHttpClientFactory : IHttpClientFactory
+        {
+            private readonly Func<HttpRequestMessage, HttpResponseMessage> handler;
+
+            public StubHttpClientFactory(Func<HttpRequestMessage, HttpResponseMessage> handler)
+            {
+                this.handler = handler;
+            }
+
+            public HttpClient CreateClient(string name)
+            {
+                return new HttpClient(new StubHttpMessageHandler(handler))
+                {
+                    BaseAddress = new Uri("http://localhost/")
+                };
+            }
+        }
+
+        private class StubHttpMessageHandler : HttpMessageHandler
+        {
+            private readonly Func<HttpRequestMessage, HttpResponseMessage> handler;
+
+            public StubHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler)
+            {
+                this.handler = handler;
+            }
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                return Task.FromResult(handler(request));
             }
         }
     }

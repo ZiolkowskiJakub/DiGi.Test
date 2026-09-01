@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
 
     <LangVersion>latest</LangVersion>
     <OutputPath>..\bin\$(MSBuildProjectName)\</OutputPath>
@@ -21,7 +22,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
-    <PackageReference Include="System.Drawing.Common" Version="10.0.5" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -68,6 +68,9 @@
     </Reference>
     <Reference Include="DiGi.WebAPI">
       <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.UI">
+      <HintPath>..\..\DiGi.GIS.UI\bin\DiGi.GIS.UI.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.YOLO">
       <HintPath>..\..\DiGi.YOLO\bin\DiGi.YOLO.dll</HintPath>
