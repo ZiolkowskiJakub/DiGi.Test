@@ -30,6 +30,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             List<double>? radiuses = postgreSQLBuildingDataUpdateOptions.Radiuses;
             Assert.NotNull(radiuses);
             Assert.Equal<double>([200, 400, 600, 1000], radiuses);
+
+            Assert.NotNull(postgreSQLBuildingDataUpdateOptions.Years);
+            Assert.Equal(2008, postgreSQLBuildingDataUpdateOptions.Years.Min);
+            Assert.Equal(2025, postgreSQLBuildingDataUpdateOptions.Years.Max);
         }
 
         /// <summary>
@@ -41,10 +45,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         {
             PostgreSQLBuildingDataUpdateOptions postgreSQLBuildingDataUpdateOptions = new()
             {
-                BuildingDataUpdateTypes = [BuildingDataUpdateType.Occupancy, BuildingDataUpdateType.RadialRatios],
+                BuildingDataUpdateTypes = [BuildingDataUpdateType.Occupancy, BuildingDataUpdateType.RadialRatios, BuildingDataUpdateType.Statistical],
                 CommandTimeout = 120,
                 CountyIds = [55417, 56029, 53477],
-                Radiuses = [50, 150]
+                Radiuses = [50, 150],
+                Years = new(2010, 2020)
             };
 
             string? text = Core.Convert.ToSystem_String(postgreSQLBuildingDataUpdateOptions);
@@ -57,9 +62,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             HashSet<BuildingDataUpdateType>? buildingDataUpdateTypes = postgreSQLBuildingDataUpdateOptions_Parsed.BuildingDataUpdateTypes;
             Assert.NotNull(buildingDataUpdateTypes);
-            Assert.Equal(2, buildingDataUpdateTypes.Count);
+            Assert.Equal(3, buildingDataUpdateTypes.Count);
             Assert.Contains(BuildingDataUpdateType.Occupancy, buildingDataUpdateTypes);
             Assert.Contains(BuildingDataUpdateType.RadialRatios, buildingDataUpdateTypes);
+            Assert.Contains(BuildingDataUpdateType.Statistical, buildingDataUpdateTypes);
             Assert.DoesNotContain(BuildingDataUpdateType.General, buildingDataUpdateTypes);
 
             HashSet<int>? countyIds = postgreSQLBuildingDataUpdateOptions_Parsed.CountyIds;
@@ -72,13 +78,21 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(postgreSQLBuildingDataUpdateOptions_Parsed.Radiuses);
             Assert.Equal<double>([50, 150], postgreSQLBuildingDataUpdateOptions_Parsed.Radiuses);
 
+            Assert.NotNull(postgreSQLBuildingDataUpdateOptions_Parsed.Years);
+            Assert.Equal(2010, postgreSQLBuildingDataUpdateOptions_Parsed.Years.Min);
+            Assert.Equal(2020, postgreSQLBuildingDataUpdateOptions_Parsed.Years.Max);
+
             PostgreSQLBuildingDataUpdateOptions postgreSQLBuildingDataUpdateOptions_Clone = new(postgreSQLBuildingDataUpdateOptions);
 
             Assert.Equal(120, postgreSQLBuildingDataUpdateOptions_Clone.CommandTimeout);
 
             // The clone has to hold its own collections, or editing one set of options would rewrite the other.
             Assert.NotNull(postgreSQLBuildingDataUpdateOptions_Clone.BuildingDataUpdateTypes);
-            Assert.Equal(2, postgreSQLBuildingDataUpdateOptions_Clone.BuildingDataUpdateTypes.Count);
+            Assert.Equal(3, postgreSQLBuildingDataUpdateOptions_Clone.BuildingDataUpdateTypes.Count);
+            Assert.Contains(BuildingDataUpdateType.Statistical, postgreSQLBuildingDataUpdateOptions_Clone.BuildingDataUpdateTypes);
+            Assert.NotNull(postgreSQLBuildingDataUpdateOptions_Clone.Years);
+            Assert.Equal(2010, postgreSQLBuildingDataUpdateOptions_Clone.Years.Min);
+            Assert.Equal(2020, postgreSQLBuildingDataUpdateOptions_Clone.Years.Max);
             Assert.NotSame(postgreSQLBuildingDataUpdateOptions.BuildingDataUpdateTypes, postgreSQLBuildingDataUpdateOptions_Clone.BuildingDataUpdateTypes);
 
             Assert.NotNull(postgreSQLBuildingDataUpdateOptions_Clone.CountyIds);

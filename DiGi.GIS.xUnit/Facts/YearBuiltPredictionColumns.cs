@@ -35,8 +35,8 @@ namespace DiGi.GIS.xUnit
             List<Column> columns = ML.Query.YearBuiltPredictionColumns();
             Assert.NotNull(columns);
 
-            // 31 core features + 25 grid cells + (18 years * 5 detections) = 146 columns
-            Assert.Equal(146, columns.Count);
+            // 31 core features + 25 grid cells + (18 years * 5 detections) + 18 population = 164 columns
+            Assert.Equal(164, columns.Count);
 
             Assert.Contains(columns, c => c.Name == "Floor area");
             Assert.Contains(columns, c => c.Name == "Total area");
@@ -58,6 +58,10 @@ namespace DiGi.GIS.xUnit
             Assert.Contains(columns, c => c.Name == "Prediction Confidence 2008");
             Assert.Contains(columns, c => c.Name == "Prediction Confidence 2025");
             Assert.Contains(columns, c => c.Name == "Prediction BoundingBox Height 2025");
+
+            // Population 2008..2025
+            Assert.Contains(columns, c => c.Name == "Population 2008");
+            Assert.Contains(columns, c => c.Name == "Population 2025");
         }
 
         /// <summary>
