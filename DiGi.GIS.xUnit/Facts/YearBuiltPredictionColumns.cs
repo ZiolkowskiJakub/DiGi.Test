@@ -60,8 +60,8 @@ namespace DiGi.GIS.xUnit
             Assert.Contains(columns, c => c.Name == "Prediction BoundingBox Height 2025");
 
             // Population 2008..2025
-            Assert.Contains(columns, c => c.Name == "Population 2008");
-            Assert.Contains(columns, c => c.Name == "Population 2025");
+            Assert.Contains(columns, c => c.Name == "Municipality population 2008");
+            Assert.Contains(columns, c => c.Name == "Municipality population 2025");
         }
 
         /// <summary>

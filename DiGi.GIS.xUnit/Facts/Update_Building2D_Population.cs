@@ -36,9 +36,9 @@ namespace DiGi.GIS.xUnit
 
             Column? column_Reference = table.Columns?.FirstOrDefault(c => c.Name == GIS.IO.Constants.Column.Reference.Name);
             Column? column_CountyId = table.Columns?.FirstOrDefault(c => c.Name == GIS.IO.Constants.Column.CountyId.Name);
-            Column? column_Pop2020 = table.Columns?.FirstOrDefault(c => c.Name == "Population 2020");
-            Column? column_Pop2021 = table.Columns?.FirstOrDefault(c => c.Name == "Population 2021");
-            Column? column_Pop2022 = table.Columns?.FirstOrDefault(c => c.Name == "Population 2022");
+            Column? column_Pop2020 = table.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2020");
+            Column? column_Pop2021 = table.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2021");
+            Column? column_Pop2022 = table.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2022");
 
             Assert.NotNull(column_Reference);
             Assert.NotNull(column_CountyId);
@@ -70,7 +70,7 @@ namespace DiGi.GIS.xUnit
             Row? row_Coll = table_Collection.GetRow(0);
             Assert.NotNull(row_Coll);
 
-            Column? column_CollPop2020 = table_Collection.Columns?.FirstOrDefault(c => c.Name == "Population 2020");
+            Column? column_CollPop2020 = table_Collection.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2020");
             Assert.NotNull(column_CollPop2020);
             Assert.True(row_Coll.TryGetValue(column_CollPop2020.Index, out int collPop2020));
             Assert.Equal(15000, collPop2020);
