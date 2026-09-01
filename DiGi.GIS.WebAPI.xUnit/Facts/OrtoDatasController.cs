@@ -50,6 +50,12 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByBuilding2DReferencesAsync([]));
                 Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByCountyIdAsync(0));
                 Assert.IsType<BadRequestResult>(await controller.GetOrtoDatasReferencesByCountyIdAsync(-1));
+
+                // Estimated coverage endpoints validation
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorAsync(0));
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorAsync(-1));
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorsAsync(null!, null));
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorsAsync([], null));
             }
             finally
             {
@@ -81,11 +87,22 @@ namespace DiGi.GIS.WebAPI.xUnit
                 // The claim is the one endpoint whose DDL can need a real timeout, so the parameter must exist
                 // and must be accepted. Pre-fix this line does not compile - the signature is the defect.
                 Assert.IsNotType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(1, 1, 600));
+
+                Assert.Equal(500, Constants.OrtoDatas.MaximumCoverageCountyCount);
             }
             finally
             {
                 System.IO.File.Delete(path);
             }
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Constants.OrtoDatas.MaximumCoverageCountyCount"/> is set to 500 to allow nation-wide coverage queries.
+        /// </summary>
+        [Fact]
+        public void OrtoDatas_MaximumCoverageCountyCount_IsFiveHundred()
+        {
+            Assert.Equal(500, Constants.OrtoDatas.MaximumCoverageCountyCount);
         }
     }
 }
