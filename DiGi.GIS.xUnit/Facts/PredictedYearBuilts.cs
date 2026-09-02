@@ -130,14 +130,14 @@ namespace DiGi.GIS.xUnit
         {
             List<Column> columns = YearBuiltPredictor.InputColumns();
             Assert.NotNull(columns);
-            Assert.Equal(164, columns.Count);
+            Assert.Equal(172, columns.Count);
 
             List<string> uniqueIds = YearBuiltPredictor.InputColumnUniqueIds();
             Assert.NotNull(uniqueIds);
-            Assert.Equal(164, uniqueIds.Count);
+            Assert.Equal(172, uniqueIds.Count);
 
             HashSet<string> set_UniqueIds = [.. uniqueIds];
-            Assert.Equal(164, set_UniqueIds.Count);
+            Assert.Equal(172, set_UniqueIds.Count);
         }
     }
 }

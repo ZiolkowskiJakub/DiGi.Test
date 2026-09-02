@@ -39,8 +39,8 @@ namespace DiGi.GIS.xUnit
             List<Column> columns = GIS.IO.Query.YearBuiltPredictionInputColumns();
             Assert.NotNull(columns);
 
-            // 31 core features + 25 grid cells + (18 years * 5 detections) + 18 population = 164 columns
-            Assert.Equal(164, columns.Count);
+            // 31 core features + 25 grid cells + (18 years * 5 detections) + 18 population + 8 radial ratios = 172 columns
+            Assert.Equal(172, columns.Count);
 
             Assert.Contains(columns, c => c.Name == "Floor area");
             Assert.Contains(columns, c => c.Name == "Total area");
@@ -66,6 +66,16 @@ namespace DiGi.GIS.xUnit
             // Population 2008..2025
             Assert.Contains(columns, c => c.Name == "Municipality population 2008");
             Assert.Contains(columns, c => c.Name == "Municipality population 2025");
+
+            // Radial ratios
+            Assert.Contains(columns, c => c.Name == "Radial Building Coverage Ratio 200m");
+            Assert.Contains(columns, c => c.Name == "Radial Building Coverage Ratio 400m");
+            Assert.Contains(columns, c => c.Name == "Radial Building Coverage Ratio 600m");
+            Assert.Contains(columns, c => c.Name == "Radial Building Coverage Ratio 1000m");
+            Assert.Contains(columns, c => c.Name == "Radial Floor Area Ratio 200m");
+            Assert.Contains(columns, c => c.Name == "Radial Floor Area Ratio 400m");
+            Assert.Contains(columns, c => c.Name == "Radial Floor Area Ratio 600m");
+            Assert.Contains(columns, c => c.Name == "Radial Floor Area Ratio 1000m");
         }
 
         /// <summary>
