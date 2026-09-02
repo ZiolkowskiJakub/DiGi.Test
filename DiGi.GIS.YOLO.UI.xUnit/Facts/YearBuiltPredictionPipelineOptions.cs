@@ -17,7 +17,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             {
                 BatchSize = 2500,
                 Confidence = 0.35,
-                CountyIds = [2212, 2213],
+                CountyIds = [73485, 73482],
                 ExportImages = false,
                 MaxConcurrentRequests = 4,
                 ModelPath = @"C:\YOLO\models\model.pt",
@@ -54,8 +54,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(yearBuiltPredictionPipelineOptions.ScratchDirectory, yearBuiltPredictionPipelineOptions_Actual.ScratchDirectory);
             Assert.Null(yearBuiltPredictionPipelineOptions_Actual.WorkingDirectory);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual.CountyIds);
-            Assert.Contains(2212, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
-            Assert.Contains(2213, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
+            Assert.Contains(73485, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
+            Assert.Contains(73482, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual.Years);
             Assert.Equal(2010, yearBuiltPredictionPipelineOptions_Actual.Years!.Min);
             Assert.Equal(2024, yearBuiltPredictionPipelineOptions_Actual.Years.Max);

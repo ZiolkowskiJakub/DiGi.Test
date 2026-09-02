@@ -20,17 +20,17 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             List<Building2DYearBuiltPredictions> building2DYearBuiltPredictions = [new("b_ref_001", [new YearBuiltPrediction(2020, new BoundingBox2D(10, 20, 30, 40), 0.9)])];
 
-            bool result_NullManager = await Modify.UpdateBuildingDataYearBuiltPredictionsAsync(null, 2212, building2DYearBuiltPredictions);
+            bool result_NullManager = await Modify.UpdateBuildingDataYearBuiltPredictionsAsync(null, 73485, building2DYearBuiltPredictions);
             Assert.False(result_NullManager);
 
             bool result_NoCounty = await gisWebAPIManager.UpdateBuildingDataYearBuiltPredictionsAsync(0, building2DYearBuiltPredictions);
             Assert.False(result_NoCounty);
 
-            bool result_NullPredictions = await gisWebAPIManager.UpdateBuildingDataYearBuiltPredictionsAsync(2212, null);
+            bool result_NullPredictions = await gisWebAPIManager.UpdateBuildingDataYearBuiltPredictionsAsync(73485, null);
             Assert.False(result_NullPredictions);
 
             //Nothing to send is not a failure - the run simply found no detections for these buildings
-            bool result_Empty = await gisWebAPIManager.UpdateBuildingDataYearBuiltPredictionsAsync(2212, []);
+            bool result_Empty = await gisWebAPIManager.UpdateBuildingDataYearBuiltPredictionsAsync(73485, []);
             Assert.True(result_Empty);
         }
 
@@ -40,7 +40,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public void UpdateBuildingDataYearBuiltPredictions_Table()
         {
-            int countyId = 2212;
+            int countyId = 73485;
 
             Building2DYearBuiltPredictions building2DYearBuiltPredictions = new("b_ref_001",
             [

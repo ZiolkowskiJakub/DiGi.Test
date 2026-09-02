@@ -20,7 +20,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
-                CountyIds = [2212],
+                CountyIds = [73485],
                 ScratchDirectory = Path.GetTempPath(),
                 ExportImages = false,
                 RunPrediction = false,
@@ -57,7 +57,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public async Task RunYearBuiltPredictions_Detections()
         {
-            int countyId = 2212;
+            int countyId = 73485;
 
             string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YOLO_Prediction.bbrf");
             Assert.False(string.IsNullOrWhiteSpace(path_Fixture));
@@ -111,7 +111,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public async Task RunYearBuiltPredictions_MissingPredictor()
         {
-            int countyId = 2212;
+            int countyId = 73485;
 
             string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YOLO_Prediction.bbrf");
             string? directory_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
@@ -150,7 +150,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public async Task RunYearBuiltPredictions_StubPredictor()
         {
-            int countyId = 2212;
+            int countyId = 73485;
 
             string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YOLO_Prediction.bbrf");
             string? directory_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());

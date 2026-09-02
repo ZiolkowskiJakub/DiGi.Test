@@ -16,7 +16,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             DateTimeOffset start = new(2026, 9, 1, 8, 30, 0, TimeSpan.FromHours(2));
             DateTimeOffset end = start.AddMinutes(45);
 
-            Classes.YearBuiltPredictionResult yearBuiltPredictionResult = new([2212, 2213], start, start, end, 1200, 3400, 900, 900, 880, 880, 1760, ["ExportPredictionImagesAsync"], ["ultralytics is not installed"], false);
+            Classes.YearBuiltPredictionResult yearBuiltPredictionResult = new([73485, 73482], start, start, end, 1200, 3400, 900, 900, 880, 880, 1760, ["ExportPredictionImagesAsync"], ["ultralytics is not installed"], false);
 
             Assert.Equal(2, yearBuiltPredictionResult.CountyIds.Count);
             Assert.Equal(1200, yearBuiltPredictionResult.ImageCount);
