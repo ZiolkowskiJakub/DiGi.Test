@@ -1,5 +1,6 @@
 using DiGi.Core;
 using DiGi.Core.Classes;
+using DiGi.Core.IO;
 using DiGi.Core.IO.Table.Classes;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,8 @@
 using DiGi.Core;
+using DiGi.Core.Interfaces;
+using DiGi.Core.IO;
 using DiGi.Core.IO.Table.Classes;
+using DiGi.Core.IO.Table.Interfaces;
 using DiGi.GIS.ML;
 using DiGi.GIS.ML.Classes;
 using System.Collections.Generic;
@@ -123,7 +126,7 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
-        /// Verifies that YearBuiltPredictor helper methods expose the S5 input allow-list columns and distinct unique identifiers.
+        /// Verifies that YearBuiltPredictor helper methods expose the S5 input allow-list columns and distinct unique identifiers as normalized slugs.
         /// </summary>
         [Fact]
         public void YearBuiltPredictor_Helpers()
@@ -138,6 +141,34 @@ namespace DiGi.GIS.xUnit
 
             HashSet<string> set_UniqueIds = [.. uniqueIds];
             Assert.Equal(172, set_UniqueIds.Count);
+
+            Assert.Contains("floor_area", set_UniqueIds);
+            Assert.Contains("storeys", set_UniqueIds);
+            Assert.Contains("internal_point_x", set_UniqueIds);
+            Assert.Contains("internal_point_y", set_UniqueIds);
+            Assert.Contains("radial_floor_area_ratio_200m", set_UniqueIds);
+            Assert.Contains("grid_cell_coverage_0_0", set_UniqueIds);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="YearBuiltPredictor.InputColumnUniqueIds"/> returns normalized column slugs matching <see cref="Core.IO.Query.UniqueId(IColumn?)"/> rather than <see cref="Core.Query.UniqueId(ISerializableObject?)"/> content hashes.
+        /// </summary>
+        [Fact]
+        public void YearBuiltPredictor_InputColumnUniqueIds_SlugVersusContentHash()
+        {
+            Column column_FloorArea = GIS.IO.Constants.Column.FloorArea;
+            string? slug_FloorArea = column_FloorArea.UniqueId();
+            string? hash_FloorArea = Core.Query.UniqueId((ISerializableObject)column_FloorArea);
+
+            Assert.Equal("floor_area", slug_FloorArea);
+            Assert.NotEqual(slug_FloorArea, hash_FloorArea);
+
+            List<string> uniqueIds = YearBuiltPredictor.InputColumnUniqueIds();
+            Assert.Contains("floor_area", uniqueIds);
+            Assert.Contains("storeys", uniqueIds);
+            Assert.Contains("internal_point_x", uniqueIds);
+            Assert.Contains("radial_floor_area_ratio_200m", uniqueIds);
+            Assert.DoesNotContain(hash_FloorArea, uniqueIds);
         }
     }
 }
