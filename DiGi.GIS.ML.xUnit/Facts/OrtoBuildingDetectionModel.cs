@@ -84,8 +84,6 @@ namespace DiGi.GIS.ML.xUnit
                 Assert.False(string.IsNullOrWhiteSpace(table_Predictions.GetValue<string>(i, index_Reference)));
                 Assert.True(table_Predictions.TryGetValue(i, index_Year, out ushort year));
 
-                // Not an assertion about accuracy - only that the scorer is reading features rather than
-                // defaults. An all-default row scores far outside the orthophoto era.
                 Assert.InRange(year, (ushort)1900, (ushort)2100);
                 years.Add(year);
             }
@@ -99,6 +97,33 @@ namespace DiGi.GIS.ML.xUnit
                 Assert.True(table_Repeat.TryGetValue(i, index_Year, out ushort year));
                 Assert.Equal(years[i], year);
             }
+
+            // The features have to be reaching the model, and a range check does not establish that: a row
+            // carrying nothing but a reference still scores 2012, comfortably inside any plausible range.
+            // Scoring the same references stripped of every feature has to give a different answer, or the
+            // binding is silently reading defaults - which is exactly how the deployed path came to score
+            // an RSquared of -1.771 while failing at nothing.
+            Table table_Stripped = new();
+            table_Stripped.AddColumn(GIS.IO.Constants.Column.Reference);
+            for (int i = 0; i < table.RowCount; i++)
+            {
+                table_Stripped.AddRow([table.GetValue<string>(i, table.GetColumnIndex(GIS.IO.Constants.Column.Reference.Name))]);
+            }
+
+            Table? table_StrippedPredictions = table_Stripped.PredictedYearBuilts();
+            Assert.NotNull(table_StrippedPredictions);
+
+            bool differs = false;
+            for (int i = 0; i < table_StrippedPredictions!.RowCount; i++)
+            {
+                if (table_StrippedPredictions.TryGetValue(i, index_Year, out ushort year_Stripped) && year_Stripped != years[i])
+                {
+                    differs = true;
+                    break;
+                }
+            }
+
+            Assert.True(differs, "Stripping every feature changed no prediction - the scorer is not reading features.");
         }
     }
 }
