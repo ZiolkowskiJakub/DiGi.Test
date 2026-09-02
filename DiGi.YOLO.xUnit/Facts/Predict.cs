@@ -198,8 +198,8 @@ namespace DiGi.YOLO.xUnit
                     "    def __init__(self, model_path):",
                     "        pass",
                     "    def __call__(self, source, **kwargs):",
-                    "        box = MockBox([100.0, 50.0, 300.0, 150.0], 0.95, 0)",
-                    "        return [MockResult([box])]"
+                    "        count = len(source) if isinstance(source, list) else 1",
+                    "        return [MockResult([MockBox([100.0, 50.0, 300.0, 150.0], 0.95, 0)]) for _ in range(count)]"
                 ];
                 File.WriteAllLines(Path.Combine(directory_MockUltralytics, "__init__.py"), lines_MockUltralytics);
 
@@ -232,6 +232,100 @@ namespace DiGi.YOLO.xUnit
                 Assert.Equal(200.0, boundingBoxResult.Width);
                 Assert.Equal(100.0, boundingBoxResult.Height);
                 Assert.Equal(0.95, boundingBoxResult.Confidence);
+            }
+            finally
+            {
+                if (Directory.Exists(directory))
+                {
+                    Directory.Delete(directory, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Modify.Predict(Classes.YOLOPredictionOptions?, System.Threading.CancellationToken)"/> passes the batch size and processes multiple images in slices.
+        /// </summary>
+        [Fact]
+        public void Predict_Batch()
+        {
+            string? pythonPath = Query.PythonPaths().FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(pythonPath))
+            {
+                return;
+            }
+
+            string directory = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Test_" + Path.GetRandomFileName());
+
+            try
+            {
+                Directory.CreateDirectory(directory);
+
+                string sourceDirectory = Path.Combine(directory, "input");
+                Directory.CreateDirectory(sourceDirectory);
+                File.WriteAllBytes(Path.Combine(sourceDirectory, "sample_001.jpg"), [0xFF, 0xD8, 0xFF, 0xD9]);
+                File.WriteAllBytes(Path.Combine(sourceDirectory, "sample_002.jpg"), [0xFF, 0xD8, 0xFF, 0xD9]);
+                File.WriteAllBytes(Path.Combine(sourceDirectory, "sample_003.jpg"), [0xFF, 0xD8, 0xFF, 0xD9]);
+
+                string path_Model = Path.Combine(directory, "best.pt");
+                File.WriteAllText(path_Model, "dummy_model");
+
+                string directory_MockUltralytics = Path.Combine(directory, "ultralytics");
+                Directory.CreateDirectory(directory_MockUltralytics);
+
+                string[] lines_MockUltralytics =
+                [
+                    "class MockTensor:",
+                    "    def __init__(self, data):",
+                    "        self.data = data",
+                    "    def tolist(self):",
+                    "        return self.data",
+                    "    def item(self):",
+                    "        return self.data",
+                    "",
+                    "class MockBox:",
+                    "    def __init__(self, xyxy, conf, cls):",
+                    "        self.xyxy = [MockTensor(xyxy)]",
+                    "        self.conf = MockTensor(conf)",
+                    "        self.cls = MockTensor(cls)",
+                    "",
+                    "class MockResult:",
+                    "    def __init__(self, boxes):",
+                    "        self.boxes = boxes",
+                    "",
+                    "class YOLO:",
+                    "    def __init__(self, model_path):",
+                    "        pass",
+                    "    def __call__(self, source, **kwargs):",
+                    "        count = len(source) if isinstance(source, list) else 1",
+                    "        return [MockResult([MockBox([100.0, 50.0, 300.0, 150.0], 0.95, 0)]) for _ in range(count)]"
+                ];
+                File.WriteAllLines(Path.Combine(directory_MockUltralytics, "__init__.py"), lines_MockUltralytics);
+
+                string path_Output = Path.Combine(directory, "output", "results.bbrf");
+
+                Classes.YOLOPredictionOptions yOLOPredictionOptions = new()
+                {
+                    BatchSize = 2,
+                    Confidence = 0.25,
+                    ModelPath = path_Model,
+                    OutputPath = path_Output,
+                    PythonPath = pythonPath,
+                    SourceDirectory = sourceDirectory,
+                    WorkingDirectory = directory
+                };
+
+                Classes.YOLOPredictionResult? yOLOPredictionResult = Modify.Predict(yOLOPredictionOptions);
+
+                Assert.NotNull(yOLOPredictionResult);
+                Assert.True(yOLOPredictionResult!.Succeeded);
+                Assert.Equal(3, yOLOPredictionResult.ImageCount);
+
+                Classes.BoundingBoxResultFile? boundingBoxResultFile = Create.BoundingBoxResultFile(yOLOPredictionResult);
+                Assert.NotNull(boundingBoxResultFile);
+                Assert.Equal(3, boundingBoxResultFile!.Count);
+                Assert.Equal("sample_001", boundingBoxResultFile[0].Name);
+                Assert.Equal("sample_002", boundingBoxResultFile[1].Name);
+                Assert.Equal("sample_003", boundingBoxResultFile[2].Name);
             }
             finally
             {
