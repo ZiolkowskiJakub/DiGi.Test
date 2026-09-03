@@ -49,5 +49,56 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 Assert.True(File.Exists(path_Probed));
             }
         }
+
+        /// <summary>
+        /// Verifies that the resolver of the headless Year Built prediction runner finds the runner in the folder beside this application's own, the layout the deployment ships.
+        /// <para>The runner is a deployment unit of its own under the software directory rather than a file beside this application's executable - so on a deployed machine it sits beside this application's folder, not beside it. A resolver that only looked beside the executable, the layout a developer has while building, would answer nothing on the machine the task is meant to run. The baseDirectory seam lets this probe a laid-out folder without deploying anything.</para>
+        /// </summary>
+        [Fact]
+        public void YearBuiltPredictionConsoleAppPath_SiblingFolder()
+        {
+            // The deployed layout: the runner in its own folder beside this application's, with nothing beside the executable
+            // itself - so the answer has to come from the sibling candidate and not from a path that is not there.
+            string root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory = System.IO.Path.Combine(root, "DiGi.GIS.PostgreSQL.UI");
+            string directory_Sibling = System.IO.Path.Combine(root, "DiGi.GIS.YOLO.UI");
+            string path = System.IO.Path.Combine(directory_Sibling, Constants.FileName.YearBuiltPredictionConsoleApp);
+
+            try
+            {
+                Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(directory_Sibling);
+                File.WriteAllText(path, string.Empty);
+
+                string? path_Resolved = Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory);
+
+                Assert.Equal(System.IO.Path.GetFullPath(path), path_Resolved);
+            }
+            finally
+            {
+                if (Directory.Exists(root))
+                {
+                    Directory.Delete(root, true);
+                }
+            }
+
+            // An application folder with no runner beside it, in its own folder, or in a workspace checkout is not answered with a path.
+            string root_Empty = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory_Empty = System.IO.Path.Combine(root_Empty, "DiGi.GIS.PostgreSQL.UI");
+
+            try
+            {
+                Directory.CreateDirectory(directory_Empty);
+
+                Assert.Null(Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory_Empty));
+            }
+            finally
+            {
+                if (Directory.Exists(root_Empty))
+                {
+                    Directory.Delete(root_Empty, true);
+                }
+            }
+        }
     }
 }
