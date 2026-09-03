@@ -1,5 +1,6 @@
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
+using System.Collections.Generic;
 
 namespace DiGi.Core.xUnit
 {
@@ -36,6 +37,56 @@ namespace DiGi.Core.xUnit
             protected override string? GetKey_2(string? value)
             {
                 return "k2";
+            }
+        }
+
+        /// <summary>
+        /// Minimal concrete <see cref="ValueCluster{TKey_1, TKey_2, TValue}"/> extracting keys from colon-separated strings.
+        /// </summary>
+        public class TestValueCluster : ValueCluster<string, string, string>
+        {
+            protected override string? GetKey_1(string? value)
+            {
+                string[]? parts = value?.Split(':');
+                return parts != null && parts.Length >= 2 ? parts[0] : null;
+            }
+
+            protected override string? GetKey_2(string? value)
+            {
+                string[]? parts = value?.Split(':');
+                return parts != null && parts.Length >= 2 ? parts[1] : null;
+            }
+        }
+
+        /// <summary>
+        /// Minimal concrete <see cref="List{TKey_1, TKey_2, TValue}"/> extracting keys from colon-separated strings.
+        /// </summary>
+        public class TestKeyedListCluster : List<string, string, string>
+        {
+            public TestKeyedListCluster()
+            {
+            }
+
+            public TestKeyedListCluster(IEnumerable<string>? values)
+                : base(values)
+            {
+            }
+
+            public bool SetValues_Test(IEnumerable<string>? values)
+            {
+                return SetValues(values);
+            }
+
+            protected override string? GetKey_1(string? value)
+            {
+                string[]? parts = value?.Split(':');
+                return parts != null && parts.Length >= 2 ? parts[0] : null;
+            }
+
+            protected override string? GetKey_2(string? value)
+            {
+                string[]? parts = value?.Split(':');
+                return parts != null && parts.Length >= 2 ? parts[1] : null;
             }
         }
     }
