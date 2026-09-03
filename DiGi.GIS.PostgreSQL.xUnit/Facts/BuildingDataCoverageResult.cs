@@ -12,7 +12,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void BuildingDataCoverageResult_Serialization()
         {
-            BuildingDataCoverageResult buildingDataCoverageResult = new(55417, 33687, 21894, 11793, 42, 11751);
+            BuildingDataCoverageResult buildingDataCoverageResult = new(55417, 33687, 21894, 11793, 42, 11751, 2);
 
             Assert.Equal(55417, buildingDataCoverageResult.CountyId);
             Assert.Equal(33687, buildingDataCoverageResult.Building2DCount);
@@ -20,6 +20,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Equal(11793, buildingDataCoverageResult.MissingReferenceCount);
             Assert.Equal(42, buildingDataCoverageResult.OrphanReferenceCount);
             Assert.Equal(11751, buildingDataCoverageResult.UnassignedSubdivisionCount);
+            Assert.Equal(2, buildingDataCoverageResult.CrossCountySubdivisionCount);
 
             string? text = Core.Convert.ToSystem_String(buildingDataCoverageResult);
             Assert.False(string.IsNullOrWhiteSpace(text));
@@ -33,12 +34,14 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Equal(11793, buildingDataCoverageResult_Parsed.MissingReferenceCount);
             Assert.Equal(42, buildingDataCoverageResult_Parsed.OrphanReferenceCount);
             Assert.Equal(11751, buildingDataCoverageResult_Parsed.UnassignedSubdivisionCount);
+            Assert.Equal(2, buildingDataCoverageResult_Parsed.CrossCountySubdivisionCount);
 
             BuildingDataCoverageResult buildingDataCoverageResult_Clone = new(buildingDataCoverageResult);
 
             Assert.Equal(55417, buildingDataCoverageResult_Clone.CountyId);
             Assert.Equal(33687, buildingDataCoverageResult_Clone.Building2DCount);
             Assert.Equal(11751, buildingDataCoverageResult_Clone.UnassignedSubdivisionCount);
+            Assert.Equal(2, buildingDataCoverageResult_Clone.CrossCountySubdivisionCount);
 
             Core.xUnit.Query.SerializationCheck(buildingDataCoverageResult);
         }
@@ -86,6 +89,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.True(buildingDataCoverageResult.MissingReferenceCount >= 0);
             Assert.True(buildingDataCoverageResult.OrphanReferenceCount >= 0);
             Assert.True(buildingDataCoverageResult.UnassignedSubdivisionCount >= 0);
+            Assert.True(buildingDataCoverageResult.CrossCountySubdivisionCount >= 0);
             Assert.True(buildingDataCoverageResult.MissingReferenceCount <= buildingDataCoverageResult.Building2DCount);
             Assert.True(buildingDataCoverageResult.OrphanReferenceCount <= buildingDataCoverageResult.BuildingDataCount);
 
