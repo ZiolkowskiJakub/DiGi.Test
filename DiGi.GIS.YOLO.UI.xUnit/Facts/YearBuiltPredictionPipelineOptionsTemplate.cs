@@ -66,6 +66,17 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             //And it names no county, so a copied template cannot run against one nobody chose
             Assert.True(yearBuiltPredictionPipelineOptions.CountyIds is null || yearBuiltPredictionPipelineOptions.CountyIds.Count == 0);
+
+            //The class default and the template must agree on the write steps, in the safe direction: a member the
+            //file does not name keeps the class default, so an options file that omits a write flag reads it back as
+            //the class default - and that default must be off, the same as the template it is copied from.
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Defaults = new();
+            Assert.False(yearBuiltPredictionPipelineOptions_Defaults.UpdateDetections);
+            Assert.Equal(yearBuiltPredictionPipelineOptions_Defaults.UpdateDetections, yearBuiltPredictionPipelineOptions.UpdateDetections);
+            Assert.False(yearBuiltPredictionPipelineOptions_Defaults.UpdateYearBuiltData);
+            Assert.Equal(yearBuiltPredictionPipelineOptions_Defaults.UpdateYearBuiltData, yearBuiltPredictionPipelineOptions.UpdateYearBuiltData);
+            Assert.False(yearBuiltPredictionPipelineOptions_Defaults.UpdatePredictedYearBuilt);
+            Assert.Equal(yearBuiltPredictionPipelineOptions_Defaults.UpdatePredictedYearBuilt, yearBuiltPredictionPipelineOptions.UpdatePredictedYearBuilt);
         }
     }
 }

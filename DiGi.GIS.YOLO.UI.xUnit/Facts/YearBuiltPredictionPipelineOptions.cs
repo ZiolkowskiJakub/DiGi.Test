@@ -82,6 +82,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         /// <summary>
         /// Verifies the defaults of YearBuiltPredictionPipelineOptions.
         /// <para>The confidence matches the prediction script's own default, the reference page matches the cap the building data endpoint enforces, and no county is named - the pipeline writes deployed data, so a run that states no scope does nothing rather than everything.</para>
+        /// <para>The three write steps default to off, so an options file that omits them - or misspells them, which is dropped in silence - reads and scores without storing anything.</para>
         /// </summary>
         [Fact]
         public void YearBuiltPredictionPipelineOptions_Defaults()
@@ -100,14 +101,67 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.True(yearBuiltPredictionPipelineOptions.Resume);
             Assert.True(yearBuiltPredictionPipelineOptions.RunPrediction);
             Assert.True(yearBuiltPredictionPipelineOptions.Score);
-            Assert.True(yearBuiltPredictionPipelineOptions.UpdateDetections);
-            Assert.True(yearBuiltPredictionPipelineOptions.UpdatePredictedYearBuilt);
-            Assert.True(yearBuiltPredictionPipelineOptions.UpdateYearBuiltData);
+            Assert.False(yearBuiltPredictionPipelineOptions.UpdateDetections);
+            Assert.False(yearBuiltPredictionPipelineOptions.UpdatePredictedYearBuilt);
+            Assert.False(yearBuiltPredictionPipelineOptions.UpdateYearBuiltData);
 
             //The default year range has to be the one the column allow-list applies, or the projection asks for columns the regressor was not trained on
             List<Core.IO.Table.Classes.Column> columns_Default = GIS.IO.Query.YearBuiltPredictionInputColumns(yearBuiltPredictionPipelineOptions.Years);
             List<Core.IO.Table.Classes.Column> columns_Stated = GIS.IO.Query.YearBuiltPredictionInputColumns(new Range<int>(2008, 2025));
             Assert.Equal(columns_Stated.Count, columns_Default.Count);
+        }
+
+        /// <summary>
+        /// Verifies the write flags read the way the pipeline needs them to: off when the file omits them, on when the file names them on.
+        /// <para>The deserializer keeps a member's class default for a key the file does not name, so with the write steps defaulted off an omitted flag - or a misspelt one, which is dropped in silence - stores nothing. A flag the file sets to true must still be honoured, though: with the steps off by default, naming one on is the only way a run writes at all, so that direction is the one a regression would silently break.</para>
+        /// </summary>
+        [Fact]
+        public void YearBuiltPredictionPipelineOptions_OmittedWriteFlags_DefaultOff()
+        {
+            //Omitted: a complete options set that names no write step must read read-only
+            string tempFilePath_Omitted = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"options_omitted_write_flags_{System.Guid.NewGuid()}.json");
+            try
+            {
+                //County and scratch are named so the file is a complete options set, but the three write flags are omitted
+                string json_Omitted = "{\"CountyIds\":[73485],\"ScratchDirectory\":\"scratch\"}";
+                System.IO.File.WriteAllText(tempFilePath_Omitted, json_Omitted);
+
+                Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Omitted = Query.YearBuiltPredictionPipelineOptions(tempFilePath_Omitted);
+                Assert.NotNull(yearBuiltPredictionPipelineOptions_Omitted);
+
+                Assert.False(yearBuiltPredictionPipelineOptions_Omitted!.UpdateDetections);
+                Assert.False(yearBuiltPredictionPipelineOptions_Omitted.UpdateYearBuiltData);
+                Assert.False(yearBuiltPredictionPipelineOptions_Omitted.UpdatePredictedYearBuilt);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempFilePath_Omitted))
+                {
+                    System.IO.File.Delete(tempFilePath_Omitted);
+                }
+            }
+
+            //Named on: a file that sets one write step to true must read it on, while the other two stay off
+            string tempFilePath_On = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"options_write_flag_on_{System.Guid.NewGuid()}.json");
+            try
+            {
+                string json_On = "{\"CountyIds\":[73485],\"ScratchDirectory\":\"scratch\",\"UpdateDetections\":true}";
+                System.IO.File.WriteAllText(tempFilePath_On, json_On);
+
+                Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_On = Query.YearBuiltPredictionPipelineOptions(tempFilePath_On);
+                Assert.NotNull(yearBuiltPredictionPipelineOptions_On);
+
+                Assert.True(yearBuiltPredictionPipelineOptions_On!.UpdateDetections);
+                Assert.False(yearBuiltPredictionPipelineOptions_On.UpdateYearBuiltData);
+                Assert.False(yearBuiltPredictionPipelineOptions_On.UpdatePredictedYearBuilt);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempFilePath_On))
+                {
+                    System.IO.File.Delete(tempFilePath_On);
+                }
+            }
         }
     }
 }
