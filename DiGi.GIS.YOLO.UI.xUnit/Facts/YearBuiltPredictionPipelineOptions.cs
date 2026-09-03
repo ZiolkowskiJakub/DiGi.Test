@@ -31,7 +31,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdatePredictedYearBuilt = false,
                 UpdateYearBuiltData = false,
                 WorkingDirectory = null,
-                Years = new Range<int>(2010, 2024)
+                Years = new Range<int>(2010, 2024),
+                Radiuses = [250, 500]
             };
 
             Assert.Equal(2500, yearBuiltPredictionPipelineOptions.BatchSize);
@@ -60,12 +61,20 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(2010, yearBuiltPredictionPipelineOptions_Actual.Years!.Min);
             Assert.Equal(2024, yearBuiltPredictionPipelineOptions_Actual.Years.Max);
 
-            //The county set and the year range are the two members a shallow copy would share with the source
+            Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual.Radiuses);
+            Assert.Equal<IEnumerable<double>>([250, 500], yearBuiltPredictionPipelineOptions_Actual.Radiuses!);
+
+            //The county set, the year range and the radiuses are the three members a shallow copy would share
+            //with the source - and a copy constructor that forgot one of them outright is what the options
+            //window works on, so the run would be scoped from a projection the operator never chose.
             Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Clone = new(yearBuiltPredictionPipelineOptions);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotSame(yearBuiltPredictionPipelineOptions.CountyIds, yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.Years);
             Assert.NotSame(yearBuiltPredictionPipelineOptions.Years, yearBuiltPredictionPipelineOptions_Clone.Years);
+            Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.Radiuses);
+            Assert.NotSame(yearBuiltPredictionPipelineOptions.Radiuses, yearBuiltPredictionPipelineOptions_Clone.Radiuses);
+            Assert.Equal<IEnumerable<double>>([250, 500], yearBuiltPredictionPipelineOptions_Clone.Radiuses!);
 
             Core.xUnit.Query.SerializationCheck(yearBuiltPredictionPipelineOptions);
         }
