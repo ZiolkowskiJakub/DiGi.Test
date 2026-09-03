@@ -91,5 +91,58 @@ namespace DiGi.Analytical.xUnit
 
             Assert.Single(spaces);
         }
+
+        /// <summary>
+        /// Tests that <see cref="BuildingModel.GetObject{TBuildingGuidObject}(IBuildingRelation?)"/> and <see cref="BuildingModel.GetObjects{TBuildingGuidObject}(IBuildingRelation?)"/> retrieve the associated object(s) when referenced by a building relation.
+        /// </summary>
+        [Fact]
+        public void BuildingModel_GetObject()
+        {
+            Plane? plane = Geometry.Spatial.Create.Plane(0.0);
+            PolygonalFace3D? polygonalFace3D = Geometry.Spatial.Create.PolygonalFace3D(plane,
+            [
+                new Geometry.Planar.Classes.Point2D(0, 0),
+                new Geometry.Planar.Classes.Point2D(10, 0),
+                new Geometry.Planar.Classes.Point2D(10, 10),
+                new Geometry.Planar.Classes.Point2D(0, 10)
+            ]);
+
+            Assert.NotNull(polygonalFace3D);
+
+            FaceFloor faceFloor = new(polygonalFace3D);
+            Space space_1 = new(new Point3D(0, 0, 0), "Space 1");
+            Space space_2 = new(new Point3D(0, 0, 3), "Space 2");
+
+            BuildingModel buildingModel = new();
+            buildingModel.Assign(faceFloor, space_1, space_2);
+
+            SpaceRelation? spaceRelation = buildingModel.GetRelation<SpaceRelation>(faceFloor);
+            Assert.NotNull(spaceRelation);
+
+            ISpace? retrievedSpace = buildingModel.GetObject<ISpace>(spaceRelation);
+            Assert.NotNull(retrievedSpace);
+            Assert.Equal(space_1.Guid, retrievedSpace.Guid);
+            Assert.NotSame(space_1, retrievedSpace);
+
+            IFloor? retrievedFloor = buildingModel.GetObject<IFloor>(spaceRelation);
+            Assert.NotNull(retrievedFloor);
+            Assert.Equal(faceFloor.Guid, retrievedFloor.Guid);
+            Assert.NotSame(faceFloor, retrievedFloor);
+
+            IZone? retrievedZone = buildingModel.GetObject<IZone>(spaceRelation);
+            Assert.Null(retrievedZone);
+
+            Assert.Null(buildingModel.GetObject<ISpace>((IBuildingRelation?)null));
+
+            List<ISpace>? retrievedSpaces = buildingModel.GetObjects<ISpace>(spaceRelation);
+            Assert.NotNull(retrievedSpaces);
+            Assert.Equal(2, retrievedSpaces.Count);
+            Assert.Equal(space_1.Guid, retrievedSpaces[0].Guid);
+            Assert.Equal(space_2.Guid, retrievedSpaces[1].Guid);
+            Assert.NotSame(space_1, retrievedSpaces[0]);
+            Assert.NotSame(space_2, retrievedSpaces[1]);
+
+            Assert.Null(buildingModel.GetObjects<ISpace>((IBuildingRelation?)null));
+        }
     }
 }
