@@ -1,4 +1,4 @@
-using DiGi.YOLO;
+﻿using DiGi.YOLO;
 using System.IO;
 
 namespace DiGi.YOLO.xUnit
@@ -18,12 +18,14 @@ namespace DiGi.YOLO.xUnit
                 bool success = Modify.WriteScripts(tempDirectory);
                 Assert.True(success);
 
+                string exportPath = Path.Combine(tempDirectory, "export.py");
                 string trainPath = Path.Combine(tempDirectory, "train.py");
                 string predictPath = Path.Combine(tempDirectory, "predict.py");
                 string utilsPath = Path.Combine(tempDirectory, "utils.py");
                 string requirementsPath = Path.Combine(tempDirectory, "requirements.txt");
                 string confPath = Path.Combine(tempDirectory, "conf.yaml");
 
+                Assert.True(File.Exists(exportPath));
                 Assert.True(File.Exists(trainPath));
                 Assert.True(File.Exists(predictPath));
                 Assert.True(File.Exists(utilsPath));
@@ -37,6 +39,12 @@ namespace DiGi.YOLO.xUnit
                 Assert.Contains("--conf", predictContent);
                 Assert.Contains("--output", predictContent);
 
+                //export.py is the only reason the frozen checkpoint can become the ONNX graph the in-process detector scores with, and it has to be laid down by the same call that lays the rest down
+                string exportContent = File.ReadAllText(exportPath);
+                Assert.Contains("format=\"onnx\"", exportContent);
+                Assert.Contains("--opset", exportContent);
+                Assert.Contains("SHA256", exportContent);
+
                 string trainContent = File.ReadAllText(trainPath);
                 Assert.Contains("epochs=150", trainContent);
 
@@ -48,6 +56,7 @@ namespace DiGi.YOLO.xUnit
                 string requirementsContent = File.ReadAllText(requirementsPath);
                 Assert.Contains("ultralytics==8.3.130", requirementsContent);
                 Assert.Contains("torch", requirementsContent);
+                Assert.Contains("onnx", requirementsContent);
 
                 string confContent = File.ReadAllText(confPath);
                 Assert.Contains("path: training", confContent);

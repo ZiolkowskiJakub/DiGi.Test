@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/Analytical/">
     <Project Path="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj">
       <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
@@ -536,6 +536,16 @@
     <Project Path="DiGi.YOLO.xUnit/DiGi.YOLO.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
       <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
+    <Project Path="../DiGi.YOLO.ONNX/DiGi.YOLO.ONNX/DiGi.YOLO.ONNX.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
+    </Project>
+    <Project Path="DiGi.YOLO.ONNX.xUnit/DiGi.YOLO.ONNX.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.YOLO/DiGi.YOLO/DiGi.YOLO.csproj" />
+      <BuildDependency Project="../DiGi.YOLO.ONNX/DiGi.YOLO.ONNX/DiGi.YOLO.ONNX.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
     <Project Path="DiGi.GIS.YOLO.UI.xUnit/DiGi.GIS.YOLO.UI.xUnit.csproj">
