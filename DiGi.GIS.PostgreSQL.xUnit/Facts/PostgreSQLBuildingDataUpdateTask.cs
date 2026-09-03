@@ -191,5 +191,66 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(buildingDataCoverageResult);
             Assert.Equal(0, buildingDataCoverageResult.MissingReferenceCount);
         }
+
+        /// <summary>
+        /// Verifies that the per-county fallback set never contains a building the subdivision loop reaches: for part 77971, the buildings under an in-scope subdivision and the buildings returned by <see cref="Building2DPostgreSQLConverter.GetBuilding2DsUnreachedByCountyAsync(int, IEnumerable{int}, int, System.Threading.CancellationToken)" /> are disjoint.
+        /// <para>The in-scope set is built exactly the way <see cref="PostgreSQLBuildingDataUpdateTask" /> builds it - <see cref="Query.SiblingCountyGroups(IEnumerable{AdministrativeAreal2DReference}?)" /> and <see cref="Query.InScopeSubdivisionIds(IEnumerable{AdministrativeAreal2DReference}?, IReadOnlyDictionary{int, HashSet{int}}?)" /> - so this asserts the caller-side invariant the fallback's safety relies on: the <c>Update_Building2D</c> upsert it pushes never clobbers a cell the loop has already written.</para>
+        /// <para>Part 77971 (Miasto Żory) carries buildings under in-scope subdivisions and two cross-county buildings under subdivision 80392 (parent part 80379), so both sets are non-empty and the disjointness is meaningful.</para>
+        /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database populated with administrative areal and building data.</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_FallbackExcludesInScopeBuildings_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            AdministrativeAreal2DPostgreSQLConverter? administrativeAreal2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
+            Assert.NotNull(administrativeAreal2DPostgreSQLConverter);
+
+            Building2DPostgreSQLConverter? building2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<Building2DPostgreSQLConverter>();
+            Assert.NotNull(building2DPostgreSQLConverter);
+
+            // Test county: part 77971, whose two cross-county buildings sit under subdivision 80392 (parent part 80379).
+            int countyId = 77971;
+
+            List<AdministrativeAreal2DReference>? subdivisions = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.Subdivision);
+            Assert.NotNull(subdivisions);
+            Assert.True(subdivisions.Count > 0, "The administrative areal data is expected to carry subdivisions.");
+
+            List<AdministrativeAreal2DReference>? countyReferences = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County);
+            Assert.NotNull(countyReferences);
+            Assert.True(countyReferences.Count > 0, "The administrative areal data is expected to carry counties.");
+
+            Dictionary<int, HashSet<int>> siblingCountyGroups = countyReferences.SiblingCountyGroups();
+
+            Dictionary<int, HashSet<int>> inScopeSubdivisionIds_ByCountyId = Query.InScopeSubdivisionIds(subdivisions, siblingCountyGroups);
+
+            Assert.True(inScopeSubdivisionIds_ByCountyId.TryGetValue(countyId, out HashSet<int>? inScopeSubdivisionIds) && inScopeSubdivisionIds.Count > 0, $"Part {countyId} is expected to carry in-scope subdivisions, or the fact is vacuous.");
+
+            List<Building2D>? buildings_InScope = await building2DPostgreSQLConverter.GetBuilding2DsByCountyIdAsync(countyId, inScopeSubdivisionIds);
+            Assert.NotNull(buildings_InScope);
+
+            // The read also returns the unassigned buildings of the part (subdivision_id IS NULL), which belong to the fallback by design - keep only the buildings under an in-scope subdivision.
+            HashSet<long> inScopeBuildingIds = [];
+            foreach (Building2D building2D in buildings_InScope)
+            {
+                if (building2D.SubdivisionId is int subdivisionId && inScopeSubdivisionIds.Contains(subdivisionId))
+                {
+                    inScopeBuildingIds.Add(building2D.Id);
+                }
+            }
+
+            Assert.True(inScopeBuildingIds.Count > 0, $"Part {countyId} is expected to carry buildings under an in-scope subdivision, or the fact is vacuous.");
+
+            List<Building2D>? buildings_Fallback = await building2DPostgreSQLConverter.GetBuilding2DsUnreachedByCountyAsync(countyId, inScopeSubdivisionIds);
+            Assert.NotNull(buildings_Fallback);
+            Assert.True(buildings_Fallback.Count > 0, $"Part {countyId} is expected to carry fallback buildings (unassigned or cross-county), or the fact is vacuous.");
+
+            // The invariant: a building the subdivision loop reaches is never handed to the fallback, so the upsert the fallback pushes never clobbers a cell the loop has already written.
+            foreach (Building2D building2D in buildings_Fallback)
+            {
+                Assert.False(inScopeBuildingIds.Contains(building2D.Id), $"Fallback building {building2D.Id} (reference {building2D.Reference}) sits under an in-scope subdivision - the fallback would re-process what the loop already wrote.");
+            }
+        }
     }
 }
