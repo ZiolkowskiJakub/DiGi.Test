@@ -11,14 +11,31 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         private sealed class YearBuiltPredictorStub : IYearBuiltPredictor
         {
             private readonly short year;
+            private readonly bool runnable;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="YearBuiltPredictorStub"/> class.
             /// </summary>
             /// <param name="year">The construction year to answer with for every row handed in.</param>
-            public YearBuiltPredictorStub(short year)
+            /// <param name="runnable">Whether the readiness probe reports this predictor can score.</param>
+            public YearBuiltPredictorStub(short year, bool runnable = true)
             {
                 this.year = year;
+                this.runnable = runnable;
+            }
+
+            /// <summary>
+            /// Reports whether this predictor can score at all, as configured at construction.
+            /// </summary>
+            /// <returns>Runnable as configured, carrying a diagnostic when it is not.</returns>
+            public DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness YearBuiltPredictorReadiness()
+            {
+                if (this.runnable)
+                {
+                    return new DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness(true);
+                }
+
+                return new DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness(false, ["the year built model is missing (stub)"]);
             }
 
             /// <summary>

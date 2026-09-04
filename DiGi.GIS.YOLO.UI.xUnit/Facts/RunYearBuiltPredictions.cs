@@ -186,5 +186,51 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(0, yearBuiltPredictorStub.CallCount);
             Assert.Equal(0, yearBuiltPredictionResult.FeatureRowCount);
         }
+
+        /// <summary>
+        /// Verifies that a predictor reporting itself unable to score is refused before any county work starts, and that the refusal carries the reason.
+        /// <para>The readiness preflight sits beside the Python one: a runner without its model otherwise exports a county of imagery, fails on the first scoring batch, and the cached engine failure repeats for every county behind it. What this pins is that the refusal comes first, with the diagnostic, and that the predictor is never asked to score.</para>
+        /// </summary>
+        [Fact]
+        public async Task RunYearBuiltPredictions_UnrunnablePredictor()
+        {
+            int countyId = 73485;
+
+            string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YOLO_Prediction.bbrf");
+            string? directory_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+
+            string directory_Scratch = Path.Combine(directory_Reports!, nameof(RunYearBuiltPredictions_UnrunnablePredictor));
+            string directory_County = Path.Combine(directory_Scratch, countyId.ToString());
+            Directory.CreateDirectory(Path.Combine(directory_County, Constants.DirectoryName.PredictionImages));
+            File.Copy(path_Fixture!, Path.Combine(directory_County, Constants.FileName.PredictionResults), true);
+
+            GISWebAPIManager gisWebAPIManager = new(null);
+            YearBuiltPredictorStub yearBuiltPredictorStub = new(1965, runnable: false);
+
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            {
+                CountyIds = [countyId],
+                ScratchDirectory = directory_Scratch,
+                ExportImages = false,
+                RunPrediction = false,
+                Score = true,
+                UpdateDetections = false,
+                UpdatePredictedYearBuilt = false,
+                UpdateYearBuiltData = false
+            };
+
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(yearBuiltPredictorStub, yearBuiltPredictionPipelineOptions);
+
+            Assert.NotNull(yearBuiltPredictionResult);
+
+            //The refusal is a preflight: nothing of the county was carried through, and the predictor was never asked to score
+            Assert.Equal(0, yearBuiltPredictorStub.CallCount);
+            Assert.Equal(0, yearBuiltPredictionResult!.BuildingCount);
+            Assert.Equal(0, yearBuiltPredictionResult.FeatureRowCount);
+
+            //The refusal is named after the readiness surface, and the reason it refused travels with the result
+            Assert.Contains(nameof(DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness), yearBuiltPredictionResult.FailedStepNames);
+            Assert.Contains("model", string.Join(" ", yearBuiltPredictionResult.Messages));
+        }
     }
 }
