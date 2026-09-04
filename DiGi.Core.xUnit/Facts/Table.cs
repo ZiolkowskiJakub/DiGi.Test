@@ -1,5 +1,7 @@
 using DiGi.Core.IO.Table.Classes;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 
 namespace DiGi.Core.xUnit
@@ -70,6 +72,94 @@ namespace DiGi.Core.xUnit
             // Verify that the extra element was ignored or handled and didn't crash
             Assert.Equal("A", table_Deserialized[0, 0]);
             Assert.Equal(10, table_Deserialized[0, 1]);
+        }
+
+        /// <summary>
+        /// Verifies that enumerating a Table yields live row references instead of a materialized cloned snapshot.
+        /// <para>Fails on the unmodified code, where GetEnumerator() delegates to the cloning Rows property, so a mutation of an enumerated row is invisible to the table.</para>
+        /// </summary>
+        [Fact]
+        public void Table_GetEnumeratorStreamsLiveRows()
+        {
+            Table table = new();
+            table.AddColumn(new Column("Col0", typeof(string)));
+            table.AddColumn(new Column("Col1", typeof(int)));
+
+            table.AddRow(["A", 1]);
+            table.AddRow(["B", 2]);
+
+            foreach (Row row in table)
+            {
+                row[0] = "Mutated";
+                break;
+            }
+
+            Assert.Equal("Mutated", table[0, 0]);
+        }
+
+        /// <summary>
+        /// Benchmarks enumeration of a 20,000-row Table and appends the measured per-run times to the reports directory.
+        /// <para>Before the fix the same loop paid for a full deep-clone pass over every row via the Rows property; measure in isolation and A/B against the pre-change baseline.</para>
+        /// </summary>
+        [Fact]
+        public void Table_Enumeration_Performance()
+        {
+            const int rowCount = 20000;
+            const int columnCount = 4;
+
+            Table table = new();
+            for (int i = 0; i < columnCount; i++)
+            {
+                table.AddColumn(new Column($"Col{i}", typeof(int)));
+            }
+
+            for (int i = 0; i < rowCount; i++)
+            {
+                List<object?> values = [];
+                for (int j = 0; j < columnCount; j++)
+                {
+                    values.Add(i * columnCount + j);
+                }
+
+                table.AddRow(values);
+            }
+
+            // Warm-up run (JIT compilation).
+            int count = 0;
+            foreach (Row row in table)
+            {
+                count++;
+            }
+
+            Assert.Equal(rowCount, count);
+
+            List<long> elapsedMilliseconds = [];
+            for (int run = 0; run < 3; run++)
+            {
+                System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                count = 0;
+                foreach (Row row in table)
+                {
+                    count++;
+                }
+
+                stopwatch.Stop();
+                elapsedMilliseconds.Add(stopwatch.ElapsedMilliseconds);
+            }
+
+            string? pathReportsDir = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            Assert.False(string.IsNullOrWhiteSpace(pathReportsDir));
+
+            List<string> reportLines =
+            [
+                $"Table_Enumeration_Performance: rowCount={rowCount} columnCount={columnCount} runs=[{string.Join(", ", elapsedMilliseconds)}] ms",
+            ];
+            string reportFilePath = System.IO.Path.Combine(pathReportsDir!, "Table_Enumeration_Performance.txt");
+            System.IO.File.AppendAllLines(reportFilePath, reportLines);
+
+            long max = elapsedMilliseconds.Max();
+            Assert.True(max < 2000, $"Enumeration exceeded the 2000 ms threshold: [{string.Join(", ", elapsedMilliseconds)}] ms");
         }
     }
 }

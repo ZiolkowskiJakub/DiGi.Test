@@ -215,5 +215,73 @@ namespace DiGi.Core.xUnit
 
             Assert.Null(testKeyedListCluster.GetKeys_2(null));
         }
+
+        /// <summary>
+        /// Pins the base-class <see cref="Core.Classes.Cluster{TKey_1, TKey_2, TValue}.GetKeys_1"/>
+        /// and <see cref="Core.Classes.Cluster{TKey_1, TKey_2, TValue}.GetKeys_2(TKey_1)"/> implementations
+        /// on a derivative that does not override them, drawn from the cluster's enumeration.
+        /// </summary>
+        [Fact]
+        public void Cluster_Base_GetKeys_StreamsOverEnumeration()
+        {
+            Classes.TestBaseCluster testBaseCluster = new();
+            Assert.True(testBaseCluster.Add("k1:subA:val1"));
+            Assert.True(testBaseCluster.Add("k1:subB:val2"));
+            Assert.True(testBaseCluster.Add("k2:subC:val3"));
+
+            List<int>? keys_1 = testBaseCluster.GetKeys_1();
+            Assert.NotNull(keys_1);
+            Assert.Single(keys_1);
+            Assert.Equal(1, keys_1[0]);
+
+            List<string>? keys_2 = testBaseCluster.GetKeys_2(1);
+            Assert.NotNull(keys_2);
+            Assert.Equal(3, keys_2.Count);
+            Assert.Contains("subA", keys_2);
+            Assert.Contains("subB", keys_2);
+            Assert.Contains("subC", keys_2);
+
+            List<string>? keys_2_NoMatch = testBaseCluster.GetKeys_2(99);
+            Assert.NotNull(keys_2_NoMatch);
+            Assert.Empty(keys_2_NoMatch);
+
+            Classes.TestBaseCluster testBaseCluster_Empty = new();
+            List<int>? keys_1_Empty = testBaseCluster_Empty.GetKeys_1();
+            Assert.NotNull(keys_1_Empty);
+            Assert.Empty(keys_1_Empty);
+        }
+
+        /// <summary>
+        /// Pins the base-class <see cref="Core.Classes.Cluster{TKey_1, TKey_2, TValue}.GetValues{UValue}(TKey_1)"/>
+        /// and <see cref="Core.Classes.Cluster{TKey_1, TKey_2, TValue}.GetValues{UValue}(System.Func{UValue, bool}?)"/> implementations
+        /// on a derivative that does not override them, built in a single pass over the cluster's enumeration.
+        /// </summary>
+        [Fact]
+        public void Cluster_Base_GetValues_SinglePassOverEnumeration()
+        {
+            Classes.TestBaseCluster testBaseCluster = new();
+            testBaseCluster.Add("groupA:sub1:apple");
+            testBaseCluster.Add("groupA:sub2:apricot");
+            testBaseCluster.Add("groupB:sub1:banana");
+
+            List<string>? byKey = testBaseCluster.GetValues<string>(1);
+            Assert.NotNull(byKey);
+            Assert.Equal(3, byKey.Count);
+            Assert.Contains("groupA:sub1:apple", byKey);
+            Assert.Contains("groupA:sub2:apricot", byKey);
+            Assert.Contains("groupB:sub1:banana", byKey);
+
+            List<string>? byKey_NoMatch = testBaseCluster.GetValues<string>(99);
+            Assert.NotNull(byKey_NoMatch);
+            Assert.Empty(byKey_NoMatch);
+
+            List<string>? byPredicate = testBaseCluster.GetValues<string>(x => x != null && x.Contains("ap"));
+            Assert.NotNull(byPredicate);
+            Assert.Equal(2, byPredicate.Count);
+
+            List<string>? all = testBaseCluster.GetValues<string>((System.Func<string?, bool>?)null);
+            Assert.NotNull(all);
+            Assert.Equal(3, all.Count);
+        }
     }
 }
