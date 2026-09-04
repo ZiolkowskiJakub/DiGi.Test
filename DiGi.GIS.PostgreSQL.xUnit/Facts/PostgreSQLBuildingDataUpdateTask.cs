@@ -27,6 +27,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Equal(0, postgreSQLBuildingDataUpdateTask.UnassignedSubdivisionBuildingCount);
             Assert.Equal(0, postgreSQLBuildingDataUpdateTask.CrossCountySubdivisionBuildingCount);
             Assert.Equal(0, postgreSQLBuildingDataUpdateTask.UpdatedRowCount);
+            Assert.Equal(0, postgreSQLBuildingDataUpdateTask.UnfulfilledUpdateTypeCount);
         }
 
         /// <summary>
@@ -433,6 +434,89 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
                 Assert.True(populationFound, $"Row {row.Index} of the pulled building data carries no positive Municipality population value in any year.");
             }
+        }
+
+        /// <summary>
+        /// Verifies that a <see cref="BuildingDataUpdateType.Statistical"/> run whose unit hierarchy cannot be loaded is reported as incomplete rather than successful.
+        /// <para>The unit converter is swapped for one holding no connection, so <c>GetStatisticalUnitAsync</c> answers no root unit - the same answer an empty or missing <c>unit</c> table gives - while every other converter reaches the real database. Before the fix the task logged a Warning, wrote none of the Municipality population columns, incremented no tally and still returned true.</para>
+        /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database populated with administrative areal and building data.</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_Statistical_NoUnitHierarchy_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            // A converter over no connection answers no root statistical unit: the task's statistical branch is then
+            // dropped silently, which is exactly the state an unpopulated unit table leaves the database in.
+            gISPostgreSQLConverterManager.Add(new UnitPostgreSQLConverter(null));
+
+            // Test county: 204 - chosen because the database holds its buildings under resolvable subdivisions, so the
+            // scope the run walks is real; the outcome under test does not depend on how many buildings it carries.
+            int countyId = 204;
+
+            PostgreSQLBuildingDataUpdateTask postgreSQLBuildingDataUpdateTask = new(gISPostgreSQLConverterManager)
+            {
+                PostgreSQLBuildingDataUpdateOptions = new PostgreSQLBuildingDataUpdateOptions
+                {
+                    BuildingDataUpdateTypes = [BuildingDataUpdateType.Statistical],
+                    CountyIds = [countyId]
+                }
+            };
+
+            TaskCompletionSource<bool> taskCompletionSource = new();
+            postgreSQLBuildingDataUpdateTask.Stopped += (object? sender, EventArgs e) => taskCompletionSource.TrySetResult(true);
+
+            postgreSQLBuildingDataUpdateTask.Start();
+
+            await taskCompletionSource.Task;
+
+            Assert.Null(postgreSQLBuildingDataUpdateTask.Exception);
+            Assert.Equal(0, postgreSQLBuildingDataUpdateTask.FailedSubdivisionCount);
+            Assert.Equal(0, postgreSQLBuildingDataUpdateTask.UpdatedRowCount);
+            Assert.Equal(1, postgreSQLBuildingDataUpdateTask.UnfulfilledUpdateTypeCount);
+            Assert.False(postgreSQLBuildingDataUpdateTask.IsSucceeded, "A Statistical run that could not load the unit hierarchy wrote nothing it was asked for - it must not be reported as succeeded.");
+        }
+
+        /// <summary>
+        /// Verifies that a run selecting several update types keeps the types it can serve when the statistical unit hierarchy cannot be loaded, while still reporting the run as incomplete.
+        /// <para>The same connection-less unit converter stub as in <see cref="PostgreSQLBuildingDataUpdateTask_Statistical_NoUnitHierarchy_Integration"/> is used, with <see cref="BuildingDataUpdateType.General"/> selected alongside <see cref="BuildingDataUpdateType.Statistical"/>. The general pass is expected to run and write; only the result changes, so <c>true</c> keeps meaning that every selected update type was written.</para>
+        /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database populated with administrative areal and building data.</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_Statistical_DoesNotSinkOtherTypes_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            gISPostgreSQLConverterManager.Add(new UnitPostgreSQLConverter(null));
+
+            // Test county: 204 - the database holds 5 814 of its buildings under 67 resolvable subdivisions, so the
+            // general pass has real subdivisions to process and the fact can tell a kept general pass from an empty scope.
+            int countyId = 204;
+
+            PostgreSQLBuildingDataUpdateTask postgreSQLBuildingDataUpdateTask = new(gISPostgreSQLConverterManager)
+            {
+                PostgreSQLBuildingDataUpdateOptions = new PostgreSQLBuildingDataUpdateOptions
+                {
+                    BuildingDataUpdateTypes = [BuildingDataUpdateType.General, BuildingDataUpdateType.Statistical],
+                    CountyIds = [countyId]
+                }
+            };
+
+            TaskCompletionSource<bool> taskCompletionSource = new();
+            postgreSQLBuildingDataUpdateTask.Stopped += (object? sender, EventArgs e) => taskCompletionSource.TrySetResult(true);
+
+            postgreSQLBuildingDataUpdateTask.Start();
+
+            await taskCompletionSource.Task;
+
+            Assert.Null(postgreSQLBuildingDataUpdateTask.Exception);
+            Assert.Equal(0, postgreSQLBuildingDataUpdateTask.FailedSubdivisionCount);
+            Assert.True(postgreSQLBuildingDataUpdateTask.ProcessedSubdivisionCount > 0, "The general pass is expected to have processed subdivisions - a missing statistical hierarchy must not sink the other selected update types.");
+            Assert.True(postgreSQLBuildingDataUpdateTask.UpdatedRowCount > 0, "The general pass is expected to have written rows.");
+            Assert.Equal(1, postgreSQLBuildingDataUpdateTask.UnfulfilledUpdateTypeCount);
+            Assert.False(postgreSQLBuildingDataUpdateTask.IsSucceeded, "A run that returned one of its selected update types unwritten must not be reported as succeeded.");
         }
     }
 }
