@@ -130,6 +130,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateBuilding2D)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateBuildingData)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateEPWFile)}=true",
+                $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateOccupancyData)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateOrtoDatas)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateYearBuiltData)}=true",
             ]);
