@@ -22,6 +22,7 @@ namespace DiGi.YOLO.xUnit
                 string trainPath = Path.Combine(tempDirectory, "train.py");
                 string predictPath = Path.Combine(tempDirectory, "predict.py");
                 string utilsPath = Path.Combine(tempDirectory, "utils.py");
+                string checkPath = Path.Combine(tempDirectory, "check.py");
                 string requirementsPath = Path.Combine(tempDirectory, "requirements.txt");
                 string confPath = Path.Combine(tempDirectory, "conf.yaml");
 
@@ -29,6 +30,7 @@ namespace DiGi.YOLO.xUnit
                 Assert.True(File.Exists(trainPath));
                 Assert.True(File.Exists(predictPath));
                 Assert.True(File.Exists(utilsPath));
+                Assert.True(File.Exists(checkPath));
                 Assert.True(File.Exists(requirementsPath));
                 Assert.True(File.Exists(confPath));
 
@@ -51,6 +53,15 @@ namespace DiGi.YOLO.xUnit
                 string utilsContent = File.ReadAllText(utilsPath);
                 Assert.Contains("isdigit()", utilsContent);
                 Assert.Contains("model.pt", utilsContent);
+
+                //check.py must state its own intent rather than inheriting torch.load's weights_only default from the ultralytics
+                //monkeypatch: torch 2.6 flipped the default to weights_only=True, which refuses the ultralytics classes a checkpoint
+                //carries. A model whose header cannot be parsed is a warning, not a refusal, so it must surface in the warnings array
+                //and leave runnable true - see ZiolkowskiJakub/DiGi.YOLO#15
+                string checkContent = File.ReadAllText(checkPath);
+                Assert.Contains("weights_only=False", checkContent);
+                Assert.Contains("warnings.append", checkContent);
+                Assert.Contains("\"warnings\": warnings", checkContent);
 
                 //The detector is frozen, so ultralytics is pinned to the version the checkpoint records as having written it
                 string requirementsContent = File.ReadAllText(requirementsPath);

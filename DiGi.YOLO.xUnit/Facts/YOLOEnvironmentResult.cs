@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace DiGi.YOLO.xUnit
 {
@@ -22,6 +24,7 @@ namespace DiGi.YOLO.xUnit
                 true,
                 @"C:\YOLO\models\best.pt",
                 "8.3.130",
+                [],
                 ["CUDA hardware acceleration available."],
                 checkedTime);
 
@@ -33,7 +36,8 @@ namespace DiGi.YOLO.xUnit
             Assert.True(yOLOEnvironmentResult.CudaAvailable);
             Assert.Equal(@"C:\YOLO\models\best.pt", yOLOEnvironmentResult.ModelPath);
             Assert.Equal("8.3.130", yOLOEnvironmentResult.ModelUltralyticsVersion);
-            Assert.Single(yOLOEnvironmentResult.Messages!);
+            Assert.Empty(yOLOEnvironmentResult.Messages!);
+            Assert.Single(yOLOEnvironmentResult.Warnings!);
             Assert.Equal(checkedTime, yOLOEnvironmentResult.Checked);
 
             Core.xUnit.Query.SerializationCheck(yOLOEnvironmentResult);
@@ -91,6 +95,81 @@ namespace DiGi.YOLO.xUnit
             Assert.NotNull(yOLOEnvironmentResult);
             Assert.False(yOLOEnvironmentResult.Runnable);
             Assert.True(stopwatch.ElapsedMilliseconds < 2000, string.Format("Preflight check took {0} ms, expected under 2000 ms.", stopwatch.ElapsedMilliseconds));
+        }
+
+        /// <summary>
+        /// Verifies that the preflight probe reports a readable checkpoint as runnable and names the ultralytics version that wrote it, and that a present but unreadable model is reported as a warning rather than making the machine unrunnable.
+        /// <para>The interpreter and checkpoint are machine specific - a CPython carrying ultralytics and torch plus the frozen model - so both are read from a git-ignored conf (DiGi.YOLO_Preflight.conf) and the fact returns without asserting when that conf is absent. The split between <see cref="Classes.YOLOEnvironmentResult.Messages"/> and <see cref="Classes.YOLOEnvironmentResult.Warnings"/> is what makes the second half hold: runnable is about the machine, and the model header is diagnostic.</para>
+        /// </summary>
+        [Fact]
+        public void YOLOEnvironmentResult_Model()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            string? directory_UserFiles = Core.xUnit.Query.UserFilesDirectory(assembly);
+            if (string.IsNullOrWhiteSpace(directory_UserFiles))
+            {
+                return;
+            }
+
+            string path_Configuration = Path.Combine(directory_UserFiles!, "DiGi.YOLO_Preflight.conf");
+            if (!File.Exists(path_Configuration))
+            {
+                return;
+            }
+
+            Dictionary<string, string> settings = [];
+            foreach (string line in File.ReadAllLines(path_Configuration))
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                int index = line.IndexOf('=');
+                if (index <= 0)
+                {
+                    continue;
+                }
+
+                settings[line.Substring(0, index).Trim()] = line.Substring(index + 1).Trim();
+            }
+
+            settings.TryGetValue("PythonPath", out string? path_Python);
+            settings.TryGetValue("ModelPath", out string? path_Model);
+
+            if (string.IsNullOrWhiteSpace(path_Python) || !File.Exists(path_Python) || string.IsNullOrWhiteSpace(path_Model) || !File.Exists(path_Model))
+            {
+                return;
+            }
+
+            // A readable checkpoint reports the ultralytics version recorded inside it and leaves the machine runnable
+            Classes.YOLOEnvironmentResult yOLOEnvironmentResult_Readable = Query.YOLOEnvironmentResult(path_Python, path_Model);
+            Assert.NotNull(yOLOEnvironmentResult_Readable);
+            Assert.True(yOLOEnvironmentResult_Readable.Runnable);
+            Assert.Equal("8.3.130", yOLOEnvironmentResult_Readable.ModelUltralyticsVersion);
+            Assert.Empty(yOLOEnvironmentResult_Readable.Warnings ?? []);
+
+            // A present model whose header cannot be parsed is a warning, not a refusal: runnable stays true and the
+            // reason surfaces in Warnings rather than Messages
+            string path_Model_Unreadable = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Unreadable_" + Path.GetRandomFileName() + ".pt");
+            try
+            {
+                File.WriteAllText(path_Model_Unreadable, "this is not a torch checkpoint");
+
+                Classes.YOLOEnvironmentResult yOLOEnvironmentResult_Unreadable = Query.YOLOEnvironmentResult(path_Python, path_Model_Unreadable);
+                Assert.NotNull(yOLOEnvironmentResult_Unreadable);
+                Assert.True(yOLOEnvironmentResult_Unreadable.Runnable);
+                Assert.Null(yOLOEnvironmentResult_Unreadable.ModelUltralyticsVersion);
+                Assert.NotEmpty(yOLOEnvironmentResult_Unreadable.Warnings ?? []);
+            }
+            finally
+            {
+                if (File.Exists(path_Model_Unreadable))
+                {
+                    File.Delete(path_Model_Unreadable);
+                }
+            }
         }
     }
 }
