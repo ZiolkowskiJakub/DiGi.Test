@@ -16,6 +16,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 BatchSize = 2500,
+                CleanScratchDirectory = false,
                 Confidence = 0.35,
                 CountyIds = [73485, 73482],
                 ExportImages = false,
@@ -40,6 +41,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.NotNull(yearBuiltPredictionPipelineOptions.CountyIds);
             Assert.Equal(2, yearBuiltPredictionPipelineOptions.CountyIds!.Count);
             Assert.False(yearBuiltPredictionPipelineOptions.ExportImages);
+            Assert.False(yearBuiltPredictionPipelineOptions.CleanScratchDirectory);
             Assert.Null(yearBuiltPredictionPipelineOptions.WorkingDirectory);
             Assert.NotNull(yearBuiltPredictionPipelineOptions.Years);
             Assert.Equal(2010, yearBuiltPredictionPipelineOptions.Years!.Min);
@@ -53,6 +55,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(yearBuiltPredictionPipelineOptions.BatchSize, yearBuiltPredictionPipelineOptions_Actual!.BatchSize);
             Assert.Equal(yearBuiltPredictionPipelineOptions.Confidence, yearBuiltPredictionPipelineOptions_Actual.Confidence);
             Assert.Equal(yearBuiltPredictionPipelineOptions.ScratchDirectory, yearBuiltPredictionPipelineOptions_Actual.ScratchDirectory);
+            //Set against its default, so a member the copy constructor or the serializer forgot reads back as true rather than as what was asked for
+            Assert.False(yearBuiltPredictionPipelineOptions_Actual.CleanScratchDirectory);
             Assert.Null(yearBuiltPredictionPipelineOptions_Actual.WorkingDirectory);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual.CountyIds);
             Assert.Contains(73485, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
@@ -68,6 +72,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //with the source - and a copy constructor that forgot one of them outright is what the options
             //window works on, so the run would be scoped from a projection the operator never chose.
             Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Clone = new(yearBuiltPredictionPipelineOptions);
+            Assert.False(yearBuiltPredictionPipelineOptions_Clone.CleanScratchDirectory);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotSame(yearBuiltPredictionPipelineOptions.CountyIds, yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.Years);
@@ -98,6 +103,9 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Null(yearBuiltPredictionPipelineOptions.Years);
 
             Assert.True(yearBuiltPredictionPipelineOptions.ExportImages);
+            //On by default: the scoring step rebuilds its building list from the results file on disk, so a scratch
+            //folder that outlives its run is what let a county be skipped in silence
+            Assert.True(yearBuiltPredictionPipelineOptions.CleanScratchDirectory);
             Assert.True(yearBuiltPredictionPipelineOptions.Resume);
             Assert.True(yearBuiltPredictionPipelineOptions.RunPrediction);
             Assert.True(yearBuiltPredictionPipelineOptions.Score);

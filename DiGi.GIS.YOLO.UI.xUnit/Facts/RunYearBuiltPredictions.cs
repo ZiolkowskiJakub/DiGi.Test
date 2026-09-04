@@ -232,5 +232,133 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Contains(nameof(DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness), yearBuiltPredictionResult.FailedStepNames);
             Assert.Contains("model", string.Join(" ", yearBuiltPredictionResult.Messages));
         }
+        /// <summary>
+        /// Verifies that a county whose detection results are not on disk is reported as a failed step rather than logged as a county the detector found nothing in.
+        /// <para>With the detector off, the results file is the only record of which buildings it fired on - the stored detection columns are never read back for this - so a scratch directory cleaned between a detections run and a scoring run leaves a county unscoreable even though its detections are already stored.</para>
+        /// <para>That used to read exactly like a county with no detections at all: an information level log, no failed step, and a run that ended green having skipped it. Only one of the two is recoverable, so they must not report identically.</para>
+        /// </summary>
+        [Fact]
+        public async Task RunYearBuiltPredictions_MissingResults()
+        {
+            int countyId = 73485;
+
+            string? directory_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            Assert.False(string.IsNullOrWhiteSpace(directory_Reports));
+
+            string directory_Scratch = Path.Combine(directory_Reports!, nameof(RunYearBuiltPredictions_MissingResults));
+            string directory_County = Path.Combine(directory_Scratch, countyId.ToString());
+
+            if (Directory.Exists(directory_County))
+            {
+                Directory.Delete(directory_County, true);
+            }
+
+            //Laid out exactly as a run leaves a county, minus the results file
+            Directory.CreateDirectory(Path.Combine(directory_County, Constants.DirectoryName.PredictionImages));
+
+            GISWebAPIManager gisWebAPIManager = new(null);
+
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            {
+                CountyIds = [countyId],
+                ScratchDirectory = directory_Scratch,
+                CleanScratchDirectory = false,
+                ExportImages = false,
+                RunPrediction = false,
+                Score = false,
+                UpdateDetections = false,
+                UpdatePredictedYearBuilt = false,
+                UpdateYearBuiltData = false
+            };
+
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
+
+            Assert.NotNull(yearBuiltPredictionResult);
+            Assert.Equal(0, yearBuiltPredictionResult!.BuildingCount);
+
+            //Named after the reader that had nothing to read, and the reason travels with the result
+            Assert.Contains(nameof(DiGi.YOLO.Create.BoundingBoxResultFile), yearBuiltPredictionResult.FailedStepNames);
+            Assert.Contains(Constants.FileName.PredictionResults, string.Join(" ", yearBuiltPredictionResult.Messages));
+        }
+
+        /// <summary>
+        /// Verifies that a county's scratch folder is removed once the run has finished with it, kept when the options ask for it to be kept, and kept when the county failed.
+        /// <para>Removing it is what closes the gap the two pass workflow had: with nothing left on disk, no later run can quietly depend on what a successful county wrote there. Keeping it is what the committed split templates ask for, so both directions are pinned - a cleanup that ignored the flag would delete the detections a manual scoring pass is about to read.</para>
+        /// <para>A failed county keeps its folder whatever the flag says. The export and the inference that filled it cost roughly half an hour and an hour and a half, and the feature coverage refusal - a reproducible configuration error - fires only after both have been paid for, so deleting the result of a failure turns a seconds long correction into a two hour one.</para>
+        /// <para>The scratch root itself is deliberately not removed. The tray application writes the options a run was started with into it, and that is the only record of what the run was asked to do.</para>
+        /// </summary>
+        [Fact]
+        public async Task RunYearBuiltPredictions_CleanScratchDirectory()
+        {
+            int countyId = 73485;
+
+            string? path_Fixture = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YOLO_Prediction.bbrf");
+            Assert.False(string.IsNullOrWhiteSpace(path_Fixture));
+
+            string? directory_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            Assert.False(string.IsNullOrWhiteSpace(directory_Reports));
+
+            string directory_Scratch = Path.Combine(directory_Reports!, nameof(RunYearBuiltPredictions_CleanScratchDirectory));
+            string directory_County = Path.Combine(directory_Scratch, countyId.ToString());
+
+            void LayOutCounty()
+            {
+                Directory.CreateDirectory(Path.Combine(directory_County, Constants.DirectoryName.PredictionImages));
+                File.Copy(path_Fixture!, Path.Combine(directory_County, Constants.FileName.PredictionResults), true);
+            }
+
+            GISWebAPIManager gisWebAPIManager = new(null);
+
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            {
+                CountyIds = [countyId],
+                ScratchDirectory = directory_Scratch,
+                ExportImages = false,
+                RunPrediction = false,
+                Score = false,
+                UpdateDetections = false,
+                UpdatePredictedYearBuilt = false,
+                UpdateYearBuiltData = false
+            };
+
+            //Kept: the detections a manual scoring pass would read are still there afterwards
+            LayOutCounty();
+
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Kept = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = false };
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Kept = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Kept);
+
+            Assert.NotNull(yearBuiltPredictionResult_Kept);
+            Assert.Equal(2, yearBuiltPredictionResult_Kept!.BuildingCount);
+            Assert.True(Directory.Exists(directory_County));
+            Assert.True(File.Exists(Path.Combine(directory_County, Constants.FileName.PredictionResults)));
+
+            //Cleaned: the same detections were read, and nothing was left behind
+            LayOutCounty();
+
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Cleaned = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = true };
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Cleaned = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Cleaned);
+
+            Assert.NotNull(yearBuiltPredictionResult_Cleaned);
+            Assert.Equal(2, yearBuiltPredictionResult_Cleaned!.BuildingCount);
+            Assert.False(Directory.Exists(directory_County));
+
+            //The run cleans up after its county, not after the scratch directory it was given
+            Assert.True(Directory.Exists(directory_Scratch));
+
+            //Failed: the flag asks for cleanup, but the county did not come through, so what it cost to produce stays
+            //on disk. Scoring with no predictor fails the county without needing a server for it.
+            LayOutCounty();
+
+            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Failed = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = true, Score = true };
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Failed = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Failed);
+
+            Assert.NotNull(yearBuiltPredictionResult_Failed);
+            Assert.Contains(nameof(IYearBuiltPredictor), yearBuiltPredictionResult_Failed!.FailedStepNames);
+            Assert.True(Directory.Exists(directory_County));
+            Assert.True(File.Exists(Path.Combine(directory_County, Constants.FileName.PredictionResults)));
+
+            //Cleaned up by the test rather than by the run, so a later run of this fact starts from a known state
+            Directory.Delete(directory_County, true);
+        }
     }
 }

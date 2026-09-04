@@ -100,5 +100,52 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 }
             }
         }
+        /// <summary>
+        /// Verifies that the resolver finds the runner in the extensions folder inside this application's own output, which is the layout the deployment now ships.
+        /// <para>The runner is assembled into this application's build output under <c>extensions</c>, in a folder of its own, before the deployment copies that output to the host - so a workspace checkout and a deployed machine resolve it identically, and a machine that will never score a building is deployed without the folder at all.</para>
+        /// <para>The folder name is a contract with <c>DiGi.Maintenance/Scripts/SyncDirectories.ps1</c>, which creates it, and nothing checks the two against each other at compile time. A rename on either side would leave the task quietly unoffered on every host, which is why the expected layout is stated here rather than only in the script.</para>
+        /// </summary>
+        [Fact]
+        public void YearBuiltPredictionConsoleAppPath_ExtensionFolder()
+        {
+            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory_Extension = System.IO.Path.Combine(directory, Constants.DirectoryName.Extensions, Constants.DirectoryName.YearBuiltPredictionExtension);
+            string path = System.IO.Path.Combine(directory_Extension, Constants.FileName.YearBuiltPredictionConsoleApp);
+
+            try
+            {
+                Directory.CreateDirectory(directory_Extension);
+                File.WriteAllText(path, string.Empty);
+
+                string? path_Resolved = Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory);
+
+                Assert.Equal(System.IO.Path.GetFullPath(path), path_Resolved);
+            }
+            finally
+            {
+                if (Directory.Exists(directory))
+                {
+                    Directory.Delete(directory, true);
+                }
+            }
+
+            // The extensions folder is optional, and an empty one is not a deployment of the runner. A task
+            // offered against a folder with no executable in it could only ever fail to start a process.
+            string directory_Empty = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+
+            try
+            {
+                Directory.CreateDirectory(System.IO.Path.Combine(directory_Empty, Constants.DirectoryName.Extensions, Constants.DirectoryName.YearBuiltPredictionExtension));
+
+                Assert.Null(Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory_Empty));
+            }
+            finally
+            {
+                if (Directory.Exists(directory_Empty))
+                {
+                    Directory.Delete(directory_Empty, true);
+                }
+            }
+        }
     }
 }
