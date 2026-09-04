@@ -2,6 +2,7 @@ using DiGi.GIS.PostgreSQL.Classes;
 using DiGi.GIS.PostgreSQL.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiGi.GIS.PostgreSQL.xUnit
@@ -250,6 +251,187 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             foreach (Building2D building2D in buildings_Fallback)
             {
                 Assert.False(inScopeBuildingIds.Contains(building2D.Id), $"Fallback building {building2D.Id} (reference {building2D.Reference}) sits under an in-scope subdivision - the fallback would re-process what the loop already wrote.");
+            }
+        }
+
+        /// <summary>
+        /// Verifies that <c>Query.Match</c> over a subdivision reference and its path prefers the subdivision's own match and falls back to the path's municipality reference only when the subdivision does not match.
+        /// <para>This is the resolution both passes of <see cref="PostgreSQLBuildingDataUpdateTask"/> share: the subdivision loop for its subdivisions, and the unassigned pass for the cross-county buildings' own subdivisions.</para>
+        /// </summary>
+        [Fact]
+        public void Match_SubdivisionReference_MunicipalityFallback()
+        {
+            List<DiGi.BDL.Classes.Unit> units =
+            [
+                new DiGi.BDL.Classes.Unit { id = "000000000000", name = "POLSKA", level = 0 },
+                new DiGi.BDL.Classes.Unit { id = "030000000000", name = "MAKROREGION POŁUDNIOWO-ZACHODNI", level = 1 },
+                new DiGi.BDL.Classes.Unit { id = "030200000000", name = "DOLNOŚLĄSKIE", level = 2 },
+                new DiGi.BDL.Classes.Unit { id = "030210000000", name = "REGION DOLNOŚLĄSKIE", level = 3 },
+                new DiGi.BDL.Classes.Unit { id = "030210100000", name = "PODREGION JELENIOGÓRSKI", level = 4 },
+                new DiGi.BDL.Classes.Unit { id = "030210101000", name = "POWIAT BOLESŁAWIECKI", level = 5 },
+                new DiGi.BDL.Classes.Unit { id = "030210101011", name = "BOLESŁAWIEC", level = 6 },
+                new DiGi.BDL.Classes.Unit { id = "030210101012", name = "GROMADKA", level = 6 }
+            ];
+
+            DiGi.GIS.Classes.StatisticalUnit? rootStatisticalUnit = GIS.Create.StatisticalUnit(units);
+            Assert.NotNull(rootStatisticalUnit);
+
+            AdministrativeAreal2DReference municipalityReference = new()
+            {
+                Id = 901,
+                Code = "0201011",
+                Name = "BOLESŁAWIEC (GM. MIEJSKA)",
+                AdministrativeArealType = AdministrativeArealType.Municipality
+            };
+
+            AdministrativeAreal2DReferencePath administrativeAreal2DReferencePath = new([municipalityReference]);
+            Assert.NotNull(administrativeAreal2DReferencePath[AdministrativeArealType.Municipality]);
+
+            // A subdivision that names its own statistical unit matches directly, even though the path's municipality is a different unit.
+            AdministrativeAreal2DReference subdivisionReference_Matched = new()
+            {
+                Id = 900,
+                Name = "GROMADKA",
+                AdministrativeArealType = AdministrativeArealType.Subdivision
+            };
+
+            DiGi.GIS.Classes.StatisticalUnit? statisticalUnit_Subdivision = Query.Match(rootStatisticalUnit, subdivisionReference_Matched, administrativeAreal2DReferencePath);
+            Assert.NotNull(statisticalUnit_Subdivision);
+            Assert.Equal("GROMADKA", statisticalUnit_Subdivision.Name);
+
+            // A subdivision that matches nothing falls back to the municipality of its path.
+            AdministrativeAreal2DReference subdivisionReference_Unmatched = new()
+            {
+                Id = 902,
+                Name = "OSIEDLE PÓŁNOC",
+                AdministrativeArealType = AdministrativeArealType.Subdivision
+            };
+
+            DiGi.GIS.Classes.StatisticalUnit? statisticalUnit_Municipality = Query.Match(rootStatisticalUnit, subdivisionReference_Unmatched, administrativeAreal2DReferencePath);
+            Assert.NotNull(statisticalUnit_Municipality);
+            Assert.Equal("BOLESŁAWIEC", statisticalUnit_Municipality.Name);
+
+            // Without a path there is nothing to fall back to.
+            Assert.Null(Query.Match(rootStatisticalUnit, subdivisionReference_Unmatched, null));
+
+            // A path without a municipality leaves nothing to fall back to either.
+            AdministrativeAreal2DReference countyReference = new()
+            {
+                Id = 903,
+                Code = "0201",
+                Name = "BOLESŁAWIECKI",
+                AdministrativeArealType = AdministrativeArealType.County
+            };
+
+            AdministrativeAreal2DReferencePath administrativeAreal2DReferencePath_County = new([countyReference]);
+            Assert.Null(Query.Match(rootStatisticalUnit, subdivisionReference_Unmatched, administrativeAreal2DReferencePath_County));
+        }
+
+        /// <summary>
+        /// Verifies that the buildings only the unassigned pass can reach - buildings naming a subdivision filed under another county part - receive the population columns when the task runs with <see cref="BuildingDataUpdateType.Statistical"/>.
+        /// <para>The county is discovered rather than hardcoded: the parts of the multi-part county codes are probed until one carries cross-county buildings, because the set the unassigned pass reaches changes with repairs and re-imports. Before the fix the final per-county pass had no statistical branch, so those buildings were never written the Municipality population columns however often the task ran with Statistical selected.</para>
+        /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database populated with administrative areal, building and statistical data.</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database populated with administrative areal, building and statistical data.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_Statistical_UnassignedBuildings_Integration()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            AdministrativeAreal2DPostgreSQLConverter? administrativeAreal2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
+            Assert.NotNull(administrativeAreal2DPostgreSQLConverter);
+
+            UnitPostgreSQLConverter? unitPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<UnitPostgreSQLConverter>();
+            Assert.NotNull(unitPostgreSQLConverter);
+
+            DiGi.GIS.Classes.StatisticalUnit? rootStatisticalUnit = await unitPostgreSQLConverter.GetStatisticalUnitAsync(commandTimeout: 600);
+            Assert.NotNull(rootStatisticalUnit);
+
+            Building2DPostgreSQLConverter? building2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<Building2DPostgreSQLConverter>();
+            Assert.NotNull(building2DPostgreSQLConverter);
+
+            BuildingDataPostgreSQLConverter? buildingDataPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<BuildingDataPostgreSQLConverter>();
+            Assert.NotNull(buildingDataPostgreSQLConverter);
+
+            List<AdministrativeAreal2DReference>? subdivisions = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.Subdivision, commandTimeout: 600);
+            Assert.NotNull(subdivisions);
+
+            List<AdministrativeAreal2DReference>? countyReferences = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County, commandTimeout: 600);
+            Assert.NotNull(countyReferences);
+
+            Dictionary<int, HashSet<int>> siblingCountyGroups = countyReferences.SiblingCountyGroups();
+            Dictionary<int, HashSet<int>> inScopeSubdivisionIds_ByCountyId = Query.InScopeSubdivisionIds(subdivisions, siblingCountyGroups);
+
+            // Discover a county whose unassigned set carries at least one building naming a (cross-county) subdivision: cross-county
+            // filing concentrates in the parts of the multi-part county codes, so those parts are probed first and the single-part
+            // codes only behind them, and the set is built exactly the way the task builds it.
+            List<int> candidateCountyIds =
+            [
+                .. siblingCountyGroups.Where(x => x.Value.Count > 1).Select(x => x.Key),
+                .. siblingCountyGroups.Where(x => x.Value.Count == 1).Select(x => x.Key)
+            ];
+
+            int countyId = -1;
+            List<Building2D> building2Ds_Unassigned = [];
+            foreach (int countyId_Candidate in candidateCountyIds)
+            {
+                inScopeSubdivisionIds_ByCountyId.TryGetValue(countyId_Candidate, out HashSet<int>? inScopeSubdivisionIds_Candidate);
+
+                List<Building2D>? building2Ds_Candidate = await building2DPostgreSQLConverter.GetBuilding2DsUnreachedByCountyAsync(countyId_Candidate, inScopeSubdivisionIds_Candidate, commandTimeout: 600);
+                if (building2Ds_Candidate is not null && building2Ds_Candidate.Any(x => x.SubdivisionId is not null))
+                {
+                    countyId = countyId_Candidate;
+                    building2Ds_Unassigned = building2Ds_Candidate;
+                    break;
+                }
+            }
+
+            Assert.True(countyId != -1, "No county part of a multi-part code carries cross-county buildings on this database, or the fact is vacuous.");
+
+            List<string> references_CrossCounty = [.. building2Ds_Unassigned.Where(x => x.SubdivisionId is not null && !string.IsNullOrWhiteSpace(x.Reference)).Select(x => x.Reference!)];
+            Assert.True(references_CrossCounty.Count > 0, $"Part {countyId} is expected to carry cross-county buildings, or the fact is vacuous.");
+
+            PostgreSQLBuildingDataUpdateTask postgreSQLBuildingDataUpdateTask = new(gISPostgreSQLConverterManager)
+            {
+                PostgreSQLBuildingDataUpdateOptions = new PostgreSQLBuildingDataUpdateOptions
+                {
+                    BuildingDataUpdateTypes = [BuildingDataUpdateType.Statistical],
+                    CountyIds = [countyId]
+                }
+            };
+
+            TaskCompletionSource<bool> taskCompletionSource = new();
+            postgreSQLBuildingDataUpdateTask.Stopped += (object? sender, EventArgs e) => taskCompletionSource.TrySetResult(true);
+
+            postgreSQLBuildingDataUpdateTask.Start();
+
+            await taskCompletionSource.Task;
+
+            Assert.Null(postgreSQLBuildingDataUpdateTask.Exception);
+            Assert.True(postgreSQLBuildingDataUpdateTask.IsSucceeded);
+            Assert.Equal(0, postgreSQLBuildingDataUpdateTask.FailedSubdivisionCount);
+            Assert.True(postgreSQLBuildingDataUpdateTask.CrossCountySubdivisionBuildingCount > 0, "The unassigned pass is expected to have processed the cross-county buildings.");
+
+            Core.IO.Table.Classes.Table? table = await buildingDataPostgreSQLConverter.PullAsync(references_CrossCounty, countyId, commandTimeout: 600);
+            Assert.NotNull(table);
+            Assert.True(table.RowCount > 0, $"The building data pull of part {countyId} returned no rows for the cross-county references - the unassigned pass did not write them.");
+
+            // The defect: those rows carried no Municipality population columns at all, so the column lookup itself failed on unmodified code.
+            Assert.True(table.Columns.Any(x => x.Name?.StartsWith("Municipality population ") == true), $"The pulled building data of part {countyId} carries no Municipality population column - the unassigned pass did not write the population columns.");
+
+            foreach (Core.IO.Table.Classes.Row row in table.Rows)
+            {
+                bool populationFound = false;
+                foreach (Core.IO.Table.Classes.Column column in table.Columns)
+                {
+                    if (column.Name?.StartsWith("Municipality population ") == true && row.TryGetValue(column.Index, out int population) && population > 0)
+                    {
+                        populationFound = true;
+                        break;
+                    }
+                }
+
+                Assert.True(populationFound, $"Row {row.Index} of the pulled building data carries no positive Municipality population value in any year.");
             }
         }
     }
