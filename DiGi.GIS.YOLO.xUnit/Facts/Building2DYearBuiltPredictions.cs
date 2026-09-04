@@ -6,8 +6,6 @@ using System.Reflection;
 
 namespace DiGi.GIS.YOLO.xUnit
 {
-    using YOLO = DiGi.YOLO;
-
     public partial class Facts
     {
         /// <summary>
