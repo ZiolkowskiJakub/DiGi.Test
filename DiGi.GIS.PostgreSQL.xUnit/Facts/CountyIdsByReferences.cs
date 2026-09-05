@@ -2,7 +2,7 @@ using DiGi.GIS.PostgreSQL.Classes;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DiGi.GIS.WebAPI.xUnit
+namespace DiGi.GIS.PostgreSQL.xUnit
 {
     public partial class Facts
     {
