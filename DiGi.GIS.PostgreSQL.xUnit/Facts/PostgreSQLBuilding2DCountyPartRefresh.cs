@@ -69,16 +69,19 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void PostgreSQLBuilding2DCountyPartRefreshResult_Serialization()
         {
-            PostgreSQLBuilding2DCountyPartRefreshResult postgreSQLBuilding2DCountyPartRefreshResult = new(18, 781_470, 781_468, 0, 0, 2, 0, false);
+            // Every tally distinct and none of them zero, so a member the copy constructor forgot cannot
+            // pass by matching another one.
+            PostgreSQLBuilding2DCountyPartRefreshResult postgreSQLBuilding2DCountyPartRefreshResult = new(18, 989_341, 758_394, 758_390, 2, 1, 4_112_508, 3, true);
 
             Assert.Equal(18, postgreSQLBuilding2DCountyPartRefreshResult.CodeCount);
-            Assert.Equal(781_470, postgreSQLBuilding2DCountyPartRefreshResult.ReadCount);
-            Assert.Equal(781_468, postgreSQLBuilding2DCountyPartRefreshResult.MoveCount);
-            Assert.Equal(0, postgreSQLBuilding2DCountyPartRefreshResult.MovedCount);
-            Assert.Equal(0, postgreSQLBuilding2DCountyPartRefreshResult.BlockedCount);
-            Assert.Equal(2, postgreSQLBuilding2DCountyPartRefreshResult.UnresolvedCount);
-            Assert.Equal(0, postgreSQLBuilding2DCountyPartRefreshResult.ReferencedObjectMovedCount);
-            Assert.False(postgreSQLBuilding2DCountyPartRefreshResult.Cancelled);
+            Assert.Equal(989_341, postgreSQLBuilding2DCountyPartRefreshResult.ReadCount);
+            Assert.Equal(758_394, postgreSQLBuilding2DCountyPartRefreshResult.MoveCount);
+            Assert.Equal(758_390, postgreSQLBuilding2DCountyPartRefreshResult.MovedCount);
+            Assert.Equal(2, postgreSQLBuilding2DCountyPartRefreshResult.BlockedCount);
+            Assert.Equal(1, postgreSQLBuilding2DCountyPartRefreshResult.UnresolvedCount);
+            Assert.Equal(4_112_508, postgreSQLBuilding2DCountyPartRefreshResult.ReferencedObjectMovedCount);
+            Assert.Equal(3, postgreSQLBuilding2DCountyPartRefreshResult.FailedCodeCount);
+            Assert.True(postgreSQLBuilding2DCountyPartRefreshResult.Cancelled);
 
             string? json = Core.Convert.ToSystem_String(postgreSQLBuilding2DCountyPartRefreshResult);
             Assert.NotNull(json);
@@ -86,14 +89,16 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             PostgreSQLBuilding2DCountyPartRefreshResult? postgreSQLBuilding2DCountyPartRefreshResult_Json = Core.Convert.ToDiGi<PostgreSQLBuilding2DCountyPartRefreshResult>(json)?.FirstOrDefault();
             Assert.NotNull(postgreSQLBuilding2DCountyPartRefreshResult_Json);
 
-            Assert.Equal(781_468, postgreSQLBuilding2DCountyPartRefreshResult_Json.MoveCount);
-            Assert.Equal(0, postgreSQLBuilding2DCountyPartRefreshResult_Json.MovedCount);
-            Assert.Equal(2, postgreSQLBuilding2DCountyPartRefreshResult_Json.UnresolvedCount);
+            Assert.Equal(758_394, postgreSQLBuilding2DCountyPartRefreshResult_Json.MoveCount);
+            Assert.Equal(758_390, postgreSQLBuilding2DCountyPartRefreshResult_Json.MovedCount);
+            Assert.Equal(1, postgreSQLBuilding2DCountyPartRefreshResult_Json.UnresolvedCount);
+            Assert.Equal(3, postgreSQLBuilding2DCountyPartRefreshResult_Json.FailedCodeCount);
 
             PostgreSQLBuilding2DCountyPartRefreshResult postgreSQLBuilding2DCountyPartRefreshResult_Clone = new(postgreSQLBuilding2DCountyPartRefreshResult);
 
             Assert.Equal(18, postgreSQLBuilding2DCountyPartRefreshResult_Clone.CodeCount);
-            Assert.Equal(781_470, postgreSQLBuilding2DCountyPartRefreshResult_Clone.ReadCount);
+            Assert.Equal(989_341, postgreSQLBuilding2DCountyPartRefreshResult_Clone.ReadCount);
+            Assert.Equal(3, postgreSQLBuilding2DCountyPartRefreshResult_Clone.FailedCodeCount);
 
             Core.xUnit.Query.SerializationCheck(postgreSQLBuilding2DCountyPartRefreshResult);
         }
@@ -105,12 +110,16 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void PostgreSQLBuilding2DCountyPartRefreshResult_Blocked()
         {
-            PostgreSQLBuilding2DCountyPartRefreshResult postgreSQLBuilding2DCountyPartRefreshResult = new(2, 44_810, 2, 1, 1, 0, 3, false);
+            PostgreSQLBuilding2DCountyPartRefreshResult postgreSQLBuilding2DCountyPartRefreshResult = new(2, 44_810, 2, 1, 1, 0, 3, 0, false);
 
             Assert.Equal(2, postgreSQLBuilding2DCountyPartRefreshResult.MoveCount);
             Assert.Equal(1, postgreSQLBuilding2DCountyPartRefreshResult.MovedCount);
             Assert.Equal(1, postgreSQLBuilding2DCountyPartRefreshResult.BlockedCount);
             Assert.Equal(3, postgreSQLBuilding2DCountyPartRefreshResult.ReferencedObjectMovedCount);
+
+            // A blocked move is not a failed county: the statement ran and reported what it would not take,
+            // which is the answer rather than an error. Only a county the run could not finish counts here.
+            Assert.Equal(0, postgreSQLBuilding2DCountyPartRefreshResult.FailedCodeCount);
 
             Core.xUnit.Query.SerializationCheck(postgreSQLBuilding2DCountyPartRefreshResult);
         }
