@@ -61,5 +61,39 @@ namespace DiGi.GIS.WebAPI.xUnit
                 }
             }
         }
+
+        /// <summary>
+        /// Asserts that the Building2D write endpoint taking county parts also accepts the county code, bound as <c>code</c>.
+        /// <para>Naming several parts leaves the part of each building to geometry, and the code is what narrows that decision to the parts of one county. Without it a building of a multi-part county is tested against every county whose extent reaches it - one query returning whole county polygons per building - which is the difference between minutes and hours over a county of tens of thousands of buildings.</para>
+        /// <para>The <c>updateitems</c> action resolves a code to its parts and then delegates here, so this parameter is what carries the code across that delegation. It went missing once, and nothing failed: the import stayed correct and became slow.</para>
+        /// </summary>
+        [Fact]
+        public void Building2DController_UpdateItemsByCountyIdsAsync_CodeQueryParameterBinding()
+        {
+            MethodInfo? methodInfo = typeof(Building2DController).GetMethod(nameof(Building2DController.UpdateItemsByCountyIdsAsync));
+            Assert.NotNull(methodInfo);
+
+            ParameterInfo? parameterInfo = null;
+            foreach (ParameterInfo parameterInfo_Temp in methodInfo.GetParameters())
+            {
+                if (parameterInfo_Temp.Name == "code")
+                {
+                    parameterInfo = parameterInfo_Temp;
+                    break;
+                }
+            }
+
+            Assert.NotNull(parameterInfo);
+
+            FromQueryAttribute? fromQueryAttribute = parameterInfo.GetCustomAttribute<FromQueryAttribute>();
+            Assert.NotNull(fromQueryAttribute);
+            Assert.Equal("code", fromQueryAttribute.Name);
+
+            // Optional, so every client that already posts without it keeps working.
+            Assert.True(parameterInfo.IsOptional);
+
+            ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+            Assert.Equal(typeof(System.Threading.CancellationToken), parameterInfos[^1].ParameterType);
+        }
     }
 }
