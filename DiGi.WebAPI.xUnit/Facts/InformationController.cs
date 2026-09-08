@@ -1,4 +1,4 @@
-﻿using DiGi.WebAPI.Classes;
+using DiGi.WebAPI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -38,7 +38,12 @@ namespace DiGi.WebAPI.xUnit
         [Fact]
         public void VersionInformation_Serialization()
         {
-            VersionInformation versionInformation = new("1.0.0.0", "1.0.0+abc1234", "0.8.8.0", "0.8.8+def5678", "10.0.0", ".NET 10.0.0-rt", DateTime.UtcNow);
+            List<ExtensionVersionInformation> extensions = [
+                new("DiGi.GIS.WebAPI", "0.8.7.20260821120000"),
+                new("DiGi.GLTF.WebAPI", "0.8.6.20260701120000")
+            ];
+
+            VersionInformation versionInformation = new("1.0.0.0", "1.0.0+abc1234", "0.8.8.0", "0.8.8+def5678", "10.0.0", ".NET 10.0.0-rt", DateTime.UtcNow, extensions);
 
             Assert.Equal("1.0.0.0", versionInformation.ServiceVersion);
             Assert.Equal("1.0.0+abc1234", versionInformation.ServiceInformationalVersion);
@@ -47,12 +52,35 @@ namespace DiGi.WebAPI.xUnit
             Assert.Equal("10.0.0", versionInformation.RuntimeVersion);
             Assert.Equal(".NET 10.0.0-rt", versionInformation.FrameworkDescription);
             Assert.NotNull(versionInformation.StartTimeUtc);
+            Assert.NotNull(versionInformation.Extensions);
+            Assert.Equal(2, versionInformation.Extensions.Count());
 
             VersionInformation versionInformation_Copy = new(versionInformation);
             Assert.Equal(versionInformation.ServiceVersion, versionInformation_Copy.ServiceVersion);
             Assert.Equal(versionInformation.WebAPIVersion, versionInformation_Copy.WebAPIVersion);
+            Assert.NotNull(versionInformation_Copy.Extensions);
+            Assert.Equal(2, versionInformation_Copy.Extensions.Count());
+            Assert.Equal("DiGi.GIS.WebAPI", versionInformation_Copy.Extensions.First().Name);
 
             Core.xUnit.Query.SerializationCheck(versionInformation);
+        }
+
+        /// <summary>
+        /// Tests serialization, copy constructor, and property values of <see cref="ExtensionVersionInformation"/>.
+        /// </summary>
+        [Fact]
+        public void ExtensionVersionInformation_Serialization()
+        {
+            ExtensionVersionInformation extensionVersionInformation = new("DiGi.GIS.WebAPI", "0.8.7.20260821120000");
+
+            Assert.Equal("DiGi.GIS.WebAPI", extensionVersionInformation.Name);
+            Assert.Equal("0.8.7.20260821120000", extensionVersionInformation.InformationalVersion);
+
+            ExtensionVersionInformation extensionVersionInformation_Copy = new(extensionVersionInformation);
+            Assert.Equal(extensionVersionInformation.Name, extensionVersionInformation_Copy.Name);
+            Assert.Equal(extensionVersionInformation.InformationalVersion, extensionVersionInformation_Copy.InformationalVersion);
+
+            Core.xUnit.Query.SerializationCheck(extensionVersionInformation);
         }
 
         /// <summary>
@@ -433,6 +461,44 @@ namespace DiGi.WebAPI.xUnit
             if (informationalVersion.Contains("+"))
             {
                 Assert.StartsWith(versionInformation_Public.WebAPIInformationalVersion ?? string.Empty, informationalVersion);
+            }
+        }
+
+        /// <summary>
+        /// Tests that loaded extensions are listed on the public version tier, with the same commit-hash rule as the host and framework: the build stamp stays public, the commit hash is withheld until the caller is authorized.
+        /// </summary>
+        [Fact]
+        public void VersionInformation_Extensions()
+        {
+            // Inject a known assembly through the explicit parameter, bypassing the location filter, so the assertion is deterministic in any test host.
+            Assembly extensionAssembly = typeof(Create).Assembly;
+
+            VersionInformation versionInformation_Public = Create.VersionInformation(false, extensionAssemblies: [extensionAssembly]);
+            Assert.NotNull(versionInformation_Public.Extensions);
+            Assert.Single(versionInformation_Public.Extensions);
+            ExtensionVersionInformation publicExtension = versionInformation_Public.Extensions.First();
+            Assert.Equal(extensionAssembly.GetName().Name, publicExtension.Name);
+            Assert.DoesNotContain("+", publicExtension.InformationalVersion ?? string.Empty);
+
+            VersionInformation versionInformation_Authorized = Create.VersionInformation(true, extensionAssemblies: [extensionAssembly]);
+            Assert.NotNull(versionInformation_Authorized.Extensions);
+            Assert.Single(versionInformation_Authorized.Extensions);
+            ExtensionVersionInformation authorizedExtension = versionInformation_Authorized.Extensions.First();
+            Assert.Equal(extensionAssembly.GetName().Name, authorizedExtension.Name);
+
+            // If the build injected a commit hash, the authorized tier carries it and the public tier is its prefix.
+            string authorizedInformationalVersion = authorizedExtension.InformationalVersion ?? string.Empty;
+            if (authorizedInformationalVersion.Contains("+"))
+            {
+                Assert.StartsWith(publicExtension.InformationalVersion ?? string.Empty, authorizedInformationalVersion);
+            }
+
+            // The framework assembly is loaded into the default ALC but lives in the normal bin, not an 'extensions/' directory, so the default location filter must exclude it.
+            VersionInformation versionInformation_Default = Create.VersionInformation(false);
+            Assert.NotNull(versionInformation_Default.Extensions);
+            foreach (ExtensionVersionInformation extension in versionInformation_Default.Extensions)
+            {
+                Assert.NotEqual("DiGi.WebAPI", extension.Name);
             }
         }
 
