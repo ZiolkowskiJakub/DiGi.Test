@@ -471,7 +471,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             await taskCompletionSource.Task;
 
-            Assert.Null(postgreSQLBuildingDataUpdateTask.Exception);
+            // The fallback wrap, not a crash: a run reporting failure by returning false carries a
+            // BackgroundTaskFailureException naming where the reason is, and nothing thrown.
+            Assert.IsType<Core.Classes.BackgroundTaskFailureException>(postgreSQLBuildingDataUpdateTask.Exception);
             Assert.Equal(0, postgreSQLBuildingDataUpdateTask.FailedSubdivisionCount);
             Assert.Equal(0, postgreSQLBuildingDataUpdateTask.UpdatedRowCount);
             Assert.Equal(1, postgreSQLBuildingDataUpdateTask.UnfulfilledUpdateTypeCount);
@@ -511,7 +513,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             await taskCompletionSource.Task;
 
-            Assert.Null(postgreSQLBuildingDataUpdateTask.Exception);
+            // The fallback wrap, not a crash: a run reporting failure by returning false carries a
+            // BackgroundTaskFailureException naming where the reason is, and nothing thrown.
+            Assert.IsType<Core.Classes.BackgroundTaskFailureException>(postgreSQLBuildingDataUpdateTask.Exception);
             Assert.Equal(0, postgreSQLBuildingDataUpdateTask.FailedSubdivisionCount);
             Assert.True(postgreSQLBuildingDataUpdateTask.ProcessedSubdivisionCount > 0, "The general pass is expected to have processed subdivisions - a missing statistical hierarchy must not sink the other selected update types.");
             Assert.True(postgreSQLBuildingDataUpdateTask.UpdatedRowCount > 0, "The general pass is expected to have written rows.");

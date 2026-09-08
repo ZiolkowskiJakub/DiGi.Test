@@ -8,6 +8,7 @@ using DiGi.User.PostgreSQL.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DiGi.GIS.PostgreSQL.UI.xUnit
 {
@@ -135,6 +136,49 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
             List<IVisualBackgroundTask>? visualBackgroundTasks_Client = Create.VisualBackgroundTasks(new GISPostgreSQLConverterManager(), userPostgreSQLConverterManager, null, Mode.Client);
             Assert.NotNull(visualBackgroundTasks_Client);
             Assert.DoesNotContain(visualBackgroundTasks_Client, x => x.TypeName == typeof(UIPostgreSQLUserCreateTask).Name);
+        }
+
+        private class TestRefusingBackgroundTask : DiGi.Core.Classes.BackgroundTask
+        {
+            protected override Task<bool> ExecuteAsync()
+            {
+                // A deliberate refusal: reports failure without throwing, the way a task declining to act
+                // does - and the situation the fallback wrap exists for.
+                return Task.FromResult(false);
+            }
+        }
+
+        /// <summary>
+        /// Tests that a task failing without an exception still surfaces a reason on its row: the fallback <see cref="DiGi.Core.Classes.BackgroundTaskFailureException"/> reaches the hover text and the clipboard text of the visual wrapper, rather than leaving a Failed status whose reason is buried in the log file.
+        /// <para>The wrapper is constructed only after the task has finished, because it refreshes through the WPF dispatcher on the task's events and a test host runs no WPF application.</para>
+        /// </summary>
+        [Fact]
+        public async Task VisualBackgroundTask_FailureWithoutException_SurfacesReason()
+        {
+            TestRefusingBackgroundTask backgroundTask = new();
+
+            backgroundTask.Start();
+
+            int timeoutMs = 1000;
+            while (!backgroundTask.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(backgroundTask.IsCompleted);
+            Assert.NotNull(backgroundTask.Exception);
+
+            DiGi.UI.WPF.Classes.VisualBackgroundTask visualBackgroundTask = new(backgroundTask, "Test task", "A task that refuses");
+
+            // The hover text names the failure type and carries the message rather than staying null, which is what turns the tooltip off in the task list
+            Assert.NotNull(visualBackgroundTask.ExceptionText);
+            Assert.StartsWith("BackgroundTaskFailureException", visualBackgroundTask.ExceptionText);
+            Assert.Contains("The task reported failure without an exception", visualBackgroundTask.ExceptionText);
+
+            // The clipboard text carries the same failure for Ctrl+C rather than falling back to the bare status
+            Assert.NotNull(visualBackgroundTask.StatusText);
+            Assert.Contains("The task reported failure without an exception", visualBackgroundTask.StatusText);
         }
     }
 }

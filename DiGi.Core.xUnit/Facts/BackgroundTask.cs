@@ -51,6 +51,34 @@ namespace DiGi.Core.xUnit
             }
         }
 
+        private class TestRefusingBackgroundTask : BackgroundTask
+        {
+            protected override Task<bool> ExecuteAsync()
+            {
+                // A deliberate refusal: reports failure without throwing, the way a task declining
+                // to act does - and the situation the fallback wrap exists for.
+                return Task.FromResult(false);
+            }
+        }
+
+        private class TestConfigurableBackgroundTask : BackgroundTask
+        {
+            public bool ShouldSucceed { get; set; } = true;
+
+            protected override Task<bool> ExecuteAsync()
+            {
+                return Task.FromResult(ShouldSucceed);
+            }
+        }
+
+        private class TestThrowingRefusalBackgroundTask : BackgroundTask
+        {
+            protected override Task<bool> ExecuteAsync()
+            {
+                throw new BackgroundTaskFailureException("A user with the email user@digiproject.uk already exists - no user was created");
+            }
+        }
+
         /// <summary>
         /// Tests the successful execution lifecycle of a background task, verifying all state transitions and events.
         /// </summary>
@@ -120,6 +148,113 @@ namespace DiGi.Core.xUnit
             Assert.Equal(BackgroundTaskStatus.Failed, task.BackgroundTaskStatus);
             Assert.NotNull(task.Exception);
             Assert.IsType<InvalidOperationException>(task.Exception);
+        }
+
+        /// <summary>
+        /// Tests that a task reporting failure by returning false without an exception is wrapped in a <see cref="BackgroundTaskFailureException"/>, so its run carries a message the task row can show.
+        /// </summary>
+        [Fact]
+        public async Task BackgroundTask_FailureWithoutException()
+        {
+            TestRefusingBackgroundTask task = new();
+
+            task.Start();
+
+            int timeoutMs = 1000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(task.IsCompleted);
+            Assert.False(task.IsRunning);
+            Assert.False(task.IsSucceeded);
+            Assert.Equal(BackgroundTaskStatus.Failed, task.BackgroundTaskStatus);
+
+            Assert.NotNull(task.Exception);
+            Assert.IsType<BackgroundTaskFailureException>(task.Exception);
+            Assert.False(string.IsNullOrWhiteSpace(task.Exception.Message));
+        }
+
+        /// <summary>
+        /// Tests that a task throwing a <see cref="BackgroundTaskFailureException"/> keeps exactly that instance as its exception, rather than being wrapped a second time.
+        /// </summary>
+        [Fact]
+        public async Task BackgroundTask_RefusalException()
+        {
+            TestThrowingRefusalBackgroundTask task = new();
+
+            task.Start();
+
+            int timeoutMs = 1000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(task.IsCompleted);
+            Assert.Equal(BackgroundTaskStatus.Failed, task.BackgroundTaskStatus);
+
+            BackgroundTaskFailureException? backgroundTaskFailureException = Assert.IsType<BackgroundTaskFailureException>(task.Exception);
+            Assert.Equal("A user with the email user@digiproject.uk already exists - no user was created", backgroundTaskFailureException.Message);
+        }
+
+        /// <summary>
+        /// Tests that a failed run leaves no failure behind after the same task succeeds on a restart, so a row never shows the reason of a run before the last one.
+        /// </summary>
+        [Fact]
+        public async Task BackgroundTask_RestartClearsFailure()
+        {
+            TestConfigurableBackgroundTask task = new() { ShouldSucceed = false };
+
+            task.Start();
+
+            int timeoutMs = 1000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(task.IsCompleted);
+            Assert.NotNull(task.Exception);
+            Assert.IsType<BackgroundTaskFailureException>(task.Exception);
+            Assert.Equal(BackgroundTaskStatus.Failed, task.BackgroundTaskStatus);
+
+            task.ShouldSucceed = true;
+
+            task.Start();
+
+            timeoutMs = 1000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(task.IsCompleted);
+            Assert.Null(task.Exception);
+            Assert.True(task.IsSucceeded);
+            Assert.Equal(BackgroundTaskStatus.Completed, task.BackgroundTaskStatus);
+        }
+
+        /// <summary>
+        /// Tests that a run stopped by cancelling its task is not wrapped as a <see cref="BackgroundTaskFailureException"/>: it returned false only because its operator asked it to stop, and a stop is not a failure to report.
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_Cancellation_NoFailureException()
+        {
+            TestCancelableBackgroundTask task = new(delayMs: 2000);
+
+            task.Start();
+
+            // Allow task to run briefly, then stop it - the stop requests cancellation and awaits completion
+            await Task.Delay(50);
+            await task.StopAsync();
+
+            Assert.Null(task.Exception);
         }
 
         /// <summary>
