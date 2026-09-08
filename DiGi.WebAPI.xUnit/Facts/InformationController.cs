@@ -269,31 +269,31 @@ namespace DiGi.WebAPI.xUnit
             DiagnosticsConfiguration diagnosticsConfiguration = new(open: true);
             InformationController controller = new(applicationPartManager, diagnosticsConfiguration: diagnosticsConfiguration);
 
-            IActionResult result_Health = await controller.GetHealthAsync();
+            IActionResult result_Health = await controller.GetServiceHealthInformationAsync();
             Assert.IsType<ContentResult>(result_Health);
             ContentResult contentResult_Health = (ContentResult)result_Health;
             Assert.Equal("application/json", contentResult_Health.ContentType);
             Assert.Contains("Healthy", contentResult_Health.Content);
 
-            IActionResult result_Version = await controller.GetVersionAsync();
+            IActionResult result_Version = await controller.GetVersionInformationAsync();
             Assert.IsType<ContentResult>(result_Version);
             ContentResult contentResult_Version = (ContentResult)result_Version;
             Assert.Equal("application/json", contentResult_Version.ContentType);
             Assert.False(string.IsNullOrWhiteSpace(contentResult_Version.Content));
 
-            IActionResult result_Assemblies = await controller.GetAssembliesAsync();
+            IActionResult result_Assemblies = await controller.GetAssemblyInformationsAsync();
             Assert.IsType<ContentResult>(result_Assemblies);
             ContentResult contentResult_Assemblies = (ContentResult)result_Assemblies;
             Assert.Equal("application/json", contentResult_Assemblies.ContentType);
             Assert.Contains("DiGi.WebAPI", contentResult_Assemblies.Content);
 
-            IActionResult result_System = await controller.GetSystemAsync();
+            IActionResult result_System = await controller.GetSystemInformationAsync();
             Assert.IsType<ContentResult>(result_System);
             ContentResult contentResult_System = (ContentResult)result_System;
             Assert.Equal("application/json", contentResult_System.ContentType);
             Assert.False(string.IsNullOrWhiteSpace(contentResult_System.Content));
 
-            IActionResult result_Controllers = await controller.GetControllersAsync();
+            IActionResult result_Controllers = await controller.GetControllerInformationsAsync();
             Assert.IsType<ContentResult>(result_Controllers);
             ContentResult contentResult_Controllers = (ContentResult)result_Controllers;
             Assert.Equal("application/json", contentResult_Controllers.ContentType);
@@ -387,57 +387,57 @@ namespace DiGi.WebAPI.xUnit
             InformationController controller = new(applicationPartManager, diagnosticsConfiguration: diagnosticsConfiguration);
 
             // Public endpoints succeed without key
-            IActionResult result_Health = await controller.GetHealthAsync();
+            IActionResult result_Health = await controller.GetServiceHealthInformationAsync();
             Assert.IsType<ContentResult>(result_Health);
 
-            IActionResult result_Version = await controller.GetVersionAsync();
+            IActionResult result_Version = await controller.GetVersionInformationAsync();
             Assert.IsType<ContentResult>(result_Version);
 
-            IActionResult result_Endpoints_Public = await controller.GetEndpointsAsync(null, includeIgnored: false, key: null);
+            IActionResult result_Endpoints_Public = await controller.GetEndpointInformationsAsync(null, includeIgnored: false, key: null);
             // Result is NoContent or Content depending on whether ActionDescriptorProvider was passed, but definitely NOT Unauthorized
             Assert.IsNotType<UnauthorizedResult>(result_Endpoints_Public);
 
             // Protected endpoints without key return 401 Unauthorized
-            IActionResult result_System_NoKey = await controller.GetSystemAsync(key: null);
+            IActionResult result_System_NoKey = await controller.GetSystemInformationAsync(key: null);
             Assert.IsType<UnauthorizedResult>(result_System_NoKey);
 
-            IActionResult result_Assemblies_NoKey = await controller.GetAssembliesAsync(key: null);
+            IActionResult result_Assemblies_NoKey = await controller.GetAssemblyInformationsAsync(key: null);
             Assert.IsType<UnauthorizedResult>(result_Assemblies_NoKey);
 
-            IActionResult result_Endpoints_Ignored_NoKey = await controller.GetEndpointsAsync(null, includeIgnored: true, key: null);
+            IActionResult result_Endpoints_Ignored_NoKey = await controller.GetEndpointInformationsAsync(null, includeIgnored: true, key: null);
             Assert.IsType<UnauthorizedResult>(result_Endpoints_Ignored_NoKey);
 
             // Protected endpoints with invalid key return 401 Unauthorized
-            IActionResult result_System_InvalidKey = await controller.GetSystemAsync(key: "invalid-key");
+            IActionResult result_System_InvalidKey = await controller.GetSystemInformationAsync(key: "invalid-key");
             Assert.IsType<UnauthorizedResult>(result_System_InvalidKey);
 
             // Protected endpoints with valid key return 200 OK
-            IActionResult result_System_ValidKey = await controller.GetSystemAsync(key: "test-mock-token");
+            IActionResult result_System_ValidKey = await controller.GetSystemInformationAsync(key: "test-mock-token");
             Assert.IsType<ContentResult>(result_System_ValidKey);
 
-            IActionResult result_Assemblies_ValidKey = await controller.GetAssembliesAsync(key: "test-mock-token");
+            IActionResult result_Assemblies_ValidKey = await controller.GetAssemblyInformationsAsync(key: "test-mock-token");
             Assert.IsType<ContentResult>(result_Assemblies_ValidKey);
 
             // /controllers names every deployed controller with its route prefix, so it sits in the
             // protected tier rather than the public one.
-            IActionResult result_Controllers_NoKey = await controller.GetControllersAsync(key: null);
+            IActionResult result_Controllers_NoKey = await controller.GetControllerInformationsAsync(key: null);
             Assert.IsType<UnauthorizedResult>(result_Controllers_NoKey);
 
-            IActionResult result_Controllers_ValidKey = await controller.GetControllersAsync(key: "test-mock-token");
+            IActionResult result_Controllers_ValidKey = await controller.GetControllerInformationsAsync(key: "test-mock-token");
             Assert.IsType<ContentResult>(result_Controllers_ValidKey);
 
             // An unconfigured controller must deny the whole protected tier. This is the exact
             // regression that reached production: every one of these answered 200.
             InformationController controller_Unconfigured = new(applicationPartManager, diagnosticsConfiguration: new DiagnosticsConfiguration());
 
-            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetSystemAsync());
-            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetAssembliesAsync());
-            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetControllersAsync());
-            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetEndpointsAsync(null, includeIgnored: true));
+            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetSystemInformationAsync());
+            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetAssemblyInformationsAsync());
+            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetControllerInformationsAsync());
+            Assert.IsType<UnauthorizedResult>(await controller_Unconfigured.GetEndpointInformationsAsync(null, includeIgnored: true));
 
             // Public tier stays reachable on the same unconfigured host.
-            Assert.IsType<ContentResult>(await controller_Unconfigured.GetHealthAsync());
-            Assert.IsType<ContentResult>(await controller_Unconfigured.GetVersionAsync());
+            Assert.IsType<ContentResult>(await controller_Unconfigured.GetServiceHealthInformationAsync());
+            Assert.IsType<ContentResult>(await controller_Unconfigured.GetVersionInformationAsync());
         }
 
         /// <summary>
