@@ -120,6 +120,12 @@
     <Reference Include="DiGi.UI.WPF">
       <HintPath>..\..\DiGi.UI.WPF\bin\DiGi.UI.WPF.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.User">
+      <HintPath>..\..\DiGi.User\bin\DiGi.User.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.User.PostgreSQL">
+      <HintPath>..\..\DiGi.User.PostgreSQL\bin\DiGi.User.PostgreSQL.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.WebAPI">
       <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
     </Reference>

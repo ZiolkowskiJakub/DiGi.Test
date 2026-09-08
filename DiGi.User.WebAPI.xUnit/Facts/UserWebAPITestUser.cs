@@ -61,7 +61,7 @@ namespace DiGi.User.WebAPI.xUnit
                 return null;
             }
 
-            UserCredential? userCredential = WebAPI.Create.UserCredential(Email, Password);
+            UserCredential? userCredential = PostgreSQL.Create.UserCredential(Email, Password);
             if (userCredential is null)
             {
                 return null;

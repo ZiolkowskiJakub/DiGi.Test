@@ -519,6 +519,17 @@
     <Project Path="../DiGi.User/DiGi.User/DiGi.User.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
     </Project>
+    <Project Path="../DiGi.User.PostgreSQL/DiGi.User.PostgreSQL/DiGi.User.PostgreSQL.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.PostgreSQL/DiGi.PostgreSQL/DiGi.PostgreSQL.csproj" />
+      <BuildDependency Project="../DiGi.User/DiGi.User/DiGi.User.csproj" />
+    </Project>
+    <Project Path="DiGi.User.PostgreSQL.xUnit/DiGi.User.PostgreSQL.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.PostgreSQL/DiGi.PostgreSQL/DiGi.PostgreSQL.csproj" />
+      <BuildDependency Project="../DiGi.User/DiGi.User/DiGi.User.csproj" />
+      <BuildDependency Project="../DiGi.User.PostgreSQL/DiGi.User.PostgreSQL/DiGi.User.PostgreSQL.csproj" />
+    </Project>
     <Project Path="../DiGi.User.WebAPI/DiGi.User.WebAPI/DiGi.User.WebAPI.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
       <BuildDependency Project="../DiGi.User/DiGi.User/DiGi.User.csproj" />

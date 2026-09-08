@@ -1,7 +1,7 @@
 using DiGi.User.Classes;
 using System.Linq;
 
-namespace DiGi.User.WebAPI.xUnit
+namespace DiGi.User.PostgreSQL.xUnit
 {
     public partial class Facts
     {

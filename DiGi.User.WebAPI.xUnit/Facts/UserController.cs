@@ -117,7 +117,7 @@ namespace DiGi.User.WebAPI.xUnit
 
             SetBearer(userWebAPIHost.HttpClient, tokenString!);
 
-            HttpResponseMessage httpResponseMessage = await userWebAPIHost.HttpClient.GetAsync("user/user/session");
+            HttpResponseMessage httpResponseMessage = await userWebAPIHost.HttpClient.GetAsync("user/session");
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
 
             string json = await httpResponseMessage.Content.ReadAsStringAsync();
@@ -158,19 +158,19 @@ namespace DiGi.User.WebAPI.xUnit
 
             SetBearer(userWebAPIHost.HttpClient, tokenString!);
 
-            HttpResponseMessage httpResponseMessage_SessionBefore = await userWebAPIHost.HttpClient.GetAsync("user/user/session");
+            HttpResponseMessage httpResponseMessage_SessionBefore = await userWebAPIHost.HttpClient.GetAsync("user/session");
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage_SessionBefore.StatusCode);
 
-            HttpResponseMessage httpResponseMessage_Logout = await userWebAPIHost.HttpClient.PostAsync("user/user/logout", EmptyJsonContent());
+            HttpResponseMessage httpResponseMessage_Logout = await userWebAPIHost.HttpClient.PostAsync("user/logout", EmptyJsonContent());
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage_Logout.StatusCode);
 
-            HttpResponseMessage httpResponseMessage_SessionAfter = await userWebAPIHost.HttpClient.GetAsync("user/user/session");
+            HttpResponseMessage httpResponseMessage_SessionAfter = await userWebAPIHost.HttpClient.GetAsync("user/session");
             Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage_SessionAfter.StatusCode);
 
-            HttpResponseMessage httpResponseMessage_SecureData = await userWebAPIHost.HttpClient.GetAsync("user/user/secure-data");
+            HttpResponseMessage httpResponseMessage_SecureData = await userWebAPIHost.HttpClient.GetAsync("user/secure-data");
             Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage_SecureData.StatusCode);
 
-            HttpResponseMessage httpResponseMessage_LogoutAgain = await userWebAPIHost.HttpClient.PostAsync("user/user/logout", EmptyJsonContent());
+            HttpResponseMessage httpResponseMessage_LogoutAgain = await userWebAPIHost.HttpClient.PostAsync("user/logout", EmptyJsonContent());
             Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage_LogoutAgain.StatusCode);
         }
 
@@ -195,7 +195,7 @@ namespace DiGi.User.WebAPI.xUnit
 
             SetBearer(userWebAPIHost.HttpClient, tokenString_Legacy);
 
-            HttpResponseMessage httpResponseMessage = await userWebAPIHost.HttpClient.PostAsync("user/user/logout", EmptyJsonContent());
+            HttpResponseMessage httpResponseMessage = await userWebAPIHost.HttpClient.PostAsync("user/logout", EmptyJsonContent());
             Assert.Equal(HttpStatusCode.BadRequest, httpResponseMessage.StatusCode);
         }
 
@@ -218,7 +218,7 @@ namespace DiGi.User.WebAPI.xUnit
 
             SetBearer(userWebAPIHost.HttpClient, tokenString_Original!);
 
-            HttpResponseMessage httpResponseMessage_Refresh = await userWebAPIHost.HttpClient.PostAsync("user/user/session/refresh", EmptyJsonContent());
+            HttpResponseMessage httpResponseMessage_Refresh = await userWebAPIHost.HttpClient.PostAsync("user/session/refresh", EmptyJsonContent());
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage_Refresh.StatusCode);
 
             string? tokenString_Refreshed = await TokenFromResponseAsync(httpResponseMessage_Refresh);
@@ -230,11 +230,11 @@ namespace DiGi.User.WebAPI.xUnit
             Assert.NotEqual(jwtSecurityToken_Original.Id, jwtSecurityToken_Refreshed.Id);
             Assert.Equal(jwtSecurityToken_Original.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Email).Value, jwtSecurityToken_Refreshed.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Email).Value);
 
-            HttpResponseMessage httpResponseMessage_SessionOriginal = await userWebAPIHost.HttpClient.GetAsync("user/user/session");
+            HttpResponseMessage httpResponseMessage_SessionOriginal = await userWebAPIHost.HttpClient.GetAsync("user/session");
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage_SessionOriginal.StatusCode);
 
             SetBearer(userWebAPIHost.HttpClient, tokenString_Refreshed!);
-            HttpResponseMessage httpResponseMessage_SessionRefreshed = await userWebAPIHost.HttpClient.GetAsync("user/user/session");
+            HttpResponseMessage httpResponseMessage_SessionRefreshed = await userWebAPIHost.HttpClient.GetAsync("user/session");
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage_SessionRefreshed.StatusCode);
         }
 
@@ -268,7 +268,7 @@ namespace DiGi.User.WebAPI.xUnit
         {
             string json = JsonSerializer.Serialize(new { Email = email, Password = password });
             StringContent stringContent = new(json, Encoding.UTF8, "application/json");
-            return await httpClient.PostAsync("user/user/login", stringContent);
+            return await httpClient.PostAsync("user/login", stringContent);
         }
 
         /// <summary>
