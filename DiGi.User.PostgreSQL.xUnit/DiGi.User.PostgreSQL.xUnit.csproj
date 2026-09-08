@@ -27,6 +27,17 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Puts User_PostgreSQL_Main.conf beside the test assembly, which is where
+       DiGi.User.PostgreSQL.Create.UserPostgreSQLConverterManager probes for it. Without it the
+       database-backed facts find no converter and return without asserting. -->
+  <Target Name="CopyUserFiles" AfterTargets="Build">
+    <ItemGroup>
+      <_UserFiles Include="$(ProjectDir)..\user files\**\*.*" />
+    </ItemGroup>
+    <Message Text="Copying all user files from directory..." Importance="high" />
+    <Copy SourceFiles="@(_UserFiles)" DestinationFiles="@(_UserFiles->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.User.PostgreSQL\DiGi.User.PostgreSQL\DiGi.User.PostgreSQL.csproj" />
     <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
