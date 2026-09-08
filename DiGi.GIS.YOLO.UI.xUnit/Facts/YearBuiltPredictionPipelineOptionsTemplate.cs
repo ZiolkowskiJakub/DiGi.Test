@@ -26,15 +26,15 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             string directory_Templates = Path.Combine(directoryInfo_Workspace!.FullName, "DiGi.GIS.YOLO.UI", "files");
 
-            string path_Template = Path.Combine(directory_Templates, $"{Constants.FileName.YearBuiltPredictionPipelineOptions}.template");
+            string path_Template = Path.Combine(directory_Templates, Constants.FileName.YearBuiltPredictionPipelineOptions);
 
             //The combined template first, then the split pair the manual recovery workflow is copied from. Named
             //rather than globbed, so a template that stops being committed fails here instead of quietly not being checked.
             List<string> paths_Template =
             [
                 path_Template,
-                Path.Combine(directory_Templates, "YearBuiltPredictionPipelineOptions.Detections.json.template"),
-                Path.Combine(directory_Templates, "YearBuiltPredictionPipelineOptions.Score.json.template")
+                Path.Combine(directory_Templates, "YearBuiltPredictionPipelineOptions.Detections.json"),
+                Path.Combine(directory_Templates, "YearBuiltPredictionPipelineOptions.Score.json")
             ];
 
             List<string> names_Member = [];
@@ -100,7 +100,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //The split pair must not. Its second run rebuilds its building list from the first run's results file,
             //so a detections pass that cleaned up would leave the scoring pass nothing to score - and a county whose
             //detections are already stored would then be skipped reporting a legitimate looking zero.
-            foreach (string name_Template in new string[] { "YearBuiltPredictionPipelineOptions.Detections.json.template", "YearBuiltPredictionPipelineOptions.Score.json.template" })
+            foreach (string name_Template in new string[] { "YearBuiltPredictionPipelineOptions.Detections.json", "YearBuiltPredictionPipelineOptions.Score.json" })
             {
                 Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Split = Query.YearBuiltPredictionPipelineOptions(Path.Combine(directory_Templates, name_Template));
                 Assert.NotNull(yearBuiltPredictionPipelineOptions_Split);
