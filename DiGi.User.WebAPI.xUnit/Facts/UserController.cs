@@ -1,5 +1,7 @@
+using DiGi.User.PostgreSQL.Classes;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
@@ -15,11 +17,19 @@ namespace DiGi.User.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that login issues a token carrying a jti session identifier and the session token lifetime, and that an unknown email is rejected.
+        /// Tests that login against the stored credential issues a token carrying a jti session identifier and the
+        /// session token lifetime, and that a wrong password, an unknown email and a blank password are each rejected.
+        /// <para>Requires a database: returns without asserting when User_PostgreSQL_Main.conf is absent or unreachable.</para>
         /// </summary>
         [Fact]
         public async Task UserController_Login_SetsJti()
         {
+            await using UserWebAPITestUser? userWebAPITestUser = await UserWebAPITestUser.CreateAsync();
+            if (userWebAPITestUser is null)
+            {
+                return;
+            }
+
             await using UserWebAPIHost userWebAPIHost = await UserWebAPIHost.CreateAsync();
 
             string? tokenString = await LoginAsync(userWebAPIHost.HttpClient);
@@ -32,9 +42,60 @@ namespace DiGi.User.WebAPI.xUnit
             Assert.True(jwtSecurityToken.ValidTo > DateTime.UtcNow.AddMinutes(58), $"Token lifetime shorter than expected! ValidTo: {jwtSecurityToken.ValidTo}.");
             Assert.True(jwtSecurityToken.ValidTo <= DateTime.UtcNow.AddHours(1).AddMinutes(2), $"Token lifetime longer than expected! ValidTo: {jwtSecurityToken.ValidTo}.");
 
-            StringContent stringContent = new("""{"Email":"other@example.com","Password":"password"}""", Encoding.UTF8, "application/json");
-            HttpResponseMessage httpResponseMessage_Unknown = await userWebAPIHost.HttpClient.PostAsync("user/user/login", stringContent);
-            Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage_Unknown.StatusCode);
+            // The denials matter more than the grant: a suite that only proves the right password works passes while
+            // the endpoint is open to everyone.
+            Assert.Equal(HttpStatusCode.Unauthorized, await LoginStatusCodeAsync(userWebAPIHost.HttpClient, UserWebAPITestUser.Email, "not-the-password"));
+            Assert.Equal(HttpStatusCode.Unauthorized, await LoginStatusCodeAsync(userWebAPIHost.HttpClient, "other@example.com", UserWebAPITestUser.Password));
+            Assert.Equal(HttpStatusCode.Unauthorized, await LoginStatusCodeAsync(userWebAPIHost.HttpClient, UserWebAPITestUser.Email, string.Empty));
+        }
+
+        /// <summary>
+        /// Tests that a user stored without a password credential cannot log in, even with the correct email.
+        /// <para>Requires a database: returns without asserting when User_PostgreSQL_Main.conf is absent or unreachable.</para>
+        /// </summary>
+        [Fact]
+        public async Task UserController_Login_NoCredential()
+        {
+            await using UserWebAPITestUser? userWebAPITestUser = await UserWebAPITestUser.CreateAsync();
+            if (userWebAPITestUser is null)
+            {
+                return;
+            }
+
+            UserPostgreSQLConverter userPostgreSQLConverter = userWebAPITestUser.UserPostgreSQLConverter;
+
+            // Drop the seeded row and re-insert the user alone, leaving the credential columns NULL.
+            await userPostgreSQLConverter.DeleteUserByEmailAsync(UserWebAPITestUser.Email);
+            List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new DiGi.User.Classes.User(UserWebAPITestUser.Email)]);
+            Assert.Single(insertedIds);
+            Assert.Null(await userPostgreSQLConverter.GetUserCredentialAsync(UserWebAPITestUser.Email));
+
+            await using UserWebAPIHost userWebAPIHost = await UserWebAPIHost.CreateAsync();
+            Assert.Equal(HttpStatusCode.Unauthorized, await LoginStatusCodeAsync(userWebAPIHost.HttpClient, UserWebAPITestUser.Email, UserWebAPITestUser.Password));
+        }
+
+        /// <summary>
+        /// Tests that the permission level of a stored user survives a round trip through the database.
+        /// <para>Requires a database: returns without asserting when User_PostgreSQL_Main.conf is absent or unreachable.</para>
+        /// </summary>
+        [Fact]
+        public async Task UserController_Login_LevelRoundTrip()
+        {
+            await using UserWebAPITestUser? userWebAPITestUser = await UserWebAPITestUser.CreateAsync();
+            if (userWebAPITestUser is null)
+            {
+                return;
+            }
+
+            UserPostgreSQLConverter userPostgreSQLConverter = userWebAPITestUser.UserPostgreSQLConverter;
+
+            List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new DiGi.User.Classes.User(UserWebAPITestUser.Email) { Level = (int)Enums.UserLevel.Admin }]);
+            Assert.Single(insertedIds);
+
+            DiGi.User.Classes.User? user = await userPostgreSQLConverter.GetUserByEmailAsync(UserWebAPITestUser.Email);
+            Assert.NotNull(user);
+            Assert.Equal((int)Enums.UserLevel.Admin, user.Level);
+            Assert.Equal(Enums.UserLevel.Admin, user.GetUserLevel());
         }
 
         /// <summary>
@@ -43,6 +104,12 @@ namespace DiGi.User.WebAPI.xUnit
         [Fact]
         public async Task UserController_Session_ReturnsClaims()
         {
+            await using UserWebAPITestUser? userWebAPITestUser = await UserWebAPITestUser.CreateAsync();
+            if (userWebAPITestUser is null)
+            {
+                return;
+            }
+
             await using UserWebAPIHost userWebAPIHost = await UserWebAPIHost.CreateAsync();
 
             string? tokenString = await LoginAsync(userWebAPIHost.HttpClient);
@@ -57,7 +124,7 @@ namespace DiGi.User.WebAPI.xUnit
             using JsonDocument jsonDocument = JsonDocument.Parse(json);
 
             Assert.True(jsonDocument.RootElement.TryGetProperty("email", out JsonElement jsonElement_Email));
-            Assert.Equal("user@example.com", jsonElement_Email.GetString());
+            Assert.Equal(UserWebAPITestUser.Email, jsonElement_Email.GetString());
 
             JwtSecurityToken jwtSecurityToken = ReadToken(tokenString);
             Assert.True(jsonDocument.RootElement.TryGetProperty("jti", out JsonElement jsonElement_Jti));
@@ -78,6 +145,12 @@ namespace DiGi.User.WebAPI.xUnit
         [Fact]
         public async Task UserController_Logout_RevokesToken()
         {
+            await using UserWebAPITestUser? userWebAPITestUser = await UserWebAPITestUser.CreateAsync();
+            if (userWebAPITestUser is null)
+            {
+                return;
+            }
+
             await using UserWebAPIHost userWebAPIHost = await UserWebAPIHost.CreateAsync();
 
             string? tokenString = await LoginAsync(userWebAPIHost.HttpClient);
@@ -112,7 +185,7 @@ namespace DiGi.User.WebAPI.xUnit
             byte[] key = userWebAPIHost.SecurityKeyManager.GetActive()!.GetBytes();
             SecurityTokenDescriptor tokenDescriptor = new()
             {
-                Subject = new ClaimsIdentity([new Claim(ClaimTypes.Email, "user@example.com")]),
+                Subject = new ClaimsIdentity([new Claim(ClaimTypes.Email, UserWebAPITestUser.Email)]),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -132,6 +205,12 @@ namespace DiGi.User.WebAPI.xUnit
         [Fact]
         public async Task UserController_Refresh_IssuesNewJti()
         {
+            await using UserWebAPITestUser? userWebAPITestUser = await UserWebAPITestUser.CreateAsync();
+            if (userWebAPITestUser is null)
+            {
+                return;
+            }
+
             await using UserWebAPIHost userWebAPIHost = await UserWebAPIHost.CreateAsync();
 
             string? tokenString_Original = await LoginAsync(userWebAPIHost.HttpClient);
@@ -160,18 +239,36 @@ namespace DiGi.User.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Logs in with the accepted test identity and returns the issued token string, or null when login fails.
+        /// Logs in with the seeded test identity and returns the issued token string, or null when login fails.
         /// </summary>
         private static async Task<string?> LoginAsync(HttpClient httpClient)
         {
-            StringContent stringContent = new("""{"Email":"user@example.com","Password":"password"}""", Encoding.UTF8, "application/json");
-            HttpResponseMessage httpResponseMessage = await httpClient.PostAsync("user/user/login", stringContent);
+            HttpResponseMessage httpResponseMessage = await PostLoginAsync(httpClient, UserWebAPITestUser.Email, UserWebAPITestUser.Password);
             if (!httpResponseMessage.IsSuccessStatusCode)
             {
                 return null;
             }
 
             return await TokenFromResponseAsync(httpResponseMessage);
+        }
+
+        /// <summary>
+        /// Posts a login attempt and returns only its status code, for the attempts that are expected to be rejected.
+        /// </summary>
+        private static async Task<HttpStatusCode> LoginStatusCodeAsync(HttpClient httpClient, string email, string password)
+        {
+            HttpResponseMessage httpResponseMessage = await PostLoginAsync(httpClient, email, password);
+            return httpResponseMessage.StatusCode;
+        }
+
+        /// <summary>
+        /// Posts a login attempt for the given credentials.
+        /// </summary>
+        private static async Task<HttpResponseMessage> PostLoginAsync(HttpClient httpClient, string email, string password)
+        {
+            string json = JsonSerializer.Serialize(new { Email = email, Password = password });
+            StringContent stringContent = new(json, Encoding.UTF8, "application/json");
+            return await httpClient.PostAsync("user/user/login", stringContent);
         }
 
         /// <summary>
