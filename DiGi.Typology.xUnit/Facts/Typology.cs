@@ -16,7 +16,7 @@ namespace DiGi.Typology.xUnit
 
             Typology.Classes.Typology? typology = new("Typology", "Sample Typology");
             typology.Update("AAA", "Test AAA");
-            typology.Update([1, 2], "CCC", "Test CCC");
+            typology.Update([0, 1], "CCC", "Test CCC");
 
             Assert.NotNull(typology.SubTypologies);
 
@@ -121,6 +121,21 @@ namespace DiGi.Typology.xUnit
 
             Assert.True(typology.TryGetLastIndex(out int lastIndex));
             Assert.True(lastIndex == 2);
+        }
+
+        /// <summary>
+        /// Verifies that the first auto-indexed child of a pathless Update lands at index [0],
+        /// not [1] - the regression tracked in ZiolkowskiJakub/DiGi.Typology#12.
+        /// </summary>
+        [Fact]
+        public void Typology_Update_FirstChildIndex()
+        {
+            Typology.Classes.Typology typology = new("Root", "Root");
+
+            Assert.NotNull(typology.Update("A", "Test A"));
+
+            Assert.NotNull(typology.GetTypology([0]));
+            Assert.Null(typology.GetTypology([1]));
         }
     }
 }
