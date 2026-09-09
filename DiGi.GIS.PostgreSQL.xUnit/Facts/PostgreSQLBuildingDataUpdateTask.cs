@@ -522,5 +522,133 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Equal(1, postgreSQLBuildingDataUpdateTask.UnfulfilledUpdateTypeCount);
             Assert.False(postgreSQLBuildingDataUpdateTask.IsSucceeded, "A run that returned one of its selected update types unwritten must not be reported as succeeded.");
         }
+
+        /// <summary>
+        /// Verifies that a <see cref="BuildingDataUpdateType.PredictedYearBuilt"/> run writes the predicted year to the
+        /// building data row even when the stored <c>year_built_data</c> row is filed under a sibling polygon part of the
+        /// same county code rather than under the target part itself.
+        /// <para>Without <c>fallbackByReference: true</c> the pruned read returns no rows, the projection is skipped, and the
+        /// <c>predicted_year_built</c> column stays at its default. With the flag the fallback finds the row under the sibling
+        /// part, and <c>Update_Building2D_PredictedYearBuilt</c> keys the write on the run's county, never on the record's.
+        /// See DiGi.GIS.PostgreSQL#70.</para>
+        /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database.</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_YearBuilt_SiblingPartRow_Integration()
+        {
+            GISPostgreSQLConverterManager? manager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(manager);
+
+            AdministrativeAreal2DPostgreSQLConverter? adminConverter = manager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
+            Assert.NotNull(adminConverter);
+
+            Building2DPostgreSQLConverter? building2DConverter = manager.GetPostgreSQLConverter<Building2DPostgreSQLConverter>();
+            Assert.NotNull(building2DConverter);
+
+            BuildingDataPostgreSQLConverter? buildingDataConverter = manager.GetPostgreSQLConverter<BuildingDataPostgreSQLConverter>();
+            Assert.NotNull(buildingDataConverter);
+
+            YearBuiltDataPostgreSQLConverter? yearBuiltDataConverter = manager.GetPostgreSQLConverter<YearBuiltDataPostgreSQLConverter>();
+            Assert.NotNull(yearBuiltDataConverter);
+
+            List<AdministrativeAreal2DReference>? subdivisions = await adminConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.Subdivision, commandTimeout: 600);
+            Assert.NotNull(subdivisions);
+
+            List<AdministrativeAreal2DReference>? countyReferences = await adminConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County, commandTimeout: 600);
+            Assert.NotNull(countyReferences);
+
+            Dictionary<int, HashSet<int>> siblingCountyGroups = countyReferences.SiblingCountyGroups();
+            Dictionary<int, HashSet<int>> inScopeSubdivisionIds = Query.InScopeSubdivisionIds(subdivisions, siblingCountyGroups);
+
+            // Discover a multi-part county group: the target part and its sibling.
+            KeyValuePair<int, HashSet<int>>? multiPartGroup = siblingCountyGroups.FirstOrDefault(x => x.Value.Count > 1);
+            Assert.True(multiPartGroup.HasValue, "No multi-part county group found in the database - the fact is vacuous.");
+
+            int targetCountyId = multiPartGroup.Value.Key;
+            int siblingCountyId = multiPartGroup.Value.Value.First(x => x != targetCountyId);
+
+            // Find a building the unassigned pass will process under the target part.
+            inScopeSubdivisionIds.TryGetValue(targetCountyId, out HashSet<int>? inScopeSubdivisionIds_Target);
+
+            List<Building2D>? buildings_Unassigned = await building2DConverter.GetBuilding2DsUnreachedByCountyAsync(targetCountyId, inScopeSubdivisionIds_Target, commandTimeout: 600);
+            Assert.NotNull(buildings_Unassigned);
+
+            Building2D? building = buildings_Unassigned.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Reference));
+            Assert.True(building is not null, $"No building with a reference found in the unassigned set of part {targetCountyId} - the fact is vacuous.");
+            string reference = building!.Reference!;
+
+            // Guard: no existing year_built_data row under the target part for this reference, or the unmodified code would find it and the test is vacuous.
+            List<YearBuiltData>? existingRows = await yearBuiltDataConverter.GetItemsByReferencesAsync([reference], targetCountyId, commandTimeout: 600);
+            Assert.True(existingRows is null || existingRows.Count == 0, $"A year_built_data row already exists under part {targetCountyId} for reference {reference} - the unmodified code would find it and the test is vacuous.");
+
+            // Guard: the building_data row exists under the target part, so cleanup is a restore rather than a delete.
+            Core.IO.Table.Classes.Table? preState = await buildingDataConverter.PullAsync([reference], targetCountyId, commandTimeout: 600);
+            Assert.True(preState is not null, $"The building_data row for reference {reference} under part {targetCountyId} does not exist - the fact cannot restore the pre-state.");
+            Assert.True(preState!.RowCount == 1, $"Expected exactly one building_data row for reference {reference} under part {targetCountyId}, got {preState.RowCount}.");
+
+            // Seed one year_built_data row under the sibling part with a known predicted year.
+            string uniqueTestId = Guid.NewGuid().ToString("N");
+            DiGi.GIS.Classes.YearBuiltData gisObject = new(reference);
+            gisObject.SetPredictedYearBuilt(DateTime.UtcNow, (short)1985);
+            YearBuiltData seed = new()
+            {
+                CountyId = siblingCountyId,
+                Reference = reference,
+                UniqueId = uniqueTestId,
+                Object = gisObject.ToJsonObject()
+            };
+            await yearBuiltDataConverter.UpdateAsync([seed], commandTimeout: 600);
+
+            try
+            {
+                // Run the task scoped to the target part, PredictedYearBuilt only.
+                PostgreSQLBuildingDataUpdateTask task = new(manager)
+                {
+                    PostgreSQLBuildingDataUpdateOptions = new()
+                    {
+                        BuildingDataUpdateTypes = [BuildingDataUpdateType.PredictedYearBuilt],
+                        CountyIds = [targetCountyId]
+                    }
+                };
+
+                TaskCompletionSource<bool> taskCompletionSource = new();
+                task.Stopped += (object? sender, EventArgs e) => taskCompletionSource.TrySetResult(true);
+                task.Start();
+                await taskCompletionSource.Task;
+
+                Assert.Null(task.Exception);
+                Assert.True(task.IsSucceeded);
+
+                // Assert the symptom is fixed: the building_data row now carries the seeded year.
+                Core.IO.Table.Classes.Table? result = await buildingDataConverter.PullAsync([reference], targetCountyId, commandTimeout: 600);
+                Assert.True(result is not null, $"The building_data pull for reference {reference} under part {targetCountyId} returned no table.");
+                Assert.True(result!.RowCount > 0, $"The building_data pull for reference {reference} under part {targetCountyId} returned no rows.");
+
+                Core.IO.Table.Classes.Column? column = result.Columns.FirstOrDefault(x => x.Name == "Predicted year built");
+                Assert.True(column is not null, "The pulled building data does not carry a 'Predicted year built' column.");
+
+                bool found = false;
+                foreach (Core.IO.Table.Classes.Row row in result.Rows)
+                {
+                    if (row.TryGetValue(column!.Index, out ushort year))
+                    {
+                        Assert.True(year == (ushort)1985, $"The predicted year built for reference {reference} under part {targetCountyId} is {year}, expected 1985. The year_built_data row was filed under sibling part {siblingCountyId} and was not found by the pruned read.");
+                        found = true;
+                        break;
+                    }
+                }
+
+                Assert.True(found, $"No row in the pulled building data carried a Predicted year built value for reference {reference} under part {targetCountyId}.");
+            }
+            finally
+            {
+                // Cleanup: remove the seeded row and restore the pre-state building_data row.
+                await yearBuiltDataConverter.RemoveByUniqueIdsAsync([uniqueTestId], siblingCountyId, commandTimeout: 600);
+                if (preState is not null)
+                {
+                    await buildingDataConverter.PushAsync(preState, commandTimeout: 600);
+                }
+            }
+        }
     }
 }
