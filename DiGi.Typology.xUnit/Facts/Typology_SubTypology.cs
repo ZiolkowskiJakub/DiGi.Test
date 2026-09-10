@@ -18,7 +18,7 @@ namespace DiGi.Typology.xUnit
             Typology.Classes.Typology typology_Pathless = new("Pathless", null);
             Typology.Classes.Typology typology_Colliding = new(new Typology.Classes.TypologyItem([0], "Colliding", null));
 
-            Typology.Classes.Typology? typology = DiGi.Typology.Create.Typology(new Typology.Classes.TypologyItem([9], "Root", null), [typology_Taken, typology_Pathless, typology_Colliding]);
+            Typology.Classes.Typology? typology = Create.Typology(new Typology.Classes.TypologyItem([9], "Root", null), [typology_Taken, typology_Pathless, typology_Colliding]);
 
             Assert.NotNull(typology);
 

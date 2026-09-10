@@ -33,7 +33,7 @@ namespace DiGi.GIS.ML.xUnit
             }
 
             HashSet<string> names_AllowList = [];
-            foreach (Column column in GIS.IO.Query.YearBuiltPredictionInputColumns())
+            foreach (Column column in IO.Query.YearBuiltPredictionInputColumns())
             {
                 if (column.Name is string name)
                 {
@@ -49,7 +49,7 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Equal(172, names_Model.Count);
 
             // The pipeline's own output must not be readable as a feature from either side.
-            foreach (Column column in GIS.IO.Query.YearBuiltPredictionOutputColumns())
+            foreach (Column column in IO.Query.YearBuiltPredictionOutputColumns())
             {
                 Assert.DoesNotContain(column.Name ?? string.Empty, names_Model);
             }
@@ -73,8 +73,8 @@ namespace DiGi.GIS.ML.xUnit
             Assert.NotNull(table_Predictions);
             Assert.Equal(table.RowCount, table_Predictions!.RowCount);
 
-            int index_Reference = table_Predictions.GetColumnIndex(GIS.IO.Constants.Column.Reference.Name);
-            int index_Year = table_Predictions.GetColumnIndex(GIS.IO.Constants.Column.PredictedYearBuilt.Name);
+            int index_Reference = table_Predictions.GetColumnIndex(IO.Constants.Column.Reference.Name);
+            int index_Year = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
             Assert.True(index_Reference >= 0);
             Assert.True(index_Year >= 0);
 
@@ -104,10 +104,10 @@ namespace DiGi.GIS.ML.xUnit
             // binding is silently reading defaults - which is exactly how the deployed path came to score
             // an RSquared of -1.771 while failing at nothing.
             Table table_Stripped = new();
-            table_Stripped.AddColumn(GIS.IO.Constants.Column.Reference);
+            table_Stripped.AddColumn(IO.Constants.Column.Reference);
             for (int i = 0; i < table.RowCount; i++)
             {
-                table_Stripped.AddRow([table.GetValue<string>(i, table.GetColumnIndex(GIS.IO.Constants.Column.Reference.Name))]);
+                table_Stripped.AddRow([table.GetValue<string>(i, table.GetColumnIndex(IO.Constants.Column.Reference.Name))]);
             }
 
             Table? table_StrippedPredictions = table_Stripped.PredictedYearBuilts();

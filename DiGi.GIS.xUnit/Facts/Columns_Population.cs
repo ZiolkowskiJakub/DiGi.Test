@@ -12,39 +12,39 @@ namespace DiGi.GIS.xUnit
         [Fact]
         public void Columns_Population()
         {
-            Column column_Single = GIS.IO.Create.Column_Population(2020);
+            Column column_Single = IO.Create.Column_Population(2020);
             Assert.NotNull(column_Single);
             Assert.Equal("Municipality population 2020", column_Single.Name);
             Assert.IsType<ExtendedColumn>(column_Single);
             ExtendedColumn extendedColumn = (ExtendedColumn)column_Single;
             Assert.Equal(typeof(int), extendedColumn.Type);
-            Assert.Equal(Core.Query.Description(GIS.IO.Enums.Category.Population), extendedColumn.Category);
+            Assert.Equal(Core.Query.Description(IO.Enums.Category.Population), extendedColumn.Category);
             Assert.Equal("Municipality population count for 2020", extendedColumn.Description);
 
-            List<Column> columns_SingleYear = GIS.IO.Create.Columns_Population(2020);
+            List<Column> columns_SingleYear = IO.Create.Columns_Population(2020);
             Assert.NotNull(columns_SingleYear);
             Assert.Single(columns_SingleYear);
             Assert.Equal("Municipality population 2020", columns_SingleYear[0].Name);
 
             Range<int> range = new(2010, 2015);
-            List<Column> columns_Range = GIS.IO.Create.Columns_Population(range);
+            List<Column> columns_Range = IO.Create.Columns_Population(range);
             Assert.NotNull(columns_Range);
             Assert.Equal(6, columns_Range.Count);
             Assert.Equal("Municipality population 2010", columns_Range[0].Name);
             Assert.Equal("Municipality population 2015", columns_Range[5].Name);
 
-            List<Column> columns_Enumerable = GIS.IO.Create.Columns_Population((IEnumerable<int>)[2008, 2012, 2024]);
+            List<Column> columns_Enumerable = IO.Create.Columns_Population((IEnumerable<int>)[2008, 2012, 2024]);
             Assert.NotNull(columns_Enumerable);
             Assert.Equal(3, columns_Enumerable.Count);
             Assert.Equal("Municipality population 2008", columns_Enumerable[0].Name);
             Assert.Equal("Municipality population 2012", columns_Enumerable[1].Name);
             Assert.Equal("Municipality population 2024", columns_Enumerable[2].Name);
 
-            List<Column> columns_NullRange = GIS.IO.Create.Columns_Population((Range<int>?)null);
+            List<Column> columns_NullRange = IO.Create.Columns_Population((Range<int>?)null);
             Assert.NotNull(columns_NullRange);
             Assert.Empty(columns_NullRange);
 
-            List<Column> columns_NullEnumerable = GIS.IO.Create.Columns_Population((IEnumerable<int>?)null);
+            List<Column> columns_NullEnumerable = IO.Create.Columns_Population((IEnumerable<int>?)null);
             Assert.NotNull(columns_NullEnumerable);
             Assert.Empty(columns_NullEnumerable);
         }

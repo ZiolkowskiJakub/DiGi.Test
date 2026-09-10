@@ -11,7 +11,7 @@ namespace DiGi.GIS.xUnit
         [Fact]
         public void Columns_RadialRatios()
         {
-            List<Column> columns_Single = GIS.IO.Create.Columns_RadialRatios(200.0);
+            List<Column> columns_Single = IO.Create.Columns_RadialRatios(200.0);
             Assert.NotNull(columns_Single);
             Assert.Equal(2, columns_Single.Count);
             Assert.Equal("Radial Building Coverage Ratio 200m", columns_Single[0].Name);
@@ -19,7 +19,7 @@ namespace DiGi.GIS.xUnit
             Assert.Equal(typeof(float), ((ExtendedColumn)columns_Single[0]).Type);
             Assert.Equal(typeof(float), ((ExtendedColumn)columns_Single[1]).Type);
 
-            List<Column> columns_Collection = GIS.IO.Create.Columns_RadialRatios((IEnumerable<double>)[200, 400, 600, 1000]);
+            List<Column> columns_Collection = IO.Create.Columns_RadialRatios((IEnumerable<double>)[200, 400, 600, 1000]);
             Assert.NotNull(columns_Collection);
             Assert.Equal(8, columns_Collection.Count);
             Assert.Equal("Radial Building Coverage Ratio 200m", columns_Collection[0].Name);
@@ -27,14 +27,14 @@ namespace DiGi.GIS.xUnit
             Assert.Equal("Radial Building Coverage Ratio 1000m", columns_Collection[6].Name);
             Assert.Equal("Radial Floor Area Ratio 1000m", columns_Collection[7].Name);
 
-            List<Column> columns_Null = GIS.IO.Create.Columns_RadialRatios((IEnumerable<double>?)null);
+            List<Column> columns_Null = IO.Create.Columns_RadialRatios((IEnumerable<double>?)null);
             Assert.NotNull(columns_Null);
             Assert.Empty(columns_Null);
 
-            Assert.Empty(GIS.IO.Create.Columns_RadialRatios(0));
-            Assert.Empty(GIS.IO.Create.Columns_RadialRatios(-100));
-            Assert.Empty(GIS.IO.Create.Columns_RadialRatios(double.NaN));
-            Assert.Empty(GIS.IO.Create.Columns_RadialRatios(double.PositiveInfinity));
+            Assert.Empty(IO.Create.Columns_RadialRatios(0));
+            Assert.Empty(IO.Create.Columns_RadialRatios(-100));
+            Assert.Empty(IO.Create.Columns_RadialRatios(double.NaN));
+            Assert.Empty(IO.Create.Columns_RadialRatios(double.PositiveInfinity));
         }
     }
 }

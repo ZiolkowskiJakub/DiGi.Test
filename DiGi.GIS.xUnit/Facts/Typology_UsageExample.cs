@@ -105,7 +105,7 @@ namespace DiGi.GIS.xUnit
             //    which buildings it holds, so it is required whenever references are being stored.
             // ---------------------------------------------------------------------------------------------
 
-            DiGi.Typology.Classes.Typology? typology = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
+            Typology.Classes.Typology? typology = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
 
             Assert.NotNull(typology);
 
@@ -120,14 +120,14 @@ namespace DiGi.GIS.xUnit
             //    the tree, not a bucket - which is why the whole set is read with includeNested.
             // ---------------------------------------------------------------------------------------------
 
-            DiGi.Typology.Classes.Typology? typology_County = DiGi.Typology.Query.SubTypology(typology, [0]);
+            Typology.Classes.Typology? typology_County = Typology.Query.SubTypology(typology, [0]);
 
             Assert.NotNull(typology_County);
             Assert.Equal("County name Poznanski", typology_County.Name);
             Assert.Equal(3, typology_County.References.Count);
 
             Assert.Empty(typology.References);
-            Assert.Equal(5, DiGi.Typology.Query.ReferenceSet(typology, true).Count);
+            Assert.Equal(5, Typology.Query.ReferenceSet(typology, true).Count);
 
             // ---------------------------------------------------------------------------------------------
             // 6. Walk the whole tree.
@@ -138,7 +138,7 @@ namespace DiGi.GIS.xUnit
             //    no year node at all. A row is not lost, it simply stops being classified further down.
             // ---------------------------------------------------------------------------------------------
 
-            List<TypologyPath> typologyPaths = DiGi.Typology.Query.TypologyPaths(typology, true);
+            List<TypologyPath> typologyPaths = Typology.Query.TypologyPaths(typology, true);
 
             Assert.NotEmpty(typologyPaths);
 
@@ -146,7 +146,7 @@ namespace DiGi.GIS.xUnit
 
             foreach (TypologyPath typologyPath in typologyPaths)
             {
-                DiGi.Typology.Classes.Typology? typology_Node = DiGi.Typology.Query.SubTypology(typology, typologyPath);
+                Typology.Classes.Typology? typology_Node = Typology.Query.SubTypology(typology, typologyPath);
                 Assert.NotNull(typology_Node);
 
                 List<string> references_Node = typology_Node.References;
@@ -158,13 +158,13 @@ namespace DiGi.GIS.xUnit
             lines_Report.Add(string.Empty);
 
             // BLD-005 reaches its occupancy node and stops there.
-            DiGi.Typology.Classes.Typology? typology_Occupied = DiGi.Typology.Query.SubTypology(typology, [1, 0]);
+            Typology.Classes.Typology? typology_Occupied = Typology.Query.SubTypology(typology, [1, 0]);
             Assert.NotNull(typology_Occupied);
             Assert.Contains("BLD-005", typology_Occupied.References);
 
-            foreach (DiGi.Typology.Classes.Typology subTypology in typology_Occupied.SubTypologies ?? [])
+            foreach (Typology.Classes.Typology subTypology in typology_Occupied.SubTypologies ?? [])
             {
-                Assert.DoesNotContain("BLD-005", DiGi.Typology.Query.ReferenceSet(subTypology, true));
+                Assert.DoesNotContain("BLD-005", Typology.Query.ReferenceSet(subTypology, true));
             }
 
             // ---------------------------------------------------------------------------------------------
@@ -174,11 +174,11 @@ namespace DiGi.GIS.xUnit
             //    The root holds nothing itself, so the two answers differ there.
             // ---------------------------------------------------------------------------------------------
 
-            Assert.True(DiGi.Typology.Query.Contains(typology_County, "BLD-001"));
-            Assert.False(DiGi.Typology.Query.Contains(typology_County, "BLD-004"));
+            Assert.True(Typology.Query.Contains(typology_County, "BLD-001"));
+            Assert.False(Typology.Query.Contains(typology_County, "BLD-004"));
 
-            Assert.False(DiGi.Typology.Query.Contains(typology, "BLD-001"));
-            Assert.True(DiGi.Typology.Query.Contains(typology, "BLD-001", true));
+            Assert.False(Typology.Query.Contains(typology, "BLD-001"));
+            Assert.True(Typology.Query.Contains(typology, "BLD-001", true));
 
             // ---------------------------------------------------------------------------------------------
             // 8. The same classification without references.
@@ -190,16 +190,16 @@ namespace DiGi.GIS.xUnit
             //    on the whole tree or on one branch.
             // ---------------------------------------------------------------------------------------------
 
-            DiGi.Typology.Classes.Typology? typology_Metadata = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference, null, false);
+            Typology.Classes.Typology? typology_Metadata = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference, null, false);
 
             Assert.NotNull(typology_Metadata);
-            Assert.Empty(DiGi.Typology.Query.ReferenceSet(typology_Metadata, true));
-            Assert.Equal(typologyPaths.Count, DiGi.Typology.Query.TypologyPaths(typology_Metadata, true).Count);
+            Assert.Empty(Typology.Query.ReferenceSet(typology_Metadata, true));
+            Assert.Equal(typologyPaths.Count, Typology.Query.TypologyPaths(typology_Metadata, true).Count);
 
-            DiGi.Typology.Classes.Typology? typology_Stripped = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
+            Typology.Classes.Typology? typology_Stripped = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
             Assert.NotNull(typology_Stripped);
-            Assert.True(DiGi.Typology.Modify.RemoveReferences(typology_Stripped, true));
-            Assert.Empty(DiGi.Typology.Query.ReferenceSet(typology_Stripped, true));
+            Assert.True(Typology.Modify.RemoveReferences(typology_Stripped, true));
+            Assert.Empty(Typology.Query.ReferenceSet(typology_Stripped, true));
 
             lines_Report.Add("Solved again with includeReferences false: same " + typologyPaths.Count + " nodes, 0 references stored.");
             lines_Report.Add(string.Empty);

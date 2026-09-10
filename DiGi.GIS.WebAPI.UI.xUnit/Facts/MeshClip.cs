@@ -61,7 +61,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             foreach (Point3D point3D in points_Clipped)
             {
                 double dist = System.Math.Sqrt((point3D.X * point3D.X) + (point3D.Y * point3D.Y));
-                Assert.True(dist <= 30.0 + DiGi.Core.Constants.Tolerance.Distance, $"Point ({point3D.X}, {point3D.Y}) distance {dist} exceeds radius 30.0");
+                Assert.True(dist <= 30.0 + Core.Constants.Tolerance.Distance, $"Point ({point3D.X}, {point3D.Y}) distance {dist} exceeds radius 30.0");
             }
         }
 
@@ -113,8 +113,8 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
 
             foreach (Point3D point3D in points_Clipped)
             {
-                Assert.True(point3D.X >= -20.0 - DiGi.Core.Constants.Tolerance.Distance && point3D.X <= 20.0 + DiGi.Core.Constants.Tolerance.Distance);
-                Assert.True(point3D.Y >= -20.0 - DiGi.Core.Constants.Tolerance.Distance && point3D.Y <= 20.0 + DiGi.Core.Constants.Tolerance.Distance);
+                Assert.True(point3D.X >= -20.0 - Core.Constants.Tolerance.Distance && point3D.X <= 20.0 + Core.Constants.Tolerance.Distance);
+                Assert.True(point3D.Y >= -20.0 - Core.Constants.Tolerance.Distance && point3D.Y <= 20.0 + Core.Constants.Tolerance.Distance);
             }
         }
 
@@ -180,7 +180,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             foreach (Point3D point3D in points_Result)
             {
                 double dist = System.Math.Sqrt((point3D.X * point3D.X) + (point3D.Y * point3D.Y));
-                Assert.True(dist <= 30.0 + DiGi.Core.Constants.Tolerance.Distance);
+                Assert.True(dist <= 30.0 + Core.Constants.Tolerance.Distance);
             }
         }
 

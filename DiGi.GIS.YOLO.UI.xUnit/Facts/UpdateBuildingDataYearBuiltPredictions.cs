@@ -49,14 +49,14 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             ]);
 
             Table table = new();
-            GIS.IO.Modify.Update_Building2D_YearBuiltPredictions(table, countyId, [building2DYearBuiltPredictions]);
+            IO.Modify.Update_Building2D_YearBuiltPredictions(table, countyId, [building2DYearBuiltPredictions]);
 
             Assert.Equal(1, table.RowCount);
 
             List<string?> columnNames = [.. (table.Columns ?? []).Select(x => x.Name)];
 
-            Assert.Contains(GIS.IO.Constants.Column.Reference.Name, columnNames);
-            Assert.Contains(GIS.IO.Constants.Column.CountyId.Name, columnNames);
+            Assert.Contains(IO.Constants.Column.Reference.Name, columnNames);
+            Assert.Contains(IO.Constants.Column.CountyId.Name, columnNames);
             Assert.Contains("Prediction Confidence 2020", columnNames);
             Assert.Contains("Prediction BoundingBox X 2020", columnNames);
             Assert.Contains("Prediction BoundingBox Y 2020", columnNames);
@@ -65,7 +65,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Contains("Prediction Confidence 2021", columnNames);
 
             //The pipeline's own output must never travel with its inputs
-            Assert.DoesNotContain(GIS.IO.Constants.Column.PredictedYearBuilt.Name, columnNames);
+            Assert.DoesNotContain(IO.Constants.Column.PredictedYearBuilt.Name, columnNames);
         }
     }
 }

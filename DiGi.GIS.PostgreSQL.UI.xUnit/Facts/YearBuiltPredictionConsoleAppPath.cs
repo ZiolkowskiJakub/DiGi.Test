@@ -15,14 +15,14 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         {
             // A path that names nothing is not a path to the runner, and neither is a malformed one - both have to
             // fall through to the probing rather than come back as an answer.
-            Assert.Null(Query.YearBuiltPredictionConsoleAppPath(System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"), Constants.FileName.YearBuiltPredictionConsoleApp)));
+            Assert.Null(Query.YearBuiltPredictionConsoleAppPath(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), Constants.FileName.YearBuiltPredictionConsoleApp)));
             Assert.Null(Query.YearBuiltPredictionConsoleAppPath(string.Empty));
             Assert.Null(Query.YearBuiltPredictionConsoleAppPath("   "));
 
             // An explicit path that does exist is taken as given, whatever the file is - the resolver's job is to
             // say whether something is there, not to vouch for what it is.
-            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            string path = System.IO.Path.Combine(directory, Constants.FileName.YearBuiltPredictionConsoleApp);
+            string directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string path = Path.Combine(directory, Constants.FileName.YearBuiltPredictionConsoleApp);
 
             try
             {
@@ -33,7 +33,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
 
                 Assert.NotNull(path_Resolved);
                 Assert.True(File.Exists(path_Resolved));
-                Assert.Equal(System.IO.Path.GetFullPath(path), path_Resolved);
+                Assert.Equal(Path.GetFullPath(path), path_Resolved);
             }
             finally
             {
@@ -59,10 +59,10 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         {
             // The deployed layout: the runner in its own folder beside this application's, with nothing beside the executable
             // itself - so the answer has to come from the sibling candidate and not from a path that is not there.
-            string root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            string directory = System.IO.Path.Combine(root, "DiGi.GIS.PostgreSQL.UI");
-            string directory_Sibling = System.IO.Path.Combine(root, "DiGi.GIS.YOLO.UI");
-            string path = System.IO.Path.Combine(directory_Sibling, Constants.FileName.YearBuiltPredictionConsoleApp);
+            string root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory = Path.Combine(root, "DiGi.GIS.PostgreSQL.UI");
+            string directory_Sibling = Path.Combine(root, "DiGi.GIS.YOLO.UI");
+            string path = Path.Combine(directory_Sibling, Constants.FileName.YearBuiltPredictionConsoleApp);
 
             try
             {
@@ -72,7 +72,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
 
                 string? path_Resolved = Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory);
 
-                Assert.Equal(System.IO.Path.GetFullPath(path), path_Resolved);
+                Assert.Equal(Path.GetFullPath(path), path_Resolved);
             }
             finally
             {
@@ -83,8 +83,8 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
             }
 
             // An application folder with no runner beside it, in its own folder, or in a workspace checkout is not answered with a path.
-            string root_Empty = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            string directory_Empty = System.IO.Path.Combine(root_Empty, "DiGi.GIS.PostgreSQL.UI");
+            string root_Empty = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory_Empty = Path.Combine(root_Empty, "DiGi.GIS.PostgreSQL.UI");
 
             try
             {
@@ -108,9 +108,9 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         [Fact]
         public void YearBuiltPredictionConsoleAppPath_ExtensionFolder()
         {
-            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            string directory_Extension = System.IO.Path.Combine(directory, Constants.DirectoryName.Extensions, Constants.DirectoryName.YearBuiltPredictionExtension);
-            string path = System.IO.Path.Combine(directory_Extension, Constants.FileName.YearBuiltPredictionConsoleApp);
+            string directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory_Extension = Path.Combine(directory, Constants.DirectoryName.Extensions, Constants.DirectoryName.YearBuiltPredictionExtension);
+            string path = Path.Combine(directory_Extension, Constants.FileName.YearBuiltPredictionConsoleApp);
 
             try
             {
@@ -119,7 +119,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
 
                 string? path_Resolved = Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory);
 
-                Assert.Equal(System.IO.Path.GetFullPath(path), path_Resolved);
+                Assert.Equal(Path.GetFullPath(path), path_Resolved);
             }
             finally
             {
@@ -131,11 +131,11 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
 
             // The extensions folder is optional, and an empty one is not a deployment of the runner. A task
             // offered against a folder with no executable in it could only ever fail to start a process.
-            string directory_Empty = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            string directory_Empty = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
 
             try
             {
-                Directory.CreateDirectory(System.IO.Path.Combine(directory_Empty, Constants.DirectoryName.Extensions, Constants.DirectoryName.YearBuiltPredictionExtension));
+                Directory.CreateDirectory(Path.Combine(directory_Empty, Constants.DirectoryName.Extensions, Constants.DirectoryName.YearBuiltPredictionExtension));
 
                 Assert.Null(Query.YearBuiltPredictionConsoleAppPath(baseDirectory: directory_Empty));
             }

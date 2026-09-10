@@ -15,11 +15,11 @@ namespace DiGi.GIS.xUnit
         [Fact]
         public void YearBuiltPredictionColumns_Disjointness()
         {
-            List<Column> inputColumns = GIS.IO.Query.YearBuiltPredictionInputColumns();
+            List<Column> inputColumns = IO.Query.YearBuiltPredictionInputColumns();
             Assert.NotNull(inputColumns);
             Assert.NotEmpty(inputColumns);
 
-            List<Column> outputColumns = GIS.IO.Query.YearBuiltPredictionOutputColumns();
+            List<Column> outputColumns = IO.Query.YearBuiltPredictionOutputColumns();
             Assert.NotNull(outputColumns);
             Assert.NotEmpty(outputColumns);
 
@@ -37,7 +37,7 @@ namespace DiGi.GIS.xUnit
         [Fact]
         public void YearBuiltPredictionColumns_Completeness()
         {
-            List<Column> columns = GIS.IO.Query.YearBuiltPredictionInputColumns();
+            List<Column> columns = IO.Query.YearBuiltPredictionInputColumns();
             Assert.NotNull(columns);
 
             // 31 core features + 25 grid cells + (18 years * 5 detections) + 18 population + 8 radial ratios = 172 columns
@@ -85,7 +85,7 @@ namespace DiGi.GIS.xUnit
         [Fact]
         public void YearBuiltPredictionColumns_UniqueIds()
         {
-            List<Column> columns = GIS.IO.Query.YearBuiltPredictionInputColumns();
+            List<Column> columns = IO.Query.YearBuiltPredictionInputColumns();
             Assert.NotNull(columns);
 
             HashSet<string> uniqueIds = [];

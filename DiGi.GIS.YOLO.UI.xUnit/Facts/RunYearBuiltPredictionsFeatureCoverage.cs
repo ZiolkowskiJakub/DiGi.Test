@@ -29,7 +29,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //The detections were still read off disk - it is the scoring that is refused, not the run
             Assert.Equal(2, yearBuiltPredictionResult!.BuildingCount);
 
-            Assert.Contains(nameof(GIS.IO.Query.UnpopulatedColumnNames), yearBuiltPredictionResult.FailedStepNames);
+            Assert.Contains(nameof(IO.Query.UnpopulatedColumnNames), yearBuiltPredictionResult.FailedStepNames);
 
             //Refused before the model saw anything, and nothing was carried forward as a prediction
             Assert.Equal(0, yearBuiltPredictorStub.CallCount);
@@ -37,7 +37,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             //The message has to name the group and the run that fills it, or an operator learns only that the run failed
             Assert.NotNull(yearBuiltPredictionResult.Messages);
-            Assert.Contains(yearBuiltPredictionResult.Messages!, x => x.Contains(GIS.IO.Constants.YearBuiltPredictionFeatureGroup.Detection) && x.Contains("UpdateDetections"));
+            Assert.Contains(yearBuiltPredictionResult.Messages!, x => x.Contains(IO.Constants.YearBuiltPredictionFeatureGroup.Detection) && x.Contains("UpdateDetections"));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.NotNull(yearBuiltPredictionResult);
             Assert.Equal(2, yearBuiltPredictionResult!.BuildingCount);
 
-            Assert.DoesNotContain(nameof(GIS.IO.Query.UnpopulatedColumnNames), yearBuiltPredictionResult.FailedStepNames);
+            Assert.DoesNotContain(nameof(IO.Query.UnpopulatedColumnNames), yearBuiltPredictionResult.FailedStepNames);
 
             Assert.Equal(1, yearBuiltPredictorStub.CallCount);
             Assert.Equal(2, yearBuiltPredictionResult.FeatureRowCount);
@@ -125,12 +125,12 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         /// <returns>The serialized table, in the form the endpoint returns it.</returns>
         private static string FeatureTableJson(IEnumerable<string> references, bool populated)
         {
-            Dictionary<string, List<Column>> columns_ByGroup = GIS.IO.Query.YearBuiltPredictionFeatureGroups();
+            Dictionary<string, List<Column>> columns_ByGroup = IO.Query.YearBuiltPredictionFeatureGroups();
 
             HashSet<string> names_Empty = [];
             if (!populated)
             {
-                foreach (string name_Group in new string[] { GIS.IO.Constants.YearBuiltPredictionFeatureGroup.Detection, GIS.IO.Constants.YearBuiltPredictionFeatureGroup.Population })
+                foreach (string name_Group in new string[] { IO.Constants.YearBuiltPredictionFeatureGroup.Detection, IO.Constants.YearBuiltPredictionFeatureGroup.Population })
                 {
                     foreach (Column column in columns_ByGroup[name_Group])
                     {
@@ -139,8 +139,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 }
             }
 
-            List<Column> columns = [GIS.IO.Constants.Column.Reference];
-            columns.AddRange(GIS.IO.Query.YearBuiltPredictionInputColumns());
+            List<Column> columns = [IO.Constants.Column.Reference];
+            columns.AddRange(IO.Query.YearBuiltPredictionInputColumns());
 
             Table table = new(columns);
 
@@ -149,7 +149,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 List<object?> values = [];
                 foreach (Column column in columns)
                 {
-                    if (column.Name == GIS.IO.Constants.Column.Reference.Name)
+                    if (column.Name == IO.Constants.Column.Reference.Name)
                     {
                         values.Add(reference);
                         continue;

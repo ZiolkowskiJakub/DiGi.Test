@@ -279,7 +279,7 @@ namespace DiGi.Core.xUnit
             Assert.NotNull(byPredicate);
             Assert.Equal(2, byPredicate.Count);
 
-            List<string>? all = testBaseCluster.GetValues<string>((System.Func<string?, bool>?)null);
+            List<string>? all = testBaseCluster.GetValues((System.Func<string?, bool>?)null);
             Assert.NotNull(all);
             Assert.Equal(3, all.Count);
         }

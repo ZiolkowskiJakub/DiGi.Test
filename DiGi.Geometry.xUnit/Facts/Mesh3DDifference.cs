@@ -249,7 +249,7 @@ namespace DiGi.Geometry.xUnit
 
             List<Point3D>? point3Ds_Result = mesh3D_Result.GetPoints();
             Assert.NotNull(point3Ds_Result);
-            Assert.True(Spatial.Query.IsValid(point3Ds_Result), "A not-a-number corner reached the cut mesh.");
+            Assert.True(Query.IsValid(point3Ds_Result), "A not-a-number corner reached the cut mesh.");
 
             // A shape carrying such a corner cannot describe an area and is ignored.
             Polygon2D polygon2D = new([new Point2D(1, 1), new Point2D(double.NaN, 1), new Point2D(5, 5), new Point2D(1, 5)]);
@@ -354,7 +354,7 @@ namespace DiGi.Geometry.xUnit
             Mesh3D mesh3D = Mesh3D_Difference_Terrain(629000, 489000, size, count, 0.02, 0.01);
             Assert.Equal(2 * count * count, mesh3D.TrianglesCount);
 
-            System.Random random = new(20260822);
+            Random random = new(20260822);
 
             List<PolygonalFace2D> polygonalFace2Ds = [];
             while (polygonalFace2Ds.Count < buildings)

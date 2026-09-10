@@ -1305,7 +1305,7 @@ namespace DiGi.Geometry.xUnit
             stringBuilder.AppendLine("| Scenario | Half-edges | Vertex weld (previous) | Greedy edge matching | Component matching | Shipped | Shipped / previous |");
             stringBuilder.AppendLine("| :--- | ---: | ---: | ---: | ---: | ---: | ---: |");
 
-            double Best(System.Func<bool> function, int repeats)
+            double Best(Func<bool> function, int repeats)
             {
                 int repeats_WarmUp = System.Math.Max(repeats, Polyhedron_IsClosed_Benchmark_WarmUp);
                 for (int i = 0; i < repeats_WarmUp; i++)
@@ -1461,7 +1461,7 @@ namespace DiGi.Geometry.xUnit
             string? directory_Reports = DiGi.Core.xUnit.Query.ReportsDirectory(System.Reflection.Assembly.GetExecutingAssembly());
             Assert.NotNull(directory_Reports);
 
-            System.IO.File.WriteAllText(System.IO.Path.Combine(directory_Reports, "IsClosed_Benchmark.md"), stringBuilder.ToString());
+            File.WriteAllText(Path.Combine(directory_Reports, "IsClosed_Benchmark.md"), stringBuilder.ToString());
         }
     }
 }

@@ -14,12 +14,12 @@ namespace DiGi.GIS.xUnit
         {
             Table table = TypologyTable();
 
-            DiGi.Typology.Classes.Typology? typology = Create.Typology(table, TypologyFilter(), IO.Constants.Column.Reference);
+            Typology.Classes.Typology? typology = Create.Typology(table, TypologyFilter(), IO.Constants.Column.Reference);
 
             Assert.NotNull(typology);
 
             Assert.Empty(typology.References);
-            Assert.Equal(7, DiGi.Typology.Query.ReferenceSet(typology, true).Count);
+            Assert.Equal(7, Typology.Query.ReferenceSet(typology, true).Count);
 
             AssertNode(typology, [0], "County name Alpha", ["b1", "b2", "b3", "b4"]);
             AssertNode(typology, [1], "County name Beta", ["b5", "b6", "b7"]);
@@ -30,9 +30,9 @@ namespace DiGi.GIS.xUnit
             AssertNode(typology, [0, 0, 0], "Predicted year built (0,2003>", ["b1", "b2"]);
             AssertNode(typology, [0, 0, 1], "Predicted year built (2004,2020>", ["b3"]);
 
-            static void AssertNode(DiGi.Typology.Classes.Typology typology, int[] values, string name, string[] references)
+            static void AssertNode(Typology.Classes.Typology typology, int[] values, string name, string[] references)
             {
-                DiGi.Typology.Classes.Typology? typology_Node = DiGi.Typology.Query.SubTypology(typology, values);
+                Typology.Classes.Typology? typology_Node = Typology.Query.SubTypology(typology, values);
 
                 Assert.NotNull(typology_Node);
                 Assert.Equal(name, typology_Node.Name);

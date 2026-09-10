@@ -68,27 +68,27 @@ namespace DiGi.GIS.WebAPI.xUnit
                 using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
                 BuildingDataController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null));
 
-                DiGi.Core.IO.Table.Classes.Table table_NoReference = new();
+                Core.IO.Table.Classes.Table table_NoReference = new();
                 table_NoReference.AddColumn("Other", typeof(string));
-                DiGi.Core.IO.Table.Classes.Row? row = table_NoReference.AddRow();
+                Core.IO.Table.Classes.Row? row = table_NoReference.AddRow();
                 if (row is not null)
                 {
                     row[0] = "val";
                 }
-                string? json_NoReference = Core.IO.Table.Convert.ToSystem_String<DiGi.Core.IO.Table.Classes.Table, DiGi.Core.IO.Table.Classes.Column, DiGi.Core.IO.Table.Classes.Row>(table_NoReference);
+                string? json_NoReference = Core.IO.Table.Convert.ToSystem_String<Core.IO.Table.Classes.Table, Core.IO.Table.Classes.Column, Core.IO.Table.Classes.Row>(table_NoReference);
                 Assert.NotNull(json_NoReference);
                 JsonObject? jsonObject_NoReference = JsonNode.Parse(json_NoReference) as JsonObject;
 
                 Assert.IsType<BadRequestResult>(await controller.UpdateItemsByCountyIdsAsync(jsonObject_NoReference, [1]));
 
-                DiGi.Core.IO.Table.Classes.Table table_LowercaseReference = new();
+                Core.IO.Table.Classes.Table table_LowercaseReference = new();
                 table_LowercaseReference.AddColumn("reference", typeof(string));
-                DiGi.Core.IO.Table.Classes.Row? row_Lower = table_LowercaseReference.AddRow();
+                Core.IO.Table.Classes.Row? row_Lower = table_LowercaseReference.AddRow();
                 if (row_Lower is not null)
                 {
                     row_Lower[0] = "ref1";
                 }
-                string? json_Lower = Core.IO.Table.Convert.ToSystem_String<DiGi.Core.IO.Table.Classes.Table, DiGi.Core.IO.Table.Classes.Column, DiGi.Core.IO.Table.Classes.Row>(table_LowercaseReference);
+                string? json_Lower = Core.IO.Table.Convert.ToSystem_String<Core.IO.Table.Classes.Table, Core.IO.Table.Classes.Column, Core.IO.Table.Classes.Row>(table_LowercaseReference);
                 Assert.NotNull(json_Lower);
                 JsonObject? jsonObject_Lower = JsonNode.Parse(json_Lower) as JsonObject;
 

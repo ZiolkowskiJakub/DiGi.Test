@@ -262,19 +262,19 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void Match_SubdivisionReference_MunicipalityFallback()
         {
-            List<DiGi.BDL.Classes.Unit> units =
+            List<BDL.Classes.Unit> units =
             [
-                new DiGi.BDL.Classes.Unit { id = "000000000000", name = "POLSKA", level = 0 },
-                new DiGi.BDL.Classes.Unit { id = "030000000000", name = "MAKROREGION POŁUDNIOWO-ZACHODNI", level = 1 },
-                new DiGi.BDL.Classes.Unit { id = "030200000000", name = "DOLNOŚLĄSKIE", level = 2 },
-                new DiGi.BDL.Classes.Unit { id = "030210000000", name = "REGION DOLNOŚLĄSKIE", level = 3 },
-                new DiGi.BDL.Classes.Unit { id = "030210100000", name = "PODREGION JELENIOGÓRSKI", level = 4 },
-                new DiGi.BDL.Classes.Unit { id = "030210101000", name = "POWIAT BOLESŁAWIECKI", level = 5 },
-                new DiGi.BDL.Classes.Unit { id = "030210101011", name = "BOLESŁAWIEC", level = 6 },
-                new DiGi.BDL.Classes.Unit { id = "030210101012", name = "GROMADKA", level = 6 }
+                new BDL.Classes.Unit { id = "000000000000", name = "POLSKA", level = 0 },
+                new BDL.Classes.Unit { id = "030000000000", name = "MAKROREGION POŁUDNIOWO-ZACHODNI", level = 1 },
+                new BDL.Classes.Unit { id = "030200000000", name = "DOLNOŚLĄSKIE", level = 2 },
+                new BDL.Classes.Unit { id = "030210000000", name = "REGION DOLNOŚLĄSKIE", level = 3 },
+                new BDL.Classes.Unit { id = "030210100000", name = "PODREGION JELENIOGÓRSKI", level = 4 },
+                new BDL.Classes.Unit { id = "030210101000", name = "POWIAT BOLESŁAWIECKI", level = 5 },
+                new BDL.Classes.Unit { id = "030210101011", name = "BOLESŁAWIEC", level = 6 },
+                new BDL.Classes.Unit { id = "030210101012", name = "GROMADKA", level = 6 }
             ];
 
-            DiGi.GIS.Classes.StatisticalUnit? rootStatisticalUnit = GIS.Create.StatisticalUnit(units);
+            GIS.Classes.StatisticalUnit? rootStatisticalUnit = GIS.Create.StatisticalUnit(units);
             Assert.NotNull(rootStatisticalUnit);
 
             AdministrativeAreal2DReference municipalityReference = new()
@@ -296,7 +296,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 AdministrativeArealType = AdministrativeArealType.Subdivision
             };
 
-            DiGi.GIS.Classes.StatisticalUnit? statisticalUnit_Subdivision = Query.Match(rootStatisticalUnit, subdivisionReference_Matched, administrativeAreal2DReferencePath);
+            GIS.Classes.StatisticalUnit? statisticalUnit_Subdivision = Query.Match(rootStatisticalUnit, subdivisionReference_Matched, administrativeAreal2DReferencePath);
             Assert.NotNull(statisticalUnit_Subdivision);
             Assert.Equal("GROMADKA", statisticalUnit_Subdivision.Name);
 
@@ -308,7 +308,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 AdministrativeArealType = AdministrativeArealType.Subdivision
             };
 
-            DiGi.GIS.Classes.StatisticalUnit? statisticalUnit_Municipality = Query.Match(rootStatisticalUnit, subdivisionReference_Unmatched, administrativeAreal2DReferencePath);
+            GIS.Classes.StatisticalUnit? statisticalUnit_Municipality = Query.Match(rootStatisticalUnit, subdivisionReference_Unmatched, administrativeAreal2DReferencePath);
             Assert.NotNull(statisticalUnit_Municipality);
             Assert.Equal("BOLESŁAWIEC", statisticalUnit_Municipality.Name);
 
@@ -345,7 +345,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             UnitPostgreSQLConverter? unitPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<UnitPostgreSQLConverter>();
             Assert.NotNull(unitPostgreSQLConverter);
 
-            DiGi.GIS.Classes.StatisticalUnit? rootStatisticalUnit = await unitPostgreSQLConverter.GetStatisticalUnitAsync(commandTimeout: 600);
+            GIS.Classes.StatisticalUnit? rootStatisticalUnit = await unitPostgreSQLConverter.GetStatisticalUnitAsync(commandTimeout: 600);
             Assert.NotNull(rootStatisticalUnit);
 
             Building2DPostgreSQLConverter? building2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<Building2DPostgreSQLConverter>();
@@ -588,7 +588,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             // Seed one year_built_data row under the sibling part with a known predicted year.
             string uniqueTestId = Guid.NewGuid().ToString("N");
-            DiGi.GIS.Classes.YearBuiltData gisObject = new(reference);
+            GIS.Classes.YearBuiltData gisObject = new(reference);
             gisObject.SetPredictedYearBuilt(DateTime.UtcNow, (short)1985);
             YearBuiltData seed = new()
             {

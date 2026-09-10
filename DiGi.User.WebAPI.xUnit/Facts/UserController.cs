@@ -66,7 +66,7 @@ namespace DiGi.User.WebAPI.xUnit
 
             // Drop the seeded row and re-insert the user alone, leaving the credential columns NULL.
             await userPostgreSQLConverter.DeleteUserByEmailAsync(UserWebAPITestUser.Email);
-            List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new DiGi.User.Classes.User(UserWebAPITestUser.Email)]);
+            List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new User.Classes.User(UserWebAPITestUser.Email)]);
             Assert.Single(insertedIds);
             Assert.Null(await userPostgreSQLConverter.GetUserCredentialAsync(UserWebAPITestUser.Email));
 
@@ -89,10 +89,10 @@ namespace DiGi.User.WebAPI.xUnit
 
             UserPostgreSQLConverter userPostgreSQLConverter = userWebAPITestUser.UserPostgreSQLConverter;
 
-            List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new DiGi.User.Classes.User(UserWebAPITestUser.Email) { Level = (int)Enums.UserLevel.Admin }]);
+            List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new User.Classes.User(UserWebAPITestUser.Email) { Level = (int)Enums.UserLevel.Admin }]);
             Assert.Single(insertedIds);
 
-            DiGi.User.Classes.User? user = await userPostgreSQLConverter.GetUserByEmailAsync(UserWebAPITestUser.Email);
+            User.Classes.User? user = await userPostgreSQLConverter.GetUserByEmailAsync(UserWebAPITestUser.Email);
             Assert.NotNull(user);
             Assert.Equal((int)Enums.UserLevel.Admin, user.Level);
             Assert.Equal(Enums.UserLevel.Admin, user.GetUserLevel());

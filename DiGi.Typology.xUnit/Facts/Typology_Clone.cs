@@ -42,7 +42,7 @@ namespace DiGi.Typology.xUnit
             Assert.Equal(2, typology_Copy.ReferenceSet(true).Count);
             Assert.Single(typology.ReferenceSet(true));
 
-            Typology.Classes.Typology? typology_Composed = DiGi.Typology.Create.Typology(new Typology.Classes.TypologyItem([9], "Composed", null), [typology_GrandChild]);
+            Typology.Classes.Typology? typology_Composed = Create.Typology(new TypologyItem([9], "Composed", null), [typology_GrandChild]);
 
             Assert.NotNull(typology_Composed);
 
@@ -61,7 +61,7 @@ namespace DiGi.Typology.xUnit
             Assert.Single(typology_Clone.ReferenceSet(true));
             Assert.Equal("GrandChild", typology_Clone.SubTypology([1, 1])?.Name);
 
-            List<Typology.Classes.Typology> typologies = [new(new Typology.Classes.TypologyItem()), new(new Typology.Classes.TypologyItem()), typology];
+            List<Typology.Classes.Typology> typologies = [new(new TypologyItem()), new(new TypologyItem()), typology];
             typologies.Sort();
 
             Assert.Equal(3, typologies.Count);

@@ -7,7 +7,7 @@ namespace DiGi.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies the guard contract of <see cref="Query.EstimatedCountsAsync(NpgsqlConnection?, IEnumerable{string}?, bool, int, int, System.Threading.CancellationToken)"/>.
+        /// Verifies the guard contract of <see cref="Query.EstimatedCountsAsync(NpgsqlConnection?, IEnumerable{string}?, bool, int, int, CancellationToken)"/>.
         /// <para>Every case here is decided before a statement is built, so none of them needs a database or an open connection.</para>
         /// <para>The distinction being pinned is that a name with no relation behind it is <b>absent</b> from the dictionary rather than present with a zero. A caller has to be able to tell "this partition does not exist" from "this partition holds no rows", because the estimated coverage factors divide one such figure by another.</para>
         /// </summary>

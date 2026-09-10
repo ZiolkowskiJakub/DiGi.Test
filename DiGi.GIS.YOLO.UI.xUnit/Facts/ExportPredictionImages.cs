@@ -36,7 +36,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync"/>) and file-based prediction image export (<see cref="DiGi.GIS.UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
+        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync"/>) and file-based prediction image export (<see cref="GIS.UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
@@ -46,7 +46,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.False(string.IsNullOrWhiteSpace(path_Fixture));
             Assert.True(File.Exists(path_Fixture));
 
-            DiGi.GIS.Classes.OrtoDatas? ortoDatas = Core.Convert.ToDiGi<DiGi.GIS.Classes.OrtoDatas>((Core.Classes.Path)path_Fixture!)?.FirstOrDefault();
+            GIS.Classes.OrtoDatas? ortoDatas = Core.Convert.ToDiGi<GIS.Classes.OrtoDatas>((Core.Classes.Path)path_Fixture!)?.FirstOrDefault();
             Assert.NotNull(ortoDatas);
             Assert.NotEmpty(ortoDatas);
 
@@ -69,14 +69,14 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Directory.CreateDirectory(directory_UIExport);
 
             // 1. Export prediction images via DiGi.GIS.UI prediction export pipeline
-            bool result_UI = DiGi.GIS.UI.Modify.WriteImages(ortoDatas, directory_UIExport);
+            bool result_UI = GIS.UI.Modify.WriteImages(ortoDatas, directory_UIExport);
             Assert.True(result_UI);
 
             // 2. Export prediction images via DiGi.GIS.YOLO database export pipeline using stubbed WebAPI response
             string json_References = Core.Convert.ToSystem_String(
                 new List<OrtoDatasReference> { new OrtoDatasReference { Reference = ortoDatas.Reference, CountyId = 1 } }) ?? string.Empty;
 
-            string json_Item = Core.Convert.ToSystem_String((DiGi.Core.Interfaces.ISerializableObject)ortoDatas) ?? string.Empty;
+            string json_Item = Core.Convert.ToSystem_String((Core.Interfaces.ISerializableObject)ortoDatas) ?? string.Empty;
             StubHttpClientFactory stubHttpClientFactory = new((request) =>
             {
                 string requestUrl = request.RequestUri?.ToString() ?? string.Empty;

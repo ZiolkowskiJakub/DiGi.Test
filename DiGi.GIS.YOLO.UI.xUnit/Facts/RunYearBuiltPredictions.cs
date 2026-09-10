@@ -18,7 +18,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         {
             GISWebAPIManager gisWebAPIManager = new(null);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [73485],
                 ScratchDirectory = Path.GetTempPath(),
@@ -30,23 +30,23 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdateYearBuiltData = false
             };
 
-            Classes.YearBuiltPredictionResult? result_NullManager = await Modify.RunYearBuiltPredictionsAsync(null, null, yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionResult? result_NullManager = await Modify.RunYearBuiltPredictionsAsync(null, null, yearBuiltPredictionPipelineOptions);
             Assert.Null(result_NullManager);
 
-            Classes.YearBuiltPredictionResult? result_NullOptions = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, null);
+            YearBuiltPredictionResult? result_NullOptions = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, null);
             Assert.Null(result_NullOptions);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_NoCounty = new(yearBuiltPredictionPipelineOptions) { CountyIds = [] };
-            Classes.YearBuiltPredictionResult? result_NoCounty = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_NoCounty);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_NoCounty = new(yearBuiltPredictionPipelineOptions) { CountyIds = [] };
+            YearBuiltPredictionResult? result_NoCounty = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_NoCounty);
             Assert.Null(result_NoCounty);
 
             //A county identifier is a database row identifier, so a non-positive one names nothing
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_BadCounty = new(yearBuiltPredictionPipelineOptions) { CountyIds = [0, -1] };
-            Classes.YearBuiltPredictionResult? result_BadCounty = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_BadCounty);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_BadCounty = new(yearBuiltPredictionPipelineOptions) { CountyIds = [0, -1] };
+            YearBuiltPredictionResult? result_BadCounty = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_BadCounty);
             Assert.Null(result_BadCounty);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_NoScratch = new(yearBuiltPredictionPipelineOptions) { ScratchDirectory = null };
-            Classes.YearBuiltPredictionResult? result_NoScratch = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_NoScratch);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_NoScratch = new(yearBuiltPredictionPipelineOptions) { ScratchDirectory = null };
+            YearBuiltPredictionResult? result_NoScratch = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_NoScratch);
             Assert.Null(result_NoScratch);
         }
 
@@ -73,7 +73,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             GISWebAPIManager gisWebAPIManager = new(null);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [countyId],
                 ScratchDirectory = directory_Scratch,
@@ -85,7 +85,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdateYearBuiltData = false
             };
 
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
 
             Assert.NotNull(yearBuiltPredictionResult);
             Assert.Equal([countyId], yearBuiltPredictionResult!.CountyIds);
@@ -123,7 +123,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             GISWebAPIManager gisWebAPIManager = new(null);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [countyId],
                 ScratchDirectory = directory_Scratch,
@@ -135,7 +135,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdateYearBuiltData = false
             };
 
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
 
             Assert.NotNull(yearBuiltPredictionResult);
             Assert.Equal(2, yearBuiltPredictionResult!.BuildingCount);
@@ -163,7 +163,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             GISWebAPIManager gisWebAPIManager = new(null);
             YearBuiltPredictorStub yearBuiltPredictorStub = new(1965);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [countyId],
                 ScratchDirectory = directory_Scratch,
@@ -175,7 +175,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdateYearBuiltData = false
             };
 
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(yearBuiltPredictorStub, yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(yearBuiltPredictorStub, yearBuiltPredictionPipelineOptions);
 
             Assert.NotNull(yearBuiltPredictionResult);
             Assert.Equal(2, yearBuiltPredictionResult!.BuildingCount);
@@ -207,7 +207,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             GISWebAPIManager gisWebAPIManager = new(null);
             YearBuiltPredictorStub yearBuiltPredictorStub = new(1965, runnable: false);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [countyId],
                 ScratchDirectory = directory_Scratch,
@@ -219,7 +219,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdateYearBuiltData = false
             };
 
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(yearBuiltPredictorStub, yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(yearBuiltPredictorStub, yearBuiltPredictionPipelineOptions);
 
             Assert.NotNull(yearBuiltPredictionResult);
 
@@ -229,7 +229,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(0, yearBuiltPredictionResult.FeatureRowCount);
 
             //The refusal is named after the readiness surface, and the reason it refused travels with the result
-            Assert.Contains(nameof(DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness), yearBuiltPredictionResult.FailedStepNames);
+            Assert.Contains(nameof(IO.Classes.YearBuiltPredictorReadiness), yearBuiltPredictionResult.FailedStepNames);
             Assert.Contains("model", string.Join(" ", yearBuiltPredictionResult.Messages));
         }
         /// <summary>
@@ -258,7 +258,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             GISWebAPIManager gisWebAPIManager = new(null);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [countyId],
                 ScratchDirectory = directory_Scratch,
@@ -271,7 +271,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 UpdateYearBuiltData = false
             };
 
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionResult? yearBuiltPredictionResult = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions);
 
             Assert.NotNull(yearBuiltPredictionResult);
             Assert.Equal(0, yearBuiltPredictionResult!.BuildingCount);
@@ -309,7 +309,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             GISWebAPIManager gisWebAPIManager = new(null);
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 CountyIds = [countyId],
                 ScratchDirectory = directory_Scratch,
@@ -324,8 +324,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //Kept: the detections a manual scoring pass would read are still there afterwards
             LayOutCounty();
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Kept = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = false };
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Kept = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Kept);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Kept = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = false };
+            YearBuiltPredictionResult? yearBuiltPredictionResult_Kept = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Kept);
 
             Assert.NotNull(yearBuiltPredictionResult_Kept);
             Assert.Equal(2, yearBuiltPredictionResult_Kept!.BuildingCount);
@@ -335,8 +335,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //Cleaned: the same detections were read, and nothing was left behind
             LayOutCounty();
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Cleaned = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = true };
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Cleaned = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Cleaned);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Cleaned = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = true };
+            YearBuiltPredictionResult? yearBuiltPredictionResult_Cleaned = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Cleaned);
 
             Assert.NotNull(yearBuiltPredictionResult_Cleaned);
             Assert.Equal(2, yearBuiltPredictionResult_Cleaned!.BuildingCount);
@@ -349,8 +349,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //on disk. Scoring with no predictor fails the county without needing a server for it.
             LayOutCounty();
 
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Failed = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = true, Score = true };
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Failed = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Failed);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Failed = new(yearBuiltPredictionPipelineOptions) { CleanScratchDirectory = true, Score = true };
+            YearBuiltPredictionResult? yearBuiltPredictionResult_Failed = await gisWebAPIManager.RunYearBuiltPredictionsAsync(null, yearBuiltPredictionPipelineOptions_Failed);
 
             Assert.NotNull(yearBuiltPredictionResult_Failed);
             Assert.Contains(nameof(IYearBuiltPredictor), yearBuiltPredictionResult_Failed!.FailedStepNames);

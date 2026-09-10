@@ -38,7 +38,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             ];
 
             List<string> names_Member = [];
-            foreach (PropertyInfo propertyInfo in typeof(Classes.YearBuiltPredictionPipelineOptions).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            foreach (PropertyInfo propertyInfo in typeof(YearBuiltPredictionPipelineOptions).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 if (propertyInfo.CanRead && propertyInfo.CanWrite)
                 {
@@ -74,7 +74,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             //The template is what a first run is copied from, so its write steps are off: the pipeline writes
             //deployed data and the master plan keeps each of those behind an explicit opt-in
-            Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions = Query.YearBuiltPredictionPipelineOptions(path_Template);
+            YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions = Query.YearBuiltPredictionPipelineOptions(path_Template);
             Assert.NotNull(yearBuiltPredictionPipelineOptions);
             Assert.False(yearBuiltPredictionPipelineOptions!.UpdateDetections);
             Assert.False(yearBuiltPredictionPipelineOptions.UpdateYearBuiltData);
@@ -86,7 +86,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //The class default and the template must agree on the write steps, in the safe direction: a member the
             //file does not name keeps the class default, so an options file that omits a write flag reads it back as
             //the class default - and that default must be off, the same as the template it is copied from.
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Defaults = new();
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Defaults = new();
             Assert.False(yearBuiltPredictionPipelineOptions_Defaults.UpdateDetections);
             Assert.Equal(yearBuiltPredictionPipelineOptions_Defaults.UpdateDetections, yearBuiltPredictionPipelineOptions.UpdateDetections);
             Assert.False(yearBuiltPredictionPipelineOptions_Defaults.UpdateYearBuiltData);
@@ -102,7 +102,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //detections are already stored would then be skipped reporting a legitimate looking zero.
             foreach (string name_Template in new string[] { "YearBuiltPredictionPipelineOptions.Detections.json", "YearBuiltPredictionPipelineOptions.Score.json" })
             {
-                Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Split = Query.YearBuiltPredictionPipelineOptions(Path.Combine(directory_Templates, name_Template));
+                YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Split = Query.YearBuiltPredictionPipelineOptions(Path.Combine(directory_Templates, name_Template));
                 Assert.NotNull(yearBuiltPredictionPipelineOptions_Split);
                 Assert.False(yearBuiltPredictionPipelineOptions_Split!.CleanScratchDirectory, $"'{name_Template}' must set CleanScratchDirectory to false - the split workflow depends on the scratch directory outliving the run that filled it.");
             }

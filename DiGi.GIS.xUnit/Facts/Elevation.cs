@@ -235,7 +235,7 @@ namespace DiGi.GIS.xUnit
 
         /// <summary>
         /// Tests that an internal server error is asked again on this path, even though the shared transient policy does not count it as one.
-        /// <para>A public elevation service asked for hundreds of thousands of single points answers 500 to load and answers correctly moments later, so giving up on the first one loses a point that was never really unavailable. <see cref="DiGi.GIS.Query.IsTransient(HttpStatusCode)"/> itself is deliberately left alone, because DiGi.WebAPI keeps a copy of it in step.</para>
+        /// <para>A public elevation service asked for hundreds of thousands of single points answers 500 to load and answers correctly moments later, so giving up on the first one loses a point that was never really unavailable. <see cref="Query.IsTransient(HttpStatusCode)"/> itself is deliberately left alone, because DiGi.WebAPI keeps a copy of it in step.</para>
         /// </summary>
         [Fact]
         public async Task ElevationsAsync_RetriesInternalServerError()

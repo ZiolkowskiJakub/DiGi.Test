@@ -8,7 +8,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetBuilding2DReferenceDuplicatesAsync(NpgsqlConnection, System.Nullable{int}, int, int, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetBuilding2DReferenceDuplicatesAsync(NpgsqlConnection, int?, int, int, System.Threading.CancellationToken)"/>
         /// and its parameterless overload return null when given invalid parameters or null connections.
         /// </summary>
         [Fact]
@@ -30,7 +30,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetDuplicatesCountAsync(NpgsqlConnection, System.Nullable{int}, int, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetDuplicatesCountAsync(NpgsqlConnection, int?, int, System.Threading.CancellationToken)"/>
         /// and its parameterless overload return -1 when given invalid parameters or null connections.
         /// </summary>
         [Fact]
@@ -49,7 +49,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetBuilding2DReferenceDuplicatesAsync(System.Nullable{int}, int, int, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetBuilding2DReferenceDuplicatesAsync(int?, int, int, System.Threading.CancellationToken)"/>
         /// executes successfully against a live database with explicit command timeout.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Storage.conf</c> pointing at a database.</para>
         /// </summary>
@@ -67,7 +67,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetDuplicatesCountAsync(System.Nullable{int}, int, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T1, T2}.GetDuplicatesCountAsync(int?, int, System.Threading.CancellationToken)"/>
         /// executes successfully against a live database with explicit command timeout.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Storage.conf</c> pointing at a database.</para>
         /// </summary>

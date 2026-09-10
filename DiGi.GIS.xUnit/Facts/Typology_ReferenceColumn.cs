@@ -36,7 +36,7 @@ namespace DiGi.GIS.xUnit
             Assert.True(columnTypologyFilterSolver.Solve());
             Assert.NotNull(columnTypologyFilterSolver.Output);
 
-            HashSet<string> references_Inherited = DiGi.Typology.Query.ReferenceSet(columnTypologyFilterSolver.Output, true);
+            HashSet<string> references_Inherited = Typology.Query.ReferenceSet(columnTypologyFilterSolver.Output, true);
             Assert.Single(references_Inherited);
             Assert.Contains(typeof(Row).FullName!, references_Inherited);
 
@@ -50,7 +50,7 @@ namespace DiGi.GIS.xUnit
             Assert.True(referenceColumnTypologyFilterSolver.Solve());
             Assert.NotNull(referenceColumnTypologyFilterSolver.Output);
 
-            HashSet<string> references = DiGi.Typology.Query.ReferenceSet(referenceColumnTypologyFilterSolver.Output, true);
+            HashSet<string> references = Typology.Query.ReferenceSet(referenceColumnTypologyFilterSolver.Output, true);
             Assert.Equal(7, references.Count);
             Assert.Contains("b1", references);
             Assert.Contains("b7", references);
@@ -73,10 +73,10 @@ namespace DiGi.GIS.xUnit
                 Rule = new UniqueValueFilterRule()
             };
 
-            DiGi.Typology.Classes.Typology? typology_Blank = Create.Typology(table_Blank, columnTypologyFilter_Blank, IO.Constants.Column.Reference);
+            Typology.Classes.Typology? typology_Blank = Create.Typology(table_Blank, columnTypologyFilter_Blank, IO.Constants.Column.Reference);
             Assert.NotNull(typology_Blank);
 
-            HashSet<string> references_Blank = DiGi.Typology.Query.ReferenceSet(typology_Blank, true);
+            HashSet<string> references_Blank = Typology.Query.ReferenceSet(typology_Blank, true);
             Assert.Single(references_Blank);
             Assert.Contains("b1", references_Blank);
         }

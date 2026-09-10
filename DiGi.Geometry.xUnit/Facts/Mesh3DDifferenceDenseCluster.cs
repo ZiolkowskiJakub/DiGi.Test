@@ -68,7 +68,7 @@ namespace DiGi.Geometry.xUnit
             // the one that puts whole terraces inside single triangles.
             Mesh3D mesh3D = Mesh3D_Difference_Terrain(629000, 489000, 100, 10, 0.02, 0.01);
 
-            System.Random random = new(20260825);
+            Random random = new(20260825);
 
             List<PolygonalFace2D> polygonalFace2Ds = [];
             while (polygonalFace2Ds.Count < 1000)

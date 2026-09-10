@@ -21,7 +21,7 @@ namespace DiGi.User.PostgreSQL.xUnit
             const string database = "user_xunit_createsdatabase";
             const string email = "xunit.createsdatabase@example.com";
 
-            UserPostgreSQLConverterManager? userPostgreSQLConverterManager = DiGi.User.PostgreSQL.Create.UserPostgreSQLConverterManager();
+            UserPostgreSQLConverterManager? userPostgreSQLConverterManager = Create.UserPostgreSQLConverterManager();
 
             UserPostgreSQLConverter? userPostgreSQLConverter_Configured = userPostgreSQLConverterManager?.GetPostgreSQLConverter<UserPostgreSQLConverter>();
             if (userPostgreSQLConverter_Configured?.ConnectionData is null)
@@ -51,14 +51,14 @@ namespace DiGi.User.PostgreSQL.xUnit
                 // The read that would have thrown 3D000, then 42P01, had the line above not run first.
                 Assert.Null(await userPostgreSQLConverter.GetUserByEmailAsync(email));
 
-                List<string> ids = await userPostgreSQLConverter.InsertAsync([new DiGi.User.Classes.User(email) { LastName = "xUnit", Level = (int)UserLevel.Admin }]);
+                List<string> ids = await userPostgreSQLConverter.InsertAsync([new User.Classes.User(email) { LastName = "xUnit", Level = (int)UserLevel.Admin }]);
                 Assert.Single(ids);
 
-                UserCredential? userCredential = DiGi.User.PostgreSQL.Create.UserCredential(email, "xunit-creates-database-password");
+                UserCredential? userCredential = Create.UserCredential(email, "xunit-creates-database-password");
                 Assert.NotNull(userCredential);
                 Assert.True(await userPostgreSQLConverter.SetUserCredentialAsync(userCredential));
 
-                DiGi.User.Classes.User? user = await userPostgreSQLConverter.GetUserByEmailAsync(email);
+                User.Classes.User? user = await userPostgreSQLConverter.GetUserByEmailAsync(email);
                 Assert.NotNull(user);
                 Assert.Equal(email, user.Email);
                 Assert.Equal((int)UserLevel.Admin, user.Level);

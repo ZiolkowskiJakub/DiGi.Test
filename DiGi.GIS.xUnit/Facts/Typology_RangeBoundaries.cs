@@ -22,7 +22,7 @@ namespace DiGi.GIS.xUnit
                 Rule = new IntegerRangeFilterRule([new Range<int>(0, 2003), new Range<int>(2004, 2020), new Range<int>(2021, int.MaxValue)])
             };
 
-            DiGi.Typology.Classes.Typology? typology = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
+            Typology.Classes.Typology? typology = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
 
             Assert.NotNull(typology);
 
@@ -30,11 +30,11 @@ namespace DiGi.GIS.xUnit
             AssertBucket(typology, "Predicted year built (2004,2020>", ["b3", "b4"]);
             AssertBucket(typology, "Predicted year built (2021,2147483647>", ["b5", "b6"]);
 
-            Assert.DoesNotContain("b7", DiGi.Typology.Query.ReferenceSet(typology, true));
+            Assert.DoesNotContain("b7", Typology.Query.ReferenceSet(typology, true));
 
-            static void AssertBucket(DiGi.Typology.Classes.Typology typology, string name, string[] references)
+            static void AssertBucket(Typology.Classes.Typology typology, string name, string[] references)
             {
-                Assert.True(DiGi.Typology.Query.TryGetTypologies(typology, name, out List<DiGi.Typology.Classes.Typology>? typologies));
+                Assert.True(Typology.Query.TryGetTypologies(typology, name, out List<Typology.Classes.Typology>? typologies));
                 Assert.NotNull(typologies);
                 Assert.Single(typologies);
 

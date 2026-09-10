@@ -28,7 +28,7 @@ namespace DiGi.Typology.xUnit
             Typology.Classes.Typology? typology_GrandGrandChild = typology.Update([1, 1, 1], "GrandGrandChild", "GrandGrandChild description");
 
             Assert.NotNull(typology_GrandGrandChild);
-            Assert.Equal(new Typology.Classes.TypologyPath([1, 1, 1]), typology_GrandGrandChild.TypologyPath);
+            Assert.Equal(new TypologyPath([1, 1, 1]), typology_GrandGrandChild.TypologyPath);
 
             Typology.Classes.Typology? typology_GrandChild_Updated = typology.Update([1, 1], "GrandChild", "Updated description");
 
@@ -48,11 +48,11 @@ namespace DiGi.Typology.xUnit
             Assert.Equal("Sibling", typology.SubTypology([1, 2])?.Name);
             Assert.Equal("Child", typology_Child.Name);
 
-            List<Typology.Classes.TypologyPath> typologyPaths = typology.TypologyPaths(true);
+            List<TypologyPath> typologyPaths = typology.TypologyPaths(true);
 
             Assert.Equal(4, typologyPaths.Count);
 
-            foreach (Typology.Classes.TypologyPath typologyPath in typologyPaths)
+            foreach (TypologyPath typologyPath in typologyPaths)
             {
                 Assert.NotNull(typology.SubTypology(typologyPath));
             }

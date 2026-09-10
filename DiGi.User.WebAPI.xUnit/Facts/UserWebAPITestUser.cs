@@ -47,7 +47,7 @@ namespace DiGi.User.WebAPI.xUnit
         /// <returns>The seeded user scope, or null when no database is available.</returns>
         public static async Task<UserWebAPITestUser?> CreateAsync()
         {
-            UserPostgreSQLConverterManager? userPostgreSQLConverterManager = DiGi.User.PostgreSQL.Create.UserPostgreSQLConverterManager();
+            UserPostgreSQLConverterManager? userPostgreSQLConverterManager = PostgreSQL.Create.UserPostgreSQLConverterManager();
 
             List<UserPostgreSQLConverter>? userPostgreSQLConverters = userPostgreSQLConverterManager?.GetPostgreSQLConverters<UserPostgreSQLConverter>();
             if (userPostgreSQLConverters is null || userPostgreSQLConverters.Count == 0)
@@ -69,7 +69,7 @@ namespace DiGi.User.WebAPI.xUnit
 
             try
             {
-                List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new DiGi.User.Classes.User(Email) { FirstName = "xUnit", LastName = "UserWebAPI" }]);
+                List<string> insertedIds = await userPostgreSQLConverter.InsertAsync([new User.Classes.User(Email) { FirstName = "xUnit", LastName = "UserWebAPI" }]);
                 if (insertedIds.Count == 0)
                 {
                     return null;

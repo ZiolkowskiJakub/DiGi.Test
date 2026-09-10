@@ -15,7 +15,7 @@ namespace DiGi.Typology.xUnit
         {
             Typology.Classes.Typology Create(int index, string? name, string? description)
             {
-                return new Typology.Classes.Typology(new Typology.Classes.TypologyItem(new Typology.Classes.TypologyPath([index]), name, description));
+                return new Typology.Classes.Typology(new TypologyItem(new TypologyPath([index]), name, description));
             }
 
             Typology.Classes.Typology typology_1 = Create(1, "AAA", "Test AAA");
@@ -61,7 +61,7 @@ namespace DiGi.Typology.xUnit
             typologies.Sort();
 
             Assert.Equal(6, typologies.Count);
-            Assert.Equal(new Typology.Classes.TypologyPath([2]), typologies[^1].TypologyPath);
+            Assert.Equal(new TypologyPath([2]), typologies[^1].TypologyPath);
         }
     }
 }

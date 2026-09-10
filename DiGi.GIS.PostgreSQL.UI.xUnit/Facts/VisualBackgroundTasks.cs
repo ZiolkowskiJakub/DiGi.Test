@@ -59,7 +59,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         public void VisualBackgroundTasks_UIYearBuiltPredictionsTask()
         {
             // Any non-empty key builds a manager. Nothing here reaches the network - the task is registered, never started.
-            GISWebAPIManager? gISWebAPIManager = DiGi.GIS.WebAPI.Create.GISWebAPIManager("00000000-0000-0000-0000-000000000000");
+            GISWebAPIManager? gISWebAPIManager = WebAPI.Create.GISWebAPIManager("00000000-0000-0000-0000-000000000000");
             Assert.NotNull(gISWebAPIManager);
 
             // A file standing in for the runner is enough: what decides the row is whether something is there, and
@@ -138,7 +138,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
             Assert.DoesNotContain(visualBackgroundTasks_Client, x => x.TypeName == typeof(UIPostgreSQLUserCreateTask).Name);
         }
 
-        private class TestRefusingBackgroundTask : DiGi.Core.Classes.BackgroundTask
+        private class TestRefusingBackgroundTask : Core.Classes.BackgroundTask
         {
             protected override Task<bool> ExecuteAsync()
             {
@@ -149,7 +149,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         }
 
         /// <summary>
-        /// Tests that a task failing without an exception still surfaces a reason on its row: the fallback <see cref="DiGi.Core.Classes.BackgroundTaskFailureException"/> reaches the hover text and the clipboard text of the visual wrapper, rather than leaving a Failed status whose reason is buried in the log file.
+        /// Tests that a task failing without an exception still surfaces a reason on its row: the fallback <see cref="Core.Classes.BackgroundTaskFailureException"/> reaches the hover text and the clipboard text of the visual wrapper, rather than leaving a Failed status whose reason is buried in the log file.
         /// <para>The wrapper is constructed only after the task has finished, because it refreshes through the WPF dispatcher on the task's events and a test host runs no WPF application.</para>
         /// </summary>
         [Fact]

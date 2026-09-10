@@ -14,7 +14,7 @@ namespace DiGi.GIS.ML.xUnit
         [Fact]
         public void YearBuiltPredictionTrainingTable_Schema()
         {
-            List<Column> columns_Input = GIS.IO.Query.YearBuiltPredictionInputColumns();
+            List<Column> columns_Input = IO.Query.YearBuiltPredictionInputColumns();
 
             // 31 base + 25 grid cell coverage + 90 detection + 18 population + 8 radial ratio. Stated rather than
             // derived so that widening the feature set - the 2026 year range in DiGi.GIS.IO#10 is the next one -
@@ -24,9 +24,9 @@ namespace DiGi.GIS.ML.xUnit
             // A deliberately narrow source: the reference and two features, standing in for a county whose
             // detection and population columns have not been written yet.
             Table table_Source = new();
-            table_Source.AddColumn(GIS.IO.Constants.Column.Reference);
-            table_Source.AddColumn(GIS.IO.Constants.Column.FloorArea);
-            table_Source.AddColumn(GIS.IO.Constants.Column.Storeys);
+            table_Source.AddColumn(IO.Constants.Column.Reference);
+            table_Source.AddColumn(IO.Constants.Column.FloorArea);
+            table_Source.AddColumn(IO.Constants.Column.Storeys);
             table_Source.AddRow(["REF-1", 120.5F, (ushort)2]);
             table_Source.AddRow(["REF-2", 64.0F, (ushort)1]);
             table_Source.AddRow(["REF-UNLABELLED", 10.0F, (ushort)1]);
@@ -40,7 +40,7 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Equal(columns_Input.Count + 2, table!.ColumnCount);
 
             List<Column> columns = [.. table.Columns];
-            Assert.Equal(GIS.IO.Constants.Column.Reference.Name, columns[0].Name);
+            Assert.Equal(IO.Constants.Column.Reference.Name, columns[0].Name);
             Assert.Equal(Constants.Column.YearBuilt.Name, columns[columns.Count - 1].Name);
 
             for (int i = 0; i < columns_Input.Count; i++)
@@ -52,7 +52,7 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Equal(2, table.RowCount);
 
             int index_Label = table.GetColumnIndex(Constants.Column.YearBuilt.Name);
-            int index_Reference = table.GetColumnIndex(GIS.IO.Constants.Column.Reference.Name);
+            int index_Reference = table.GetColumnIndex(IO.Constants.Column.Reference.Name);
             Assert.True(index_Label > 0);
             Assert.True(index_Reference == 0);
 
@@ -68,7 +68,7 @@ namespace DiGi.GIS.ML.xUnit
             Assert.False(years_ByReference.ContainsKey("REF-UNLABELLED"));
 
             // The values the source did carry survive the projection.
-            int index_FloorArea = table.GetColumnIndex(GIS.IO.Constants.Column.FloorArea.Name);
+            int index_FloorArea = table.GetColumnIndex(IO.Constants.Column.FloorArea.Name);
             Assert.True(index_FloorArea > 0);
             Assert.True(table.TryGetValue(0, index_FloorArea, out float floorArea));
             Assert.Equal(120.5F, floorArea, 3);
@@ -82,8 +82,8 @@ namespace DiGi.GIS.ML.xUnit
         public void YearBuiltPredictionTrainingTable_MissingColumnsDefaulted()
         {
             Table table_Source = new();
-            table_Source.AddColumn(GIS.IO.Constants.Column.Reference);
-            table_Source.AddColumn(GIS.IO.Constants.Column.FloorArea);
+            table_Source.AddColumn(IO.Constants.Column.Reference);
+            table_Source.AddColumn(IO.Constants.Column.FloorArea);
             table_Source.AddRow(["REF-1", 120.5F]);
             table_Source.AddRow(["REF-2", 64.0F]);
 
@@ -93,7 +93,7 @@ namespace DiGi.GIS.ML.xUnit
             Assert.NotNull(table);
 
             // A detection column no county has yet been written: present in the schema, zero in every row.
-            Column column_Detection = GIS.IO.Create.Column_PredictionYearBuit(GIS.IO.Constants.ColumnNamePrefix.PredictionConfidence, 2019);
+            Column column_Detection = IO.Create.Column_PredictionYearBuit(IO.Constants.ColumnNamePrefix.PredictionConfidence, 2019);
             int index_Detection = table!.GetColumnIndex(column_Detection.Name);
             Assert.True(index_Detection > 0);
 
@@ -104,7 +104,7 @@ namespace DiGi.GIS.ML.xUnit
             }
 
             // A population column, likewise.
-            int index_Population = table.GetColumnIndex(GIS.IO.Create.Column_Population(2019).Name);
+            int index_Population = table.GetColumnIndex(IO.Create.Column_Population(2019).Name);
             Assert.True(index_Population > 0);
             Assert.True(table.TryGetValue(0, index_Population, out int population));
             Assert.Equal(0, population);
@@ -112,10 +112,10 @@ namespace DiGi.GIS.ML.xUnit
             // The signature of an assembly run before the data-population runs: whole feature groups constant.
             List<string> names_Constant = table.DefaultOnlyColumnNames();
             Assert.Contains(column_Detection.Name, names_Constant);
-            Assert.Contains(GIS.IO.Create.Column_Population(2019).Name, names_Constant);
+            Assert.Contains(IO.Create.Column_Population(2019).Name, names_Constant);
 
             // A column that genuinely varies is not reported.
-            Assert.DoesNotContain(GIS.IO.Constants.Column.FloorArea.Name, names_Constant);
+            Assert.DoesNotContain(IO.Constants.Column.FloorArea.Name, names_Constant);
         }
 
         /// <summary>
@@ -126,15 +126,15 @@ namespace DiGi.GIS.ML.xUnit
         public void YearBuiltPredictionTrainingTable_NoOutputColumnLeaks()
         {
             Table table_Source = new();
-            table_Source.AddColumn(GIS.IO.Constants.Column.Reference);
-            table_Source.AddColumn(GIS.IO.Constants.Column.PredictedYearBuilt);
+            table_Source.AddColumn(IO.Constants.Column.Reference);
+            table_Source.AddColumn(IO.Constants.Column.PredictedYearBuilt);
             table_Source.AddRow(["REF-1", (ushort)1999]);
 
             Table? table = table_Source.YearBuiltPredictionTrainingTable(new Dictionary<string, short> { ["REF-1"] = 1975 });
             Assert.NotNull(table);
 
             // Even when the source hands it over, the pipeline's own output does not reach the training table.
-            foreach (Column column in GIS.IO.Query.YearBuiltPredictionOutputColumns())
+            foreach (Column column in IO.Query.YearBuiltPredictionOutputColumns())
             {
                 Assert.True(table!.GetColumnIndex(column.Name) < 0, $"Output column '{column.Name}' leaked into the training table.");
             }

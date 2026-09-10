@@ -58,9 +58,9 @@ namespace DiGi.GIS.xUnit
             Assert.Null(Create.Typology(table, TypologyFilter(), null));
             Assert.Null(Create.Typology(table, TypologyFilter(), IO.Constants.Column.Storeys));
 
-            DiGi.Typology.Classes.Typology? typology = Create.Typology(table, TypologyFilter(), null, null, false);
+            Typology.Classes.Typology? typology = Create.Typology(table, TypologyFilter(), null, null, false);
             Assert.NotNull(typology);
-            Assert.Empty(DiGi.Typology.Query.ReferenceSet(typology, true));
+            Assert.Empty(Typology.Query.ReferenceSet(typology, true));
         }
     }
 }

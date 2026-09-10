@@ -72,15 +72,15 @@ namespace DiGi.Analytical.xUnit
                 double area = 0;
                 foreach (PolygonalFace2D polygonalFace2D in polygonalFace2Ds)
                 {
-                    Assert.True(polygonalFace2D.GetArea() >= DiGi.Core.Constants.Tolerance.Distance, "An outline was returned for a component covering no ground.");
+                    Assert.True(polygonalFace2D.GetArea() >= Core.Constants.Tolerance.Distance, "An outline was returned for a component covering no ground.");
 
                     BoundingBox2D? boundingBox2D = polygonalFace2D.GetBoundingBox();
                     Assert.NotNull(boundingBox2D);
 
-                    Assert.True(boundingBox2D.Min.X >= boundingBox3D.Min.X - DiGi.Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
-                    Assert.True(boundingBox2D.Min.Y >= boundingBox3D.Min.Y - DiGi.Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
-                    Assert.True(boundingBox2D.Max.X <= boundingBox3D.Max.X + DiGi.Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
-                    Assert.True(boundingBox2D.Max.Y <= boundingBox3D.Max.Y + DiGi.Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
+                    Assert.True(boundingBox2D.Min.X >= boundingBox3D.Min.X - Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
+                    Assert.True(boundingBox2D.Min.Y >= boundingBox3D.Min.Y - Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
+                    Assert.True(boundingBox2D.Max.X <= boundingBox3D.Max.X + Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
+                    Assert.True(boundingBox2D.Max.Y <= boundingBox3D.Max.Y + Core.Constants.Tolerance.MacroDistance, "An outline reached outside the plan bounds of its building.");
 
                     area += polygonalFace2D.GetArea();
                 }
@@ -168,7 +168,7 @@ namespace DiGi.Analytical.xUnit
             {
                 foreach (BuildingModel buildingModel in buildingModels)
                 {
-                    BuildingModel? buildingModel_Temp = DiGi.Core.Query.Clone(buildingModel) as BuildingModel;
+                    BuildingModel? buildingModel_Temp = Core.Query.Clone(buildingModel) as BuildingModel;
                     if (buildingModel_Temp is null)
                     {
                         continue;
@@ -189,7 +189,7 @@ namespace DiGi.Analytical.xUnit
 
             Assert.NotNull(polygonalFace2Ds);
 
-            string? path_Reports = DiGi.Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            string? path_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
             if (!string.IsNullOrWhiteSpace(path_Reports))
             {
                 File.WriteAllText(Path.Combine(path_Reports, "BuildingModel_Footprints_Performance.txt"), $"Building models {buildingModels_Temp.Count}, outlines {polygonalFace2Ds.Count}, elapsed {stopwatch.ElapsedMilliseconds} ms.");
@@ -204,14 +204,14 @@ namespace DiGi.Analytical.xUnit
         [Fact]
         public void BuildingModel_Footprints_RealBuilding()
         {
-            string? path_Building = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "buildingmodel_5072294.json");
-            string? path_Terrain = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "terrain_response.json");
+            string? path_Building = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "buildingmodel_5072294.json");
+            string? path_Terrain = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "terrain_response.json");
 
             Assert.NotNull(path_Building);
             Assert.NotNull(path_Terrain);
 
-            List<BuildingModel>? buildingModels = DiGi.Core.Convert.ToDiGi<BuildingModel>((DiGi.Core.Classes.Path)path_Building);
-            List<Mesh3D>? mesh3Ds = DiGi.Core.Convert.ToDiGi<Mesh3D>((DiGi.Core.Classes.Path)path_Terrain);
+            List<BuildingModel>? buildingModels = Core.Convert.ToDiGi<BuildingModel>((Core.Classes.Path)path_Building);
+            List<Mesh3D>? mesh3Ds = Core.Convert.ToDiGi<Mesh3D>((Core.Classes.Path)path_Terrain);
 
             Assert.NotNull(buildingModels);
             Assert.NotEmpty(buildingModels);
@@ -238,7 +238,7 @@ namespace DiGi.Analytical.xUnit
             double area_After = mesh3D_Cut.GetArea();
             int triangles_After = mesh3D_Cut.TrianglesCount;
 
-            string? path_Reports = DiGi.Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            string? path_Reports = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
             if (!string.IsNullOrWhiteSpace(path_Reports))
             {
                 File.WriteAllText(Path.Combine(path_Reports, "BuildingModel_5072294_Cuts.txt"),
@@ -254,13 +254,13 @@ namespace DiGi.Analytical.xUnit
 
         private static List<BuildingModel>? BuildingModel_Footprints_File(string fileName)
         {
-            string? path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), fileName);
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), fileName);
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
                 return null;
             }
 
-            return DiGi.Core.Convert.ToDiGi<BuildingModel>((DiGi.Core.Classes.Path)path);
+            return Core.Convert.ToDiGi<BuildingModel>((Core.Classes.Path)path);
         }
 
         private static PolygonalFace3D BuildingModel_Footprints_Face(List<Point3D> point3Ds)

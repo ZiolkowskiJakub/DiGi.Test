@@ -19,7 +19,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             const int countyId = 5;
             const string reference = "272D6AAF-9D86-9B0E-E053-CC2BA8C0B5EA";
 
-            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = GIS.PostgreSQL.Create.GISPostgreSQLConverterManager();
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
             Assert.NotNull(gISPostgreSQLConverterManager);
 
             Building2DOccupancyDataPostgreSQLConverter? building2DOccupancyDataPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<Building2DOccupancyDataPostgreSQLConverter>();

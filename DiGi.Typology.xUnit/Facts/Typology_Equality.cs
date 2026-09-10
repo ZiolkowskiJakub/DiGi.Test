@@ -90,7 +90,7 @@ namespace DiGi.Typology.xUnit
             Assert.Equal(typology_1, typology_Copy);
             Assert.Equal(typology_1.GetHashCode(), typology_Copy.GetHashCode());
 
-            Typology.Classes.Typology? typology_Fallback = DiGi.Typology.Create.Typology(new Typology.Classes.TypologyItem([9], "Composed", null), [new Typology.Classes.Typology("A", null), new Typology.Classes.Typology("B", null), new Typology.Classes.Typology(new Typology.Classes.TypologyItem([0], "C", null))]);
+            Typology.Classes.Typology? typology_Fallback = DiGi.Typology.Create.Typology(new TypologyItem([9], "Composed", null), [new Typology.Classes.Typology("A", null), new Typology.Classes.Typology("B", null), new Typology.Classes.Typology(new TypologyItem([0], "C", null))]);
 
             Assert.NotNull(typology_Fallback);
 
@@ -101,11 +101,11 @@ namespace DiGi.Typology.xUnit
             Assert.Equal(typology_Fallback, new Typology.Classes.Typology(typology_Fallback));
             Assert.Equal(0, typology_Fallback.CompareTo(typology_Fallback_Clone));
 
-            Typology.Classes.Typology typology_Empty = new((Typology.Classes.TypologyItem?)null);
+            Typology.Classes.Typology typology_Empty = new((TypologyItem?)null);
 
-            Assert.Equal(typology_Empty, new Typology.Classes.Typology((Typology.Classes.TypologyItem?)null));
-            Assert.Equal(typology_Empty.GetHashCode(), new Typology.Classes.Typology((Typology.Classes.TypologyItem?)null).GetHashCode());
-            Assert.Equal(0, typology_Empty.CompareTo(new Typology.Classes.Typology((Typology.Classes.TypologyItem?)null)));
+            Assert.Equal(typology_Empty, new Typology.Classes.Typology((TypologyItem?)null));
+            Assert.Equal(typology_Empty.GetHashCode(), new Typology.Classes.Typology((TypologyItem?)null).GetHashCode());
+            Assert.Equal(0, typology_Empty.CompareTo(new Typology.Classes.Typology((TypologyItem?)null)));
             Assert.NotEqual(typology_1, typology_Empty);
             Assert.True(typology_Empty.CompareTo(typology_1) != 0);
 

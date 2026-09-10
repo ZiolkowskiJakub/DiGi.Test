@@ -27,7 +27,7 @@ namespace DiGi.YOLO.ONNX.xUnit
             Assert.Equal(TimeSpan.FromMinutes(7), yOLOONNXPredictionResult.Duration);
 
             //The line holding only an image name records an image with no detections and is not a detection itself, exactly as the CPython path writes it
-            DiGi.YOLO.Classes.BoundingBoxResultFile? boundingBoxResultFile = Create.BoundingBoxResultFile(yOLOONNXPredictionResult);
+            YOLO.Classes.BoundingBoxResultFile? boundingBoxResultFile = Create.BoundingBoxResultFile(yOLOONNXPredictionResult);
             Assert.NotNull(boundingBoxResultFile);
             Assert.Single(boundingBoxResultFile!);
             Assert.Equal(0.93, boundingBoxResultFile![0].Confidence);

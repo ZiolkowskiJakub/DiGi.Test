@@ -93,7 +93,7 @@ namespace DiGi.Geometry.xUnit
             Assert.NotNull(polyhedron_Reversed);
 
             // Seed 20260824 - fixed so a failure is reproducible.
-            System.Random random = new(20260824);
+            Random random = new(20260824);
             List<IPolygonalFace3D> polygonalFace3Ds_Shuffled = new(polygonalFace3Ds);
             for (int i = polygonalFace3Ds_Shuffled.Count - 1; i > 0; i--)
             {

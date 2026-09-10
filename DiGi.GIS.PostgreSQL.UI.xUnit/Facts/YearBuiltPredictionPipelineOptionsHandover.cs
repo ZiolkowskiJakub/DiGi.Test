@@ -51,10 +51,10 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 JsonObject? jsonObject = yearBuiltPredictionPipelineOptions.ToJsonObject();
                 Assert.NotNull(jsonObject);
 
-                string path = System.IO.Path.Combine(directory, DiGi.GIS.YOLO.UI.Constants.FileName.YearBuiltPredictionPipelineOptions);
+                string path = System.IO.Path.Combine(directory, YOLO.UI.Constants.FileName.YearBuiltPredictionPipelineOptions);
                 File.WriteAllText(path, jsonObject!.ToString());
 
-                YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Read = DiGi.GIS.YOLO.UI.Query.YearBuiltPredictionPipelineOptions(path);
+                YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Read = YOLO.UI.Query.YearBuiltPredictionPipelineOptions(path);
                 Assert.NotNull(yearBuiltPredictionPipelineOptions_Read);
 
                 Assert.NotNull(yearBuiltPredictionPipelineOptions_Read!.CountyIds);

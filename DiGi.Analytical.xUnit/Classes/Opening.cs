@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 namespace DiGi.Analytical.xUnit
 {
     /// <summary>
-    /// Represents an opening used as test data, carrying a plane geometry. No concrete opening class exists in <see cref="DiGi.Analytical.Building.Classes"/> yet.
+    /// Represents an opening used as test data, carrying a plane geometry. No concrete opening class exists in <see cref="Building.Classes"/> yet.
     /// </summary>
     public class Opening : BuildingGeometry3DObject<Plane>, IOpening
     {

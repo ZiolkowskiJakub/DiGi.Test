@@ -171,7 +171,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         public async Task StatisticalDataCollectionPostgreSQLConverter_Integration()
         {
             string path = System.IO.Path.Combine(AppContext.BaseDirectory, Constants.FileName.PostgreSQL_Main);
-            if (!System.IO.File.Exists(path) || DiGi.PostgreSQL.Create.PostgreSQLConfigurationFile(path) is not PostgreSQLConfigurationFile postgreSQLConfigurationFile)
+            if (!File.Exists(path) || DiGi.PostgreSQL.Create.PostgreSQLConfigurationFile(path) is not PostgreSQLConfigurationFile postgreSQLConfigurationFile)
             {
                 return;
             }

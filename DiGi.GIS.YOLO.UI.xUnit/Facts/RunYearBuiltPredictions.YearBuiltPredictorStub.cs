@@ -28,14 +28,14 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             /// Reports whether this predictor can score at all, as configured at construction.
             /// </summary>
             /// <returns>Runnable as configured, carrying a diagnostic when it is not.</returns>
-            public DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness YearBuiltPredictorReadiness()
+            public IO.Classes.YearBuiltPredictorReadiness YearBuiltPredictorReadiness()
             {
                 if (this.runnable)
                 {
-                    return new DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness(true);
+                    return new IO.Classes.YearBuiltPredictorReadiness(true);
                 }
 
-                return new DiGi.GIS.IO.Classes.YearBuiltPredictorReadiness(false, ["the year built model is missing (stub)"]);
+                return new IO.Classes.YearBuiltPredictorReadiness(false, ["the year built model is missing (stub)"]);
             }
 
             /// <summary>
@@ -57,15 +57,15 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                     return null;
                 }
 
-                int index_Reference = table.GetColumnIndex(GIS.IO.Constants.Column.Reference.Name);
+                int index_Reference = table.GetColumnIndex(IO.Constants.Column.Reference.Name);
                 if (index_Reference < 0)
                 {
                     return null;
                 }
 
                 Table result = new();
-                result.AddColumn(GIS.IO.Constants.Column.Reference.Name, typeof(string));
-                result.AddColumn(GIS.IO.Constants.Column.PredictedYearBuilt.Name, typeof(ushort));
+                result.AddColumn(IO.Constants.Column.Reference.Name, typeof(string));
+                result.AddColumn(IO.Constants.Column.PredictedYearBuilt.Name, typeof(ushort));
 
                 for (int i = 0; i < table.RowCount; i++)
                 {

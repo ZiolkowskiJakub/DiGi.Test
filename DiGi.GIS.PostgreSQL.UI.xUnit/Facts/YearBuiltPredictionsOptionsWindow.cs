@@ -46,7 +46,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 UpdateDetections = false,
                 UpdateYearBuiltData = false,
                 UpdatePredictedYearBuilt = false,
-                Years = new DiGi.Core.Classes.Range<int>(1900, 2000),
+                Years = new Core.Classes.Range<int>(1900, 2000),
                 Radiuses = [1.0, 2.0]
             };
 
@@ -84,7 +84,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                         && yearBuiltPredictionPipelineOptions_Held.Confidence == 0.25
                         && yearBuiltPredictionPipelineOptions_Held.BatchSize == 2500
                         && yearBuiltPredictionPipelineOptions_Held.ReferenceBatchSize == 5000
-                        && yearBuiltPredictionPipelineOptions_Held.Years is DiGi.Core.Classes.Range<int> years && years.Min == 1900 && years.Max == 2000
+                        && yearBuiltPredictionPipelineOptions_Held.Years is Core.Classes.Range<int> years && years.Min == 1900 && years.Max == 2000
                         && yearBuiltPredictionPipelineOptions_Held.Radiuses is not null && yearBuiltPredictionPipelineOptions_Held.Radiuses.Count == 2 && yearBuiltPredictionPipelineOptions_Held.Radiuses[0] == 1.0 && yearBuiltPredictionPipelineOptions_Held.Radiuses[1] == 2.0;
 
                     // A cancelled dialog has to leave the caller's options alone, which only holds if the window
@@ -151,7 +151,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 Confidence = 0.25,
                 BatchSize = 2500,
                 ReferenceBatchSize = 5000,
-                Years = new DiGi.Core.Classes.Range<int>(1900, 2000),
+                Years = new Core.Classes.Range<int>(1900, 2000),
                 Radiuses = [1.0, 2.0]
             };
 
@@ -208,7 +208,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                         && yearBuiltPredictionPipelineOptions_Written.Confidence == 0.25
                         && yearBuiltPredictionPipelineOptions_Written.BatchSize == 2500
                         && yearBuiltPredictionPipelineOptions_Written.ReferenceBatchSize == 5000
-                        && yearBuiltPredictionPipelineOptions_Written.Years is DiGi.Core.Classes.Range<int> years && years.Min == 1900 && years.Max == 2000
+                        && yearBuiltPredictionPipelineOptions_Written.Years is Core.Classes.Range<int> years && years.Min == 1900 && years.Max == 2000
                         && yearBuiltPredictionPipelineOptions_Written.Radiuses is not null && yearBuiltPredictionPipelineOptions_Written.Radiuses.Count == 2 && yearBuiltPredictionPipelineOptions_Written.Radiuses[0] == 1.0 && yearBuiltPredictionPipelineOptions_Written.Radiuses[1] == 2.0;
                 }
                 catch (Exception exception_Temp)

@@ -13,7 +13,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public void YearBuiltPredictionPipelineOptions()
         {
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 BatchSize = 2500,
                 CleanScratchDirectory = false,
@@ -50,7 +50,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             string? json = Core.Convert.ToSystem_String(yearBuiltPredictionPipelineOptions);
             Assert.False(string.IsNullOrWhiteSpace(json));
 
-            Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Actual = Core.Convert.ToDiGi<Classes.YearBuiltPredictionPipelineOptions>(json)?.FirstOrDefault();
+            YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Actual = Core.Convert.ToDiGi<YearBuiltPredictionPipelineOptions>(json)?.FirstOrDefault();
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual);
             Assert.Equal(yearBuiltPredictionPipelineOptions.BatchSize, yearBuiltPredictionPipelineOptions_Actual!.BatchSize);
             Assert.Equal(yearBuiltPredictionPipelineOptions.Confidence, yearBuiltPredictionPipelineOptions_Actual.Confidence);
@@ -71,7 +71,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //The county set, the year range and the radiuses are the three members a shallow copy would share
             //with the source - and a copy constructor that forgot one of them outright is what the options
             //window works on, so the run would be scoped from a projection the operator never chose.
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Clone = new(yearBuiltPredictionPipelineOptions);
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Clone = new(yearBuiltPredictionPipelineOptions);
             Assert.False(yearBuiltPredictionPipelineOptions_Clone.CleanScratchDirectory);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotSame(yearBuiltPredictionPipelineOptions.CountyIds, yearBuiltPredictionPipelineOptions_Clone.CountyIds);
@@ -92,7 +92,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public void YearBuiltPredictionPipelineOptions_Defaults()
         {
-            Classes.YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new();
+            YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new();
 
             Assert.Equal(0.1, yearBuiltPredictionPipelineOptions.Confidence);
             Assert.Equal(5000, yearBuiltPredictionPipelineOptions.BatchSize);
@@ -114,8 +114,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.False(yearBuiltPredictionPipelineOptions.UpdateYearBuiltData);
 
             //The default year range has to be the one the column allow-list applies, or the projection asks for columns the regressor was not trained on
-            List<Core.IO.Table.Classes.Column> columns_Default = GIS.IO.Query.YearBuiltPredictionInputColumns(yearBuiltPredictionPipelineOptions.Years);
-            List<Core.IO.Table.Classes.Column> columns_Stated = GIS.IO.Query.YearBuiltPredictionInputColumns(new Range<int>(2008, 2025));
+            List<Core.IO.Table.Classes.Column> columns_Default = IO.Query.YearBuiltPredictionInputColumns(yearBuiltPredictionPipelineOptions.Years);
+            List<Core.IO.Table.Classes.Column> columns_Stated = IO.Query.YearBuiltPredictionInputColumns(new Range<int>(2008, 2025));
             Assert.Equal(columns_Stated.Count, columns_Default.Count);
         }
 
@@ -134,7 +134,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 string json_Omitted = "{\"CountyIds\":[73485],\"ScratchDirectory\":\"scratch\"}";
                 System.IO.File.WriteAllText(tempFilePath_Omitted, json_Omitted);
 
-                Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Omitted = Query.YearBuiltPredictionPipelineOptions(tempFilePath_Omitted);
+                YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Omitted = Query.YearBuiltPredictionPipelineOptions(tempFilePath_Omitted);
                 Assert.NotNull(yearBuiltPredictionPipelineOptions_Omitted);
 
                 Assert.False(yearBuiltPredictionPipelineOptions_Omitted!.UpdateDetections);
@@ -156,7 +156,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 string json_On = "{\"CountyIds\":[73485],\"ScratchDirectory\":\"scratch\",\"UpdateDetections\":true}";
                 System.IO.File.WriteAllText(tempFilePath_On, json_On);
 
-                Classes.YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_On = Query.YearBuiltPredictionPipelineOptions(tempFilePath_On);
+                YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_On = Query.YearBuiltPredictionPipelineOptions(tempFilePath_On);
                 Assert.NotNull(yearBuiltPredictionPipelineOptions_On);
 
                 Assert.True(yearBuiltPredictionPipelineOptions_On!.UpdateDetections);

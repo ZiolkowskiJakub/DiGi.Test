@@ -49,7 +49,7 @@ namespace DiGi.User.WebAPI.xUnit
             await webApplicationBuilder.Services.InitializeAsync();
 
             IMvcBuilder mvcBuilder = webApplicationBuilder.Services.AddControllers();
-            _ = mvcBuilder.AddApplicationPart(typeof(DiGi.User.WebAPI.Classes.UserController).Assembly);
+            _ = mvcBuilder.AddApplicationPart(typeof(Classes.UserController).Assembly);
 
             WebApplication webApplication = webApplicationBuilder.Build();
             _ = webApplication.UseAuthentication();

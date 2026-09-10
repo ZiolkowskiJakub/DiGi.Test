@@ -16,7 +16,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             DateTimeOffset start = new(2026, 9, 1, 8, 30, 0, TimeSpan.FromHours(2));
             DateTimeOffset end = start.AddMinutes(45);
 
-            Classes.YearBuiltPredictionResult yearBuiltPredictionResult = new([73485, 73482], start, start, end, 1200, 3400, 900, 900, 880, 880, 1760, ["ExportPredictionImagesAsync"], ["ultralytics is not installed"], false);
+            YearBuiltPredictionResult yearBuiltPredictionResult = new([73485, 73482], start, start, end, 1200, 3400, 900, 900, 880, 880, 1760, ["ExportPredictionImagesAsync"], ["ultralytics is not installed"], false);
 
             Assert.Equal(2, yearBuiltPredictionResult.CountyIds.Count);
             Assert.Equal(1200, yearBuiltPredictionResult.ImageCount);
@@ -34,7 +34,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             string? json = Core.Convert.ToSystem_String(yearBuiltPredictionResult);
             Assert.False(string.IsNullOrWhiteSpace(json));
 
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult_Actual = Core.Convert.ToDiGi<Classes.YearBuiltPredictionResult>(json)?.FirstOrDefault();
+            YearBuiltPredictionResult? yearBuiltPredictionResult_Actual = Core.Convert.ToDiGi<YearBuiltPredictionResult>(json)?.FirstOrDefault();
             Assert.NotNull(yearBuiltPredictionResult_Actual);
             Assert.Equal(yearBuiltPredictionResult.DetectionCount, yearBuiltPredictionResult_Actual!.DetectionCount);
             Assert.Equal(yearBuiltPredictionResult.BuildingDataUpdatedCount, yearBuiltPredictionResult_Actual.BuildingDataUpdatedCount);
@@ -58,7 +58,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         [Fact]
         public void YearBuiltPredictionResult_Empty()
         {
-            Classes.YearBuiltPredictionResult yearBuiltPredictionResult = new(null, null, null, null, 0, 0, 0, 0, 0, 0, 0, null, null, true);
+            YearBuiltPredictionResult yearBuiltPredictionResult = new(null, null, null, null, 0, 0, 0, 0, 0, 0, 0, null, null, true);
 
             Assert.Empty(yearBuiltPredictionResult.CountyIds);
             Assert.Empty(yearBuiltPredictionResult.FailedStepNames);

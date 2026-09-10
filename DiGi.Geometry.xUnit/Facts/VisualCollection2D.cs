@@ -86,8 +86,8 @@ namespace DiGi.Geometry.xUnit
 
             long min = elapsedMilliseconds.Min();
             long max = elapsedMilliseconds.Max();
-            string reportFilePath = System.IO.Path.Combine(pathReportsDir!, "VisualCollection2D_Enumeration_Performance.txt");
-            System.IO.File.WriteAllLines(reportFilePath, new[]
+            string reportFilePath = Path.Combine(pathReportsDir!, "VisualCollection2D_Enumeration_Performance.txt");
+            File.WriteAllLines(reportFilePath, new[]
             {
                 $"elementCount = {elementCount}",
                 $"min = {min} ms",

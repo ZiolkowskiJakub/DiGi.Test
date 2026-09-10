@@ -9,7 +9,7 @@ namespace DiGi.Core.xUnit
     {
         /// <summary>
         /// Minimal concrete <see cref="ListClusterReference{TKey_1, TKey_2}"/> used to exercise
-        /// <see cref="List{TKey_1, TKey_2, TValue}.Remove(System.Collections.Generic.IEnumerable{ListClusterReference{TKey_1, TKey_2}})"/>.
+        /// <see cref="List{TKey_1, TKey_2, TValue}.Remove(IEnumerable{ListClusterReference{TKey_1, TKey_2}})"/>.
         /// </summary>
         public class TestListClusterReference : ListClusterReference<string, string>
         {

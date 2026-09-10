@@ -148,7 +148,7 @@ namespace DiGi.Core.xUnit
                 elapsedMilliseconds.Add(stopwatch.ElapsedMilliseconds);
             }
 
-            string? pathReportsDir = Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            string? pathReportsDir = Query.ReportsDirectory(Assembly.GetExecutingAssembly());
             Assert.False(string.IsNullOrWhiteSpace(pathReportsDir));
 
             List<string> reportLines =

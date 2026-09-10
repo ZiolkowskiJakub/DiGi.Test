@@ -182,7 +182,7 @@ namespace DiGi.Geometry.PointCloud.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="DiGi.Geometry.PointCloud.Core.Query.ErodedIndexes"/> answers null rather than throwing when what it is given cannot be eroded.
+        /// Tests that <see cref="Core.Query.ErodedIndexes"/> answers null rather than throwing when what it is given cannot be eroded.
         /// </summary>
         [Fact]
         public void PointCloudMeshErosion_Invalid()

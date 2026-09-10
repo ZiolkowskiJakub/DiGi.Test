@@ -38,11 +38,11 @@ namespace DiGi.GIS.xUnit
         public void PredictedYearBuilts_Scoring()
         {
             Table table = new();
-            table.AddColumn(GIS.IO.Constants.Column.Reference);
-            table.AddColumn(GIS.IO.Constants.Column.Storeys);
-            table.AddColumn(GIS.IO.Constants.Column.FloorArea);
-            table.AddColumn(GIS.IO.Constants.Column.InternalPointX);
-            table.AddColumn(GIS.IO.Constants.Column.InternalPointY);
+            table.AddColumn(IO.Constants.Column.Reference);
+            table.AddColumn(IO.Constants.Column.Storeys);
+            table.AddColumn(IO.Constants.Column.FloorArea);
+            table.AddColumn(IO.Constants.Column.InternalPointX);
+            table.AddColumn(IO.Constants.Column.InternalPointY);
 
             table.AddRow(["PL.PZGiK.338.2415.B1", (ushort)2, 120.5, 500000.0, 600000.0]);
             table.AddRow(["PL.PZGiK.338.2415.B2", (ushort)1, 85.0, 500100.0, 600100.0]);
@@ -52,8 +52,8 @@ namespace DiGi.GIS.xUnit
             Assert.Equal(2, table_Predictions.RowCount);
             Assert.Equal(2, table_Predictions.ColumnCount);
 
-            int index_Reference = table_Predictions.GetColumnIndex(GIS.IO.Constants.Column.Reference.Name);
-            int index_PredictedYear = table_Predictions.GetColumnIndex(GIS.IO.Constants.Column.PredictedYearBuilt.Name);
+            int index_Reference = table_Predictions.GetColumnIndex(IO.Constants.Column.Reference.Name);
+            int index_PredictedYear = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
 
             Assert.True(index_Reference >= 0);
             Assert.True(index_PredictedYear >= 0);
@@ -86,10 +86,10 @@ namespace DiGi.GIS.xUnit
         public void PredictedYearBuilts_TargetLeakageProtection()
         {
             Table table = new();
-            table.AddColumn(GIS.IO.Constants.Column.Reference);
-            table.AddColumn(GIS.IO.Constants.Column.Storeys);
-            table.AddColumn(GIS.IO.Constants.Column.FloorArea);
-            table.AddColumn(GIS.IO.Constants.Column.PredictedYearBuilt);
+            table.AddColumn(IO.Constants.Column.Reference);
+            table.AddColumn(IO.Constants.Column.Storeys);
+            table.AddColumn(IO.Constants.Column.FloorArea);
+            table.AddColumn(IO.Constants.Column.PredictedYearBuilt);
 
             table.AddRow(["PL.PZGiK.338.2415.B1", (ushort)2, 120.5, (ushort)1950]);
 
@@ -97,7 +97,7 @@ namespace DiGi.GIS.xUnit
             Assert.NotNull(table_Predictions);
             Assert.Equal(1, table_Predictions.RowCount);
 
-            int index_PredictedYear = table_Predictions.GetColumnIndex(GIS.IO.Constants.Column.PredictedYearBuilt.Name);
+            int index_PredictedYear = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
             Assert.True(table_Predictions.TryGetValue(0, index_PredictedYear, out ushort predictedYear));
             Assert.True(predictedYear >= 1900);
         }
@@ -120,7 +120,7 @@ namespace DiGi.GIS.xUnit
             Assert.NotNull(table_Predictions);
             Assert.Equal(1, table_Predictions.RowCount);
 
-            int index_PredictedYear = table_Predictions.GetColumnIndex(GIS.IO.Constants.Column.PredictedYearBuilt.Name);
+            int index_PredictedYear = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
             Assert.True(table_Predictions.TryGetValue(0, index_PredictedYear, out ushort year));
             Assert.True(year >= 1900 && year <= 2030);
         }
@@ -156,7 +156,7 @@ namespace DiGi.GIS.xUnit
         [Fact]
         public void YearBuiltPredictor_InputColumnUniqueIds_SlugVersusContentHash()
         {
-            Column column_FloorArea = GIS.IO.Constants.Column.FloorArea;
+            Column column_FloorArea = IO.Constants.Column.FloorArea;
             string? slug_FloorArea = column_FloorArea.UniqueId();
             string? hash_FloorArea = Core.Query.UniqueId((ISerializableObject)column_FloorArea);
 

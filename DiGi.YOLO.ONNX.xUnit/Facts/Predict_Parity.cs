@@ -111,7 +111,7 @@ namespace DiGi.YOLO.ONNX.xUnit
                 string path_Output_Python = Path.Combine(directory_Work, "python", "results.bbrf");
                 string path_Output_ONNX = Path.Combine(directory_Work, "onnx", "results.bbrf");
 
-                DiGi.YOLO.Classes.YOLOPredictionOptions? yOLOPredictionOptions = DiGi.YOLO.Create.YOLOPredictionOptions(null, path_Model, directory_Source, path_Output_Python, Path.Combine(directory_Work, "scripts"), 0.1, 32);
+                YOLOPredictionOptions? yOLOPredictionOptions = YOLO.Create.YOLOPredictionOptions(null, path_Model, directory_Source, path_Output_Python, Path.Combine(directory_Work, "scripts"), 0.1, 32);
                 if (yOLOPredictionOptions == null)
                 {
                     //No CPython carrying ultralytics on this machine, so there is nothing to compare against
@@ -119,7 +119,7 @@ namespace DiGi.YOLO.ONNX.xUnit
                 }
 
                 Stopwatch stopwatch_Python = Stopwatch.StartNew();
-                DiGi.YOLO.Classes.YOLOPredictionResult? yOLOPredictionResult = DiGi.YOLO.Modify.Predict(yOLOPredictionOptions);
+                YOLOPredictionResult? yOLOPredictionResult = YOLO.Modify.Predict(yOLOPredictionOptions);
                 stopwatch_Python.Stop();
 
                 Assert.NotNull(yOLOPredictionResult);
@@ -144,7 +144,7 @@ namespace DiGi.YOLO.ONNX.xUnit
                 Assert.NotNull(yOLOONNXPredictionResult);
                 Assert.True(yOLOONNXPredictionResult!.Succeeded, string.Join(Environment.NewLine, yOLOONNXPredictionResult.Messages ?? []));
 
-                BoundingBoxResultFile? boundingBoxResultFile_Python = DiGi.YOLO.Create.BoundingBoxResultFile(yOLOPredictionResult);
+                BoundingBoxResultFile? boundingBoxResultFile_Python = YOLO.Create.BoundingBoxResultFile(yOLOPredictionResult);
                 BoundingBoxResultFile? boundingBoxResultFile_ONNX = Create.BoundingBoxResultFile(yOLOONNXPredictionResult);
 
                 Assert.NotNull(boundingBoxResultFile_Python);

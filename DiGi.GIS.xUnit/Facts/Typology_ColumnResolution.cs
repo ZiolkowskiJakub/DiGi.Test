@@ -22,10 +22,10 @@ namespace DiGi.GIS.xUnit
             ColumnTypologyFilter<Column>? columnTypologyFilter_Level2 = columnTypologyFilter.Filter;
             Assert.NotNull(columnTypologyFilter_Level2);
 
-            DiGi.Typology.Classes.Typology? typology = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
+            Typology.Classes.Typology? typology = Create.Typology(table, columnTypologyFilter, IO.Constants.Column.Reference);
             Assert.NotNull(typology);
 
-            Assert.Equal(7, DiGi.Typology.Query.ReferenceSet(typology, true).Count);
+            Assert.Equal(7, Typology.Query.ReferenceSet(typology, true).Count);
 
             Assert.Equal(-1, columnTypologyFilter.Value.Index);
             Assert.Same(columnTypologyFilter_Level2, columnTypologyFilter.Filter);

@@ -7,7 +7,7 @@ namespace DiGi.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Pins the guard contract of <see cref="Query.CountAsync(NpgsqlConnection, string, int, System.Threading.CancellationToken)"/> that is decided before any statement is built.
+        /// Pins the guard contract of <see cref="Query.CountAsync(NpgsqlConnection, string, int, CancellationToken)"/> that is decided before any statement is built.
         /// <para>None of these cases needs a database or an open connection: a blank table name answers -1 before the existence check runs. Naming the <c>commandTimeout</c> argument is itself the point - the defect this change fixes was that no caller could set it at all, so this fact does not compile against the pre-fix signature.</para>
         /// </summary>
         [Fact]

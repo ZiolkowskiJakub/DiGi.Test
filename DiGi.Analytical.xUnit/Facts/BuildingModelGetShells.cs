@@ -71,8 +71,8 @@ namespace DiGi.Analytical.xUnit
             string? pathReportsDirectory = Core.xUnit.Query.ReportsDirectory(System.Reflection.Assembly.GetExecutingAssembly());
             Assert.False(string.IsNullOrWhiteSpace(pathReportsDirectory));
 
-            string pathReport = System.IO.Path.Combine(pathReportsDirectory!, "BuildingModelGetShells_Performance.txt");
-            System.IO.File.WriteAllLines(pathReport, [.. durations.Select(x => string.Format("{0} ms", x))]);
+            string pathReport = Path.Combine(pathReportsDirectory!, "BuildingModelGetShells_Performance.txt");
+            File.WriteAllLines(pathReport, [.. durations.Select(x => string.Format("{0} ms", x))]);
 
             Assert.True(durations.Max() < 2000, string.Format("BuildingModel.GetShells failed threshold! Elapsed: {0} ms.", durations.Max()));
         }

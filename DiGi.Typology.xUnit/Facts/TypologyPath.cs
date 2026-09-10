@@ -14,7 +14,7 @@ namespace DiGi.Typology.xUnit
         [Fact]
         public void TypologyPath()
         {
-            Typology.Classes.TypologyPath typologyPath = new([1, 2, 3]);
+            TypologyPath typologyPath = new([1, 2, 3]);
 
             Assert.Equal(3, typologyPath.Count);
             Assert.Equal(3, typologyPath.Index);
@@ -22,15 +22,15 @@ namespace DiGi.Typology.xUnit
             Assert.Equal(1, typologyPath[0]);
             Assert.Equal("1.2.3", typologyPath.ToString());
 
-            Assert.Equal(new Typology.Classes.TypologyPath([1, 2]), typologyPath.Parent);
-            Assert.Equal(new Typology.Classes.TypologyPath([1]), typologyPath.GetParent(0));
-            Assert.Equal(new Typology.Classes.TypologyPath([1, 2]), typologyPath.GetParent(1));
+            Assert.Equal(new TypologyPath([1, 2]), typologyPath.Parent);
+            Assert.Equal(new TypologyPath([1]), typologyPath.GetParent(0));
+            Assert.Equal(new TypologyPath([1, 2]), typologyPath.GetParent(1));
             Assert.Null(typologyPath.GetParent(2));
 
-            List<Typology.Classes.TypologyPath> typologyPaths = typologyPath.GetTypologyPaths();
+            List<TypologyPath> typologyPaths = typologyPath.GetTypologyPaths();
             Assert.Equal(2, typologyPaths.Count);
 
-            Typology.Classes.TypologyPath typologyPath_Empty = new((IEnumerable<int>?)null);
+            TypologyPath typologyPath_Empty = new((IEnumerable<int>?)null);
 
             Assert.Equal(0, typologyPath_Empty.Count);
             Assert.Equal(-1, typologyPath_Empty.Index);
@@ -38,25 +38,25 @@ namespace DiGi.Typology.xUnit
             Assert.Null(typologyPath_Empty.Parent);
             Assert.Empty(typologyPath_Empty.GetTypologyPaths());
 
-            Assert.Equal(new Typology.Classes.TypologyPath([2, 3]), typologyPath.GetTypologyPath(1, 2));
-            Assert.Equal(new Typology.Classes.TypologyPath([1]), typologyPath.GetTypologyPath(0, 1));
+            Assert.Equal(new TypologyPath([2, 3]), typologyPath.GetTypologyPath(1, 2));
+            Assert.Equal(new TypologyPath([1]), typologyPath.GetTypologyPath(0, 1));
             Assert.Null(typologyPath.GetTypologyPath(1, 3));
             Assert.Null(typologyPath.GetTypologyPath(-1, 1));
             Assert.Null(typologyPath.GetTypologyPath(0, -1));
 
-            Assert.Equal(new Typology.Classes.TypologyPath([1, 2, 3, 4]), typologyPath + new Typology.Classes.TypologyPath([4]));
-            Assert.Equal(typologyPath, typologyPath + (Typology.Classes.TypologyPath?)null);
-            Assert.Equal(typologyPath, (Typology.Classes.TypologyPath?)null + typologyPath);
-            Assert.Null((Typology.Classes.TypologyPath?)null + (Typology.Classes.TypologyPath?)null);
+            Assert.Equal(new TypologyPath([1, 2, 3, 4]), typologyPath + new TypologyPath([4]));
+            Assert.Equal(typologyPath, typologyPath + (TypologyPath?)null);
+            Assert.Equal(typologyPath, (TypologyPath?)null + typologyPath);
+            Assert.Null((TypologyPath?)null + (TypologyPath?)null);
 
-            Assert.Equal(typologyPath, new Typology.Classes.TypologyPath([1, 2, 3]));
-            Assert.Equal(typologyPath.GetHashCode(), new Typology.Classes.TypologyPath([1, 2, 3]).GetHashCode());
-            Assert.NotEqual(typologyPath, new Typology.Classes.TypologyPath([1, 2, 4]));
-            Assert.NotEqual(typologyPath, new Typology.Classes.TypologyPath([1, 2]));
+            Assert.Equal(typologyPath, new TypologyPath([1, 2, 3]));
+            Assert.Equal(typologyPath.GetHashCode(), new TypologyPath([1, 2, 3]).GetHashCode());
+            Assert.NotEqual(typologyPath, new TypologyPath([1, 2, 4]));
+            Assert.NotEqual(typologyPath, new TypologyPath([1, 2]));
 
-            Assert.Equal(0, typologyPath.CompareTo(new Typology.Classes.TypologyPath([1, 2, 3])));
-            Assert.True(new Typology.Classes.TypologyPath([1, 2]).CompareTo(typologyPath) < 0);
-            Assert.True(new Typology.Classes.TypologyPath([1, 3]).CompareTo(typologyPath) > 0);
+            Assert.Equal(0, typologyPath.CompareTo(new TypologyPath([1, 2, 3])));
+            Assert.True(new TypologyPath([1, 2]).CompareTo(typologyPath) < 0);
+            Assert.True(new TypologyPath([1, 3]).CompareTo(typologyPath) > 0);
             Assert.True(typologyPath.CompareTo(null!) > 0);
 
             List<int>? values = (List<int>?)typologyPath;
@@ -74,7 +74,7 @@ namespace DiGi.Typology.xUnit
             Assert.DoesNotContain("\"Index\"", json);
             Assert.Contains("\"Values\"", json);
 
-            Typology.Classes.TypologyPath? typologyPath_Temp = Core.Convert.ToDiGi<Typology.Classes.TypologyPath>(json)?.FirstOrDefault();
+            TypologyPath? typologyPath_Temp = Core.Convert.ToDiGi<TypologyPath>(json)?.FirstOrDefault();
 
             Assert.NotNull(typologyPath_Temp);
             Assert.Equal(typologyPath, typologyPath_Temp);
@@ -91,9 +91,9 @@ namespace DiGi.Typology.xUnit
         [Fact]
         public void TypologyPath_EqualityOperators()
         {
-            Typology.Classes.TypologyPath typologyPath_1 = new([1, 2, 3]);
-            Typology.Classes.TypologyPath typologyPath_2 = new([1, 2, 3]);
-            Typology.Classes.TypologyPath typologyPath_3 = new([1, 2, 4]);
+            TypologyPath typologyPath_1 = new([1, 2, 3]);
+            TypologyPath typologyPath_2 = new([1, 2, 3]);
+            TypologyPath typologyPath_3 = new([1, 2, 4]);
 
             Assert.True(typologyPath_1 == typologyPath_2);
             Assert.False(typologyPath_1 != typologyPath_2);
@@ -102,12 +102,12 @@ namespace DiGi.Typology.xUnit
 
             Assert.True(typologyPath_1.Equals(typologyPath_2));
             Assert.False(typologyPath_1.Equals(typologyPath_3));
-            Assert.False(typologyPath_1.Equals((Typology.Classes.TypologyPath?)null));
+            Assert.False(typologyPath_1.Equals((TypologyPath?)null));
 
-            Assert.True(System.Collections.Generic.EqualityComparer<Typology.Classes.TypologyPath>.Default.Equals(typologyPath_1, typologyPath_2));
-            Assert.False(System.Collections.Generic.EqualityComparer<Typology.Classes.TypologyPath>.Default.Equals(typologyPath_1, typologyPath_3));
+            Assert.True(EqualityComparer<TypologyPath>.Default.Equals(typologyPath_1, typologyPath_2));
+            Assert.False(EqualityComparer<TypologyPath>.Default.Equals(typologyPath_1, typologyPath_3));
 
-            Typology.Classes.TypologyPath? typologyPath_Null = null;
+            TypologyPath? typologyPath_Null = null;
 
             Assert.True(typologyPath_Null == null);
             Assert.False(typologyPath_Null == typologyPath_1);

@@ -17,7 +17,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.Equal(5, task.Count);
             Assert.NotNull(task.OrtoDatasBuilding2DOptions);
             Assert.IsAssignableFrom<OrtoDatasPostTask>(task);
-            Assert.IsAssignableFrom<DiGi.GIS.WebAPI.Interfaces.IGISWebAPIObject>(task);
+            Assert.IsAssignableFrom<Interfaces.IGISWebAPIObject>(task);
         }
     }
 }

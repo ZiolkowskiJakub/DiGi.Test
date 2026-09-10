@@ -20,7 +20,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             const string code = "9001";
             const string reference = "COUNTY_PART_NAMED_INTEGRATION";
 
-            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = GIS.PostgreSQL.Create.GISPostgreSQLConverterManager();
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
             Assert.NotNull(gISPostgreSQLConverterManager);
 
             AdministrativeAreal2DPostgreSQLConverter? administrativeAreal2DPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();

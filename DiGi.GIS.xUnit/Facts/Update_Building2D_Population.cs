@@ -30,12 +30,12 @@ namespace DiGi.GIS.xUnit
             Table table = new();
             int countyId = 2212;
 
-            GIS.IO.Modify.Update_Building2D_Population(table, countyId, [building2D_1, building2D_2], statisticalYearlyDoubleData, new Range<int>(2020, 2022));
+            IO.Modify.Update_Building2D_Population(table, countyId, [building2D_1, building2D_2], statisticalYearlyDoubleData, new Range<int>(2020, 2022));
 
             Assert.Equal(2, table.RowCount);
 
-            Column? column_Reference = table.Columns?.FirstOrDefault(c => c.Name == GIS.IO.Constants.Column.Reference.Name);
-            Column? column_CountyId = table.Columns?.FirstOrDefault(c => c.Name == GIS.IO.Constants.Column.CountyId.Name);
+            Column? column_Reference = table.Columns?.FirstOrDefault(c => c.Name == IO.Constants.Column.Reference.Name);
+            Column? column_CountyId = table.Columns?.FirstOrDefault(c => c.Name == IO.Constants.Column.CountyId.Name);
             Column? column_Pop2020 = table.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2020");
             Column? column_Pop2021 = table.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2021");
             Column? column_Pop2022 = table.Columns?.FirstOrDefault(c => c.Name == "Municipality population 2022");
@@ -64,7 +64,7 @@ namespace DiGi.GIS.xUnit
             collection.Add(statisticalYearlyDoubleData);
 
             Table table_Collection = new();
-            GIS.IO.Modify.Update_Building2D_Population(table_Collection, countyId, [building2D_1], collection, new Range<int>(2020, 2021));
+            IO.Modify.Update_Building2D_Population(table_Collection, countyId, [building2D_1], collection, new Range<int>(2020, 2021));
 
             Assert.Equal(1, table_Collection.RowCount);
             Row? row_Coll = table_Collection.GetRow(0);
@@ -77,11 +77,11 @@ namespace DiGi.GIS.xUnit
 
             // Null guards
             Table? table_Null = null;
-            GIS.IO.Modify.Update_Building2D_Population(table_Null, countyId, [building2D_1], statisticalYearlyDoubleData);
-            GIS.IO.Modify.Update_Building2D_Population(table, countyId, null, statisticalYearlyDoubleData);
-            GIS.IO.Modify.Update_Building2D_Population(table, countyId, [], statisticalYearlyDoubleData);
-            GIS.IO.Modify.Update_Building2D_Population(table, countyId, [building2D_1], (StatisticalYearlyDoubleData?)null);
-            GIS.IO.Modify.Update_Building2D_Population(table, countyId, [building2D_1], (StatisticalDataCollection?)null);
+            IO.Modify.Update_Building2D_Population(table_Null, countyId, [building2D_1], statisticalYearlyDoubleData);
+            IO.Modify.Update_Building2D_Population(table, countyId, null, statisticalYearlyDoubleData);
+            IO.Modify.Update_Building2D_Population(table, countyId, [], statisticalYearlyDoubleData);
+            IO.Modify.Update_Building2D_Population(table, countyId, [building2D_1], (StatisticalYearlyDoubleData?)null);
+            IO.Modify.Update_Building2D_Population(table, countyId, [building2D_1], (StatisticalDataCollection?)null);
         }
     }
 }
