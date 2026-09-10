@@ -43,9 +43,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 building2DOccupancyDatas.Add(building2DOccupancyData);
             }
 
-            HashSet<long>? ids_Stored = await building2DOccupancyDataPostgreSQLConverter.UpdateAsync(building2DOccupancyDatas);
-            Assert.NotNull(ids_Stored);
-            Assert.Equal(2, ids_Stored.Count);
+            PostgreSQLUpdateResult? updateResult_Stored = await building2DOccupancyDataPostgreSQLConverter.UpdateAsync(building2DOccupancyDatas);
+            Assert.NotNull(updateResult_Stored);
+            Assert.Equal(2, updateResult_Stored.Ids.Count);
 
             List<Building2DOccupancyData>? building2DOccupancyDatas_Stored = await building2DOccupancyDataPostgreSQLConverter.GetItemsByReferenceAsync(reference, countyId);
             Assert.NotNull(building2DOccupancyDatas_Stored);

@@ -128,6 +128,22 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Equal(1, (int)UpdateRejectionReason.MissingGeometry);
             Assert.Equal(2, (int)UpdateRejectionReason.CountyUnresolved);
             Assert.Equal(3, (int)UpdateRejectionReason.PartitionUnavailable);
+            Assert.Equal(4, (int)UpdateRejectionReason.MissingCounty);
+        }
+
+        /// <summary>
+        /// Verifies that a rejection with the <c>MissingCounty</c> reason survives a JSON round trip.
+        /// <para>This is the reason the <c>Building2DReferencedObjectPostgreSQLConverter</c> records when a row arrives with no county identifier - the caller failed to state which part the row belongs to.</para>
+        /// </summary>
+        [Fact]
+        public void Rejection_MissingCounty_Serialization()
+        {
+            Rejection rejection = new("1234.5678.AB_12", UpdateRejectionReason.MissingCounty);
+
+            Assert.Equal("1234.5678.AB_12", rejection.Reference);
+            Assert.Equal(UpdateRejectionReason.MissingCounty, rejection.UpdateRejectionReason);
+
+            Core.xUnit.Query.SerializationCheck(rejection);
         }
     }
 }

@@ -33,11 +33,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Building2DOccupancyData? building2DOccupancyData_Stray = occupancyData_Stray.ToPostgreSQL(countyId_Wrong);
             Assert.NotNull(building2DOccupancyData_Stray);
 
-            HashSet<long>? ids_Stored = await building2DOccupancyDataPostgreSQLConverter.UpdateAsync([building2DOccupancyData_Stray]);
-            Assert.NotNull(ids_Stored);
-            Assert.Single(ids_Stored);
+            PostgreSQLUpdateResult? updateResult_Stored = await building2DOccupancyDataPostgreSQLConverter.UpdateAsync([building2DOccupancyData_Stray]);
+            Assert.NotNull(updateResult_Stored);
+            Assert.Single(updateResult_Stored.Ids);
 
-            long id_Stored = ids_Stored.First();
+            long id_Stored = updateResult_Stored.Ids.First();
 
             HashSet<string>? references_Refreshed = await building2DOccupancyDataPostgreSQLConverter.RefreshCountyIdsAsync([reference], countyId_Target);
             Assert.NotNull(references_Refreshed);
@@ -70,9 +70,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(building2DOccupancyData_Collision_Wrong);
             Assert.Equal(building2DOccupancyData_Collision_Target.UniqueId, building2DOccupancyData_Collision_Wrong.UniqueId);
 
-            HashSet<long>? ids_Stored_Collision = await building2DOccupancyDataPostgreSQLConverter.UpdateAsync([building2DOccupancyData_Collision_Target, building2DOccupancyData_Collision_Wrong]);
-            Assert.NotNull(ids_Stored_Collision);
-            Assert.Equal(2, ids_Stored_Collision.Count);
+            PostgreSQLUpdateResult? updateResult_Stored_Collision = await building2DOccupancyDataPostgreSQLConverter.UpdateAsync([building2DOccupancyData_Collision_Target, building2DOccupancyData_Collision_Wrong]);
+            Assert.NotNull(updateResult_Stored_Collision);
+            Assert.Equal(2, updateResult_Stored_Collision.Ids.Count);
 
             HashSet<string>? references_Refreshed_Collision = await building2DOccupancyDataPostgreSQLConverter.RefreshCountyIdsAsync([reference], countyId_Target);
             Assert.NotNull(references_Refreshed_Collision);
