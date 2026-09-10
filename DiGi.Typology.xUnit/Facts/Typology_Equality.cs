@@ -70,7 +70,7 @@ namespace DiGi.Typology.xUnit
             Assert.NotEqual(typology_1, typology_SubTypology);
 
             Typology.Classes.Typology typology_Nested = Create();
-            Typology.Classes.Typology? typology_Nested_Grandchild = typology_Nested.GetTypology([0, 0]);
+            Typology.Classes.Typology? typology_Nested_Grandchild = typology_Nested.SubTypology([0, 0]);
 
             Assert.NotNull(typology_Nested_Grandchild);
             typology_Nested_Grandchild.Name = "Renamed";
@@ -90,7 +90,9 @@ namespace DiGi.Typology.xUnit
             Assert.Equal(typology_1, typology_Copy);
             Assert.Equal(typology_1.GetHashCode(), typology_Copy.GetHashCode());
 
-            Typology.Classes.Typology typology_Fallback = new(new Typology.Classes.TypologyItem([9], "Composed", null), [new Typology.Classes.Typology("A", null), new Typology.Classes.Typology("B", null), new Typology.Classes.Typology(new Typology.Classes.TypologyItem([0], "C", null))]);
+            Typology.Classes.Typology? typology_Fallback = DiGi.Typology.Create.Typology(new Typology.Classes.TypologyItem([9], "Composed", null), [new Typology.Classes.Typology("A", null), new Typology.Classes.Typology("B", null), new Typology.Classes.Typology(new Typology.Classes.TypologyItem([0], "C", null))]);
+
+            Assert.NotNull(typology_Fallback);
 
             Typology.Classes.Typology? typology_Fallback_Clone = Core.Query.Clone(typology_Fallback);
 

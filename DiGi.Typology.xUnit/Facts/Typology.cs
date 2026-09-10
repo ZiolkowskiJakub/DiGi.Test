@@ -42,7 +42,7 @@ namespace DiGi.Typology.xUnit
 
             Typology.Classes.Typology? typology_Temp;
 
-            typology_Temp = typology.GetTypology([3]);
+            typology_Temp = typology.SubTypology([3]);
             Assert.NotNull(typology_Temp);
 
             if (typology_Temp is null)
@@ -58,16 +58,16 @@ namespace DiGi.Typology.xUnit
             }
 
             Assert.NotNull(subTypology?.SubTypologies);
-            Assert.NotNull(typology_Temp?.GetTypology([1]));
-            Assert.NotNull(typology_Temp?.GetTypology([2]));
+            Assert.NotNull(typology_Temp?.SubTypology([1]));
+            Assert.NotNull(typology_Temp?.SubTypology([2]));
 
-            Assert.NotNull(typology?.GetTypology([3, 1]));
-            Assert.NotNull(typology?.GetTypology([3, 2]));
+            Assert.NotNull(typology?.SubTypology([3, 1]));
+            Assert.NotNull(typology?.SubTypology([3, 2]));
 
             Core.xUnit.Query.SerializationCheck(typology);
             Core.xUnit.Query.SerializationCheck(subTypology);
 
-            typology_Temp = typology.GetTypology([]);
+            typology_Temp = typology.SubTypology([]);
             Assert.NotNull(typology_Temp);
 
             if (typology_Temp is null)
@@ -88,7 +88,7 @@ namespace DiGi.Typology.xUnit
 
             Assert.True(typologies[0].Description == "Test DDD");
 
-            List<TypologyPath>? typologyPaths = typology.GetTypologyPaths(true);
+            List<TypologyPath>? typologyPaths = typology.TypologyPaths(true);
 
             Assert.NotNull(typologyPaths);
             Assert.NotEmpty(typologyPaths);
@@ -100,7 +100,7 @@ namespace DiGi.Typology.xUnit
 
             foreach (TypologyPath typologyPath in typologyPaths)
             {
-                typology_Temp = typology.GetTypology(typologyPath);
+                typology_Temp = typology.SubTypology(typologyPath);
                 Assert.NotNull(typology_Temp);
             }
 
@@ -134,8 +134,8 @@ namespace DiGi.Typology.xUnit
 
             Assert.NotNull(typology.Update("A", "Test A"));
 
-            Assert.NotNull(typology.GetTypology([0]));
-            Assert.Null(typology.GetTypology([1]));
+            Assert.NotNull(typology.SubTypology([0]));
+            Assert.Null(typology.SubTypology([1]));
         }
     }
 }

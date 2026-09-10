@@ -79,16 +79,16 @@ namespace DiGi.Typology.xUnit
             Typology.Classes.Typology? typology = typologyFilterSolverTest.Output;
             Assert.NotNull(typology);
 
-            HashSet<string> references = typology.GetReferences(true);
+            HashSet<string> references = typology.ReferenceSet(true);
             Assert.NotNull(references);
             Assert.Equal(4, references.Count);
 
-            List<TypologyPath>? typologyPaths = typology.GetTypologyPaths(true);
+            List<TypologyPath>? typologyPaths = typology.TypologyPaths(true);
             Assert.NotNull(typologyPaths);
 
             for (int i = typologyPaths.Count - 1; i >= 0; i--)
             {
-                Typology.Classes.Typology? typology_Temp = typology.GetTypology(typologyPaths[i]);
+                Typology.Classes.Typology? typology_Temp = typology.SubTypology(typologyPaths[i]);
                 Assert.NotNull(typology_Temp);
 
                 if (typology_Temp.References is null || typology_Temp.References.Count < 2)

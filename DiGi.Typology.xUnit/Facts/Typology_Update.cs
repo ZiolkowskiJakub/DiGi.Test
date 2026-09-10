@@ -37,24 +37,24 @@ namespace DiGi.Typology.xUnit
             Assert.Equal("Updated description", typology_GrandChild_Updated.Description);
             Assert.True(typology_GrandChild_Updated.Contains("reference_1"));
 
-            Assert.Equal("GrandGrandChild", typology.GetTypology([1, 1, 1])?.Name);
-            Assert.Single(typology_GrandChild_Updated.GetReferences(true));
-            Assert.Empty(typology.GetReferences());
-            Assert.Equal(typology.GetReferences(false), typology.GetReferences());
-            Assert.NotEqual(typology.GetReferences(false), typology.GetReferences(true));
+            Assert.Equal("GrandGrandChild", typology.SubTypology([1, 1, 1])?.Name);
+            Assert.Single(typology_GrandChild_Updated.ReferenceSet(true));
+            Assert.Empty(typology.ReferenceSet());
+            Assert.Equal(typology.ReferenceSet(false), typology.ReferenceSet());
+            Assert.NotEqual(typology.ReferenceSet(false), typology.ReferenceSet(true));
 
             Assert.NotNull(typology.Update([1, 2], "Sibling", "Sibling description"));
-            Assert.Equal("GrandChild", typology.GetTypology([1, 1])?.Name);
-            Assert.Equal("Sibling", typology.GetTypology([1, 2])?.Name);
+            Assert.Equal("GrandChild", typology.SubTypology([1, 1])?.Name);
+            Assert.Equal("Sibling", typology.SubTypology([1, 2])?.Name);
             Assert.Equal("Child", typology_Child.Name);
 
-            List<Typology.Classes.TypologyPath> typologyPaths = typology.GetTypologyPaths(true);
+            List<Typology.Classes.TypologyPath> typologyPaths = typology.TypologyPaths(true);
 
             Assert.Equal(4, typologyPaths.Count);
 
             foreach (Typology.Classes.TypologyPath typologyPath in typologyPaths)
             {
-                Assert.NotNull(typology.GetTypology(typologyPath));
+                Assert.NotNull(typology.SubTypology(typologyPath));
             }
 
             Core.xUnit.Query.SerializationCheck(typology);
