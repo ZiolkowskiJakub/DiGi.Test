@@ -20,6 +20,8 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.Equal("gis/yearbuiltdata/countbycountyid", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetCountByCountyIdAsync)));
             Assert.Equal("gis/yearbuiltdata/itemsbyreferences", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetItemsByReferencesAsync)));
             Assert.Equal("gis/yearbuiltdata/itemsbyreference", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetItemsByReferenceAsync)));
+            Assert.Equal("gis/yearbuiltdata/referenceduplicates", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetReferenceDuplicatesAsync)));
+            Assert.Equal("gis/yearbuiltdata/countypartmismatches", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetCountyPartMismatchesAsync)));
         }
 
         /// <summary>
@@ -63,6 +65,16 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestResult>(await controller.UpdateItemsAsync(null, string.Empty));
                 Assert.IsType<BadRequestResult>(await controller.UpdateItemsByCountyIdsAsync(new JsonArray(), null));
                 Assert.IsType<BadRequestResult>(await controller.UpdateItemsByCountyIdsAsync(new JsonArray(), []));
+
+                Assert.IsType<BadRequestResult>(await controller.GetReferenceDuplicatesAsync(limit: 0));
+                Assert.IsType<BadRequestResult>(await controller.GetReferenceDuplicatesAsync(limit: -1));
+                Assert.IsType<BadRequestResult>(await controller.GetReferenceDuplicatesAsync(commandTimeout: -1));
+
+                Assert.IsType<BadRequestResult>(await controller.GetCountyPartMismatchesAsync(commandTimeout: -1));
+
+                // A converter built on null connection data cannot reach the database, so a valid request answers NotFound rather than 500.
+                Assert.IsType<NotFoundResult>(await controller.GetReferenceDuplicatesAsync());
+                Assert.IsType<NotFoundResult>(await controller.GetCountyPartMismatchesAsync());
             }
             finally
             {
