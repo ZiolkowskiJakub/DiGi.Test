@@ -81,5 +81,38 @@ namespace DiGi.Typology.xUnit
 
             Core.xUnit.Query.SerializationCheck(typologyPath);
         }
+
+        /// <summary>
+        /// Tests that the == and != operators and IEquatable route to value equality rather than
+        /// reference equality, so two distinct but value-equal paths compare equal.
+        /// <para>Reproduction guard: without the operators, == compiled to reference equality and
+        /// returned false for equal-but-distinct instances.</para>
+        /// </summary>
+        [Fact]
+        public void TypologyPath_EqualityOperators()
+        {
+            Typology.Classes.TypologyPath typologyPath_1 = new([1, 2, 3]);
+            Typology.Classes.TypologyPath typologyPath_2 = new([1, 2, 3]);
+            Typology.Classes.TypologyPath typologyPath_3 = new([1, 2, 4]);
+
+            Assert.True(typologyPath_1 == typologyPath_2);
+            Assert.False(typologyPath_1 != typologyPath_2);
+            Assert.True(typologyPath_1 != typologyPath_3);
+            Assert.False(typologyPath_1 == typologyPath_3);
+
+            Assert.True(typologyPath_1.Equals(typologyPath_2));
+            Assert.False(typologyPath_1.Equals(typologyPath_3));
+            Assert.False(typologyPath_1.Equals((Typology.Classes.TypologyPath?)null));
+
+            Assert.True(System.Collections.Generic.EqualityComparer<Typology.Classes.TypologyPath>.Default.Equals(typologyPath_1, typologyPath_2));
+            Assert.False(System.Collections.Generic.EqualityComparer<Typology.Classes.TypologyPath>.Default.Equals(typologyPath_1, typologyPath_3));
+
+            Typology.Classes.TypologyPath? typologyPath_Null = null;
+
+            Assert.True(typologyPath_Null == null);
+            Assert.False(typologyPath_Null == typologyPath_1);
+            Assert.True(typologyPath_Null != typologyPath_1);
+            Assert.False(typologyPath_Null != null);
+        }
     }
 }

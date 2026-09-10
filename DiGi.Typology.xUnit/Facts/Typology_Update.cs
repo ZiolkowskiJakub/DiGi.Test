@@ -39,6 +39,9 @@ namespace DiGi.Typology.xUnit
 
             Assert.Equal("GrandGrandChild", typology.GetTypology([1, 1, 1])?.Name);
             Assert.Single(typology_GrandChild_Updated.GetReferences(true));
+            Assert.Empty(typology.GetReferences());
+            Assert.Equal(typology.GetReferences(false), typology.GetReferences());
+            Assert.NotEqual(typology.GetReferences(false), typology.GetReferences(true));
 
             Assert.NotNull(typology.Update([1, 2], "Sibling", "Sibling description"));
             Assert.Equal("GrandChild", typology.GetTypology([1, 1])?.Name);
