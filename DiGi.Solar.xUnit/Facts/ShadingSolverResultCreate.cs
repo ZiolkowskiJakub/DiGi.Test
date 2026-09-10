@@ -24,7 +24,7 @@ namespace DiGi.Solar.xUnit
             PolygonalFace2D polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(externalEdge, [])!;
             List<IPolygonalFace2D> polygonalFace2Ds = [polygonalFace2D];
 
-            IShadingSolverResult? result = Create.ShadingSolverResult(ShadingSolverType.Geometrical, dateTime, plane, polygonalFace2Ds);
+            IShadingSolverResult? result = ComputeSharp.Create.ShadingSolverResult(ShadingSolverType.Geometrical, dateTime, plane, polygonalFace2Ds);
 
             Assert.NotNull(result);
             Assert.IsType<GeometricalShadingSolverResult>(result);
@@ -32,7 +32,7 @@ namespace DiGi.Solar.xUnit
             Assert.Equal(100.0, result.Area, 5);
 
             // Null plane boundary case for Geometrical type
-            IShadingSolverResult? result_NullPlane = Create.ShadingSolverResult(ShadingSolverType.Geometrical, dateTime, null, polygonalFace2Ds);
+            IShadingSolverResult? result_NullPlane = ComputeSharp.Create.ShadingSolverResult(ShadingSolverType.Geometrical, dateTime, null, polygonalFace2Ds);
             Assert.Null(result_NullPlane);
         }
 
@@ -50,7 +50,7 @@ namespace DiGi.Solar.xUnit
             PolygonalFace2D polygonalFace2D_2 = Geometry.Planar.Create.PolygonalFace2D(externalEdge_2, [])!;
             List<IPolygonalFace2D> polygonalFace2Ds = [polygonalFace2D_1, polygonalFace2D_2];
 
-            IShadingSolverResult? result = Create.ShadingSolverResult(ShadingSolverType.Numerical, dateTime, null, polygonalFace2Ds);
+            IShadingSolverResult? result = ComputeSharp.Create.ShadingSolverResult(ShadingSolverType.Numerical, dateTime, null, polygonalFace2Ds);
 
             Assert.NotNull(result);
             Assert.IsType<NumericalShadingSolverResult>(result);
@@ -66,7 +66,7 @@ namespace DiGi.Solar.xUnit
         public void ShadingSolverResult_Create_Undefined()
         {
             DateTime dateTime = new(2026, 6, 26, 12, 0, 0);
-            IShadingSolverResult? result = Create.ShadingSolverResult(ShadingSolverType.Undefined, dateTime, null, null);
+            IShadingSolverResult? result = ComputeSharp.Create.ShadingSolverResult(ShadingSolverType.Undefined, dateTime, null, null);
             Assert.Null(result);
         }
     }
