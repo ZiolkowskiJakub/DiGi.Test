@@ -50,6 +50,9 @@
     <Reference Include="DiGi.GIS.ML">
       <HintPath>..\..\DiGi.GIS.ML\bin\DiGi.GIS.ML.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Typology">
+      <HintPath>..\..\DiGi.Typology\bin\DiGi.Typology.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Unit">
       <HintPath>..\..\DiGi.Unit\bin\DiGi.Unit.dll</HintPath>
     </Reference>
