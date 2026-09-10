@@ -72,6 +72,23 @@ namespace DiGi.Typology.xUnit
             Assert.Null(typologyItems[1].TypologyPath);
             Assert.Equal(typologyPath, typologyItems[2].TypologyPath);
 
+            Typology.Classes.TypologyItem typologyItem_OtherName = new(typologyPath, "DDD", "Test CCC");
+
+            Assert.True(typologyItem.Equals(typologyItem_Values));
+            Assert.True(typologyItem == typologyItem_Values);
+            Assert.False(typologyItem != typologyItem_Values);
+            Assert.Equal(typologyItem.GetHashCode(), typologyItem_Values.GetHashCode());
+            Assert.True(typologyItem_Empty == new Typology.Classes.TypologyItem());
+            Assert.False(typologyItem.Equals(typologyItem_Name));
+            Assert.False(typologyItem.Equals(null));
+            Assert.False(typologyItem == null);
+            Assert.False(null == typologyItem);
+            Assert.NotEqual(typologyItem, typologyItem_OtherName);
+
+            Assert.True(typologyItem_Name.CompareTo(typologyItem) < 0);
+            Assert.True(typologyItem.CompareTo(typologyItem_OtherName) < 0);
+            Assert.True(typologyItem_OtherName.CompareTo(typologyItem) > 0);
+
             Core.xUnit.Query.SerializationCheck(typologyItem);
         }
     }
