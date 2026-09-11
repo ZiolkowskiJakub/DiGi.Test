@@ -27,8 +27,8 @@ namespace DiGi.GIS.xUnit
             AssertNode(typology, [0, 0], "Is occupied True", ["b1", "b2", "b3"]);
             AssertNode(typology, [0, 1], "Is occupied False", ["b4"]);
 
-            AssertNode(typology, [0, 0, 0], "Predicted year built (0,2003>", ["b1", "b2"]);
-            AssertNode(typology, [0, 0, 1], "Predicted year built (2004,2020>", ["b3"]);
+            AssertNode(typology, [0, 0, 0], "Predicted year built [0, 2003]", ["b1", "b2"]);
+            AssertNode(typology, [0, 0, 1], "Predicted year built [2004, 2020]", ["b3"]);
 
             static void AssertNode(Typology.Classes.Typology typology, int[] values, string name, string[] references)
             {

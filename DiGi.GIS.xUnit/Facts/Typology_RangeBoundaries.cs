@@ -26,9 +26,9 @@ namespace DiGi.GIS.xUnit
 
             Assert.NotNull(typology);
 
-            AssertBucket(typology, "Predicted year built (0,2003>", ["b1", "b2"]);
-            AssertBucket(typology, "Predicted year built (2004,2020>", ["b3", "b4"]);
-            AssertBucket(typology, "Predicted year built (2021,2147483647>", ["b5", "b6"]);
+            AssertBucket(typology, "Predicted year built [0, 2003]", ["b1", "b2"]);
+            AssertBucket(typology, "Predicted year built [2004, 2020]", ["b3", "b4"]);
+            AssertBucket(typology, "Predicted year built [2021, 2147483647]", ["b5", "b6"]);
 
             Assert.DoesNotContain("b7", Typology.Query.ReferenceSet(typology, true));
 
