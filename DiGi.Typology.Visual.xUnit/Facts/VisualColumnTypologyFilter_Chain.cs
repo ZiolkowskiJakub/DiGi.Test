@@ -89,6 +89,16 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Same(ranges[1], integerRangeFilterRule_RoundTrip.RuleData(2010)?.Range);
             Assert.Null(integerRangeFilterRule_RoundTrip.RuleData(-1));
 
+            // The range rule copy constructor clones each range by its runtime type, so the visual ones stay visual.
+            IntegerRangeFilterRule integerRangeFilterRule_Copy = new(integerRangeFilterRule);
+
+            List<Range<int>> ranges_Copy = [.. integerRangeFilterRule_Copy.Ranges];
+
+            Assert.Equal(3, ranges_Copy.Count);
+            Assert.NotNull(Assert.IsType<VisualRange<int>>(ranges_Copy[0]).Appearance);
+            Assert.IsType<Range<int>>(ranges_Copy[1]);
+            Assert.NotNull(Assert.IsType<VisualRange<int>>(ranges_Copy[2]).Appearance);
+
             Core.xUnit.Query.SerializationCheck(visualColumnTypologyFilter);
         }
     }

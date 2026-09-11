@@ -16,7 +16,7 @@ namespace DiGi.Typology.Visual.xUnit
         [Fact]
         public void VisualTypology()
         {
-            Classes.VisualTypology Create_VisualTypology(System.Drawing.Color color)
+            static Classes.VisualTypology CreateVisualTypology(System.Drawing.Color color)
             {
                 Classes.VisualTypology visualTypology = new(new Classes.VisualTypologyItem(null, "Root", "All buildings", Create.TypologyAppearance(color)));
 
@@ -36,9 +36,9 @@ namespace DiGi.Typology.Visual.xUnit
                 return visualTypology;
             }
 
-            Classes.VisualTypology visualTypology_1 = Create_VisualTypology(System.Drawing.Color.Red);
-            Classes.VisualTypology visualTypology_2 = Create_VisualTypology(System.Drawing.Color.Red);
-            Classes.VisualTypology visualTypology_Blue = Create_VisualTypology(System.Drawing.Color.Blue);
+            Classes.VisualTypology visualTypology_1 = CreateVisualTypology(System.Drawing.Color.Red);
+            Classes.VisualTypology visualTypology_2 = CreateVisualTypology(System.Drawing.Color.Red);
+            Classes.VisualTypology visualTypology_Blue = CreateVisualTypology(System.Drawing.Color.Blue);
 
             Assert.Equal([0, 3], visualTypology_1.Indexes);
             Assert.NotNull(visualTypology_1.TypologyItem?.Appearance);
@@ -58,7 +58,7 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.NotEqual(visualTypology_1.GetHashCode(), visualTypology_Blue.GetHashCode());
 
             // A tree differing only in a grandchild's appearance is a different tree.
-            Classes.VisualTypology visualTypology_3 = Create_VisualTypology(System.Drawing.Color.Red);
+            Classes.VisualTypology visualTypology_3 = CreateVisualTypology(System.Drawing.Color.Red);
             Classes.VisualTypologyItem? visualTypologyItem_Grandchild = visualTypology_3[0]?[0]?.TypologyItem;
 
             Assert.NotNull(visualTypologyItem_Grandchild);

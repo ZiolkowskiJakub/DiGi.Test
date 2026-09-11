@@ -24,6 +24,8 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Equal("210", Classes.TypologyAppearanceCollection.Key((byte)210));
             Assert.Equal("2010", Classes.TypologyAppearanceCollection.Key("2010"));
             Assert.Equal("-5", Classes.TypologyAppearanceCollection.Key(-5));
+            Assert.Equal("2010", Classes.TypologyAppearanceCollection.Key(2010.0));
+            Assert.Equal("2010", Classes.TypologyAppearanceCollection.Key(2010m));
 
             // A decimal is keyed without its scale, because 1.10m equals 1.1m.
             Assert.True(1.10m.Equals(1.1m));
