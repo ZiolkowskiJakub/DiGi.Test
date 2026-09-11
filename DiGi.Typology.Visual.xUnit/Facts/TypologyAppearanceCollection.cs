@@ -42,7 +42,7 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Same(typologyAppearance_2010, typologyAppearanceCollection[2010L]);
             Assert.Same(typologyAppearance_2010, typologyAppearanceCollection[(short)2010]);
             Assert.Same(typologyAppearance_2010, typologyAppearanceCollection[new UniqueValueRuleData(2010)]);
-            Assert.Same(typologyAppearance_2010, typologyAppearanceCollection[Classes.TypologyAppearanceCollection.Key(2010)]);
+            Assert.Same(typologyAppearance_2010, typologyAppearanceCollection[Query.Key(2010)]);
             Assert.True(typologyAppearanceCollection.Contains(2010L));
 
             // A decimal of another scale is the same value, so it finds the same entry.

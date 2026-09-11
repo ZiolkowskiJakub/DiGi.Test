@@ -1,26 +1,24 @@
 using DiGi.Core.IO.Table.Classes;
 using DiGi.Typology.Classes;
-using DiGi.Typology.Visual.Classes;
+using DiGi.Typology.Visual.Interfaces;
 
 namespace DiGi.Typology.Visual.xUnit
 {
     public partial class Facts
     {
         /// <summary>
-        /// Tests <see cref="Classes.VisualColumnTypologyFilter"/>: the level appearance, the value, the rule and a nested
-        /// filter all survive a string round trip and SerializationCheck, the copy constructor clones the appearance, and
-        /// the type is a <see cref="ColumnTypologyFilter{UColumn}"/> so a consumer typed on the base accepts it.
+        /// Tests <see cref="Classes.VisualColumnTypologyFilter"/>: the value, the rule and a nested filter all survive a
+        /// string round trip and SerializationCheck, the copy constructor clones the chain, the nested filter is typed
+        /// Visual so the chain cannot degrade to plain levels, and the type is a member of the Visual family by its
+        /// marker interface and by its <c>_type</c>.
         /// </summary>
         [Fact]
         public void VisualColumnTypologyFilter()
         {
-            TypologyAppearance typologyAppearance = Create.TypologyAppearance(System.Drawing.Color.Red);
-
             Classes.VisualColumnTypologyFilter visualColumnTypologyFilter = new()
             {
                 Value = new Column(0, "occupancy", typeof(string)),
                 Rule = new UniqueValueFilterRule(),
-                Appearance = typologyAppearance,
                 Filter = new Classes.VisualColumnTypologyFilter()
                 {
                     Value = new Column(1, "year_built", typeof(int)),
@@ -28,19 +26,14 @@ namespace DiGi.Typology.Visual.xUnit
                 }
             };
 
-            ColumnTypologyFilter<Column> columnTypologyFilter = visualColumnTypologyFilter;
+            Assert.IsAssignableFrom<ITypologyVisualSerializableObject>(visualColumnTypologyFilter);
+            Assert.IsAssignableFrom<TypologyFilter<Classes.VisualColumnTypologyFilter<Column>, Column>>(visualColumnTypologyFilter);
+            Assert.Equal("occupancy", visualColumnTypologyFilter.Value?.Name);
+            Assert.IsType<Classes.VisualColumnTypologyFilter>(visualColumnTypologyFilter.Filter);
 
-            Assert.Same(typologyAppearance, visualColumnTypologyFilter.Appearance);
-            Assert.Equal("occupancy", columnTypologyFilter.Value?.Name);
-            Assert.NotNull(columnTypologyFilter.Filter);
-            Assert.Null((columnTypologyFilter.Filter as Classes.VisualColumnTypologyFilter)?.Appearance);
-
-            // The copy constructor clones the appearance and the chain below it.
+            // The copy constructor clones the chain below it.
             Classes.VisualColumnTypologyFilter visualColumnTypologyFilter_Copy = new(visualColumnTypologyFilter);
 
-            Assert.NotNull(visualColumnTypologyFilter_Copy.Appearance);
-            Assert.NotSame(typologyAppearance, visualColumnTypologyFilter_Copy.Appearance);
-            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance), Core.Convert.ToSystem_String(visualColumnTypologyFilter_Copy.Appearance));
             Assert.NotSame(visualColumnTypologyFilter.Filter, visualColumnTypologyFilter_Copy.Filter);
             Assert.IsType<Classes.VisualColumnTypologyFilter>(visualColumnTypologyFilter_Copy.Filter);
             Assert.Equal("year_built", visualColumnTypologyFilter_Copy.Filter?.Value?.Name);
@@ -53,8 +46,6 @@ namespace DiGi.Typology.Visual.xUnit
             Classes.VisualColumnTypologyFilter? visualColumnTypologyFilter_RoundTrip = Core.Convert.ToDiGi<Classes.VisualColumnTypologyFilter>(json)?.FirstOrDefault();
 
             Assert.NotNull(visualColumnTypologyFilter_RoundTrip);
-            Assert.NotNull(visualColumnTypologyFilter_RoundTrip.Appearance);
-            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance), Core.Convert.ToSystem_String(visualColumnTypologyFilter_RoundTrip.Appearance));
             Assert.Equal("occupancy", visualColumnTypologyFilter_RoundTrip.Value?.Name);
             Assert.IsType<UniqueValueFilterRule>(visualColumnTypologyFilter_RoundTrip.Rule);
             Assert.IsType<Classes.VisualColumnTypologyFilter>(visualColumnTypologyFilter_RoundTrip.Filter);

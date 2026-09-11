@@ -1,6 +1,7 @@
 using DiGi.Core.Classes;
 using DiGi.Core.IO.Table.Classes;
 using DiGi.Typology.Classes;
+using DiGi.Typology.Interfaces;
 using DiGi.Typology.Visual.Classes;
 
 namespace DiGi.Typology.Visual.xUnit
@@ -8,18 +9,18 @@ namespace DiGi.Typology.Visual.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests a whole Visual definition chain through a string round trip: a level with a node appearance and a
+        /// Tests a whole Visual definition chain through a string round trip: a level with a
         /// <see cref="VisualUniqueValueFilterRule"/> mapping two values, nesting a level whose
-        /// <see cref="IntegerRangeFilterRule"/> holds two <see cref="VisualRange{T}"/> and one plain <see cref="Range{T}"/>.
-        /// <para>Asserted, not measured: after the round trip the ranges are still held in ascending order, each visual
-        /// range is still a <c>VisualRange&lt;int&gt;</c> carrying its appearance while the plain one is still plain, the
-        /// rule still buckets a value onto the very range instance the definition holds, the mapped values still resolve
-        /// their appearance, and the nested level is still Visual by its <c>_type</c>.</para>
+        /// <see cref="VisualIntegerRangeFilterRule"/> holds three ranges and maps two of them.
+        /// <para>Asserted, not measured: after the round trip the ranges are still held in ascending order, the mapped
+        /// ranges and values still resolve their appearance and the unmapped ones resolve none, each rule still buckets a
+        /// value onto the very range instance the definition holds and hands the bucket's appearance to its rule data,
+        /// the reflection path of <see cref="Typology.Query.RuleData(ITypologyFilterRule, object)"/> reaches the Visual
+        /// rule data, and the nested level is still Visual by its <c>_type</c>.</para>
         /// </summary>
         [Fact]
         public void VisualColumnTypologyFilter_Chain()
         {
-            TypologyAppearance typologyAppearance_Node = Create.TypologyAppearance(System.Drawing.Color.Gray);
             TypologyAppearance typologyAppearance_Residential = Create.TypologyAppearance(System.Drawing.Color.Red);
             TypologyAppearance typologyAppearance_Industrial = Create.TypologyAppearance(System.Drawing.Color.Purple);
             TypologyAppearance typologyAppearance_Old = Create.TypologyAppearance(System.Drawing.Color.Brown);
@@ -30,17 +31,23 @@ namespace DiGi.Typology.Visual.xUnit
             visualUniqueValueFilterRule.TypologyAppearanceCollection["Residential"] = typologyAppearance_Residential;
             visualUniqueValueFilterRule.TypologyAppearanceCollection["Industrial"] = typologyAppearance_Industrial;
 
-            IntegerRangeFilterRule integerRangeFilterRule = new([new VisualRange<int>(2021, int.MaxValue, typologyAppearance_New), new Range<int>(2004, 2020), new VisualRange<int>(0, 2003, typologyAppearance_Old)]);
+            Range<int> range_New = new(2021, int.MaxValue);
+            Range<int> range_Middle = new(2004, 2020);
+            Range<int> range_Old = new(0, 2003);
+
+            VisualIntegerRangeFilterRule visualIntegerRangeFilterRule = new([range_New, range_Middle, range_Old]);
+
+            visualIntegerRangeFilterRule.TypologyAppearanceCollection[range_New] = typologyAppearance_New;
+            visualIntegerRangeFilterRule.TypologyAppearanceCollection[range_Old] = typologyAppearance_Old;
 
             Classes.VisualColumnTypologyFilter visualColumnTypologyFilter = new()
             {
                 Value = new Column(0, "occupancy", typeof(string)),
                 Rule = visualUniqueValueFilterRule,
-                Appearance = typologyAppearance_Node,
                 Filter = new Classes.VisualColumnTypologyFilter()
                 {
                     Value = new Column(1, "year_built", typeof(int)),
-                    Rule = integerRangeFilterRule
+                    Rule = visualIntegerRangeFilterRule
                 }
             };
 
@@ -51,53 +58,53 @@ namespace DiGi.Typology.Visual.xUnit
             Classes.VisualColumnTypologyFilter? visualColumnTypologyFilter_RoundTrip = Core.Convert.ToDiGi<Classes.VisualColumnTypologyFilter>(json)?.FirstOrDefault();
 
             Assert.NotNull(visualColumnTypologyFilter_RoundTrip);
-            Assert.NotNull(visualColumnTypologyFilter_RoundTrip.Appearance);
-            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Node), Core.Convert.ToSystem_String(visualColumnTypologyFilter_RoundTrip.Appearance));
 
             // Level 1: the unique value rule and its mapped values.
             Classes.VisualUniqueValueFilterRule visualUniqueValueFilterRule_RoundTrip = Assert.IsType<Classes.VisualUniqueValueFilterRule>(visualColumnTypologyFilter_RoundTrip.Rule);
 
             Assert.Equal(["Residential", "Industrial"], visualUniqueValueFilterRule_RoundTrip.TypologyAppearanceCollection.Keys);
-            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Industrial), Core.Convert.ToSystem_String(visualUniqueValueFilterRule_RoundTrip.TypologyAppearanceCollection[visualUniqueValueFilterRule_RoundTrip.RuleData("Industrial")]));
+
+            VisualUniqueValueRuleData? visualUniqueValueRuleData = visualUniqueValueFilterRule_RoundTrip.RuleData("Industrial");
+
+            Assert.NotNull(visualUniqueValueRuleData);
+            Assert.Equal("Industrial", visualUniqueValueRuleData.Value);
+            Assert.Same(visualUniqueValueFilterRule_RoundTrip.TypologyAppearanceCollection["Industrial"], visualUniqueValueRuleData.Appearance);
+            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Industrial), Core.Convert.ToSystem_String(visualUniqueValueRuleData.Appearance));
+            Assert.Null(visualUniqueValueFilterRule_RoundTrip.RuleData("Agricultural")?.Appearance);
             Assert.Null(visualUniqueValueFilterRule_RoundTrip.TypologyAppearanceCollection["Agricultural"]);
 
-            // Level 2: the nested level is Visual by its _type, and the ranges are still ascending with their kinds intact.
+            // Level 2: the nested level is Visual by its _type, and the ranges are still ascending.
             Classes.VisualColumnTypologyFilter visualColumnTypologyFilter_Nested = Assert.IsType<Classes.VisualColumnTypologyFilter>(visualColumnTypologyFilter_RoundTrip.Filter);
 
-            Assert.Null(visualColumnTypologyFilter_Nested.Appearance);
             Assert.Equal("year_built", visualColumnTypologyFilter_Nested.Value?.Name);
 
-            IntegerRangeFilterRule integerRangeFilterRule_RoundTrip = Assert.IsType<IntegerRangeFilterRule>(visualColumnTypologyFilter_Nested.Rule);
+            VisualIntegerRangeFilterRule visualIntegerRangeFilterRule_RoundTrip = Assert.IsType<VisualIntegerRangeFilterRule>(visualColumnTypologyFilter_Nested.Rule);
 
-            List<Range<int>> ranges = [.. integerRangeFilterRule_RoundTrip.Ranges];
+            List<Range<int>> ranges = [.. visualIntegerRangeFilterRule_RoundTrip.Ranges];
 
             Assert.Equal(3, ranges.Count);
             Assert.Equal([0, 2004, 2021], ranges.ConvertAll(x => x.Min));
+            Assert.Equal(2, visualIntegerRangeFilterRule_RoundTrip.TypologyAppearanceCollection.Count);
+            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Old), Core.Convert.ToSystem_String(visualIntegerRangeFilterRule_RoundTrip.TypologyAppearanceCollection[range_Old]));
+            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_New), Core.Convert.ToSystem_String(visualIntegerRangeFilterRule_RoundTrip.TypologyAppearanceCollection[ranges[2]]));
+            Assert.Null(visualIntegerRangeFilterRule_RoundTrip.TypologyAppearanceCollection[range_Middle]);
 
-            VisualRange<int> visualRange_Old = Assert.IsType<VisualRange<int>>(ranges[0]);
-            VisualRange<int> visualRange_New = Assert.IsType<VisualRange<int>>(ranges[2]);
+            // The rule still buckets, onto the very instance the definition holds, and hands the bucket's appearance to the rule data.
+            VisualRangeValueRuleData<int>? visualRangeValueRuleData_Old = visualIntegerRangeFilterRule_RoundTrip.RuleData(1995);
+            VisualRangeValueRuleData<int>? visualRangeValueRuleData_Middle = visualIntegerRangeFilterRule_RoundTrip.RuleData(2010);
 
-            Assert.IsType<Range<int>>(ranges[1]);
-            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Old), Core.Convert.ToSystem_String(visualRange_Old.Appearance));
-            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_New), Core.Convert.ToSystem_String(visualRange_New.Appearance));
+            Assert.NotNull(visualRangeValueRuleData_Old);
+            Assert.NotNull(visualRangeValueRuleData_Middle);
+            Assert.Same(ranges[0], visualRangeValueRuleData_Old.Range);
+            Assert.Same(visualIntegerRangeFilterRule_RoundTrip.TypologyAppearanceCollection[range_Old], visualRangeValueRuleData_Old.Appearance);
+            Assert.Same(ranges[1], visualRangeValueRuleData_Middle.Range);
+            Assert.Null(visualRangeValueRuleData_Middle.Appearance);
+            Assert.Null(visualIntegerRangeFilterRule_RoundTrip.RuleData(-1));
 
-            // The rule still buckets, onto the very instance the definition holds - which is how a solver reads the appearance.
-            RangeValueRuleData<int>? rangeValueRuleData = integerRangeFilterRule_RoundTrip.RuleData(1995);
-
-            Assert.NotNull(rangeValueRuleData);
-            Assert.Same(visualRange_Old, rangeValueRuleData.Range);
-            Assert.Same(ranges[1], integerRangeFilterRule_RoundTrip.RuleData(2010)?.Range);
-            Assert.Null(integerRangeFilterRule_RoundTrip.RuleData(-1));
-
-            // The range rule copy constructor clones each range by its runtime type, so the visual ones stay visual.
-            IntegerRangeFilterRule integerRangeFilterRule_Copy = new(integerRangeFilterRule);
-
-            List<Range<int>> ranges_Copy = [.. integerRangeFilterRule_Copy.Ranges];
-
-            Assert.Equal(3, ranges_Copy.Count);
-            Assert.NotNull(Assert.IsType<VisualRange<int>>(ranges_Copy[0]).Appearance);
-            Assert.IsType<Range<int>>(ranges_Copy[1]);
-            Assert.NotNull(Assert.IsType<VisualRange<int>>(ranges_Copy[2]).Appearance);
+            // The reflection path the solver takes reaches the Visual rule data of both rules.
+            Assert.IsType<VisualUniqueValueRuleData>(Typology.Query.RuleData(visualUniqueValueFilterRule_RoundTrip, "Residential"));
+            Assert.IsType<VisualRangeValueRuleData<int>>(Typology.Query.RuleData(visualIntegerRangeFilterRule_RoundTrip, 2021));
+            Assert.NotNull((Typology.Query.RuleData(visualIntegerRangeFilterRule_RoundTrip, 2021) as VisualRangeValueRuleData<int>)?.Appearance);
 
             Core.xUnit.Query.SerializationCheck(visualColumnTypologyFilter);
         }
