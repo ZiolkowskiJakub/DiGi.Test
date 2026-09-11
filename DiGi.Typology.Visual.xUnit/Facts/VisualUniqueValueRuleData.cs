@@ -66,7 +66,7 @@ namespace DiGi.Typology.Visual.xUnit
             Core.xUnit.Query.SerializationCheck(visualUniqueValueRuleData);
             Core.xUnit.Query.SerializationCheck(visualUniqueValueRuleData_Bare);
 
-            // TODO [ObjectMemberClone]: add SerializationCheck(visualUniqueValueRuleData_Int) once DiGi.Core's Query.Value reads a
+            // TODO [ObjectMemberClone]: add SerializationCheck(visualUniqueValueRuleData_Int) once ZiolkowskiJakub/DiGi.Core#6 ships and Query.Value reads a
             // CLR-backed JsonValue holding a boxed int under an object member - today Clone() throws on it (the same holds for
             // the base UniqueValueRuleData(2010)), while the text round trip above passes.
         }
