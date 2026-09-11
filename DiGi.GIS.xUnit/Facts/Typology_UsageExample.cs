@@ -53,9 +53,10 @@ namespace DiGi.GIS.xUnit
             //    IntegerRangeFilterRule buckets by range. Ranges are CLOSED at both ends - 1989 and 1990 are
             //    each in exactly one of the first two below - and may be declared in any order.
             //
-            //    Reading the report, note that a bucket renders as "(0,1989>", which looks half-open and is
-            //    not: 0 is in that bucket. That mismatch between the name and the matching is
-            //    ZiolkowskiJakub/DiGi.Typology#16, and the name is what a consumer displays.
+            //    Reading the report, note that a bucket renders as "[0, 1989]" - the closed-interval
+            //    notation matching the rule's closed matching on both ends: 0 is in that bucket, and the
+            //    name says so. The name is what a consumer displays. (It used to render "(0,1989>", which
+            //    looked half-open while 0 still matched - ZiolkowskiJakub/DiGi.Typology#16, now fixed.)
             //
             //    Grouping by County name rather than County Id is deliberate: an id addresses one polygon
             //    part, and 18 counties have several, so id-grouping would split a county across sibling
