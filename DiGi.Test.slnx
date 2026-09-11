@@ -505,6 +505,24 @@
       <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
+    <Project Path="../DiGi.Typology/DiGi.Typology.Visual/DiGi.Typology.Visual.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry.Visual/DiGi.Geometry.Visual/DiGi.Geometry.Visual.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
+    </Project>
+    <Project Path="DiGi.Typology.Visual.xUnit/DiGi.Typology.Visual.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Geometry.Visual/DiGi.Geometry.Visual/DiGi.Geometry.Visual.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.Typology/DiGi.Typology.Visual/DiGi.Typology.Visual.csproj" />
+      <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
   </Folder>
   <Folder Name="/Unit/">
     <Project Path="../DiGi.Unit/DiGi.Unit/DiGi.Unit.csproj">
