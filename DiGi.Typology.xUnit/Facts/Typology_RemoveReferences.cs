@@ -39,7 +39,7 @@ namespace DiGi.Typology.xUnit
             Assert.Contains("first", typology.ReferenceSet(true));
             Assert.Contains("second", typology.ReferenceSet(true));
 
-            Assert.False(Modify.RemoveReferences(null));
+            Assert.False(Modify.RemoveReferences((Typology.Classes.Typology?)null));
 
             static Typology.Classes.Typology Create()
             {

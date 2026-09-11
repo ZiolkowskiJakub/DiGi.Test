@@ -103,6 +103,26 @@ namespace DiGi.Typology.xUnit
             Assert.NotEqual(typology_Light.GetHashCode(), typology_Heavy.GetHashCode());
             Assert.True(typology_Light == new Typology.Classes.Typology(typology_Light));
 
+            // The generic Query/Modify extensions infer the type arguments from the derived typology.
+            Assert.True(typologyTest_1.Contains("ref-3", true));
+            Assert.False(typologyTest_1.Contains("ref-3"));
+            Assert.Equal(["ref-1", "ref-2", "ref-3"], typologyTest_1.ReferenceSet(true).OrderBy(x => x));
+            Assert.Equal("Grandchild", typologyTest_1.SubTypology([0, 0])?.Name);
+            Assert.Same(typologyTest_1, typologyTest_1.SubTypology((IEnumerable<int>)[]));
+            Assert.True(typologyTest_1.TryGetLastIndex(out int index_Last));
+            Assert.Equal(3, index_Last);
+            Assert.True(typologyTest_1.TryGetTypologies("Child 3", out List<TypologyTest>? typologyTests));
+            Assert.Equal(2.5, typologyTests?.Single().TypologyItem?.Weight);
+            Assert.Equal(3, typologyTest_1.TypologyPaths(true).Count);
+
+            TypologyTest typologyTest_Filed = new((TypologyItemTest?)null);
+
+            Assert.Equal(2, typologyTest_Filed.AddSubTypologies([typologyTest_1[0], typologyTest_1[0]]));
+            Assert.Equal([0, 1], typologyTest_Filed.Indexes);
+            Assert.NotSame(typologyTest_1[0], typologyTest_Filed[0]);
+            Assert.True(typologyTest_Filed.RemoveReferences());
+            Assert.Empty(typologyTest_Filed.ReferenceSet(true));
+
             // The whole tree, its references and the derived item's field round-trip.
             Core.xUnit.Query.SerializationCheck(typologyTest_1);
 
