@@ -48,17 +48,32 @@
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Core.IO">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Geometry">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Geometry.Object">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Geometry.Visual">
+      <HintPath>..\..\DiGi.Geometry.Visual\bin\DiGi.Geometry.Visual.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.GIS.WebAPI.UI">
       <HintPath>..\..\DiGi.GIS.WebAPI.UI\bin\DiGi.GIS.WebAPI.UI.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.GLTF">
       <HintPath>..\..\DiGi.GLTF\bin\DiGi.GLTF.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.PostgreSQL.Table">
+      <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.Table.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Typology">
+      <HintPath>..\..\DiGi.Typology\bin\DiGi.Typology.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Typology.Visual">
+      <HintPath>..\..\DiGi.Typology\bin\DiGi.Typology.Visual.dll</HintPath>
     </Reference>
   </ItemGroup>
 
