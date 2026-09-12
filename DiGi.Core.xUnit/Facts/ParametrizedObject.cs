@@ -32,6 +32,35 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
+        /// Pins ZiolkowskiJakub/DiGi.Core#6 for the public API: a <c>Double</c>-typed parameter holding a whole number reloads as an
+        /// <c>int</c> raw value on the text leg (Scope-B canonicalization), yet <c>GetValue&lt;double&gt;</c> still returns the expected
+        /// <c>double</c>.
+        /// </summary>
+        [Fact]
+        public void ParametrizedObject_DoubleWholeNumberRoundTrip()
+        {
+            ExternalParameterDefinition? externalParameterDefinition = Core.Parameter.Create.ExternalParameterDefinition(Guid.NewGuid(), "D", "desc", Core.Parameter.Enums.ParameterType.Double, typeof(ParametrizedObject), nullable: false);
+            Assert.NotNull(externalParameterDefinition);
+
+            ParametrizedObject source = new();
+            Assert.True(source.SetValue(externalParameterDefinition, 20.0));
+
+            string? json = Convert.ToSystem_String(source);
+            Assert.NotNull(json);
+
+            ParametrizedObject? reloaded = Convert.ToDiGi<ParametrizedObject>(json)?.FirstOrDefault();
+            Assert.NotNull(reloaded);
+
+            DiGi.Core.Parameter.Classes.Parameter? parameter = reloaded.ParameterGroupCollection.SelectMany(g => g).FirstOrDefault();
+            Assert.NotNull(parameter);
+
+            // The raw object value canonicalizes to an int for a whole number on the text leg, but the typed API recovers the double.
+            Assert.IsType<int>(parameter.Value);
+            double? value = parameter.GetValue<double>();
+            Assert.Equal(20.0, value);
+        }
+
+        /// <summary>
         /// Tests that ParametrizedObject.TryGetValue successfully retrieves a set parameter value and safely returns false on a non-existent parameter without throwing an exception or causing a stack overflow.
         /// </summary>
         [Fact]

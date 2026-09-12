@@ -33,6 +33,9 @@ namespace DiGi.Typology.xUnit
             Assert.Equal(uniqueValueFilterRule.RuleData(2010), uniqueValueFilterRule_Copy.RuleData(2010));
             Assert.Equal(uniqueValueFilterRule.RuleData(null), uniqueValueFilterRule_Copy.RuleData(null));
 
+            // A bare rule data wrapping a whole number survives the clone leg (an object member holding a boxed int),
+            // the surface of ZiolkowskiJakub/DiGi.Core#6.
+            Core.xUnit.Query.SerializationCheck(new UniqueValueRuleData(2010));
             Core.xUnit.Query.SerializationCheck(uniqueValueFilterRule);
         }
     }

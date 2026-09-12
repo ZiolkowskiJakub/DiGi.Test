@@ -51,24 +51,22 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Null(visualUniqueValueRuleData_Copy.Appearance);
             Assert.Same(typologyAppearance, visualUniqueValueRuleData.Appearance);
 
-            // String round trip. An object-typed int comes back as a double, so it is no longer Equals-equal to the int it
-            // was, while its key is unchanged - which is what the appearance collection relies on.
+            // String round trip. An object-typed whole number now reads back as the int it was (the text leg canonicalizes
+            // a JSON number to the narrowest CLR type that round-trips), so it is Equals-equal to the int - and its key is
+            // unchanged, which is what the appearance collection relies on.
             Classes.VisualUniqueValueRuleData visualUniqueValueRuleData_Int = new(2010, typologyAppearance);
 
             Classes.VisualUniqueValueRuleData? visualUniqueValueRuleData_RoundTrip = Core.Convert.ToDiGi<Classes.VisualUniqueValueRuleData>(Core.Convert.ToSystem_String(visualUniqueValueRuleData_Int))?.FirstOrDefault();
 
             Assert.NotNull(visualUniqueValueRuleData_RoundTrip);
-            Assert.NotEqual(2010, visualUniqueValueRuleData_RoundTrip.Value);
+            Assert.Equal(2010, visualUniqueValueRuleData_RoundTrip.Value);
             Assert.Equal(Query.Key(2010), Query.Key(visualUniqueValueRuleData_RoundTrip.Value));
             Assert.Equal(Query.Key(2010), Query.Key(visualUniqueValueRuleData_RoundTrip));
             Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance), Core.Convert.ToSystem_String(visualUniqueValueRuleData_RoundTrip.Appearance));
 
             Core.xUnit.Query.SerializationCheck(visualUniqueValueRuleData);
             Core.xUnit.Query.SerializationCheck(visualUniqueValueRuleData_Bare);
-
-            // TODO [ObjectMemberClone]: add SerializationCheck(visualUniqueValueRuleData_Int) once ZiolkowskiJakub/DiGi.Core#6 ships and Query.Value reads a
-            // CLR-backed JsonValue holding a boxed int under an object member - today Clone() throws on it (the same holds for
-            // the base UniqueValueRuleData(2010)), while the text round trip above passes.
+            Core.xUnit.Query.SerializationCheck(visualUniqueValueRuleData_Int);
         }
     }
 }
