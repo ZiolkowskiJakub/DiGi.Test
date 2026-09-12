@@ -8,7 +8,7 @@ namespace DiGi.Typology.Visual.xUnit
         /// <summary>
         /// Tests <see cref="Classes.VisualTypology"/> as a tree: appearances on the root, a child and a grandchild take
         /// part in equality, ordering and the hash; the setters create a visual item; the appearance survives
-        /// <see cref="Modify.RemoveReferences{TTypology, TTypologyItem}(Typology{TTypology, TTypologyItem}, bool)"/>,
+        /// <see cref="DiGi.Typology.Modify.RemoveReferences{TTypology, TTypologyItem}(Typology{TTypology, TTypologyItem}, bool)"/>,
         /// <see cref="Core.Query.Clone{TSerializableObject}(TSerializableObject)"/>, the copy constructor and a string
         /// round trip; and the generic Query and Modify extensions bind to the derived typology.
         /// <para>Appearance is metadata, not link data - it is exactly what a reference-free tree must keep.</para>

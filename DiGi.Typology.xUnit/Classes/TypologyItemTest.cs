@@ -33,6 +33,18 @@ namespace DiGi.Typology.xUnit.Classes
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="TypologyItemTest"/> class using a specific typology path and
+        /// the name, description and weight of another item.
+        /// </summary>
+        /// <param name="typologyPath">The path to assign to this item.</param>
+        /// <param name="typologyItemTest">The source item to copy the name, the description and the weight from.</param>
+        public TypologyItemTest(TypologyPath? typologyPath, TypologyItemTest typologyItemTest)
+            : base(typologyPath, typologyItemTest)
+        {
+            weight = typologyItemTest.weight;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TypologyItemTest"/> class by cloning an existing item.
         /// </summary>
         /// <param name="typologyItemTest">The source item to clone.</param>
