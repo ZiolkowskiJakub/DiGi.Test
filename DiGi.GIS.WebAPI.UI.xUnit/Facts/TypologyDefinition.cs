@@ -22,7 +22,11 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
               ""uniqueValueColors"": [ { ""value"": ""Residential"", ""color"": ""#d62728"" }, { ""value"": null, ""color"": ""#7f7f7f"" }, { ""value"": ""Industrial"", ""color"": ""#9467bd"" } ] },
             { ""uniqueId"": ""floor_area"", ""ruleType"": ""VisualDoubleRangeFilterRule"",
               ""ranges"": [ { ""min"": 0.5, ""max"": 12.25, ""color"": ""#8c564b"" }, { ""min"": 12.5, ""max"": 1000000, ""color"": ""#e377c2"" } ],
-              ""uniqueValueColors"": [] } ] }";
+              ""uniqueValueColors"": [] },
+            { ""uniqueId"": ""storeys"", ""ruleType"": ""VisualUniqueValueFilterRule"", ""ranges"": [],
+              ""uniqueValueColors"": [ { ""value"": 1, ""color"": ""#bcbd22"" }, { ""value"": 2, ""color"": ""#17becf"" }, { ""value"": null, ""color"": ""#393b79"" } ] },
+            { ""uniqueId"": ""has_lift"", ""ruleType"": ""VisualUniqueValueFilterRule"", ""ranges"": [],
+              ""uniqueValueColors"": [ { ""value"": true, ""color"": ""#e7ba52"" }, { ""value"": false, ""color"": ""#1f77b4"" } ] } ] }";
 
         /// <summary>
         /// Validates the Export then Import round trip of a Typology definition (#17): the page state becomes a
@@ -84,7 +88,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
 
                 TypologyDefinitionParameter? typologyDefinitionParameter_RoundTrip = visualColumnTypologyFilter_RoundTrip.TypologyDefinitionParameter(columns);
                 Assert.NotNull(typologyDefinitionParameter_RoundTrip?.Levels);
-                Assert.Equal(3, typologyDefinitionParameter_RoundTrip.Levels.Count);
+                Assert.Equal(5, typologyDefinitionParameter_RoundTrip.Levels.Count);
 
                 TypologyDefinitionLevelParameter level_Year = typologyDefinitionParameter_RoundTrip.Levels[0];
                 Assert.Equal("predicted_year_built", level_Year.UniqueId);
@@ -112,6 +116,20 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
                 Assert.Equal([0.5, 12.5], level_FloorArea.Ranges!.ConvertAll(x => x.Min));
                 Assert.Equal([12.25, 1000000.0], level_FloorArea.Ranges.ConvertAll(x => x.Max));
                 Assert.Equal(["#8c564b", "#e377c2"], level_FloorArea.Ranges.ConvertAll(x => x.Color));
+
+                // A numeric column classified by unique value: the page posts JSON numbers, the document files them under
+                // the width-agnostic key ("1", not "1.0"), and they come back as the column's CLR type, not as strings.
+                TypologyDefinitionLevelParameter level_Storeys = typologyDefinitionParameter_RoundTrip.Levels[3];
+                Assert.Equal(nameof(VisualUniqueValueFilterRule), level_Storeys.RuleType);
+                Assert.Equal([1, 2, null], level_Storeys.UniqueValueColors!.ConvertAll(x => x.Value));
+                Assert.Equal(["#bcbd22", "#17becf", "#393b79"], level_Storeys.UniqueValueColors.ConvertAll(x => x.Color));
+                Assert.Contains("\"1\":", json);
+                Assert.DoesNotContain("\"1.0\":", json);
+
+                // A boolean column: JSON true/false file under "True"/"False" and come back as booleans.
+                TypologyDefinitionLevelParameter level_HasLift = typologyDefinitionParameter_RoundTrip.Levels[4];
+                Assert.Equal([true, false], level_HasLift.UniqueValueColors!.ConvertAll(x => x.Value));
+                Assert.Contains("\"True\":", json);
 
                 Core.xUnit.Query.SerializationCheck(visualColumnTypologyFilter);
             }

@@ -18,7 +18,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             [
                 new Column() { Name = "Predicted year built", UniqueId = "predicted_year_built", Index = 2, DataType = DataType.UShort, Category = "Year built" },
                 new Column() { Name = "Occupancy", UniqueId = "occupancy", Index = 5, DataType = DataType.String },
-                new Column() { Name = "Floor area", UniqueId = "floor_area", Index = 7, DataType = DataType.Double }
+                new Column() { Name = "Floor area", UniqueId = "floor_area", Index = 7, DataType = DataType.Double },
+                new Column() { Name = "Storeys", UniqueId = "storeys", Index = 9, DataType = DataType.Int },
+                new Column() { Name = "Has lift", UniqueId = "has_lift", Index = 11, DataType = DataType.Bool }
             ];
         }
     }
