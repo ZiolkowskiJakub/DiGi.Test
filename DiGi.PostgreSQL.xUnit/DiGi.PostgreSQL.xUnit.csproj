@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
     <ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL.PartitionReference\DiGi.PostgreSQL.PartitionReference.csproj" />
     <ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL.UniqueReference\DiGi.PostgreSQL.UniqueReference.csproj" />
     <ProjectReference Include="..\..\DiGi.PostgreSQL\DiGi.PostgreSQL\DiGi.PostgreSQL.csproj" />
