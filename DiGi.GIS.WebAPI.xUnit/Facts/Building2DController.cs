@@ -36,6 +36,8 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestResult>(await controller.GetItemsByReferencesAsync(null, null));
                 Assert.IsType<BadRequestResult>(await controller.GetItemsByCountyIdAsync(0));
                 Assert.IsType<BadRequestResult>(await controller.GetItemsByCircleAsync(0, 0, null, null, null));
+                Assert.IsType<BadRequestResult>(await controller.GetPoint2DsByAdministrativeAreal2DIdAsync(0));
+                Assert.IsType<BadRequestResult>(await controller.GetPoint2DsByAdministrativeAreal2DIdAsync(0, -1));
                 Assert.IsType<BadRequestResult>(await controller.GetPoint2DsByReferencesAsync(null, null));
                 Assert.IsType<BadRequestResult>(await controller.GetReferencesByCountyIdAsync(0));
                 Assert.IsType<BadRequestResult>(await controller.GetReferenceDuplicatesAsync(0));
