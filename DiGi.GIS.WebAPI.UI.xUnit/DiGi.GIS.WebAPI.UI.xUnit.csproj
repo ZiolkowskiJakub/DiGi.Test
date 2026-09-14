@@ -60,6 +60,9 @@
     <Reference Include="DiGi.Geometry.Visual">
       <HintPath>..\..\DiGi.Geometry.Visual\bin\DiGi.Geometry.Visual.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.GIS.PostgreSQL">
+      <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.GIS.PostgreSQL.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.GIS.WebAPI.UI">
       <HintPath>..\..\DiGi.GIS.WebAPI.UI\bin\DiGi.GIS.WebAPI.UI.dll</HintPath>
     </Reference>
