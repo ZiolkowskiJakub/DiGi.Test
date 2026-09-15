@@ -13,12 +13,13 @@ namespace DiGi.Typology.xUnit
         [Fact]
         public void RangeValueRuleData_CopyConstructor()
         {
-            RangeValueRuleData<int> source = new(new Range<int>(0, 100));
+            RangeValueRuleData<int> source = new(new Range<int>(0, 100), maxExclusive: true);
             RangeValueRuleData<int> copy = new(source);
 
             Assert.NotNull(copy.Range);
             Assert.Equal(source.Range, copy.Range);
             Assert.NotSame(source.Range, copy.Range);
+            Assert.True(copy.MaxExclusive);
         }
     }
 }

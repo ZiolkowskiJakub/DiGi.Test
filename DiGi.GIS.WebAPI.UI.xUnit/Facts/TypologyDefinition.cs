@@ -163,7 +163,10 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Contains(Errors(Level("predicted_year_built", nameof(VisualIntegerRangeFilterRule), [Range(0, 10, "#zz0000")])), x => x.Contains("not a color"));
             Assert.Contains(Errors(Level("predicted_year_built", nameof(VisualIntegerRangeFilterRule), [Range(0, 10, null)])), x => x.Contains("not a color"));
             Assert.Contains(Errors(Level("predicted_year_built", nameof(VisualIntegerRangeFilterRule), [Range(0, 10, "#000000"), Range(0, 20, "#000000")])), x => x.Contains("two ranges start at 0"));
-            Assert.Contains(Errors(Level("predicted_year_built", nameof(VisualIntegerRangeFilterRule), [Range(11, 20, "#000000"), Range(0, 11, "#000000")])), x => x.Contains("[0, 11] and [11, 20] overlap"));
+            Assert.Contains(Errors(Level("predicted_year_built", nameof(VisualIntegerRangeFilterRule), [Range(10, 20, "#000000"), Range(0, 11, "#000000")])), x => x.Contains("[0, 11] and [10, 20] overlap"));
+            // Two ranges meeting at one value are not an overlap: the solver hands the value to the upper range.
+            Assert.DoesNotContain(Errors(Level("predicted_year_built", nameof(VisualIntegerRangeFilterRule), [Range(11, 20, "#000000"), Range(0, 11, "#000000")])), x => x.Contains("overlap"));
+            Assert.DoesNotContain(Errors(Level("floor_area", nameof(VisualDoubleRangeFilterRule), [Range(0.5, 12.25, "#000000"), Range(12.25, 20, "#000000")])), x => x.Contains("overlap"));
             Assert.Contains(Errors(Level("floor_area", nameof(VisualDoubleRangeFilterRule), [Range(0.5, 12.25, "#000000"), Range(12.0, 20, "#000000")])), x => x.Contains("[0.5, 12.25] and [12, 20] overlap"));
 
             Assert.Contains(Errors(Level("occupancy", nameof(VisualUniqueValueFilterRule), null, [])), x => x.Contains("at least one value"));

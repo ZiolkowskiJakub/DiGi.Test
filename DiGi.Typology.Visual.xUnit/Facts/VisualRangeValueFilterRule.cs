@@ -67,9 +67,24 @@ namespace DiGi.Typology.Visual.xUnit
             // Both bounds are inclusive; outside every range, or not convertible, there is no bucket.
             Assert.Same(range_Old, visualIntegerRangeFilterRule.RuleData(2003)?.Range);
             Assert.Same(range_Middle, visualIntegerRangeFilterRule.RuleData(2004)?.Range);
+            Assert.False(visualRangeValueRuleData_Old.MaxExclusive);
             Assert.Null(visualIntegerRangeFilterRule.RuleData(-1));
             Assert.Null(visualIntegerRangeFilterRule.RuleData(null));
             Assert.Null(visualIntegerRangeFilterRule.RuleData("year"));
+
+            // Ranges meeting at a boundary hand it to the upper one, with the appearance filed for that range; the lower
+            // one's rule data then reads half-open.
+            VisualIntegerRangeFilterRule visualIntegerRangeFilterRule_Touching = new([new Range<int>(0, 2004), new Range<int>(2004, 2020)]);
+            visualIntegerRangeFilterRule_Touching.TypologyAppearanceCollection[new Range<int>(2004, 2020)] = typologyAppearance_New;
+
+            VisualRangeValueRuleData<int>? visualRangeValueRuleData_Boundary = visualIntegerRangeFilterRule_Touching.RuleData(2004);
+
+            Assert.NotNull(visualRangeValueRuleData_Boundary);
+            Assert.Equal(new Range<int>(2004, 2020), visualRangeValueRuleData_Boundary.Range);
+            Assert.Same(typologyAppearance_New, visualRangeValueRuleData_Boundary.Appearance);
+            Assert.False(visualRangeValueRuleData_Boundary.MaxExclusive);
+            Assert.Equal("[0, 2004)", visualIntegerRangeFilterRule_Touching.RuleData(1995)?.ToString());
+            Assert.True(visualIntegerRangeFilterRule_Touching.MaxExclusive(new Range<int>(0, 2004)));
 
             // Two rule data of one bucket are equal whatever their appearance, which is how a solver groups them.
             Assert.Equal(visualRangeValueRuleData_Old, new VisualRangeValueRuleData<int>(new Range<int>(0, 2003), null));
