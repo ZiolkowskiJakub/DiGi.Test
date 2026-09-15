@@ -14,6 +14,8 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// matched it at every level, never on the root - so the root counts the sum of its children, and a reference a bucket
         /// holds but none of its children does (a row dropped at the next level) stays in its count while absent from the flat
         /// building list.</para>
+        /// <para>#26: each building entry carries the database identifier from the reference-to-id map, and 0 when the map lacks
+        /// the reference or is absent.</para>
         /// </summary>
         [Fact]
         public void Create_TypologyBuildingsViewModel()
@@ -47,7 +49,13 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
                 ["B1"] = 103
             };
 
-            ViewModels.TypologyBuildingsViewModel? viewModel = root.TypologyBuildingsViewModel(countyId_ByReference);
+            Dictionary<string, long> id_ByReference = new()
+            {
+                ["A1"] = 9157,
+                ["B1"] = 42
+            };
+
+            ViewModels.TypologyBuildingsViewModel? viewModel = root.TypologyBuildingsViewModel(countyId_ByReference, id_ByReference);
             Assert.NotNull(viewModel);
 
             ViewModels.TypologyTreeNodeViewModel? rootNode = viewModel.Root;
@@ -85,16 +93,23 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
 
             ViewModels.TypologyBuildingViewModel building_A1 = viewModel.Buildings.First(b => b.Reference == "A1");
             Assert.Equal(101, building_A1.CountyId);
+            Assert.Equal(9157, building_A1.Id);
             Assert.Equal([0, 0], building_A1.Path);
+
+            // A reference absent from the id map falls back to Id 0.
+            ViewModels.TypologyBuildingViewModel building_A2 = viewModel.Buildings.First(b => b.Reference == "A2");
+            Assert.Equal(0, building_A2.Id);
 
             ViewModels.TypologyBuildingViewModel building_B1 = viewModel.Buildings.First(b => b.Reference == "B1");
             Assert.Equal(103, building_B1.CountyId);
+            Assert.Equal(42, building_B1.Id);
             Assert.Equal([1], building_B1.Path);
 
             // A reference absent from the map falls back to CountyId 0.
             ViewModels.TypologyBuildingsViewModel? viewModel_NoMap = root.TypologyBuildingsViewModel();
             Assert.NotNull(viewModel_NoMap);
             Assert.All(viewModel_NoMap!.Buildings, b => Assert.Equal(0, b.CountyId));
+            Assert.All(viewModel_NoMap.Buildings, b => Assert.Equal(0, b.Id));
         }
     }
 }
