@@ -161,5 +161,68 @@ namespace DiGi.Core.xUnit
             long max = elapsedMilliseconds.Max();
             Assert.True(max < 2000, $"Enumeration exceeded the 2000 ms threshold: [{string.Join(", ", elapsedMilliseconds)}] ms");
         }
+
+        /// <summary>
+        /// Benchmarks filling a Table row by row and appends the measured per-run times to the reports directory.
+        /// <para>Every AddRow asks the table for its next row index. Before the fix that was Enumerable.Last over a SortedDictionary - a walk of every row already held - so a table of n rows cost O(n^2) to fill: 100 000 rows took tens of seconds, and the Typology solve of a large county never finished. The rows now sit in a SortedList whose last key is O(1), so the fill is O(n log n) and the bound below holds with a wide margin; measure in isolation and A/B against the pre-change baseline.</para>
+        /// </summary>
+        [Fact]
+        public void Table_AddRow_Performance()
+        {
+            const int rowCount = 100000;
+            const int columnCount = 4;
+
+            // Warm-up run (JIT compilation).
+            Fill(1000);
+
+            List<long> elapsedMilliseconds = [];
+            for (int run = 0; run < 3; run++)
+            {
+                System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                Table table = Fill(rowCount);
+
+                stopwatch.Stop();
+                elapsedMilliseconds.Add(stopwatch.ElapsedMilliseconds);
+
+                Assert.Equal(rowCount, table.RowCount);
+                Assert.Equal(rowCount, table.GetNextRowIndex());
+            }
+
+            string? pathReportsDir = Query.ReportsDirectory(Assembly.GetExecutingAssembly());
+            Assert.False(string.IsNullOrWhiteSpace(pathReportsDir));
+
+            List<string> reportLines =
+            [
+                $"Table_AddRow_Performance: rowCount={rowCount} columnCount={columnCount} runs=[{string.Join(", ", elapsedMilliseconds)}] ms",
+            ];
+            string reportFilePath = System.IO.Path.Combine(pathReportsDir!, "Table_AddRow_Performance.txt");
+            System.IO.File.AppendAllLines(reportFilePath, reportLines);
+
+            long max = elapsedMilliseconds.Max();
+            Assert.True(max < 3000, $"AddRow exceeded the 3000 ms threshold: [{string.Join(", ", elapsedMilliseconds)}] ms");
+
+            static Table Fill(int count)
+            {
+                Table table = new();
+                for (int i = 0; i < columnCount; i++)
+                {
+                    table.AddColumn(new Column($"Col{i}", typeof(int)));
+                }
+
+                for (int i = 0; i < count; i++)
+                {
+                    List<object?> values = [];
+                    for (int j = 0; j < columnCount; j++)
+                    {
+                        values.Add(i * columnCount + j);
+                    }
+
+                    table.AddRow(values);
+                }
+
+                return table;
+            }
+        }
     }
 }
