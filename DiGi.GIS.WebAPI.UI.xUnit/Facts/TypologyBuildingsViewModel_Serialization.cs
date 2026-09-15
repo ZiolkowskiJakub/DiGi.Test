@@ -6,15 +6,15 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     {
         /// <summary>
         /// Round-trips the <c>POST /typology/buildings</c> response DTO through System.Text.Json (#22): the recursive node
-        /// tree survives with each node's name, color and path, a leaf's null children stay null, and the flat building list
+        /// tree survives with each node's name, color, path and count, a leaf's null children stay null, and the flat building list
         /// carries its reference, county part and path.
         /// </summary>
         [Fact]
         public void TypologyBuildingsViewModel_Serialization()
         {
             ViewModels.TypologyBuildingViewModel building = new("A1", 101, [0]);
-            ViewModels.TypologyTreeNodeViewModel leaf = new("Storeys 1-2", "Low", "#0000ff", [0], null);
-            ViewModels.TypologyTreeNodeViewModel root = new(null, null, null, [], [leaf]);
+            ViewModels.TypologyTreeNodeViewModel leaf = new("Storeys 1-2", "Low", "#0000ff", [0], 1, null);
+            ViewModels.TypologyTreeNodeViewModel root = new(null, null, null, [], 2, [leaf]);
             ViewModels.TypologyBuildingsViewModel viewModel = new(root, [building]);
 
             string json = JsonSerializer.Serialize(viewModel);
@@ -23,7 +23,8 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
 
             ViewModels.TypologyTreeNodeViewModel? rootNode = roundTrip.Root;
             Assert.NotNull(rootNode);
-            Assert.NotNull(rootNode!.Children);
+            Assert.Equal(2, rootNode!.Count);
+            Assert.NotNull(rootNode.Children);
             Assert.Single(rootNode.Children!);
 
             ViewModels.TypologyTreeNodeViewModel roundTrip_Leaf = rootNode.Children![0];
@@ -31,6 +32,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal("Low", roundTrip_Leaf.Description);
             Assert.Equal("#0000ff", roundTrip_Leaf.Color);
             Assert.Equal([0], roundTrip_Leaf.Path);
+            Assert.Equal(1, roundTrip_Leaf.Count);
             Assert.Null(roundTrip_Leaf.Children);
 
             Assert.Single(roundTrip.Buildings);
