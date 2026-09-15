@@ -11,9 +11,11 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// node's name, description, color (as a CSS hex string read from its appearance) and path, a leaf's references become
         /// the flat building entries with their node's path, and each building's CountyId comes from the reference-to-part map.
         /// <para>#24: each bucket node carries the count of its reference set - the solver files a reference on the bucket that
-        /// matched it at every level, never on the root - so the root counts the sum of its children, and a reference a bucket
-        /// holds but none of its children does (a row dropped at the next level) stays in its count while absent from the flat
-        /// building list.</para>
+        /// matched it at every level, never on the root - so the root counts the sum of its children. A reference a bucket
+        /// holds but none of its children does (a row dropped at the next level) stays in its count and is filed in the flat
+        /// building list under that bucket - the deepest node holding it - so the map, the grid and the building card agree
+        /// with the tree's count (#21 review); the pie charts the children against the count and shows the rest as its
+        /// remainder slice.</para>
         /// <para>#26: each building entry carries the database identifier from the reference-to-id map, and 0 when the map lacks
         /// the reference or is absent.</para>
         /// </summary>
@@ -83,13 +85,19 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal(1, node_B.Count);
             Assert.Null(node_B.Children);
 
-            // The remainder A counts but no leaf files is not a building entry: the pie shows it as a neutral slice.
-            Assert.Equal(3, viewModel.Buildings.Count);
-            Assert.DoesNotContain(viewModel.Buildings, b => b.Reference == "X");
+            // The remainder A counts but no child files is a building entry of A itself - its deepest node - and appears once.
+            Assert.Equal(4, viewModel.Buildings.Count);
             List<string> references = viewModel.Buildings.Select(b => b.Reference).ToList();
+            Assert.Equal(references.Count, references.Distinct().Count());
             Assert.Contains("A1", references);
             Assert.Contains("A2", references);
             Assert.Contains("B1", references);
+            Assert.Contains("X", references);
+
+            ViewModels.TypologyBuildingViewModel building_X = viewModel.Buildings.First(b => b.Reference == "X");
+            Assert.Equal([0], building_X.Path);
+            Assert.Equal(0, building_X.CountyId);
+            Assert.Equal(0, building_X.Id);
 
             ViewModels.TypologyBuildingViewModel building_A1 = viewModel.Buildings.First(b => b.Reference == "A1");
             Assert.Equal(101, building_A1.CountyId);
