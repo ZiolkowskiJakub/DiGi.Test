@@ -73,6 +73,9 @@
     <Reference Include="DiGi.PostgreSQL">
       <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.PostgreSQL.Table">
+      <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.Table.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Serilog">
       <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
     </Reference>

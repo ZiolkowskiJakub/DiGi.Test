@@ -161,6 +161,187 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
+        /// Verifies the equal-count bucketing (ZiolkowskiJakub/DiGi.PostgreSQL#7): 25 skewed values asked for 5 buckets answer exactly 5 buckets of 5 rows each, numbered 1 to 5, ascending and non-overlapping, with the actual minimum and maximum of each bucket's rows - and the equal-width control on the same seed files 21 of the 25 rows into its first bucket, proving the two rules differ where a skewed column needs them to.
+        /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SkippableFact]
+        public async Task GetHistogramSummaryAsync_EqualCount_SkewedValues_EqualRowsPerBucket()
+        {
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            {
+                return;
+            }
+
+            BaseTablePostgreSQLConverter testConverter = new(connectionData);
+
+            // 1 .. 20 then 100, 200, 300, 400, 500: the body sits in the first fifth of the span, the tail spreads over the rest.
+            double?[] values = new double?[25];
+            for (int i = 0; i < 20; i++)
+            {
+                values[i] = i + 1;
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                values[20 + i] = 100 * (i + 1);
+            }
+
+            await SeedHistogramTableAsync(connectionData, testConverter, values);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                System.Text.Json.Nodes.JsonArray? equalCount = await testConverter.GetHistogramSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "value", bucketCount: 5, histogramBucketing: Enums.HistogramBucketing.EqualCount);
+                Assert.NotNull(equalCount);
+                Assert.Equal(5, equalCount.Count);
+                Assert.Equal(25, SumBucketCounts(equalCount));
+
+                (double rangeStart, double rangeEnd)[] expectedBounds = [(1, 5), (6, 10), (11, 15), (16, 20), (100, 500)];
+                for (int i = 0; i < 5; i++)
+                {
+                    (int bucket, double rangeStart, double rangeEnd, long count) row = BucketRow(equalCount[i]);
+                    Assert.Equal(i + 1, row.bucket);
+                    Assert.Equal(5, row.count);
+                    Assert.Equal(expectedBounds[i].rangeStart, row.rangeStart);
+                    Assert.Equal(expectedBounds[i].rangeEnd, row.rangeEnd);
+                }
+
+                // The control: equal width over [1, 500] puts 1 .. 20 and 100 into the first fifth of the span.
+                System.Text.Json.Nodes.JsonArray? equalWidth = await testConverter.GetHistogramSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "value", bucketCount: 5);
+                Assert.NotNull(equalWidth);
+                Assert.Equal(25, SumBucketCounts(equalWidth));
+                Assert.Equal(21, BucketRow(equalWidth[0]).count);
+            }
+            finally
+            {
+                await UnseedHistogramTableAsync(connectionData, testConverter);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that equal-count bucketing with fewer rows than buckets answers one bucket per row (ntile numbers 1 .. rows), every bucket a single value with its start equal to its end, and that an all-NULL scope still answers null under equal count (the #6 contract holds for both rules).
+        /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SkippableFact]
+        public async Task GetHistogramSummaryAsync_EqualCount_FewerRowsThanBuckets_OneRowPerBucket()
+        {
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            {
+                return;
+            }
+
+            BaseTablePostgreSQLConverter testConverter = new(connectionData);
+
+            await SeedHistogramTableAsync(connectionData, testConverter, [30.0, null, 10.0, 20.0]);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                System.Text.Json.Nodes.JsonArray? histogramArray = await testConverter.GetHistogramSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "value", bucketCount: 10, histogramBucketing: Enums.HistogramBucketing.EqualCount);
+                Assert.NotNull(histogramArray);
+                Assert.Equal(3, histogramArray.Count);
+                Assert.Equal(3, SumBucketCounts(histogramArray));
+
+                double[] expectedValues = [10, 20, 30];
+                for (int i = 0; i < 3; i++)
+                {
+                    (int bucket, double rangeStart, double rangeEnd, long count) row = BucketRow(histogramArray[i]);
+                    Assert.Equal(i + 1, row.bucket);
+                    Assert.Equal(1, row.count);
+                    Assert.Equal(expectedValues[i], row.rangeStart);
+                    Assert.Equal(expectedValues[i], row.rangeEnd);
+                }
+            }
+            finally
+            {
+                await UnseedHistogramTableAsync(connectionData, testConverter);
+            }
+
+            await SeedHistogramTableAsync(connectionData, testConverter, [(double?)null, null]);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                System.Text.Json.Nodes.JsonArray? histogramArray = await testConverter.GetHistogramSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "value", bucketCount: 10, histogramBucketing: Enums.HistogramBucketing.EqualCount);
+                Assert.Null(histogramArray);
+            }
+            finally
+            {
+                await UnseedHistogramTableAsync(connectionData, testConverter);
+            }
+        }
+
+        /// <summary>
+        /// Verifies the partition-scope path under equal-count bucketing: the partition filter is honoured (the sibling partition's rows are not ranked into the buckets), a tie spanning two buckets is answered with the same value as one bucket's end and the next bucket's start, and an all-NULL partition answers null.
+        /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SkippableFact]
+        public async Task GetHistogramSummaryAsync_EqualCount_Partitioned_HonoursPartitionAndTies()
+        {
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            {
+                return;
+            }
+
+            HistogramPartitionTablePostgreSQLConverter testConverter = new(connectionData);
+
+            // Partition 7: four rows, three of them the value 1 - two buckets split the tie. Partition 5 is entirely NULL; partition 9 carries values that must not leak into 7.
+            await SeedHistogramPartitionTableAsync(connectionData, testConverter, [(7, 1.0), (7, 1.0), (7, 1.0), (7, 2.0), (5, (double?)null), (5, null), (9, 500.0), (9, 600.0)]);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                System.Text.Json.Nodes.JsonArray? dataPartition = await testConverter.GetHistogramSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "value", bucketCount: 2, partitionValue: 7, histogramBucketing: Enums.HistogramBucketing.EqualCount);
+                Assert.NotNull(dataPartition);
+                Assert.Equal(2, dataPartition.Count);
+                Assert.Equal(4, SumBucketCounts(dataPartition));
+
+                (int bucket, double rangeStart, double rangeEnd, long count) row_1 = BucketRow(dataPartition[0]);
+                (int bucket, double rangeStart, double rangeEnd, long count) row_2 = BucketRow(dataPartition[1]);
+                Assert.Equal(2, row_1.count);
+                Assert.Equal(1, row_1.rangeStart);
+                Assert.Equal(1, row_1.rangeEnd);
+                Assert.Equal(2, row_2.count);
+                Assert.Equal(1, row_2.rangeStart);
+                Assert.Equal(2, row_2.rangeEnd);
+
+                System.Text.Json.Nodes.JsonArray? allNullPartition = await testConverter.GetHistogramSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "value", bucketCount: 2, partitionValue: 5, histogramBucketing: Enums.HistogramBucketing.EqualCount);
+                Assert.Null(allNullPartition);
+            }
+            finally
+            {
+                await UnseedHistogramPartitionTableAsync(connectionData, testConverter);
+            }
+        }
+
+        /// <summary>
         /// Creates the basetable scratch table (an int primary key plus the <c>value</c> double column under test) and seeds the supplied values, dropping any leftovers first so every fact starts from the same state.
         /// </summary>
         /// <param name="connectionData">The connection data for the development database.</param>
@@ -264,6 +445,22 @@ namespace DiGi.PostgreSQL.Table.xUnit
             }
 
             return total;
+        }
+
+        /// <summary>
+        /// Reads the four fields of one histogram bucket row.
+        /// </summary>
+        /// <param name="jsonNode_Bucket">The bucket row, a <c>{bucket, rangeStart, rangeEnd, count}</c> object.</param>
+        /// <returns>The bucket ordinal, its actual value bounds and its row count.</returns>
+        private static (int bucket, double rangeStart, double rangeEnd, long count) BucketRow(System.Text.Json.Nodes.JsonNode? jsonNode_Bucket)
+        {
+            System.Text.Json.Nodes.JsonObject jsonObject_Bucket = Assert.IsType<System.Text.Json.Nodes.JsonObject>(jsonNode_Bucket);
+
+            return (
+                jsonObject_Bucket["bucket"]!.GetValue<int>(),
+                jsonObject_Bucket["rangeStart"]!.GetValue<double>(),
+                jsonObject_Bucket["rangeEnd"]!.GetValue<double>(),
+                jsonObject_Bucket["count"]!.GetValue<long>());
         }
     }
 }

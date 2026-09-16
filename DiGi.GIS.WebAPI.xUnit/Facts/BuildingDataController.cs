@@ -148,5 +148,24 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.False(new NpgsqlException("boom").IsTransient);
             Assert.False(new PostgresException("cancelling statement", "ERROR", "ERROR", "57014").IsTransient);
         }
+
+        /// <summary>
+        /// Pins the <c>histogramsummary</c> body contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#35: <see cref="HistogramRequestParameter.HistogramBucketing"/> binds from its integer value under the web defaults the input formatter deserializes with (<c>1</c> is equal count), and a body without the property keeps equal width, so clients written against the earlier contract are unaffected.
+        /// </summary>
+        [Fact]
+        public void HistogramRequestParameter_HistogramBucketing_BindsFromInteger()
+        {
+            System.Text.Json.JsonSerializerOptions jsonSerializerOptions = new(System.Text.Json.JsonSerializerDefaults.Web);
+
+            HistogramRequestParameter? equalCount = System.Text.Json.JsonSerializer.Deserialize<HistogramRequestParameter>("{\"ColumnUniqueId\":\"floor_area\",\"CountyId\":53477,\"BucketCount\":1000,\"HistogramBucketing\":1}", jsonSerializerOptions);
+            Assert.NotNull(equalCount);
+            Assert.Equal(DiGi.PostgreSQL.Table.Enums.HistogramBucketing.EqualCount, equalCount.HistogramBucketing);
+            Assert.Equal(1000, equalCount.BucketCount);
+            Assert.Equal(53477, equalCount.CountyId);
+
+            HistogramRequestParameter? omitted = System.Text.Json.JsonSerializer.Deserialize<HistogramRequestParameter>("{\"ColumnUniqueId\":\"floor_area\",\"CountyId\":53477,\"BucketCount\":1000}", jsonSerializerOptions);
+            Assert.NotNull(omitted);
+            Assert.Equal(DiGi.PostgreSQL.Table.Enums.HistogramBucketing.EqualWidth, omitted.HistogramBucketing);
+        }
     }
 }
