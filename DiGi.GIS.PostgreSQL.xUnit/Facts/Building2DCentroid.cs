@@ -158,5 +158,34 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Assert.Contains((building2DCentroid.Reference, building2DCentroid.CountyId!.Value), referenceSet);
             }
         }
+
+        /// <summary>
+        /// Verifies the containment rule of the geometry path, <see cref="Building2DPostgreSQLConverter.IsInside(PolygonalFace2D, BoundingBox2D, Point2D, double)"/>: a centre inside a district polygon with a hole is kept, one outside, one in the hole, one on the boundary within the tolerance and one just past the bounding box are all dropped, and a null polygon or centre is never inside.
+        /// <para>Warsaw files every building under one of its 199 nested subdivisions by lowest identifier, so Bemowo (55626) holds none by <c>subdivision_id</c> while its polygon holds thousands - this rule is what answers the district instead. The boundary case matters because a building on the line between two districts must get the same answer from both.</para>
+        /// </summary>
+        [Fact]
+        public void IsInside_DistrictPolygon()
+        {
+            Polygon2D polygon2D_External = new([new Point2D(0, 0), new Point2D(100, 0), new Point2D(100, 100), new Point2D(0, 100)]);
+            Polygon2D polygon2D_Internal = new([new Point2D(40, 40), new Point2D(60, 40), new Point2D(60, 60), new Point2D(40, 60)]);
+
+            PolygonalFace2D? polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(polygon2D_External, [polygon2D_Internal]);
+            Assert.NotNull(polygonalFace2D);
+
+            BoundingBox2D? boundingBox2D = polygonalFace2D.GetBoundingBox();
+            Assert.NotNull(boundingBox2D);
+
+            double tolerance = Core.Constants.Tolerance.MacroDistance;
+
+            Assert.True(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, new Point2D(10, 10), tolerance));
+            Assert.True(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, null, new Point2D(10, 10), tolerance));
+            Assert.False(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, new Point2D(150, 50), tolerance));
+            Assert.False(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, new Point2D(50, 50), tolerance));
+            Assert.False(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, new Point2D(100 + tolerance / 2, 50), tolerance));
+            Assert.False(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, new Point2D(100 + tolerance * 2, 50), tolerance));
+            Assert.True(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, new Point2D(100 - tolerance * 2, 50), tolerance));
+            Assert.False(Building2DPostgreSQLConverter.IsInside(null, boundingBox2D, new Point2D(10, 10), tolerance));
+            Assert.False(Building2DPostgreSQLConverter.IsInside(polygonalFace2D, boundingBox2D, null, tolerance));
+        }
     }
 }
