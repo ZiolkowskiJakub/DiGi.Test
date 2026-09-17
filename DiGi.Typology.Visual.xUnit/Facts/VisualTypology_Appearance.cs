@@ -10,7 +10,7 @@ namespace DiGi.Typology.Visual.xUnit
     {
         /// <summary>
         /// Tests that a solved VisualTypology carries the appearance of the bucket each node came from, filed on the rule of its level.
-        /// <para>Asserted, not measured: every node of a two level chain holds the appearance its rule data hands over - a mapped unique value and a mapped range carry theirs, an unmapped bucket and a value below a level carrying a base rule carry none, the dropped null-year row is absent from the tree, references reach every node from the matched one up to the root, stripping the references keeps every appearance, and the solved tree round trips through serialization.</para>
+        /// <para>Asserted, not measured: every node of a two level chain holds the appearance its rule data hands over - a declared unique value and a mapped range carry theirs, a declared-but-unmapped range and a value below a level carrying a base rule carry none, the undeclared-unique-value rows and the null-year row are absent from the tree, references reach every node from the matched one up to the root, stripping the references keeps every appearance, and the solved tree round trips through serialization.</para>
         /// </summary>
         [Fact]
         public void VisualTypology_Appearance()
@@ -52,17 +52,18 @@ namespace DiGi.Typology.Visual.xUnit
 
             VisualTypology visualTypology_Residential = SubTypologyByName(visualTypology, "occupancy Residential");
             VisualTypology visualTypology_Industrial = SubTypologyByName(visualTypology, "occupancy Industrial");
-            VisualTypology visualTypology_Agricultural = SubTypologyByName(visualTypology, "occupancy Agricultural");
 
-            // Level 1: a mapped unique value carries its appearance, an unmapped one carries none, and each node holds its subtree's references.
+            // Level 1: a declared unique value carries its appearance and each node holds its subtree's references, and the
+            // level holds exactly the two values the rule declares - the Agricultural rows (b6, b7) resolved to no bucket and
+            // are absent from the tree, as rows outside every declared range are.
+            Assert.Equal(2, SubTypologies(visualTypology).Count);
+            Assert.DoesNotContain(SubTypologies(visualTypology), subTypology => string.Equals(subTypology.Name, "occupancy Agricultural", StringComparison.Ordinal));
+
             AssertAppearance(typologyAppearance_Residential, visualTypology_Residential);
             Assert.Equal(["b1", "b2", "b3"], [.. visualTypology_Residential.References.OrderBy(x => x)]);
 
             AssertAppearance(typologyAppearance_Industrial, visualTypology_Industrial);
             Assert.Equal(["b4", "b5"], [.. visualTypology_Industrial.References.OrderBy(x => x)]);
-
-            Assert.Null(visualTypology_Agricultural.TypologyItem?.Appearance);
-            Assert.Equal(["b6", "b7"], [.. visualTypology_Agricultural.References.OrderBy(x => x)]);
 
             // Level 2: a mapped range carries its appearance, an unmapped one carries none, and the null-year row is absent entirely.
             AssertAppearance(typologyAppearance_Old, SubTypologyByName(visualTypology_Residential, $"year_built [{range_Old.Min}, {range_Old.Max}]"));
@@ -72,12 +73,9 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Equal(3, SubTypologies(visualTypology_Residential).Count);
             Assert.Equal(2, SubTypologies(visualTypology_Industrial).Count);
 
-            // The row with no year built resolves to no range bucket, so the Agricultural branch holds its single remaining row only.
-            Assert.Single(SubTypologies(visualTypology_Agricultural));
-            AssertAppearance(typologyAppearance_Old, SubTypologyByName(visualTypology_Agricultural, $"year_built [{range_Old.Min}, {range_Old.Max}]"));
-
-            // Every reference reaches the root, because an ancestor holds its whole subtree's.
-            Assert.Equal(7, visualTypology.ReferenceSet(true).Count);
+            // Every reference reaches the root, because an ancestor holds its whole subtree's - the Agricultural rows are not
+            // among them, because no bucket resolved for them.
+            Assert.Equal(5, visualTypology.ReferenceSet(true).Count);
 
             // A level carrying a base rule is legal: it buckets as its base does and resolves no appearance.
             VisualColumnTypologyFilter<Column> visualColumnTypologyFilter_BaseRule = new()

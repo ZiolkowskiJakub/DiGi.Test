@@ -37,7 +37,13 @@ namespace DiGi.Typology.Visual.xUnit
             AssertNode(typology_Metadata, visualTypology_Metadata);
 
             Assert.Contains(SubTypologies(visualTypology_Metadata), subTypology => string.Equals(subTypology.Name, "occupancy Residential", StringComparison.Ordinal) && subTypology.TypologyItem?.Appearance is not null);
-            Assert.Contains(SubTypologies(visualTypology_Metadata), subTypology => string.Equals(subTypology.Name, "occupancy Agricultural", StringComparison.Ordinal) && subTypology.TypologyItem?.Appearance is null);
+            Assert.Contains(SubTypologies(visualTypology_Metadata), subTypology => string.Equals(subTypology.Name, "occupancy Agricultural", StringComparison.Ordinal) && subTypology.TypologyItem?.Appearance is not null);
+
+            // A declared range with no filed appearance still solves as a bucket - the range rule declares its buckets
+            // through its ranges, the unique value rule through its appearances.
+            VisualTypology visualTypology_Residential = SubTypologies(visualTypology_Metadata).First(subTypology => string.Equals(subTypology.Name, "occupancy Residential", StringComparison.Ordinal));
+
+            Assert.Contains(SubTypologies(visualTypology_Residential), subTypology => string.Equals(subTypology.Name, "year_built [2004, 2020]", StringComparison.Ordinal) && subTypology.TypologyItem?.Appearance is null);
 
             void AssertNode(Typology.Classes.Typology typology_Level, VisualTypology visualTypology_Level)
             {

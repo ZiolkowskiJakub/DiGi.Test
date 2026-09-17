@@ -51,17 +51,20 @@ namespace DiGi.Typology.Visual.xUnit
             //    then year band within that.
             //
             //    The chain, the rules and the solved tree are the Visual family. A Visual rule buckets
-            //    exactly like its base counterpart - VisualUniqueValueFilterRule buckets by exact value
-            //    with null as its own "null" bucket, VisualIntegerRangeFilterRule buckets by range, CLOSED
-            //    at both ends, declared in any order - and adds one thing: a TypologyAppearanceCollection,
-            //    one appearance per bucket. Filing an entry is the painting:
+            //    exactly like its base counterpart - VisualUniqueValueFilterRule buckets by exact value,
+            //    VisualIntegerRangeFilterRule buckets by range, CLOSED at both ends, declared in any
+            //    order - and adds one thing: a TypologyAppearanceCollection, one appearance per bucket.
+            //    Filing an entry is the painting, and for a unique value rule the declaration too: a
+            //    value resolves a bucket only when an appearance is filed for it, exactly as a value
+            //    outside every declared range resolves nothing.
             //
             //        rule.TypologyAppearanceCollection["Residential"] = appearance;
             //        rule.TypologyAppearanceCollection[range] = appearance;
             //
-            //    A bucket with no entry solves with a null appearance - no member of the level carries a
-            //    fallback colour. Below, "Agricultural" and the middle year band are left unpainted on
-            //    purpose so the walk in step 5 shows both outcomes.
+            //    A range bucket with no entry still solves, with a null appearance - no member of the
+            //    level carries a fallback colour. Below, the middle year band is left unpainted on
+            //    purpose so the walk in step 5 shows that outcome; every occupancy value is painted,
+            //    because an unpainted occupancy value would simply not be classified.
             //
             //    The keys are the bucket's value or range rendered through DiGi.Typology.Visual.Query.Key,
             //    invariantly, so a definition that survived a JSON round trip still paints the same
@@ -79,6 +82,7 @@ namespace DiGi.Typology.Visual.xUnit
 
             TypologyAppearance typologyAppearance_Residential = Create.TypologyAppearance(System.Drawing.Color.Red);
             TypologyAppearance typologyAppearance_Industrial = Create.TypologyAppearance(System.Drawing.Color.Purple);
+            TypologyAppearance typologyAppearance_Agricultural = Create.TypologyAppearance(System.Drawing.Color.Yellow);
             TypologyAppearance typologyAppearance_Old = Create.TypologyAppearance(System.Drawing.Color.Brown);
             TypologyAppearance typologyAppearance_New = Create.TypologyAppearance(System.Drawing.Color.Green);
 
@@ -90,6 +94,7 @@ namespace DiGi.Typology.Visual.xUnit
 
             visualUniqueValueFilterRule.TypologyAppearanceCollection["Residential"] = typologyAppearance_Residential;
             visualUniqueValueFilterRule.TypologyAppearanceCollection["Industrial"] = typologyAppearance_Industrial;
+            visualUniqueValueFilterRule.TypologyAppearanceCollection["Agricultural"] = typologyAppearance_Agricultural;
 
             VisualIntegerRangeFilterRule visualIntegerRangeFilterRule = new([range_New, range_Middle, range_Old]);
 
@@ -156,9 +161,10 @@ namespace DiGi.Typology.Visual.xUnit
             //    - there is no catch-all bucket. So BLD-005 is listed on its occupancy node and on no
             //    year node at all. A row is not lost, it simply stops being classified further down.
             //
-            //    Note also which nodes carry an appearance: "Agricultural" and the middle band carry
-            //    none, because nothing was filed for their buckets - that is the unpainted-bucket
-            //    outcome from step 2.
+            //    Note also which nodes carry an appearance: the middle band carries none, because
+            //    nothing was filed for its bucket - that is the unpainted-bucket outcome from step 2.
+            //    Every occupancy node carries one, because a unique value level holds exactly the
+            //    values it declares; a value with no filed appearance would not be classified at all.
             // ---------------------------------------------------------------------------------------------
 
             List<TypologyPath> typologyPaths = Typology.Query.TypologyPaths(visualTypology, true);
@@ -187,7 +193,7 @@ namespace DiGi.Typology.Visual.xUnit
 
             Assert.NotNull(visualTypology_Agricultural);
             Assert.Contains("BLD-005", visualTypology_Agricultural.References);
-            Assert.Null(visualTypology_Agricultural.TypologyItem?.Appearance);
+            Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Agricultural), Core.Convert.ToSystem_String(visualTypology_Agricultural.TypologyItem?.Appearance));
 
             Assert.NotNull(visualTypology_Agricultural.SubTypologies);
             Assert.Empty(visualTypology_Agricultural.SubTypologies!);

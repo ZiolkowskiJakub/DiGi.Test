@@ -13,8 +13,9 @@ namespace DiGi.Typology.Visual.xUnit
         /// <see cref="VisualUniqueValueFilterRule"/> mapping two values, nesting a level whose
         /// <see cref="VisualIntegerRangeFilterRule"/> holds three ranges and maps two of them.
         /// <para>Asserted, not measured: after the round trip the ranges are still held in ascending order, the mapped
-        /// ranges and values still resolve their appearance and the unmapped ones resolve none, each rule still buckets a
-        /// value onto the very range instance the definition holds and hands the bucket's appearance to its rule data,
+        /// ranges and values still resolve their appearance, an unmapped value resolves to nothing and an unmapped range
+        /// still resolves a bucket carrying no appearance, each rule still buckets a value onto the very range instance the
+        /// definition holds and hands the bucket's appearance to its rule data,
         /// the reflection path of <see cref="Typology.Query.RuleData(ITypologyFilterRule, object)"/> reaches the Visual
         /// rule data, and the nested level is still Visual by its <c>_type</c>.</para>
         /// </summary>
@@ -70,7 +71,8 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Equal("Industrial", visualUniqueValueRuleData.Value);
             Assert.Same(visualUniqueValueFilterRule_RoundTrip.TypologyAppearanceCollection["Industrial"], visualUniqueValueRuleData.Appearance);
             Assert.Equal(Core.Convert.ToSystem_String(typologyAppearance_Industrial), Core.Convert.ToSystem_String(visualUniqueValueRuleData.Appearance));
-            Assert.Null(visualUniqueValueFilterRule_RoundTrip.RuleData("Agricultural")?.Appearance);
+            // The unmapped value resolves to no rule data at all - the range below, mapped or not, still resolves its bucket.
+            Assert.Null(visualUniqueValueFilterRule_RoundTrip.RuleData("Agricultural"));
             Assert.Null(visualUniqueValueFilterRule_RoundTrip.TypologyAppearanceCollection["Agricultural"]);
 
             // Level 2: the nested level is Visual by its _type, and the ranges are still ascending.

@@ -9,7 +9,7 @@ namespace DiGi.Typology.Visual.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests a three level Visual chain end to end: county bucketed by unique value, occupancy bucketed by unique value with an appearance filed for a mapped value and for the NULL bucket, then year built bucketed into ranges.
+        /// Tests a three level Visual chain end to end: county bucketed by unique value, occupancy bucketed by unique value with an appearance filed for every value it carries and for the NULL bucket, then year built bucketed into ranges.
         /// <para>Asserted, not measured: the NULL bucket of a unique value rule solves as a node named "occupancy null" carrying the appearance filed for it, a leaf three levels deep carries the full three segment path, the solved structure equals what DiGi.GIS Create.Typology solves over an equivalent plain chain - names, descriptions, references and filing indexes at every level - and the caller's chain is left exactly as it was: the same rule instances, the same links and the original column instances with no table index.</para>
         /// </summary>
         [Fact]
@@ -21,6 +21,12 @@ namespace DiGi.Typology.Visual.xUnit
 
             Range<int> range_New = new(2021, int.MaxValue);
             Range<int> range_Old = new(0, 2020);
+
+            // Every value the table carries is declared: a unique value level holds exactly the values it declares, so the
+            // visual tree below can be compared node for node with the plain solver's tree over an equivalent chain.
+            TypologyAppearance typologyAppearance_Alpha = Create.TypologyAppearance(System.Drawing.Color.Blue);
+            TypologyAppearance typologyAppearance_Beta = Create.TypologyAppearance(System.Drawing.Color.Orange);
+            TypologyAppearance typologyAppearance_Industrial = Create.TypologyAppearance(System.Drawing.Color.Purple);
 
             Table table = new();
 
@@ -36,10 +42,14 @@ namespace DiGi.Typology.Visual.xUnit
 
             VisualUniqueValueFilterRule visualUniqueValueFilterRule_County = new();
 
+            visualUniqueValueFilterRule_County.TypologyAppearanceCollection["Alpha"] = typologyAppearance_Alpha;
+            visualUniqueValueFilterRule_County.TypologyAppearanceCollection["Beta"] = typologyAppearance_Beta;
+
             VisualUniqueValueFilterRule visualUniqueValueFilterRule_Occupancy = new();
 
             visualUniqueValueFilterRule_Occupancy.TypologyAppearanceCollection[null] = typologyAppearance_Null;
             visualUniqueValueFilterRule_Occupancy.TypologyAppearanceCollection["Residential"] = typologyAppearance_Residential;
+            visualUniqueValueFilterRule_Occupancy.TypologyAppearanceCollection["Industrial"] = typologyAppearance_Industrial;
 
             VisualIntegerRangeFilterRule visualIntegerRangeFilterRule_Year = new([range_New, range_Old]);
             visualIntegerRangeFilterRule_Year.TypologyAppearanceCollection[range_Old] = typologyAppearance_Old;

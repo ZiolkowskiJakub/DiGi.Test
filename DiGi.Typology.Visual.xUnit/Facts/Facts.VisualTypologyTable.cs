@@ -41,7 +41,7 @@ namespace DiGi.Typology.Visual.xUnit
         }
 
         /// <summary>
-        /// Builds the two level Visual filter chain the Visual typology facts group by - occupancy bucketed by unique value, then year built bucketed into three ranges - with an appearance filed for two of the three buckets of each level.
+        /// Builds the two level Visual filter chain the Visual typology facts group by - occupancy bucketed by unique value, then year built bucketed into three ranges - with an appearance filed for every occupancy value the table carries (a unique value level holds exactly the values it declares) and for two of the three ranges.
         /// <para>The chain names columns that carry no table index (an index belongs to the table a column was added to), so resolving them against the table is the work the factory does. The ranges are declared in descending order to exercise the rule's own ordering rather than one the declaration happens to agree with.</para>
         /// </summary>
         /// <returns>The root of the Visual chain.</returns>
@@ -55,6 +55,7 @@ namespace DiGi.Typology.Visual.xUnit
 
             visualUniqueValueFilterRule.TypologyAppearanceCollection["Residential"] = Create.TypologyAppearance(System.Drawing.Color.Red);
             visualUniqueValueFilterRule.TypologyAppearanceCollection["Industrial"] = Create.TypologyAppearance(System.Drawing.Color.Purple);
+            visualUniqueValueFilterRule.TypologyAppearanceCollection["Agricultural"] = Create.TypologyAppearance(System.Drawing.Color.Yellow);
 
             VisualIntegerRangeFilterRule visualIntegerRangeFilterRule = new([range_New, range_Middle, range_Old]);
 

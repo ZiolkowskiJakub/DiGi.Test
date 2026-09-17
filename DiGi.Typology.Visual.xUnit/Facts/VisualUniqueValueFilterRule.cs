@@ -8,8 +8,9 @@ namespace DiGi.Typology.Visual.xUnit
     {
         /// <summary>
         /// Tests <see cref="Classes.VisualUniqueValueFilterRule"/>: the appearance collection is filed by value, the rule
-        /// buckets every value and hands the bucket's appearance to the <see cref="VisualUniqueValueRuleData"/> it
-        /// produces (by reference, null where none is filed), the reflection path of
+        /// resolves a bucket only for the values an appearance is filed for and hands the bucket's appearance to the
+        /// <see cref="VisualUniqueValueRuleData"/> it produces (by reference), resolving nothing for the rest as a range rule
+        /// does for a value outside every declared range, the reflection path of
         /// <see cref="Typology.Query.RuleData(ITypologyFilterRule, object)"/> reaches it, the copy constructor clones the
         /// collection and its entries, and the rule survives a string round trip and SerializationCheck.
         /// </summary>
@@ -37,19 +38,14 @@ namespace DiGi.Typology.Visual.xUnit
             Assert.Same(typologyAppearance_2010, visualUniqueValueRuleData.Appearance);
             Assert.Same(typologyAppearance_2010, visualUniqueValueFilterRule.TypologyAppearanceCollection[visualUniqueValueRuleData]);
 
-            // An unmapped value still gets a bucket, with no appearance; so does null.
-            VisualUniqueValueRuleData? visualUniqueValueRuleData_Unmapped = visualUniqueValueFilterRule.RuleData("Industrial");
-
-            Assert.NotNull(visualUniqueValueRuleData_Unmapped);
-            Assert.Equal("Industrial", visualUniqueValueRuleData_Unmapped.Value);
-            Assert.Null(visualUniqueValueRuleData_Unmapped.Appearance);
-            Assert.Null(visualUniqueValueFilterRule.RuleData(null)?.Value);
-            Assert.Null(visualUniqueValueFilterRule.RuleData(null)?.Appearance);
+            // A value with no filed appearance resolves to no bucket - the same resolve-nothing semantics a range rule
+            // applies to a value outside every declared range - and so does null, for which no appearance is filed either.
+            Assert.Null(visualUniqueValueFilterRule.RuleData("Industrial"));
+            Assert.Null(visualUniqueValueFilterRule.RuleData(null));
 
             // Two rule data of one bucket are equal whatever their appearance, which is how a solver groups them.
             Assert.Equal(visualUniqueValueRuleData, new VisualUniqueValueRuleData(2010));
             Assert.Equal(visualUniqueValueRuleData.GetHashCode(), new VisualUniqueValueRuleData(2010).GetHashCode());
-            Assert.NotEqual(visualUniqueValueRuleData, visualUniqueValueRuleData_Unmapped);
 
             // The reflection path the solver takes reaches the Visual rule data.
             ITypologyFilterRuleData? typologyFilterRuleData = Typology.Query.RuleData(visualUniqueValueFilterRule, "Residential");
