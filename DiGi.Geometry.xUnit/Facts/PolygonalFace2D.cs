@@ -254,5 +254,32 @@ namespace DiGi.Geometry.xUnit
 
             Assert.True(stopwatch.ElapsedMilliseconds < 1500, $"PolygonalFace2Ds creator performance check failed! Took {stopwatch.ElapsedMilliseconds} ms.");
         }
+
+        /// <summary>
+        /// Verifies that <see cref="PolygonalFace2D.InRange(Point2D, double)"/> reports a point on the external ring as in range when the face has a hole - the hole loop used to overwrite the external-ring answer, so such a point was out of range only on faces with holes (ZiolkowskiJakub/DiGi.Geometry#5).
+        /// </summary>
+        [Fact]
+        public void PolygonalFace2D_InRange_OnOutlineWithHole()
+        {
+            double tolerance = 0.01;
+
+            Polygon2D externalEdge = new Polygon2D([new Point2D(0, 0), new Point2D(10, 0), new Point2D(10, 10), new Point2D(0, 10)]);
+            Polygon2D internalEdge = new Polygon2D([new Point2D(4, 4), new Point2D(6, 4), new Point2D(6, 6), new Point2D(4, 6)]);
+
+            PolygonalFace2D? polygonalFace2D_Hole = Create.PolygonalFace2D(externalEdge, [internalEdge]);
+            PolygonalFace2D? polygonalFace2D_Solid = Create.PolygonalFace2D(externalEdge);
+            Assert.NotNull(polygonalFace2D_Hole);
+            Assert.NotNull(polygonalFace2D_Solid);
+
+            Point2D point2D_OnOutline = new Point2D(5, 0.005);
+            Point2D point2D_OnRim = new Point2D(4.005, 5);
+            Point2D point2D_InHole = new Point2D(5, 5);
+
+            Assert.True(polygonalFace2D_Solid.InRange(point2D_OnOutline, tolerance));
+            Assert.True(polygonalFace2D_Hole.InRange(point2D_OnOutline, tolerance));
+            Assert.True(polygonalFace2D_Hole.InRange(point2D_OnRim, tolerance));
+            Assert.False(polygonalFace2D_Hole.InRange(point2D_InHole, tolerance));
+            Assert.False(polygonalFace2D_Hole.Inside(point2D_OnOutline, tolerance));
+        }
     }
 }
