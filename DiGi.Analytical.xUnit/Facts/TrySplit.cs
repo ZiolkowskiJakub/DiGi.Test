@@ -2,6 +2,7 @@ using DiGi.Analytical.Classes;
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
 using DiGi.Geometry.Planar.Classes;
+using DiGi.Geometry.Spatial;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 
@@ -35,6 +36,105 @@ namespace DiGi.Analytical.xUnit
             }
 
             return new Shell(uniqueReference, faces);
+        }
+
+        /// <summary>
+        /// Creates a courtyard <see cref="Shell"/> - a 20 x 20 ring with a centred 10 x 10 courtyard extruded by 10 - where the shell and each of its ten faces carry a distinct <see cref="GuidReference"/>.
+        /// </summary>
+        /// <param name="uniqueReference">The <see cref="IUniqueReference"/> to be assigned to the created <see cref="Shell"/>.</param>
+        /// <returns>A <see cref="Shell"/> built from the annulus base, the annulus top, four outer walls and four courtyard walls, or null if the prism could not be created.</returns>
+        private static Shell? CourtyardShell(IUniqueReference? uniqueReference)
+        {
+            Polygon2D polygon2D_External = new([new Point2D(0, 0), new Point2D(20, 0), new Point2D(20, 20), new Point2D(0, 20)]);
+            Polygon2D polygon2D_Internal = new([new Point2D(5, 5), new Point2D(15, 5), new Point2D(15, 15), new Point2D(5, 15)]);
+
+            PolygonalFace2D? polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(polygon2D_External, [polygon2D_Internal]);
+            if (polygonalFace2D is null)
+            {
+                return null;
+            }
+
+            PolygonalFace3D polygonalFace3D = new(new Plane(new Point3D(0, 0, 0), Geometry.Spatial.Constants.Vector3D.WorldZ), polygonalFace2D);
+
+            Polyhedron? polyhedron = Geometry.Spatial.Create.Polyhedron(polygonalFace3D, new Vector3D(0, 0, 10));
+            if (polyhedron?.PolygonalFaces is not List<IPolygonalFace3D> polygonalFace3Ds)
+            {
+                return null;
+            }
+
+            List<Face> faces = [];
+            for (int i = 0; i < polygonalFace3Ds.Count; i++)
+            {
+                if (polygonalFace3Ds[i] is not PolygonalFace3D polygonalFace3D_Temp)
+                {
+                    continue;
+                }
+
+                faces.Add(new Face(new GuidReference(new TypeReference(typeof(Face)), Guid.NewGuid()), polygonalFace3D_Temp));
+            }
+
+            return new Shell(uniqueReference, faces);
+        }
+
+        /// <summary>
+        /// Tests splitting a courtyard <see cref="Shell"/> by a horizontal <see cref="Plane"/>: both parts stay closed, each carries exactly one face on the cutting plane, that face keeps the courtyard as its internal edge and carries no reference, and no face of either part covers the courtyard.
+        /// <para>Guard for DiGi.GIS.WebAPI.UI#45 - the cap used to be assembled from every section loop separately, which filled the courtyard with a solid floor on every storey plane.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_Plane_Shell_Courtyard()
+        {
+            double tolerance = Core.Constants.Tolerance.Distance;
+
+            GuidReference guidReference_Shell = new(new TypeReference(typeof(Shell)), Guid.NewGuid());
+
+            Shell? shell = CourtyardShell(guidReference_Shell);
+            Assert.NotNull(shell);
+            Assert.Equal(10, shell.Count);
+            Assert.True(shell.IsClosed(tolerance));
+
+            Plane plane = new(new Point3D(0, 0, 5), Geometry.Spatial.Constants.Vector3D.WorldZ);
+
+            Assert.True(Query.TrySplit(plane, shell, out List<Shell>? shells_Result));
+            Assert.NotNull(shells_Result);
+            Assert.Equal(2, shells_Result.Count);
+
+            Point3D point3D_Courtyard = new(10, 10, 5);
+
+            for (int i = 0; i < shells_Result.Count; i++)
+            {
+                Shell shell_Result = shells_Result[i];
+
+                Assert.True(guidReference_Shell.Equals(shell_Result.UniqueReference));
+                Assert.True(shell_Result.IsClosed(tolerance));
+                Assert.Equal(10, shell_Result.Count);
+
+                List<Face>? faces_Result = shell_Result.PolygonalFaces;
+                Assert.NotNull(faces_Result);
+
+                int count_Plane = 0;
+
+                for (int j = 0; j < faces_Result.Count; j++)
+                {
+                    Face face = faces_Result[j];
+
+                    BoundingBox3D? boundingBox3D = face.GetBoundingBox();
+                    Assert.NotNull(boundingBox3D);
+
+                    Assert.False(face.InRange(point3D_Courtyard, tolerance));
+
+                    if (boundingBox3D.MinZ > 5 - tolerance && boundingBox3D.MaxZ < 5 + tolerance)
+                    {
+                        count_Plane++;
+
+                        Assert.Null(face.UniqueReference);
+                        Assert.NotNull(face.InternalEdges);
+                        Assert.Single(face.InternalEdges);
+                        Assert.Equal(300, face.GetArea(), 6);
+                    }
+                }
+
+                Assert.Equal(1, count_Plane);
+            }
         }
 
         /// <summary>

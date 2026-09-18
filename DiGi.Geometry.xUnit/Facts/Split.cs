@@ -642,6 +642,128 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Tests <see cref="Create.PolygonalFace3Ds(Plane?, IPolyhedron?, double)"/> on a courtyard prism - an annulus (20 x 20 outer ring, 10 x 10 inner ring) extruded by 10.
+        /// <para>The section on the mid plane has to be a single face carrying the courtyard as its internal edge, area 300. Converting each section loop separately used to return a solid outer face plus a solid courtyard face, which is how the storey split of DiGi.GIS.WebAPI.UI#45 filled the courtyard of the stored building model.</para>
+        /// </summary>
+        [Fact]
+        public void PolygonalFace3Ds_Plane_Polyhedron_Courtyard()
+        {
+            double tolerance = DiGi.Core.Constants.Tolerance.Distance;
+
+            Polyhedron? polyhedron = CourtyardPrism();
+            Assert.NotNull(polyhedron);
+            Assert.Equal(10, polyhedron.Count);
+            Assert.True(polyhedron.IsClosed(tolerance));
+
+            Plane plane = new(new Point3D(0, 0, 5), Spatial.Constants.Vector3D.WorldZ);
+
+            List<PolygonalFace3D>? polygonalFace3Ds = Create.PolygonalFace3Ds(plane, polyhedron, tolerance);
+            Assert.NotNull(polygonalFace3Ds);
+            Assert.Single(polygonalFace3Ds);
+
+            PolygonalFace3D polygonalFace3D = polygonalFace3Ds[0];
+            Assert.NotNull(polygonalFace3D.InternalEdges);
+            Assert.Single(polygonalFace3D.InternalEdges);
+            Assert.Equal(300, polygonalFace3D.GetArea(), 6);
+
+            // The courtyard centre lies on the plane but not on the section face
+            Assert.False(polygonalFace3D.InRange(new Point3D(10, 10, 5), tolerance));
+            Assert.True(polygonalFace3D.InRange(new Point3D(2.5, 10, 5), tolerance));
+
+            // A plane above the prism cuts nothing
+            Plane plane_Far = new(new Point3D(0, 0, 100), Spatial.Constants.Vector3D.WorldZ);
+            Assert.Null(Create.PolygonalFace3Ds(plane_Far, polyhedron, tolerance));
+
+            // Null inputs
+            Assert.Null(Create.PolygonalFace3Ds(null, polyhedron, tolerance));
+            Assert.Null(Create.PolygonalFace3Ds(plane, null, tolerance));
+
+            // A hole-free box still yields one solid section face
+            Polyhedron? polyhedron_Box = Create.Polyhedron(new BoundingBox3D(new Point3D(0, 0, 0), new Point3D(10, 10, 10)));
+            Assert.NotNull(polyhedron_Box);
+
+            List<PolygonalFace3D>? polygonalFace3Ds_Box = Create.PolygonalFace3Ds(plane, polyhedron_Box, tolerance);
+            Assert.NotNull(polygonalFace3Ds_Box);
+            Assert.Single(polygonalFace3Ds_Box);
+            Assert.True(polygonalFace3Ds_Box[0].InternalEdges is null || polygonalFace3Ds_Box[0].InternalEdges.Count == 0);
+            Assert.Equal(100, polygonalFace3Ds_Box[0].GetArea(), 6);
+        }
+
+        /// <summary>
+        /// Tests <see cref="Query.TrySplit(Plane?, IPolyhedron?, out List{Polyhedron}?, double)"/> on a courtyard prism: both parts stay closed, each carries exactly one cap on the cutting plane, the cap keeps the courtyard as an internal edge and no face of either part covers the courtyard.
+        /// </summary>
+        [Fact]
+        public void TrySplit_Plane_Polyhedron_Courtyard()
+        {
+            double tolerance = DiGi.Core.Constants.Tolerance.Distance;
+
+            Polyhedron? polyhedron = CourtyardPrism();
+            Assert.NotNull(polyhedron);
+
+            Plane plane = new(new Point3D(0, 0, 5), Spatial.Constants.Vector3D.WorldZ);
+
+            Assert.True(plane.TrySplit(polyhedron, out List<Polyhedron>? polyhedrons));
+            Assert.NotNull(polyhedrons);
+            Assert.Equal(2, polyhedrons.Count);
+
+            Point3D point3D_Courtyard = new(10, 10, 5);
+
+            foreach (Polyhedron polyhedron_Part in polyhedrons)
+            {
+                Assert.True(polyhedron_Part.IsClosed(tolerance));
+
+                // Annulus cap + annulus base + 4 outer walls + 4 courtyard walls
+                Assert.Equal(10, polyhedron_Part.Count);
+
+                int count_Cap = 0;
+
+                List<IPolygonalFace3D>? polygonalFace3Ds = polyhedron_Part.PolygonalFaces;
+                Assert.NotNull(polygonalFace3Ds);
+
+                foreach (IPolygonalFace3D polygonalFace3D in polygonalFace3Ds)
+                {
+                    BoundingBox3D? boundingBox3D = polygonalFace3D.GetBoundingBox();
+                    Assert.NotNull(boundingBox3D);
+
+                    if (System.Math.Abs(boundingBox3D.MinZ - 5) <= tolerance && System.Math.Abs(boundingBox3D.MaxZ - 5) <= tolerance)
+                    {
+                        count_Cap++;
+
+                        Assert.NotNull(polygonalFace3D.InternalEdges);
+                        Assert.Single(polygonalFace3D.InternalEdges);
+                        Assert.Equal(300, polygonalFace3D.GetArea(), 6);
+                        Assert.False(polygonalFace3D.InRange(point3D_Courtyard, tolerance));
+                    }
+                }
+
+                Assert.Equal(1, count_Cap);
+
+                // The courtyard stays outside both parts
+                Assert.False(polyhedron_Part.InRange(new Point3D(10, 10, 2.5), tolerance));
+                Assert.False(polyhedron_Part.InRange(new Point3D(10, 10, 7.5), tolerance));
+            }
+        }
+
+        /// <summary>
+        /// Creates a closed courtyard prism: a 20 x 20 square with a centred 10 x 10 hole extruded by 10 along Z (10 faces).
+        /// </summary>
+        private static Polyhedron? CourtyardPrism()
+        {
+            Polygon2D polygon2D_External = new([new Point2D(0, 0), new Point2D(20, 0), new Point2D(20, 20), new Point2D(0, 20)]);
+            Polygon2D polygon2D_Internal = new([new Point2D(5, 5), new Point2D(15, 5), new Point2D(15, 15), new Point2D(5, 15)]);
+
+            PolygonalFace2D? polygonalFace2D = Planar.Create.PolygonalFace2D(polygon2D_External, [polygon2D_Internal]);
+            if (polygonalFace2D is null)
+            {
+                return null;
+            }
+
+            PolygonalFace3D polygonalFace3D = new(new Plane(new Point3D(0, 0, 0), Spatial.Constants.Vector3D.WorldZ), polygonalFace2D);
+
+            return Create.Polyhedron(polygonalFace3D, new Spatial.Classes.Vector3D(0, 0, 10));
+        }
+
+        /// <summary>
         /// Tests <see cref="Query.TrySplit(Plane?, IPolygonalFace3D?, out List{PolygonalFace3D}?, double)"/> with edge cases including null inputs, coplanar face, and valid face split.
         /// </summary>
         [Fact]

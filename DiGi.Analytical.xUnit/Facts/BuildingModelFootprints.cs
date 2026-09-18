@@ -38,6 +38,51 @@ namespace DiGi.Analytical.xUnit
         }
 
         /// <summary>
+        /// Tests that the outline of a courtyard building keeps the courtyard, before and after the model is cut into storeys the way DiGi.GIS.Analytical cuts the national 3D building models (no floor construction - air faces on the cutting planes, converted afterwards).
+        /// <para>Guard for DiGi.GIS.WebAPI.UI#45: the section faces of the storey split used to fill the courtyard, the outline then lost its internal edge and the terrain was cut away under the courtyard. The outline has to stay one face of 300 with one internal edge, and the courtyard centre has to stay outside it.</para>
+        /// </summary>
+        [Fact]
+        public void BuildingModel_Footprints_Courtyard()
+        {
+            double tolerance = Core.Constants.Tolerance.Distance;
+
+            BuildingModel buildingModel = new();
+
+            Space space = new(new Point3D(2.5, 10, 6), "Space 1");
+
+            List<IComponent>? components = AddCourtyardSpace(buildingModel, 12, space, new WallConstruction(), new FloorConstruction(), new RoofConstruction());
+            Assert.NotNull(components);
+            Assert.Equal(10, components.Count);
+
+            Point2D point2D_Courtyard = new(10, 10);
+
+            void AssertCourtyard(string stage)
+            {
+                List<PolygonalFace2D>? polygonalFace2Ds = buildingModel.Footprints(tolerance);
+                Assert.NotNull(polygonalFace2Ds);
+                Assert.True(polygonalFace2Ds.Count == 1, $"{stage}: expected one outline, got {polygonalFace2Ds.Count}.");
+
+                PolygonalFace2D polygonalFace2D = polygonalFace2Ds[0];
+                Assert.NotNull(polygonalFace2D.InternalEdges);
+                Assert.True(polygonalFace2D.InternalEdges.Count == 1, $"{stage}: the courtyard is not an internal edge of the outline.");
+                Assert.Equal(300, polygonalFace2D.GetArea(), 6);
+                Assert.False(polygonalFace2D.InRange(point2D_Courtyard, tolerance), $"{stage}: the courtyard centre is covered by the outline.");
+            }
+
+            AssertCourtyard("Unsplit");
+
+            // Three storeys of 4, cut the way the GIS conversion does it
+            Assert.True(buildingModel.TrySplit([4.0, 8.0], tolerance: tolerance));
+            buildingModel.ConvertAirs<IAir>();
+
+            List<ISpace>? spaces = buildingModel.GetSpaces<ISpace>();
+            Assert.NotNull(spaces);
+            Assert.Equal(3, spaces.Count);
+
+            AssertCourtyard("Split");
+        }
+
+        /// <summary>
         /// Tests the outline of the building models stored in the shared fixture of valid geometry.
         /// <para>Every face of an outline has to cover ground, has to stay within the plan bounds of the model it came from, and the faces of one model together may not cover more than those bounds, which is what the joining of the projected components guarantees.</para>
         /// </summary>

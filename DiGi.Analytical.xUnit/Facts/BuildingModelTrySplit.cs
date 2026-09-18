@@ -68,6 +68,148 @@ namespace DiGi.Analytical.xUnit
         }
 
         /// <summary>
+        /// Creates the components of a courtyard space - a 20 x 20 ring with a centred 10 x 10 courtyard extruded by <paramref name="height"/> - and assigns them together with the given constructions to the specified <see cref="BuildingModel"/>.
+        /// <para>The annulus base becomes a <see cref="FaceFloor"/>, the annulus top a <see cref="SurfaceRoof"/> and the eight vertical faces (four outer, four around the courtyard) become <see cref="SurfaceWall"/> components.</para>
+        /// </summary>
+        /// <param name="buildingModel">The <see cref="BuildingModel"/> the components are added to.</param>
+        /// <param name="height">The height of the extrusion.</param>
+        /// <param name="space">The <see cref="ISpace"/> the created components are assigned to.</param>
+        /// <param name="wallConstruction">The construction assigned to the created walls.</param>
+        /// <param name="floorConstruction">The construction assigned to the created floor.</param>
+        /// <param name="roofConstruction">The construction assigned to the created roof.</param>
+        /// <returns>A <see cref="List{IComponent}"/> containing the ten created components, or null if the prism could not be created.</returns>
+        private static List<IComponent>? AddCourtyardSpace(BuildingModel buildingModel, double height, ISpace space, IWallConstruction? wallConstruction, IFloorConstruction? floorConstruction, IRoofConstruction? roofConstruction)
+        {
+            Geometry.Planar.Classes.Polygon2D polygon2D_External = new([new Geometry.Planar.Classes.Point2D(0, 0), new Geometry.Planar.Classes.Point2D(20, 0), new Geometry.Planar.Classes.Point2D(20, 20), new Geometry.Planar.Classes.Point2D(0, 20)]);
+            Geometry.Planar.Classes.Polygon2D polygon2D_Internal = new([new Geometry.Planar.Classes.Point2D(5, 5), new Geometry.Planar.Classes.Point2D(15, 5), new Geometry.Planar.Classes.Point2D(15, 15), new Geometry.Planar.Classes.Point2D(5, 15)]);
+
+            Geometry.Planar.Classes.PolygonalFace2D? polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(polygon2D_External, [polygon2D_Internal]);
+            if (polygonalFace2D is null)
+            {
+                return null;
+            }
+
+            PolygonalFace3D polygonalFace3D_Base = new(new Plane(new Point3D(0, 0, 0), Geometry.Spatial.Constants.Vector3D.WorldZ), polygonalFace2D);
+
+            Polyhedron? polyhedron = Geometry.Spatial.Create.Polyhedron(polygonalFace3D_Base, new Vector3D(0, 0, height));
+            if (polyhedron?.PolygonalFaces is not List<IPolygonalFace3D> polygonalFace3Ds)
+            {
+                return null;
+            }
+
+            List<IComponent> components = [];
+
+            for (int i = 0; i < polygonalFace3Ds.Count; i++)
+            {
+                if (polygonalFace3Ds[i] is not PolygonalFace3D polygonalFace3D || polygonalFace3D.GetBoundingBox() is not BoundingBox3D boundingBox3D_Face)
+                {
+                    continue;
+                }
+
+                IComponent? component;
+
+                if (boundingBox3D_Face.MaxZ - boundingBox3D_Face.MinZ < Core.Constants.Tolerance.Distance)
+                {
+                    if (boundingBox3D_Face.MinZ < Core.Constants.Tolerance.Distance)
+                    {
+                        FaceFloor faceFloor = new(polygonalFace3D);
+                        buildingModel.Assign(faceFloor, floorConstruction);
+                        component = faceFloor;
+                    }
+                    else
+                    {
+                        SurfaceRoof surfaceRoof = new(polygonalFace3D);
+                        buildingModel.Assign(surfaceRoof, roofConstruction);
+                        component = surfaceRoof;
+                    }
+                }
+                else
+                {
+                    SurfaceWall surfaceWall = new(polygonalFace3D);
+                    buildingModel.Assign(surfaceWall, wallConstruction);
+                    component = surfaceWall;
+                }
+
+                buildingModel.Assign(component, space);
+                components.Add(component);
+            }
+
+            return components;
+        }
+
+        /// <summary>
+        /// Tests splitting a <see cref="BuildingModel"/> holding a single courtyard space by a horizontal plane.
+        /// <para>Verifies that two spaces are created, that the single floor created on the cutting plane keeps the courtyard as its internal edge (area 300, not the 400 of a solid slab), that it is shared by both spaces and that no component of the model covers the courtyard centre. Guard for DiGi.GIS.WebAPI.UI#45, where the storey split of a courtyard building filled the courtyard with solid floors.</para>
+        /// </summary>
+        [Fact]
+        public void TrySplit_BuildingModel_Courtyard()
+        {
+            double tolerance = Core.Constants.Tolerance.Distance;
+
+            BuildingModel buildingModel = new();
+
+            Space space = new(new Point3D(2.5, 10, 2), "Space 1");
+
+            WallConstruction wallConstruction = new();
+            FloorConstruction floorConstruction = new();
+            RoofConstruction roofConstruction = new();
+
+            List<IComponent>? components = AddCourtyardSpace(buildingModel, 10, space, wallConstruction, floorConstruction, roofConstruction);
+
+            Assert.NotNull(components);
+            Assert.Equal(10, components.Count);
+
+            IFloor? floor_Source = buildingModel.GetComponents<IFloor>()?.Find(x => true);
+            Assert.NotNull(floor_Source);
+
+            FloorConstruction floorConstruction_Split = new();
+
+            Assert.True(buildingModel.TrySplit(5, 1, floorConstruction_Split, tolerance: tolerance));
+
+            List<ISpace>? spaces = buildingModel.GetSpaces<ISpace>();
+            Assert.NotNull(spaces);
+            Assert.Equal(2, spaces.Count);
+            Assert.Contains(spaces, x => x.Guid == space.Guid);
+
+            // Eight walls split into sixteen
+            List<IWall>? walls = buildingModel.GetComponents<IWall>();
+            Assert.NotNull(walls);
+            Assert.Equal(16, walls.Count);
+
+            // Original floor plus the single annulus floor created on the cutting plane
+            List<IFloor>? floors = buildingModel.GetComponents<IFloor>();
+            Assert.NotNull(floors);
+            Assert.Equal(2, floors.Count);
+
+            IFloor? floor_Split = floors.Find(x => x.Guid != floor_Source.Guid);
+            Assert.NotNull(floor_Split);
+
+            PolygonalFace3D? polygonalFace3D_Split = floor_Split.Geometry3D<PolygonalFace3D>();
+            Assert.NotNull(polygonalFace3D_Split);
+            Assert.NotNull(polygonalFace3D_Split.InternalEdges);
+            Assert.Single(polygonalFace3D_Split.InternalEdges);
+            Assert.Equal(300, polygonalFace3D_Split.GetArea(), 6);
+
+            List<ISpace>? spaces_Floor = buildingModel.GetSpaces(floor_Split);
+            Assert.NotNull(spaces_Floor);
+            Assert.Equal(2, spaces_Floor.Count);
+
+            // Nothing covers the courtyard
+            Point3D point3D_Courtyard = new(10, 10, 5);
+            List<IComponent>? components_All = buildingModel.GetComponents<IComponent>();
+            Assert.NotNull(components_All);
+            foreach (IComponent component in components_All)
+            {
+                if (component.Geometry3D<IPolygonalFace3D>() is IPolygonalFace3D polygonalFace3D)
+                {
+                    Assert.False(polygonalFace3D.InRange(point3D_Courtyard, tolerance));
+                }
+            }
+
+            Core.xUnit.Query.SerializationCheck(buildingModel);
+        }
+
+        /// <summary>
         /// Tests splitting a <see cref="BuildingModel"/> holding a single box shaped space by a horizontal plane.
         /// <para>Verifies that two spaces are created with one of them keeping the identifier of the original space, that every wall is split into two components of the same type keeping the wall construction, that exactly one of the fragments of each wall keeps the identifier of the original wall, that the original floor and roof stay untouched and that a single floor is created on the cutting plane and assigned to both spaces.</para>
         /// </summary>
