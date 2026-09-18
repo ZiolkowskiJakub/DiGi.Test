@@ -138,6 +138,30 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
             Assert.DoesNotContain(visualBackgroundTasks_Client, x => x.TypeName == typeof(UIPostgreSQLUserCreateTask).Name);
         }
 
+        /// <summary>
+        /// Tests that the external components area task is offered on the server tab, under the name the operator sees, and nowhere else.
+        /// <para>The task reads the stored building models and writes the building data table directly from the storage database, so it belongs on the server side beside the Update building data row it completes, and a missing converter manager has to leave it out rather than produce a row that throws when it is clicked.</para>
+        /// <para>The registration is what decides whether the row appears, so the registration is what is asserted: constructing the task proves nothing about the tab an operator opens.</para>
+        /// </summary>
+        [Fact]
+        public void VisualBackgroundTasks_UIPostgreSQLBuildingDataExternalComponentsUpdateTask()
+        {
+            // Nothing here reaches a database - the task is registered, never started.
+            List<IVisualBackgroundTask>? visualBackgroundTasks_Server = Create.VisualBackgroundTasks(new GISPostgreSQLConverterManager(), null, null, Mode.Server);
+            Assert.NotNull(visualBackgroundTasks_Server);
+            Assert.Contains(visualBackgroundTasks_Server, x => x.TypeName == typeof(UIPostgreSQLBuildingDataExternalComponentsUpdateTask).Name && x.Name == "Update external components area");
+
+            // The client tab holds the tasks driven by the Web API; this one is not among them.
+            List<IVisualBackgroundTask>? visualBackgroundTasks_Client = Create.VisualBackgroundTasks(new GISPostgreSQLConverterManager(), null, null, Mode.Client);
+            Assert.NotNull(visualBackgroundTasks_Client);
+            Assert.DoesNotContain(visualBackgroundTasks_Client, x => x.TypeName == typeof(UIPostgreSQLBuildingDataExternalComponentsUpdateTask).Name);
+
+            // Without a converter manager there is nothing to read the stored models with, so the row must not be offered at all.
+            List<IVisualBackgroundTask>? visualBackgroundTasks_NoManager = Create.VisualBackgroundTasks(null, null, null, Mode.ServerAndCient);
+            Assert.NotNull(visualBackgroundTasks_NoManager);
+            Assert.Empty(visualBackgroundTasks_NoManager);
+        }
+
         private class TestRefusingBackgroundTask : Core.Classes.BackgroundTask
         {
             protected override Task<bool> ExecuteAsync()
