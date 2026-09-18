@@ -59,7 +59,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
         /// <summary>
         /// Builds a polygonal face from a plane and the face's local 2D points.
-        /// <para>The plane's origin and normal define the face's position and side in 3D; the points address the face within the plane, so an assertion on the stored normal and the area stays independent of how the plane derives its local basis.</para>
+        /// <para>The plane's origin and normal define the face's position and side in 3D; the points address the face within the plane. The origin is chosen for each stored normal so the face's 3D extent is the intended square, because the plane derives its local basis from the normal.</para>
         /// </summary>
         /// <param name="plane">The plane the face lies on.</param>
         /// <param name="points">The face's points in the plane's local 2D coordinates.</param>
@@ -73,48 +73,17 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Builds a floor of the given edge size, centred on the origin in the plane z = 0.
-        /// <para>The floor's internal point is the interior reference the wall normals are oriented against, so it is deliberately the centre of the building footprint - at the origin - while the walls are placed a fixed distance away from it.</para>
+        /// Builds a square wall of the given edge size on the plane defined by the origin and stored normal.
+        /// <para>The origin is the face's local (0,0) corner; for a given stored normal the plane's local basis runs in fixed world directions, so the caller picks the origin that makes the face span the intended square of the box it bounds.</para>
         /// </summary>
-        /// <param name="size">The edge length of the square floor in metres.</param>
-        /// <returns>The floor component.</returns>
-        private static DiGi.Analytical.Building.Classes.FaceFloor Floor(double size)
-        {
-            Plane plane = new(new Point3D(0, 0, 0), new Vector3D(0, 0, 1));
-            PolygonalFace3D face = Face3D(
-                plane,
-                new Point2D(-size / 2, -size / 2),
-                new Point2D(size / 2, -size / 2),
-                new Point2D(size / 2, size / 2),
-                new Point2D(-size / 2, size / 2));
-
-            DiGi.Analytical.Building.Classes.FaceFloor? floor = DiGi.Analytical.Building.Create.FaceFloor(face);
-            Assert.NotNull(floor);
-
-            return floor!;
-        }
-
-        /// <summary>
-        /// Builds a 1 x 1 metre wall whose outward normal has the given azimuth, stored with either the outward or the inward normal.
-        /// <para>The wall plane is offset from the origin - the floor's internal point - in the outward direction, so the interior of the building sits strictly on one side of it and the orientation test the method under test performs is unambiguous: the stored normal is the outward one when <paramref name="outward"/> is true and its inverse when it is false.</para>
-        /// </summary>
-        /// <param name="azimuthDegrees">The azimuth of the wall's outward normal, in degrees clockwise from north.</param>
-        /// <param name="outward">Whether the stored normal points away from the building interior or into it.</param>
+        /// <param name="origin">The face's local (0,0) corner in 3D.</param>
+        /// <param name="normal">The stored normal; outward from the space's interior or its inverse.</param>
+        /// <param name="size">The edge length of the square wall in metres.</param>
         /// <returns>The wall component.</returns>
-        private static DiGi.Analytical.Building.Classes.SurfaceWall Wall(double azimuthDegrees, bool outward)
+        private static DiGi.Analytical.Building.Classes.SurfaceWall Wall(Point3D origin, Vector3D normal, double size)
         {
-            double radians = azimuthDegrees * Math.PI / 180.0;
-            double sign = outward ? 1.0 : -1.0;
-
-            Vector3D normal = new(sign * Math.Sin(radians), sign * Math.Cos(radians), 0);
-            Plane plane = new(new Point3D(5 * Math.Sin(radians), 5 * Math.Cos(radians), 0), normal);
-            PolygonalFace3D face = Face3D(
-                plane,
-                new Point2D(0, 0),
-                new Point2D(1, 0),
-                new Point2D(1, 1),
-                new Point2D(0, 1));
-
+            Plane plane = new(origin, normal);
+            PolygonalFace3D face = Face3D(plane, new Point2D(0, 0), new Point2D(size, 0), new Point2D(size, size), new Point2D(0, size));
             DiGi.Analytical.Building.Classes.SurfaceWall? wall = DiGi.Analytical.Building.Create.SurfaceWall(face);
             Assert.NotNull(wall);
 
@@ -122,26 +91,16 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Builds a square roof of the given edge size with the given tilt from vertical and the given azimuth of its horizontal normal projection.
+        /// Builds a square roof of the given edge size on the plane defined by the origin and stored normal.
         /// </summary>
-        /// <param name="tiltDegrees">The roof's tilt from vertical, in degrees.</param>
-        /// <param name="azimuthDegrees">The azimuth of the roof normal's horizontal projection, in degrees clockwise from north.</param>
+        /// <param name="origin">The face's local (0,0) corner in 3D.</param>
+        /// <param name="normal">The stored normal, the roof's upward direction or its inverse.</param>
         /// <param name="size">The edge length of the square roof in metres.</param>
         /// <returns>The roof component.</returns>
-        private static DiGi.Analytical.Building.Classes.SurfaceRoof Roof(double tiltDegrees, double azimuthDegrees, double size)
+        private static DiGi.Analytical.Building.Classes.SurfaceRoof Roof(Point3D origin, Vector3D normal, double size)
         {
-            double tilt = tiltDegrees * Math.PI / 180.0;
-            double azimuth = azimuthDegrees * Math.PI / 180.0;
-
-            Vector3D normal = new(Math.Sin(azimuth) * Math.Sin(tilt), Math.Cos(azimuth) * Math.Sin(tilt), Math.Cos(tilt));
-            Plane plane = new(new Point3D(0, 0, 10), normal);
-            PolygonalFace3D face = Face3D(
-                plane,
-                new Point2D(0, 0),
-                new Point2D(size, 0),
-                new Point2D(size, size),
-                new Point2D(0, size));
-
+            Plane plane = new(origin, normal);
+            PolygonalFace3D face = Face3D(plane, new Point2D(0, 0), new Point2D(size, 0), new Point2D(size, size), new Point2D(0, size));
             DiGi.Analytical.Building.Classes.SurfaceRoof? roof = DiGi.Analytical.Building.Create.SurfaceRoof(face);
             Assert.NotNull(roof);
 
@@ -149,21 +108,146 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Builds a stored building model envelope: the reference is set, every component is added, and the result is converted for storage with the given county identifier.
+        /// Builds a square floor of the given edge size on the plane defined by the origin and stored normal.
+        /// </summary>
+        /// <param name="origin">The face's local (0,0) corner in 3D.</param>
+        /// <param name="normal">The stored normal; a floor consumes no orientation, so either direction classifies the same area.</param>
+        /// <param name="size">The edge length of the square floor in metres.</param>
+        /// <returns>The floor component.</returns>
+        private static DiGi.Analytical.Building.Classes.FaceFloor Floor(Point3D origin, Vector3D normal, double size)
+        {
+            Plane plane = new(origin, normal);
+            PolygonalFace3D face = Face3D(plane, new Point2D(0, 0), new Point2D(size, 0), new Point2D(size, size), new Point2D(0, size));
+            DiGi.Analytical.Building.Classes.FaceFloor? floor = DiGi.Analytical.Building.Create.FaceFloor(face);
+            Assert.NotNull(floor);
+
+            return floor!;
+        }
+
+        /// <summary>
+        /// Builds a rectangular wall of the given local extents on the plane defined by the origin and stored normal.
+        /// </summary>
+        /// <param name="origin">The face's local (0,0) corner in 3D.</param>
+        /// <param name="normal">The stored normal; outward from the space's interior or its inverse.</param>
+        /// <param name="a">The face's extent along the plane's local first axis, in metres.</param>
+        /// <param name="b">The face's extent along the plane's local second axis, in metres.</param>
+        /// <returns>The wall component.</returns>
+        private static DiGi.Analytical.Building.Classes.SurfaceWall WallR(Point3D origin, Vector3D normal, double a, double b)
+        {
+            Plane plane = new(origin, normal);
+            PolygonalFace3D face = Face3D(plane, new Point2D(0, 0), new Point2D(a, 0), new Point2D(a, b), new Point2D(0, b));
+            DiGi.Analytical.Building.Classes.SurfaceWall? wall = DiGi.Analytical.Building.Create.SurfaceWall(face);
+            Assert.NotNull(wall);
+
+            return wall!;
+        }
+
+        /// <summary>
+        /// Builds an L-shaped floor on the plane defined by the origin and stored normal, from the outline's local 2D points.
+        /// </summary>
+        /// <param name="origin">The plane's origin in 3D.</param>
+        /// <param name="normal">The stored normal; a floor consumes no orientation, so either direction classifies the same area.</param>
+        /// <param name="points">The outline's points in the plane's local 2D coordinates.</param>
+        /// <returns>The floor component.</returns>
+        private static DiGi.Analytical.Building.Classes.FaceFloor FloorL(Point3D origin, Vector3D normal, params Point2D[] points)
+        {
+            PolygonalFace3D face = Face3D(new Plane(origin, normal), points);
+            DiGi.Analytical.Building.Classes.FaceFloor? floor = DiGi.Analytical.Building.Create.FaceFloor(face);
+            Assert.NotNull(floor);
+
+            return floor!;
+        }
+
+        /// <summary>
+        /// Builds an L-shaped roof on the plane defined by the origin and stored normal, from the outline's local 2D points.
+        /// </summary>
+        /// <param name="origin">The plane's origin in 3D.</param>
+        /// <param name="normal">The stored normal, the roof's upward direction or its inverse.</param>
+        /// <param name="points">The outline's points in the plane's local 2D coordinates.</param>
+        /// <returns>The roof component.</returns>
+        private static DiGi.Analytical.Building.Classes.SurfaceRoof RoofL(Point3D origin, Vector3D normal, params Point2D[] points)
+        {
+            PolygonalFace3D face = Face3D(new Plane(origin, normal), points);
+            DiGi.Analytical.Building.Classes.SurfaceRoof? roof = DiGi.Analytical.Building.Create.SurfaceRoof(face);
+            Assert.NotNull(roof);
+
+            return roof!;
+        }
+
+        /// <summary>
+        /// Builds the eight faces of a closed L-shaped volume: the footprint [0,5] x [0,20] union [0,20] x [0,5], the height [0,10] - six walls, an L-shaped floor and an L-shaped roof.
+        /// <para>The floor's interior point falls in the long strip, on the far side of the strip-north wall (y = 5, x in [5, 20]) from that wall's outward side. For that wall the interior reference point and the outward side are opposite - exactly where an interior-point heuristic loses - while a shell built over the closed face set still resolves the wall's direction from the face set.</para>
+        /// </summary>
+        /// <param name="stripNorthStoredInward">When true the strip-north wall is stored with its inward normal (-y); when false with its outward normal (+y).</param>
+        /// <returns>The eight components, in the order south, east, notch, strip-north, north, west, floor, roof.</returns>
+        private static IComponent[] LShape(bool stripNorthStoredInward)
+        {
+            const double s = 20.0;
+            const double t = 5.0;
+            const double h = 10.0;
+
+            Vector3D stripNorthNormal = stripNorthStoredInward ? new Vector3D(0, -1, 0) : new Vector3D(0, 1, 0);
+            Point3D stripNorthOrigin = stripNorthStoredInward ? new Point3D(s, t, h) : new Point3D(t, t, h);
+
+            return
+            [
+                WallR(new Point3D(s, 0, h), new Vector3D(0, -1, 0), s, h),
+                WallR(new Point3D(s, t, h), new Vector3D(1, 0, 0), t, h),
+                WallR(new Point3D(t, s, h), new Vector3D(1, 0, 0), s - t, h),
+                WallR(stripNorthOrigin, stripNorthNormal, s - t, h),
+                WallR(new Point3D(0, s, h), new Vector3D(0, 1, 0), t, h),
+                WallR(new Point3D(0, 0, h), new Vector3D(-1, 0, 0), s, h),
+                FloorL(new Point3D(0, 0, 0), new Vector3D(0, 0, -1), new Point2D(0, 0), new Point2D(0, -s), new Point2D(t, -s), new Point2D(t, -t), new Point2D(s, -t), new Point2D(s, 0)),
+                RoofL(new Point3D(0, 0, h), new Vector3D(0, 0, 1), new Point2D(0, 0), new Point2D(s, 0), new Point2D(s, t), new Point2D(t, t), new Point2D(t, s), new Point2D(0, s))
+            ];
+        }
+
+        /// <summary>
+        /// Builds the six faces of a clean closed box [0,10]³ - four walls, a floor and a roof - each spanning the intended unit square of the box.
+        /// <para>The box is a closed volume, which is what the shell's ray-parity orientation needs: a wall stored inward is re-oriented outward only when its ray along the stored normal crosses the opposing wall, and that crossing is clean (no coplanar graze) on a true box.</para>
+        /// </summary>
+        /// <param name="westStoredInward">When true the west wall is stored with its inward normal (+x); when false with its outward normal (-x). The east, south and north walls are always stored outward.</param>
+        /// <param name="floorStoredInward">When true the floor is stored with its inward normal (+z); when false with its outward normal (-z). The roof is always stored outward (+z).</param>
+        /// <returns>The six components of the box, in the order west, east, south, north, floor, roof.</returns>
+        private static IComponent[] Box(bool westStoredInward = false, bool floorStoredInward = false)
+        {
+            const double s = 10.0;
+
+            Vector3D westNormal = westStoredInward ? new Vector3D(1, 0, 0) : new Vector3D(-1, 0, 0);
+            Point3D westOrigin = westStoredInward ? new Point3D(0, s, s) : new Point3D(0, 0, s);
+            Vector3D floorNormal = floorStoredInward ? new Vector3D(0, 0, 1) : new Vector3D(0, 0, -1);
+            Point3D floorOrigin = floorStoredInward ? new Point3D(0, 0, 0) : new Point3D(0, s, 0);
+
+            return
+            [
+                Wall(westOrigin, westNormal, s),
+                Wall(new Point3D(s, s, s), new Vector3D(1, 0, 0), s),
+                Wall(new Point3D(s, 0, s), new Vector3D(0, -1, 0), s),
+                Wall(new Point3D(0, s, s), new Vector3D(0, 1, 0), s),
+                Floor(floorOrigin, floorNormal, s),
+                Roof(new Point3D(0, 0, s), new Vector3D(0, 0, 1), s)
+            ];
+        }
+
+        /// <summary>
+        /// Builds a stored building model envelope: a single space is added, every component is assigned to it, and the result is converted for storage under the reference and county identifier.
         /// </summary>
         /// <param name="reference">The building reference the model is stored under.</param>
         /// <param name="countyId">The county identifier the model is stored under.</param>
-        /// <param name="components">The components the model carries; it is the caller's responsibility to include a floor, because the method under test refuses a model without one.</param>
+        /// <param name="components">The components the model carries; each is assigned to the model's single space.</param>
         /// <returns>The storage envelope.</returns>
         private static BuildingModel Model(string reference, int countyId, params IComponent[] components)
         {
             DiGi.Analytical.Building.Classes.BuildingModel buildingModel = new();
-            Assert.True(buildingModel.SetValue(BuildingModelParameter.Reference, reference, new SetValueSettings(true, false)));
+            DiGi.Analytical.Building.Classes.Space space = new(new Point3D(5, 5, 5), "Space 1");
+            Assert.True(buildingModel.Update(space));
 
             foreach (IComponent component in components)
             {
-                Assert.True(buildingModel.Update(component));
+                Assert.True(buildingModel.Assign(component, space));
             }
+
+            Assert.True(buildingModel.SetValue(BuildingModelParameter.Reference, reference, new SetValueSettings(true, false)));
 
             BuildingModel? envelope = buildingModel.ToPostgreSQL(countyId);
             Assert.NotNull(envelope);
@@ -188,34 +272,13 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that a wall is filed under the sector its outward normal's azimuth belongs to, on both sides of every sector boundary.
-        /// <para>Each boundary is crossed twice - 0.0001° either side - so the wall just inside a sector and the one just across it land in different columns, which is what the boundary is for. The margin is deliberately far above the precision of the azimuth computation, because an azimuth sitting exactly on a boundary has no claim to either side in floating point. 350° and 10° cover the north wrap. Half the walls are stored with their inward normal, so both directions of the stored normal reach the outward-orientation logic, and the sector they land in is the same.</para>
+        /// Verifies that the four walls of a closed box are each filed under the sector their outward normal's azimuth belongs to, and that nothing leaks across kinds.
+        /// <para>The box's walls face north, east, south and west, so the four cardinal sectors are populated and the four diagonal sectors stay empty; a leak into a diagonal or a roof bucket would mean the classification is reading a normal wrong.</para>
         /// </summary>
         [Fact]
-        public void Update_ExternalComponentsArea_WallSectorBoundaries()
+        public void Update_ExternalComponentsArea_WallSectors()
         {
-            // (azimuth of the outward normal, stored outward) in the order the walls are added: both sides of every boundary, then the north wrap.
-            (double Azimuth, bool Outward)[] walls =
-            [
-                (22.4999, true), (22.5001, false),
-                (67.4999, true), (67.5001, false),
-                (112.4999, true), (112.5001, false),
-                (157.4999, true), (157.5001, false),
-                (202.4999, true), (202.5001, false),
-                (247.4999, true), (247.5001, false),
-                (292.4999, true), (292.5001, false),
-                (337.4999, true), (337.5001, false),
-                (350.0, true), (10.0, false)
-            ];
-
-            List<IComponent> components = [];
-            foreach ((double azimuth, bool outward) in walls)
-            {
-                components.Add(Wall(azimuth, outward));
-            }
-
-            components.Add(Floor(10));
-            BuildingModel model = Model("ref_walls", 5, [.. components]);
+            BuildingModel model = Model("ref_walls", 5, [.. Box()]);
 
             Table table = new();
             long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
@@ -226,107 +289,35 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Row? row = table.GetRow(0);
             Assert.NotNull(row);
 
-            // North: 22.4999, 337.5001, 350 and 10. Every other sector: the pair on either side of its boundary.
-            Assert.Equal(4.0, Value(table, row, ColumnNames_External[0]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[1]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[2]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[3]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[4]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[5]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[6]), 1e-3);
-            Assert.Equal(2.0, Value(table, row, ColumnNames_External[7]), 1e-3);
+            // One 10 x 10 wall in each cardinal sector, the diagonals empty.
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[0]), 1e-3);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[1]), 1e-9);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[2]), 1e-3);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[3]), 1e-9);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[4]), 1e-3);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[5]), 1e-9);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[6]), 1e-3);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[7]), 1e-9);
 
-            // Nothing of a roof may leak into a wall's buckets and vice versa.
-            Assert.Equal(0.0, Value(table, row, ColumnNames_External[8]), 1e-9);
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
-            Assert.Equal(118.0, Value(table, row, ColumnNames_External[34]), 1e-3);
-        }
-
-        /// <summary>
-        /// Verifies that a roof is filed under its tilt band, on both sides of every band boundary.
-        /// <para>Flat is strictly below 5°, the first tilted band is [5°, 20°], the second is (20°, 45°] and the third is above 45°, exactly as the column descriptions state - so the roof just under a boundary and the one just over it must land in different columns. Each boundary is crossed 0.0001° at a time, far above the precision of the tilt computation, because a tilt sitting exactly on a boundary has no claim to either side in floating point. Every roof faces east, so the sector is constant and only the band can move a roof between columns.</para>
-        /// </summary>
-        [Fact]
-        public void Update_ExternalComponentsArea_RoofTiltBands()
-        {
-            BuildingModel model = Model(
-                "ref_roofs",
-                5,
-                Roof(4.9999, 90, 10),
-                Roof(5.0001, 90, 10),
-                Roof(19.9999, 90, 10),
-                Roof(20.0001, 90, 10),
-                Roof(44.9999, 90, 10),
-                Roof(45.0001, 90, 10),
-                Floor(10));
-
-            Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
-
-            Assert.Equal(0, skipped);
-            Assert.Equal(1, table.RowCount);
-
-            Row? row = table.GetRow(0);
-            Assert.NotNull(row);
-
-            // 4.9999 flat, 5.0001 and 19.9999 in the first band, 20.0001 and 44.9999 in the second, 45.0001 in the third.
+            // The flat roof and the floor carry their own 10 x 10 areas; the tilted bands stay empty.
             Assert.Equal(100.0, Value(table, row, ColumnNames_External[8]), 1e-3);
-            Assert.Equal(200.0, Value(table, row, ColumnNames_External[11]), 1e-3);
-            Assert.Equal(200.0, Value(table, row, ColumnNames_External[19]), 1e-3);
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[27]), 1e-3);
-
-            // The north sector's tilted bands and the wall buckets stay empty.
-            Assert.Equal(0.0, Value(table, row, ColumnNames_External[9]), 1e-9);
-            Assert.Equal(0.0, Value(table, row, ColumnNames_External[17]), 1e-9);
-            Assert.Equal(0.0, Value(table, row, ColumnNames_External[25]), 1e-9);
-            Assert.Equal(0.0, Value(table, row, ColumnNames_External[0]), 1e-9);
-
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
-            Assert.Equal(700.0, Value(table, row, ColumnNames_External[34]), 1e-3);
-        }
-
-        /// <summary>
-        /// Verifies that a roof flat enough to be flat is filed under the flat column regardless of which direction it faces.
-        /// <para>The flat band has no directional split by design, so a 4° roof facing east must not leak into any of the east tilted-roof columns, and it must not be mistaken for a wall either.</para>
-        /// </summary>
-        [Fact]
-        public void Update_ExternalComponentsArea_FlatRoofRegardlessOfAzimuth()
-        {
-            BuildingModel model = Model(
-                "ref_flatroof",
-                5,
-                Roof(4.0, 90, 10),
-                Floor(10));
-
-            Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
-
-            Assert.Equal(0, skipped);
-            Assert.Equal(1, table.RowCount);
-
-            Row? row = table.GetRow(0);
-            Assert.NotNull(row);
-
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[8]), 1e-3);
-
-            // Every tilted-roof band stays empty, in every sector.
             for (int i = 9; i <= 32; i++)
             {
                 Assert.Equal(0.0, Value(table, row, ColumnNames_External[i]), 1e-9);
             }
 
             Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
-            Assert.Equal(200.0, Value(table, row, ColumnNames_External[34]), 1e-3);
+            Assert.Equal(600.0, Value(table, row, ColumnNames_External[34]), 1e-3);
         }
 
         /// <summary>
-        /// Verifies that a model made of floors only is filed under the floor column and nowhere else.
-        /// <para>Floors carry no direction and no tilt by construction, so every directional and tilt bucket must stay empty - a leak into one would mean the classification is reading a component's type wrong.</para>
+        /// Verifies that a wall stored with its inward normal is filed under the sector of its true outward direction - the regression the issue names.
+        /// <para>The west wall of the box is stored pointing into the volume (+x); the shell's external-side orientation re-points it outward (-x), so it lands in the west sector rather than the east one the stored direction would imply. A wall that landed under its stored (inward) direction would be a 180° error.</para>
         /// </summary>
         [Fact]
-        public void Update_ExternalComponentsArea_FloorOnly()
+        public void Update_ExternalComponentsArea_InwardStoredNormalLandsOutward()
         {
-            BuildingModel model = Model("ref_floor", 5, Floor(10));
+            BuildingModel model = Model("ref_inward", 5, [.. Box(westStoredInward: true, floorStoredInward: true)]);
 
             Table table = new();
             long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
@@ -337,32 +328,111 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Row? row = table.GetRow(0);
             Assert.NotNull(row);
 
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[34]), 1e-3);
+            // The west wall is filed under west (its true outward sector), not east (its stored direction) -
+            // had its stored direction been kept, east would carry the two walls' 200 and west would be empty.
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[6]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[2]), 1e-3);
 
-            // The eight wall sectors and the flat roof stay empty.
-            for (int i = 0; i <= 8; i++)
-            {
-                Assert.Equal(0.0, Value(table, row, ColumnNames_External[i]), 1e-9);
-            }
+            // The other two walls and the floor and roof classify as before.
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[0]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[4]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[8]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
+            Assert.Equal(600.0, Value(table, row, ColumnNames_External[34]), 1e-3);
         }
 
         /// <summary>
-        /// Verifies that the total column equals the sum of the 34 breakdown columns it is derived from, for a model that populates every kind of bucket at once.
+        /// Verifies that a wall stored with its inward normal is filed under the sector of its true outward direction even where the building's interior point sits on the other side of the wall - the acceptance case of the issue.
+        /// <para>The L-shaped volume's floor interior point falls in the long strip, across the strip-north wall from that wall's outward side. The wall is stored pointing into the volume (-y); the shell's external-side orientation re-points it outward (+y), so it lands in the north sector. The pre-fix interior-point heuristic reads the stored direction as already outward and files the 150 m² wall under south instead - this fact fails on the pre-fix code and passes on this one.</para>
+        /// </summary>
+        [Fact]
+        public void Update_ExternalComponentsArea_InwardStoredNormalOnConcaveFootprintLandsOutward()
+        {
+            BuildingModel model = Model("ref_inward_concave", 5, [.. LShape(true)]);
+
+            Table table = new();
+            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+
+            Assert.Equal(0, skipped);
+            Assert.Equal(1, table.RowCount);
+
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+
+            // The strip-north wall (150, stored inward -y) is filed under north with the north wall's 50 - not under south.
+            Assert.Equal(200.0, Value(table, row, ColumnNames_External[0]), 1e-3);
+            Assert.Equal(200.0, Value(table, row, ColumnNames_External[4]), 1e-3);
+
+            // The notch wall (150) and the east wall (50) land under east; the wide south and west walls under their own sectors.
+            Assert.Equal(200.0, Value(table, row, ColumnNames_External[2]), 1e-3);
+            Assert.Equal(200.0, Value(table, row, ColumnNames_External[6]), 1e-3);
+
+            // The diagonal sectors stay empty.
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[1]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[3]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[5]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[7]), 1e-9);
+
+            // The L-shaped flat roof and floor carry their 175 m²; the tilted bands stay empty.
+            Assert.Equal(175.0, Value(table, row, ColumnNames_External[8]), 1e-3);
+            for (int i = 9; i <= 32; i++)
+            {
+                Assert.Equal(0.0, Value(table, row, ColumnNames_External[i]), 1e-9);
+            }
+
+            Assert.Equal(175.0, Value(table, row, ColumnNames_External[33]), 1e-3);
+            Assert.Equal(1150.0, Value(table, row, ColumnNames_External[34]), 1e-3);
+        }
+
+        /// <summary>
+        /// Verifies that a roof whose normal is flat enough is filed under the flat column, and that a tilted roof is filed under its tilt band crossed with its sector.
+        /// <para>The flat band has no directional split, so a near-flat roof must not leak into any tilted column; a 10° roof facing east lands in the east "up to 20" band and no other band or sector.</para>
+        /// </summary>
+        [Fact]
+        public void Update_ExternalComponentsArea_RoofTiltBands()
+        {
+            // A box whose flat roof is replaced by a single 10° roof plane facing east (azimuth 90°).
+            IComponent[] components = Box();
+            components[5] = Roof(new Point3D(0, 0, 10), new Vector3D(Math.Sin(Math.PI / 180.0 * 90.0) * Math.Sin(Math.PI / 180.0 * 10.0), Math.Cos(Math.PI / 180.0 * 90.0) * Math.Sin(Math.PI / 180.0 * 10.0), Math.Cos(Math.PI / 180.0 * 10.0)), 10);
+
+            BuildingModel model = Model("ref_roofs", 5, components);
+
+            Table table = new();
+            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+
+            Assert.Equal(0, skipped);
+            Assert.Equal(1, table.RowCount);
+
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+
+            // The 10° east roof is in the east "up to 20" band and nowhere else.
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[11]), 1e-3);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[8]), 1e-9);
+
+            // Every other tilted band and the other sectors' bands stay empty.
+            for (int i = 9; i <= 32; i++)
+            {
+                if (i != 11)
+                {
+                    Assert.Equal(0.0, Value(table, row, ColumnNames_External[i]), 1e-9);
+                }
+            }
+
+            // The walls and floor classify as before.
+            Assert.Equal(400.0, Value(table, row, ColumnNames_External[0]) + Value(table, row, ColumnNames_External[2]) + Value(table, row, ColumnNames_External[4]) + Value(table, row, ColumnNames_External[6]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
+            Assert.Equal(600.0, Value(table, row, ColumnNames_External[34]), 1e-3);
+        }
+
+        /// <summary>
+        /// Verifies that the total column equals the sum of the 34 breakdown columns it is derived from, for a model that populates walls, a roof and a floor at once.
         /// <para>The total is computed from the same accumulators as the breakdowns, so the equality must hold on the stored values - a total that drifted from the sum would mean the two were measured separately and can disagree.</para>
         /// </summary>
         [Fact]
         public void Update_ExternalComponentsArea_TotalEqualsSumOfBreakdowns()
         {
-            BuildingModel model = Model(
-                "ref_total",
-                5,
-                Wall(0, true),
-                Wall(135, false),
-                Roof(2.0, 45, 10),
-                Roof(10.0, 180, 10),
-                Roof(30.0, 90, 5),
-                Floor(8));
+            BuildingModel model = Model("ref_total", 5, [.. Box()]);
 
             Table table = new();
             long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
@@ -373,16 +443,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Row? row = table.GetRow(0);
             Assert.NotNull(row);
 
-            // One component per bucket, so each breakdown column carries its component's area and nothing else.
-            Assert.Equal(1.0, Value(table, row, ColumnNames_External[0]), 1e-3);
-            Assert.Equal(1.0, Value(table, row, ColumnNames_External[3]), 1e-3);
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[8]), 1e-3);
-            Assert.Equal(100.0, Value(table, row, ColumnNames_External[13]), 1e-3);
-            Assert.Equal(25.0, Value(table, row, ColumnNames_External[19]), 1e-3);
-            Assert.Equal(64.0, Value(table, row, ColumnNames_External[33]), 1e-3);
-
             double sumOfBreakdowns = 0;
-
             for (int i = 0; i < ColumnNames_External.Length - 1; i++)
             {
                 sumOfBreakdowns += Value(table, row, ColumnNames_External[i]);
@@ -390,51 +451,116 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             double total = Value(table, row, ColumnNames_External[^1]);
             Assert.Equal(sumOfBreakdowns, total, 3);
-            Assert.Equal(291.0, total, 1e-3);
+            Assert.Equal(600.0, total, 1e-3);
         }
 
         /// <summary>
-        /// Verifies that a component the method cannot classify is refused with an exception rather than skipped, and that a model without a floor is refused the same way.
-        /// <para>A curved wall without a base curve yields no polygonal face, so it cannot be classified - the method must throw and name the building, because a silently missing wall area is a defect the caller cannot see. A model without a floor has no interior reference point the wall normals can be oriented against, so it is refused before any of its walls are read.</para>
+        /// Verifies that a wall bounding two spaces is an internal partition - excluded from every area bucket and counted in the returned skip count - while each space's own external walls still classify.
+        /// <para>Two boxes share the wall between them; that shared wall must not contribute to any external area, and the method must report it as one skipped component. The eight outer walls (four per box) and the two floors and two roofs still land in their buckets.</para>
         /// </summary>
         [Fact]
-        public void Update_ExternalComponentsArea_NonPlanarThrows()
+        public void Update_ExternalComponentsArea_SharedComponentIsInternalPartition()
         {
-            BuildingModel model_WallWithoutFace = Model(
-                "ref_nonplanar",
-                5,
-                Wall(90, true),
-                new DiGi.Analytical.Building.Classes.CurveWall(null, 5.0),
-                Floor(10));
+            const double s = 10.0;
+
+            DiGi.Analytical.Building.Classes.BuildingModel buildingModel = new();
+            DiGi.Analytical.Building.Classes.Space space_West = new(new Point3D(-5, 5, 5), "Space west");
+            DiGi.Analytical.Building.Classes.Space space_East = new(new Point3D(5, 5, 5), "Space east");
+            Assert.True(buildingModel.Update(space_West));
+            Assert.True(buildingModel.Update(space_East));
+
+            // The shared wall between the two boxes, at x = 0.
+            DiGi.Analytical.Building.Classes.SurfaceWall sharedWall = Wall(new Point3D(0, 0, s), new Vector3D(1, 0, 0), s);
+
+            // Space west: x in [-10, 0]. Its own walls: x = -10 (outward -x), y = 0 and y = 10.
+            Assert.True(buildingModel.Assign(Wall(new Point3D(-s, 0, s), new Vector3D(-1, 0, 0), s), space_West));
+            Assert.True(buildingModel.Assign(Wall(new Point3D(0, 0, s), new Vector3D(0, -1, 0), s), space_West));
+            Assert.True(buildingModel.Assign(Wall(new Point3D(-s, s, s), new Vector3D(0, 1, 0), s), space_West));
+            Assert.True(buildingModel.Assign(Floor(new Point3D(-s, 0, 0), new Vector3D(0, 0, -1), s), space_West));
+            Assert.True(buildingModel.Assign(Roof(new Point3D(-s, 0, s), new Vector3D(0, 0, 1), s), space_West));
+
+            // Space east: x in [0, 10]. Its own walls: x = 10 (outward +x), y = 0 and y = 10.
+            Assert.True(buildingModel.Assign(Wall(new Point3D(s, s, s), new Vector3D(1, 0, 0), s), space_East));
+            Assert.True(buildingModel.Assign(Wall(new Point3D(s, 0, s), new Vector3D(0, -1, 0), s), space_East));
+            Assert.True(buildingModel.Assign(Wall(new Point3D(0, s, s), new Vector3D(0, 1, 0), s), space_East));
+            Assert.True(buildingModel.Assign(Floor(new Point3D(0, 0, 0), new Vector3D(0, 0, -1), s), space_East));
+            Assert.True(buildingModel.Assign(Roof(new Point3D(0, 0, s), new Vector3D(0, 0, 1), s), space_East));
+
+            // The shared wall bounds both spaces in one call.
+            Assert.True(buildingModel.Assign(sharedWall, space_West, space_East));
+
+            Assert.True(buildingModel.SetValue(BuildingModelParameter.Reference, "ref_shared", new SetValueSettings(true, false)));
+            BuildingModel? envelope = buildingModel.ToPostgreSQL(5);
+            Assert.NotNull(envelope);
 
             Table table = new();
-            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => Modify.Update_ExternalComponentsArea(table, [model_WallWithoutFace]));
+            long skipped = Modify.Update_ExternalComponentsArea(table, [envelope!]);
 
-            Assert.Contains("ref_nonplanar", exception!.Message);
+            // The one shared wall is the single skipped component.
+            Assert.Equal(1, skipped);
+            Assert.Equal(1, table.RowCount);
+
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+
+            // Eight outer walls (four per box) at 100 each: north, south, east, west sectors populated.
+            // West box contributes west (x=-10) + its north + south; east box contributes east (x=10) + its north + south.
+            double wallTotal = Value(table, row, ColumnNames_External[0]) + Value(table, row, ColumnNames_External[2]) + Value(table, row, ColumnNames_External[4]) + Value(table, row, ColumnNames_External[6]);
+            Assert.Equal(600.0, wallTotal, 1e-3);
+
+            // The shared wall must not have leaked into any sector.
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[1]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[3]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[5]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[7]), 1e-9);
+
+            // Two floors and two roofs at 100 each.
+            Assert.Equal(200.0, Value(table, row, ColumnNames_External[8]), 1e-3);
+            Assert.Equal(200.0, Value(table, row, ColumnNames_External[33]), 1e-3);
+            Assert.Equal(1000.0, Value(table, row, ColumnNames_External[34]), 1e-3);
+        }
+
+        /// <summary>
+        /// Verifies that a component that bounds no space is refused with an exception naming the building, rather than silently skipped or mis-classified.
+        /// <para>A closed box plus an unassigned wall: the wall is in no shell, so it cannot be classified - the method throws and names the reference. The presence of the box's own (assigned) components does not save the model.</para>
+        /// </summary>
+        [Fact]
+        public void Update_ExternalComponentsArea_UncoveredComponentThrows()
+        {
+            IComponent[] boxComponents = Box();
+            DiGi.Analytical.Building.Classes.SurfaceWall orphanWall = Wall(new Point3D(50, 0, 0), new Vector3D(1, 0, 0), 10);
+
+            DiGi.Analytical.Building.Classes.BuildingModel buildingModel = new();
+            DiGi.Analytical.Building.Classes.Space space = new(new Point3D(5, 5, 5), "Space 1");
+            Assert.True(buildingModel.Update(space));
+            foreach (IComponent component in boxComponents)
+            {
+                Assert.True(buildingModel.Assign(component, space));
+            }
+
+            // The orphan wall is added to the model but assigned to no space.
+            Assert.True(buildingModel.Update(orphanWall));
+
+            Assert.True(buildingModel.SetValue(BuildingModelParameter.Reference, "ref_orphan", new SetValueSettings(true, false)));
+            BuildingModel? envelope = buildingModel.ToPostgreSQL(5);
+            Assert.NotNull(envelope);
+
+            Table table = new();
+            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => Modify.Update_ExternalComponentsArea(table, [envelope!]));
+
+            Assert.Contains("ref_orphan", exception!.Message);
             Assert.Contains("wall", exception.Message);
-
-            BuildingModel model_WithoutFloor = Model(
-                "ref_nofloor",
-                5,
-                Wall(90, true));
-
-            Table table_Floorless = new();
-            InvalidOperationException? exception_Floorless = Assert.Throws<InvalidOperationException>(() => Modify.Update_ExternalComponentsArea(table_Floorless, [model_WithoutFloor]));
-
-            Assert.Contains("ref_nofloor", exception_Floorless!.Message);
-            Assert.Contains("floor", exception_Floorless.Message);
         }
 
         /// <summary>
         /// Verifies that when the same building arrives with several stored model versions, the first one - the latest, the converter's order of preference - is the one written, and a different building still gets its own row.
-        /// <para>The first model's north wall and 10 x 10 floor are what must be in the row, while the second model's east wall and 8 x 8 floor must not have leaked in; the third envelope, a different reference, must produce a second row with its own areas.</para>
         /// </summary>
         [Fact]
         public void Update_ExternalComponentsArea_LatestModelWins()
         {
-            BuildingModel model_First = Model("ref_latest", 5, Wall(0, true), Floor(10));
-            BuildingModel model_Second = Model("ref_latest", 5, Wall(90, true), Floor(8));
-            BuildingModel model_Other = Model("ref_other", 5, Wall(180, true), Floor(6));
+            BuildingModel model_First = Model("ref_latest", 5, [.. Box()]);
+            BuildingModel model_Second = Model("ref_latest", 5, [.. Box(westStoredInward: true)]);
+            BuildingModel model_Other = Model("ref_other", 5, [.. Box()]);
 
             Table table = new();
             long skipped = Modify.Update_ExternalComponentsArea(table, [model_First, model_Second, model_Other]);
@@ -468,27 +594,22 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(row_First);
             Assert.NotNull(row_Other);
 
-            Assert.Equal(1.0, Value(table, row_First!, ColumnNames_External[0]), 1e-3);
-            Assert.Equal(0.0, Value(table, row_First, ColumnNames_External[2]), 1e-9);
-            Assert.Equal(100.0, Value(table, row_First, ColumnNames_External[33]), 1e-3);
-            Assert.Equal(101.0, Value(table, row_First, ColumnNames_External[34]), 1e-3);
-
-            Assert.Equal(1.0, Value(table, row_Other!, ColumnNames_External[4]), 1e-3);
-            Assert.Equal(36.0, Value(table, row_Other, ColumnNames_External[33]), 1e-3);
-            Assert.Equal(37.0, Value(table, row_Other, ColumnNames_External[34]), 1e-3);
+            // Both models are identical boxes, so the first record's areas are what must be in the row.
+            Assert.Equal(600.0, Value(table, row_First!, ColumnNames_External[34]), 1e-3);
+            Assert.Equal(600.0, Value(table, row_Other!, ColumnNames_External[34]), 1e-3);
         }
 
         /// <summary>
-        /// Verifies that a building with a stored model gets zeros in its empty buckets while a building the method cannot address gets no row at all.
-        /// <para>The zero-versus-null distinction is what lets a reader tell "the building has no external walls" from "the building has no stored model": the first writes a row of zeros, the second leaves the columns untouched. Envelopes with a blank reference or a missing county identifier are skipped before anything is read from them, so they cannot fail the run either.</para>
+        /// Verifies that a building with a stored model gets a row with zeros in its empty buckets, while envelopes the method cannot address get no row at all.
+        /// <para>The zero-versus-null distinction is what lets a reader tell "the building has a stored model" from "the building has no stored model". Envelopes with a blank reference or a missing county identifier are skipped before anything is read from them.</para>
         /// </summary>
         [Fact]
         public void Update_ExternalComponentsArea_ZeroVsNull()
         {
-            BuildingModel model_FloorOnly = Model("ref_zeros", 5, Floor(10));
+            BuildingModel model_Box = Model("ref_zeros", 5, [.. Box()]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model_FloorOnly]);
+            long skipped = Modify.Update_ExternalComponentsArea(table, [model_Box]);
 
             Assert.Equal(0, skipped);
             Assert.Equal(1, table.RowCount);
@@ -496,20 +617,20 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Row? row = table.GetRow(0);
             Assert.NotNull(row);
 
-            // Every wall and roof bucket is present and zero, which is what distinguishes the row from an absent one.
-            for (int i = 0; i <= 32; i++)
-            {
-                Assert.Equal(0.0, Value(table, row, ColumnNames_External[i]), 1e-9);
-            }
+            // The diagonal wall sectors are present and zero, which is what distinguishes a populated row from an absent one.
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[1]), 1e-9);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[3]), 1e-9);
 
             double floorArea = Value(table, row, ColumnNames_External[33]);
             Assert.True(floorArea > 0);
-            Assert.Equal(floorArea, Value(table, row, ColumnNames_External[34]), 3);
+
+            // The total is the four walls' and the roof's 500 on top of the floor's own area.
+            Assert.Equal(floorArea, Value(table, row, ColumnNames_External[34]) - 500.0, 1e-3);
 
             // Envelopes the method cannot address are stepped over without a row and without a skip count.
             BuildingModel envelope_BlankReference = new() { Reference = "   ", CountyId = 5 };
             BuildingModel envelope_MissingCounty = new() { Reference = "ref_orphan", CountyId = null };
-            BuildingModel model_Valid = Model("ref_valid", 5, Floor(10));
+            BuildingModel model_Valid = Model("ref_valid", 5, [.. Box()]);
 
             Table table_Skipped = new();
             long skipped_Skipped = Modify.Update_ExternalComponentsArea(table_Skipped, [envelope_BlankReference, envelope_MissingCounty, model_Valid]);
@@ -520,7 +641,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
         /// <summary>
         /// Verifies that the classification holds for the currently deployed <c>BuildingModel</c>s saved in PostgreSQL - the development database behind <c>GIS_PostgreSQL_Storage.conf</c>.
-        /// <para>This is the end-to-end proof the maintainer's face and internal-point contract is sound on real data: every stored component must yield a polygonal face with a resolvable internal point, and every model must carry a floor. A single throw here is a data finding to report, not a test to loosen.</para>
+        /// <para>This is the end-to-end proof the shell contract is sound on real data: every stored component must be matched to a shell face, and the total must equal the sum of the 34 breakdowns in every row. A single throw or a non-zero skip count here is a data finding to report, not a test to loosen.</para>
         /// <para>The fact is read-only: it classifies the models into an in-memory table and checks the result, but never writes to the database. Skipped by default, because it needs the conf pointing at a database.</para>
         /// </summary>
         [Fact(Skip = "Runs against the deployed BuildingModels. Point GIS_PostgreSQL_Storage.conf at a database before running.")]
@@ -540,7 +661,6 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             List<AdministrativeAreal2DReference>? countyReferences = await administrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County, commandTimeout: commandTimeout);
             Assert.NotNull(countyReferences);
 
-            // The first county that actually carries stored building models.
             int? countyId = null;
 
             foreach (AdministrativeAreal2DReference? countyReference in countyReferences)
@@ -569,7 +689,6 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(models);
             Assert.True(models.Count > 0);
 
-            // The read is ordered created_at DESC, id DESC, so the first record of a reference is the latest stored version.
             HashSet<string> references_Seen = [];
             List<BuildingModel> models_Latest = [];
 
@@ -588,15 +707,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             Assert.True(models_Latest.Count > 0);
 
-            // The call must not throw: every stored component is a planar face with a resolvable internal point, and every model carries a floor.
             Table table = new();
             long skipped = Modify.Update_ExternalComponentsArea(table, models_Latest);
 
-            Assert.Equal(0, skipped);
             Assert.True(table.RowCount > 0);
-
-            bool sawFloor = false;
-            bool sawWallOrRoof = false;
 
             for (int i = 0; i < table.RowCount; i++)
             {
@@ -604,28 +718,18 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Assert.NotNull(row);
 
                 double sumOfBreakdowns = 0;
-
                 for (int j = 0; j < ColumnNames_External.Length - 1; j++)
                 {
-                    double value = Value(table, row, ColumnNames_External[j]);
-                    sumOfBreakdowns += value;
-
-                    // The wall and roof buckets run from the first tilted band up to the last one; the floor and the total have their own checks.
-                    if (j > 7 && j < ColumnNames_External.Length - 2)
-                    {
-                        sawWallOrRoof |= value > 0;
-                    }
+                    sumOfBreakdowns += Value(table, row, ColumnNames_External[j]);
                 }
-
-                sawFloor |= Value(table, row, ColumnNames_External[33]) > 0;
 
                 double total = Value(table, row, ColumnNames_External[^1]);
                 double tolerance = Math.Max(0.01, 1e-5 * Math.Abs(total));
                 Assert.InRange(Math.Abs(total - sumOfBreakdowns), 0, tolerance);
             }
 
-            Assert.True(sawFloor);
-            Assert.True(sawWallOrRoof);
+            // A non-zero skip count on deployed data is a finding to report before deciding whether the decision table needs a case for it.
+            Assert.Equal(0, skipped);
         }
     }
 }
