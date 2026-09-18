@@ -522,7 +522,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
         /// <summary>
         /// Verifies that a component that bounds no space is refused with an exception naming the building, rather than silently skipped or mis-classified.
-        /// <para>A closed box plus an unassigned wall: the wall is in no shell, so it cannot be classified - the method throws and names the reference. The presence of the box's own (assigned) components does not save the model.</para>
+        /// <para>A closed box plus an unassigned wall: the wall bounds no space, so the external envelope leaves it out and it cannot be classified - the method throws and names the reference. The presence of the box's own (assigned) components does not save the model.</para>
         /// </summary>
         [Fact]
         public void Update_ExternalComponentsArea_UncoveredComponentThrows()
@@ -637,6 +637,25 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             Assert.Equal(0, skipped_Skipped);
             Assert.Equal(1, table_Skipped.RowCount);
+        }
+
+        /// <summary>
+        /// Verifies that a model whose external components are too few to close an envelope is refused with an exception naming the building, rather than classified from an open face set.
+        /// <para>One space with three assigned components - a floor and two walls - yields no external envelope, since a closed solid needs at least four faces. Every component then bounds one space and is carried by no envelope face, so the method throws and names the reference and the space count. The pre-switch per-space path threw too, but for a shell that came back with no face at all - the polyhedron silently keeps nothing below four faces - so the message on the space count is what this fact tells apart.</para>
+        /// </summary>
+        [Fact]
+        public void Update_ExternalComponentsArea_EnvelopeBelowFourFacesThrows()
+        {
+            IComponent[] boxComponents = Box();
+
+            // The west and east walls and the floor of the box; the south and north walls and the roof are left out.
+            BuildingModel model = Model("ref_three_faces", 5, boxComponents[0], boxComponents[1], boxComponents[4]);
+
+            Table table = new();
+            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => Modify.Update_ExternalComponentsArea(table, [model]));
+
+            Assert.Contains("ref_three_faces", exception!.Message);
+            Assert.Contains("bounds 1 space", exception.Message);
         }
 
         /// <summary>
