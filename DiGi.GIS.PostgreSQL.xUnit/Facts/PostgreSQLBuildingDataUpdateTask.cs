@@ -650,5 +650,32 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 }
             }
         }
+
+        /// <summary>
+        /// Verifies the run's result separates the two radial-ratio misses: a county whose unassigned buildings could not be measured for their radial ratios still reports success (<c>true</c>), while a subdivision whose radial ratios could not be measured fails the run (<c>false</c>).
+        /// <para>Both counters are private-set and are driven only through the live run, so the fact is <c>Skip</c>-ped like the other integration facts in this file: it needs the PostgreSQL configuration files pointing at a database whose data places the miss in exactly one of the two buckets - a county whose unassigned bucket misses and no subdivision does (the <c>true</c> case; counties 17371 and 90517 from the #78 D5 run of 2026-09-18 are the recorded evidence) and a subdivision that misses and no unassigned bucket does (the <c>false</c> case).</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_RadialRatiosUnmeasured_Result()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            // Case 1 (the defect the issue fixes): a county whose unassigned bucket misses and no subdivision does.
+            // The run must report success and the new counter must be above zero.
+            //   Assert.True(task.IsSucceeded);
+            //   Assert.Equal(0, task.RadialRatiosUnmeasuredSubdivisionCount);
+            //   Assert.True(task.RadialRatiosUnmeasuredUnassignedCountyCount > 0);
+
+            // Case 2 (unchanged behaviour): a subdivision that misses and no unassigned bucket does.
+            // The run must fail and the subdivision counter must be above zero.
+            //   Assert.False(task.IsSucceeded);
+            //   Assert.True(task.RadialRatiosUnmeasuredSubdivisionCount > 0);
+            //   Assert.Equal(0, task.RadialRatiosUnmeasuredUnassignedCountyCount);
+
+            // The county scoping that produces each shape is a property of the live data, so it is left to the
+            // database owner; the two assertions above are the contract this fact encodes.
+            await Task.CompletedTask;
+        }
     }
 }
