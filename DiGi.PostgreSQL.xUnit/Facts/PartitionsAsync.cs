@@ -35,8 +35,8 @@ namespace DiGi.PostgreSQL.xUnit
             CancellationTokenSource cancellationTokenSource = new();
             cancellationTokenSource.Cancel();
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Query.PartitionsAsync(npgsqlConnection, [1], cancellationTokenSource.Token));
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Query.PartitionsAsync(npgsqlConnection, ["x"], cancellationTokenSource.Token));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Query.PartitionsAsync(npgsqlConnection, [1], cancellationToken: cancellationTokenSource.Token));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Query.PartitionsAsync(npgsqlConnection, ["x"], cancellationToken: cancellationTokenSource.Token));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace DiGi.PostgreSQL.xUnit
                 }
 
                 CancellationTokenSource cancellationTokenSource = new();
-                Task<List<Partition>?> attempt = Query.PartitionsAsync(npgsqlConnection, partitionIds, cancellationTokenSource.Token);
+                Task<List<Partition>?> attempt = Query.PartitionsAsync(npgsqlConnection, partitionIds, cancellationToken: cancellationTokenSource.Token);
 
                 // Cancel at 40% of the warm control total: inside the row loop (the reader phase is a few ms), with the loop still running for well over 40% of the total.
                 await Task.Delay(TimeSpan.FromMilliseconds(totalMilliseconds * 4 / 10));

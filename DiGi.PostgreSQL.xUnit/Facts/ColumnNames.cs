@@ -33,7 +33,7 @@ namespace DiGi.PostgreSQL.xUnit
             CancellationTokenSource cancellationTokenSource = new();
             cancellationTokenSource.Cancel();
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Query.ColumnNamesAsync(npgsqlConnection, "partitions", cancellationTokenSource.Token));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Query.ColumnNamesAsync(npgsqlConnection, "partitions", cancellationToken: cancellationTokenSource.Token));
         }
     }
 }

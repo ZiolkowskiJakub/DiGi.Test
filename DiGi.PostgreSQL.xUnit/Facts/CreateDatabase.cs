@@ -16,19 +16,19 @@ namespace DiGi.PostgreSQL.xUnit
                 return;
             }
 
-            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
+            Assert.True(await connectionData.DatabaseAsync());
 
             connectionData = Create.ConnectionData(Enums.StorageMethod.UniqueReference);
 
-            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
+            Assert.True(await connectionData.DatabaseAsync());
 
             connectionData = Create.ConnectionData(Enums.StorageMethod.PartitionUniqueReference);
 
-            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
+            Assert.True(await connectionData.DatabaseAsync());
 
             connectionData = Create.ConnectionData(Enums.StorageMethod.Table);
 
-            Assert.True(await PostgreSQL.Create.DatabaseAsync(connectionData));
+            Assert.True(await connectionData.DatabaseAsync());
         }
     }
 }
