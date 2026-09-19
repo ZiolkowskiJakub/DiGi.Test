@@ -17,7 +17,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Core\DiGi.Core\DiGi.Core.csproj" />
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
     <ProjectReference Include="..\..\DiGi.Unit\DiGi.Unit\DiGi.Unit.csproj" />
+    <ProjectReference Include="..\..\DiGi.Unit\DiGi.Unit.IO\DiGi.Unit.IO.csproj" />
   </ItemGroup>
 
   <ItemGroup>
