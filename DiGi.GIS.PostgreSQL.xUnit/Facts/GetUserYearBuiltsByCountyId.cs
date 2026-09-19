@@ -139,5 +139,57 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS {yearBuiltDataPostgreSQLConverter.TableName}_990103;");
             }
         }
+
+        /// <summary>
+        /// Verifies, measured on the development database, that a bounded user entry is excluded from the label while a legacy exact entry is included.
+        /// <para>A <c>YearBuiltRelation</c> of <c>AtOrBefore</c> or <c>After</c> is a verification, not a label: the read's <c>COALESCE((value-&gt;&gt;'YearBuiltRelation')::int, 0) = 0</c> filter admits only exact entries and legacy entries that carry no relation member at all.</para>
+        /// <para>Skipped by default: it creates and drops county partitions and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database - never the deployed one.</para>
+        /// </summary>
+        [Fact(Skip = "Creates and drops partitions. Point GIS_PostgreSQL_Main.conf at a scratch database before running.")]
+        public async Task UserYearBuilts_ExcludeBounds_DevDb()
+        {
+            const int countyId = 990101;
+
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<YearBuiltDataPostgreSQLConverter>();
+            Assert.NotNull(yearBuiltDataPostgreSQLConverter);
+
+            ConnectionData? connectionData = yearBuiltDataPostgreSQLConverter.ConnectionData;
+            Assert.NotNull(connectionData);
+
+            await using NpgsqlConnection? npgsqlConnection = DiGi.PostgreSQL.Create.NpgsqlConnection(connectionData);
+            Assert.NotNull(npgsqlConnection);
+
+            await npgsqlConnection.OpenAsync();
+
+            string tableName = yearBuiltDataPostgreSQLConverter.TableName;
+            try
+            {
+                await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS {tableName}_{countyId};");
+                Assert.True(await npgsqlConnection.TableAsync_Building2DReferencedObject(tableName));
+                Assert.True(await npgsqlConnection.TableAsync_Building2DReferencedObject_Partition(tableName, countyId));
+
+                string userType = "DiGi.GIS.Classes.UserYearBuilt,DiGi.GIS";
+                string createdAt = "2026-01-01T00:00:00Z";
+
+                // A bounded user entry (AtOrBefore) is a verification, not a label: excluded from the result.
+                await ExecuteAsync(npgsqlConnection, $"INSERT INTO {tableName} (county_id, unique_id, reference, object, created_at) VALUES ({countyId}, 'xunit-yb-bound-1', 'XUNIT-YB-BOUNDED', '{{\"_type\":\"DiGi.GIS.Classes.YearBuiltData,DiGi.GIS\",\"Guid\":\"33333333-0000-0000-0000-000000000001\",\"YearBuilts\":[{{\"_type\":\"{userType}\",\"Year\":1950,\"YearBuiltRelation\":1}}],\"Reference\":\"XUNIT-YB-BOUNDED\"}}'::jsonb, '{createdAt}')");
+
+                // A legacy exact user entry (no YearBuiltRelation member) is a label: included in the result.
+                await ExecuteAsync(npgsqlConnection, $"INSERT INTO {tableName} (county_id, unique_id, reference, object, created_at) VALUES ({countyId}, 'xunit-yb-exact-1', 'XUNIT-YB-EXACT', '{{\"_type\":\"DiGi.GIS.Classes.YearBuiltData,DiGi.GIS\",\"Guid\":\"33333333-0000-0000-0000-000000000002\",\"YearBuilts\":[{{\"_type\":\"{userType}\",\"Year\":1965}}],\"Reference\":\"XUNIT-YB-EXACT\"}}'::jsonb, '{createdAt}')");
+
+                Dictionary<string, short>? result = await yearBuiltDataPostgreSQLConverter.GetUserYearBuiltsByCountyIdAsync(countyId);
+                Assert.NotNull(result);
+
+                Assert.Equal((short)1965, result["XUNIT-YB-EXACT"]);
+                Assert.False(result.ContainsKey("XUNIT-YB-BOUNDED"), "a bounded user entry must not appear as a label");
+            }
+            finally
+            {
+                await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS {tableName}_{countyId};");
+            }
+        }
     }
 }
