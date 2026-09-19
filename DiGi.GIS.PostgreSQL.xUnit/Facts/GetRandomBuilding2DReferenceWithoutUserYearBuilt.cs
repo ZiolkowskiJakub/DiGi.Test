@@ -24,6 +24,66 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
+        /// Verifies that the <c>countyIds</c>-filtering overloads of <see cref="OrtoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync"/> answer null when no connection is available, without touching a database.
+        /// </summary>
+        [Fact]
+        public async Task GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync_CountyIds_NullConnection_ReturnsNull()
+        {
+            Building2DReference? result_Static = await OrtoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync(null, [1]);
+            Assert.Null(result_Static);
+
+            OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
+            Building2DReference? result_Instance = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([1]);
+            Assert.Null(result_Instance);
+        }
+
+        /// <summary>
+        /// Verifies, measured on the development database, that a <c>countyIds</c> filter confines the draw to the requested <c>building_2d</c> parts.
+        /// <para>The scratch county 990101 is one of hundreds of covered parts, so an unfiltered draw lands elsewhere with overwhelming probability; 20 filtered draws that all land on the scratch part is the differential that fails if the filter is dead. A part id that names nothing empties the pool and answers null; an empty filter behaves as the baseline.</para>
+        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database - never the deployed one.</para>
+        /// </summary>
+        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf at a scratch database before running.")]
+        public async Task RandomBuilding2DReference_CountyIds_RestrictsToRequestedParts_DevDb()
+        {
+            (NpgsqlConnection? npgsqlConnection, YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter) = await ScratchConnectionAsync();
+            Assert.NotNull(yearBuiltDataPostgreSQLConverter);
+            Assert.NotNull(npgsqlConnection);
+
+            int countyId = 0;
+            try
+            {
+                countyId = await SeedScratchCountyAsync(npgsqlConnection);
+
+                await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-PART");
+                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-PART", "2010");
+                await AnalyzeOrtoDatasAsync(npgsqlConnection, countyId);
+
+                OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+
+                for (int i = 0; i < 20; i++)
+                {
+                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([countyId]);
+                    Assert.NotNull(drawn);
+                    Assert.Equal(countyId, drawn.CountyId);
+                    Assert.Equal("XUNIT-RND-PART", drawn.Reference);
+                }
+
+                // A part id that names nothing: the pool is empty, so the answer is null rather than a building from elsewhere.
+                Building2DReference? drawn_Unknown = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([countyId + 1_000_000]);
+                Assert.Null(drawn_Unknown);
+
+                // An empty filter is the baseline: a draw is possible because the scratch part is covered.
+                Building2DReference? drawn_Empty = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([]);
+                Assert.NotNull(drawn_Empty);
+            }
+            finally
+            {
+                await CleanupScratchCountyAsync(npgsqlConnection, countyId);
+                npgsqlConnection?.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Verifies, measured on the development database, that the drawn building is orthophoto-covered with at least one card and carries no user year built entry.
         /// <para>The scratch county 990101 is seeded with one eligible building so a draw is always possible; the assertions are on the property of whatever is drawn, so the fact holds whether the draw lands on the scratch county or on any other covered county of the database.</para>
         /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database - never the deployed one.</para>

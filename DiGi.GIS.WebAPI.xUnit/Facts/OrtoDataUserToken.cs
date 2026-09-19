@@ -22,6 +22,19 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.IsType<UnauthorizedResult>(await controller.GetRandomBuilding2DReferenceAsync());
         }
 
+        /// <summary>
+        /// The optional <c>countyids</c> filter is additive: it reaches the same user-token gate as the unfiltered call, so an anonymous request with a filter still answers 401 and never touches the converter.
+        /// </summary>
+        [Fact]
+        public async Task RandomBuilding2DReference_CountyIds_Anonymous_Answers401()
+        {
+            using GISWebAPIConfigurationFileWatcher watcher = new(ConfigurationFilePath());
+            OrtoDatasController controller = new(watcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+            controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+
+            Assert.IsType<UnauthorizedResult>(await controller.GetRandomBuilding2DReferenceAsync(countyIds: [1, 2]));
+        }
+
         [Fact]
         public async Task YearsByReference_Anonymous_Answers401()
         {
