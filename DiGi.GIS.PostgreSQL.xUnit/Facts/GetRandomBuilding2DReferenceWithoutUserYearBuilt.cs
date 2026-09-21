@@ -334,7 +334,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <param name="year">The photo year to store, or null for an empty <c>Values</c> array.</param>
         private static async Task SeedOrtoDatasAsync(NpgsqlConnection npgsqlConnection, int countyId, string reference, string? year)
         {
-            string values = year is null ? "[]" : $"[{{\"Bytes\":\"AQID\",\"DateTime\":\"{year}-01-01T00:00:00\",\"Scale\":2.5}}]";
+            // Bytes is a JSON array of numbers - the shape the DiGi serializer writes for a byte[] - never base64 (DiGi.GIS.PostgreSQL#90).
+            string values = year is null ? "[]" : $"[{{\"Bytes\":[1,2,3],\"DateTime\":\"{year}-01-01T00:00:00\",\"Scale\":2.5}}]";
             string objectJson = $"{{\"_type\":\"DiGi.GIS.Classes.OrtoDatas,DiGi.GIS\",\"Guid\":\"11111111-0000-0000-0000-000000000001\",\"Reference\":\"{reference}\",\"Values\":[{values}]}}";
 
             await ExecuteAsync(npgsqlConnection, $"DELETE FROM orto_datas WHERE county_id = {countyId} AND reference = '{reference}';");

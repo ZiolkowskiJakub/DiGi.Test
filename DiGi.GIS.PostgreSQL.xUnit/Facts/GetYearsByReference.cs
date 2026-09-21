@@ -36,7 +36,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
                 // A building holding cards in three distinct years, and one holding none.
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-YRS-MULTI");
-                string objectJson_Multi = "{\"_type\":\"DiGi.GIS.Classes.OrtoDatas,DiGi.GIS\",\"Guid\":\"11111111-0000-0000-0000-000000000001\",\"Reference\":\"XUNIT-YRS-MULTI\",\"Values\":[{\"Bytes\":\"AQID\",\"DateTime\":\"2004-01-01T00:00:00\",\"Scale\":2.5},{\"Bytes\":\"AQID\",\"DateTime\":\"2010-01-01T00:00:00\",\"Scale\":2.5},{\"Bytes\":\"AQID\",\"DateTime\":\"2015-01-01T00:00:00\",\"Scale\":2.5}]}";
+                string objectJson_Multi = "{\"_type\":\"DiGi.GIS.Classes.OrtoDatas,DiGi.GIS\",\"Guid\":\"11111111-0000-0000-0000-000000000001\",\"Reference\":\"XUNIT-YRS-MULTI\",\"Values\":[{\"Bytes\":[1,2,3],\"DateTime\":\"2004-01-01T00:00:00\",\"Scale\":2.5},{\"Bytes\":[1,2,3],\"DateTime\":\"2010-01-01T00:00:00\",\"Scale\":2.5},{\"Bytes\":[1,2,3],\"DateTime\":\"2015-01-01T00:00:00\",\"Scale\":2.5}]}";
                 await ExecuteAsync(npgsqlConnection, $"DELETE FROM orto_datas WHERE county_id = {countyId} AND reference = 'XUNIT-YRS-MULTI';");
                 await ExecuteAsync(npgsqlConnection, $"INSERT INTO orto_datas (county_id, reference, object) VALUES ({countyId}, 'XUNIT-YRS-MULTI', '{objectJson_Multi}'::jsonb);");
 
