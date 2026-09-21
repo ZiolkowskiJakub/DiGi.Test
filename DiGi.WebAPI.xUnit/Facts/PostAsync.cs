@@ -159,6 +159,27 @@ namespace DiGi.WebAPI.xUnit
         }
 
         /// <summary>
+        /// Tests that a connection-level failure (reset, refused, DNS) is treated as transient and retried with a fresh body.
+        /// <para>On 2026-09-19 the server dropped its keep-alive connections once and eight consecutive county requests each picked a stale pooled socket, failing with <see cref="HttpRequestException"/>; with the factory overload the second attempt gets a live connection.</para>
+        /// </summary>
+        [Fact]
+        public async Task PostAsync_RetriesOnConnectionFailure()
+        {
+            const string content = "{\"CountyId\":15678}";
+
+            ConnectionFailureHttpMessageHandler connectionFailureHttpMessageHandler = new(1);
+
+            using HttpClient httpClient = new(connectionFailureHttpMessageHandler);
+
+            PostResponse postResponse = await Modify.PostAsync(httpClient, "https://localhost/building2Dreferencesbypagingparameter", HttpContentFactory(content), PostOptions());
+
+            Assert.True(postResponse.Succeeded);
+            Assert.Equal(2, connectionFailureHttpMessageHandler.RequestCount);
+            Assert.Equal(2, connectionFailureHttpMessageHandler.RequestBodies.Count);
+            Assert.All(connectionFailureHttpMessageHandler.RequestBodies, x => Assert.Equal(content, x));
+        }
+
+        /// <summary>
         /// Tests that passing invalid parameters returns a failing PostResponse without throwing.
         /// </summary>
         [Fact]
@@ -229,6 +250,52 @@ namespace DiGi.WebAPI.xUnit
                 if (requestCount <= timeoutAttempts)
                 {
                     await Task.Delay(5000, cancellationToken);
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(string.Empty) };
+            }
+        }
+
+        /// <summary>
+        /// An HTTP handler that fails at the connection level for a set number of attempts, the way a stale pooled socket does, and records what was sent.
+        /// </summary>
+        private sealed class ConnectionFailureHttpMessageHandler : HttpMessageHandler
+        {
+            private readonly List<string> requestBodies = [];
+            private readonly int failureAttempts;
+            private int requestCount = 0;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ConnectionFailureHttpMessageHandler"/> class.
+            /// </summary>
+            /// <param name="failureAttempts">The number of initial requests that should fail with <see cref="HttpRequestException"/>.</param>
+            public ConnectionFailureHttpMessageHandler(int failureAttempts)
+            {
+                this.failureAttempts = failureAttempts;
+            }
+
+            /// <summary>
+            /// Gets the body text of every request received, in order.
+            /// </summary>
+            public List<string> RequestBodies => requestBodies;
+
+            /// <summary>
+            /// Gets how many requests the handler received.
+            /// </summary>
+            public int RequestCount => requestCount;
+
+            /// <inheritdoc />
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage httpRequestMessage, CancellationToken cancellationToken)
+            {
+                if (httpRequestMessage.Content is not null)
+                {
+                    requestBodies.Add(await httpRequestMessage.Content.ReadAsStringAsync(cancellationToken));
+                }
+
+                requestCount++;
+                if (requestCount <= failureAttempts)
+                {
+                    throw new HttpRequestException("An error occurred while sending the request.", new System.IO.IOException("An existing connection was forcibly closed by the remote host."));
                 }
 
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(string.Empty) };
