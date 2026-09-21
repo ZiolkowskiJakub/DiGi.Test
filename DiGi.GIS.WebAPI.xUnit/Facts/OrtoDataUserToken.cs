@@ -58,6 +58,50 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
+        /// Verifies that the random draw answers 503, not 404, when the main-store converter it needs is not configured: a host that cannot reach <c>building_2d</c> / <c>year_built_data</c> is an outage, not an empty pool (DiGi.GIS.WebAPI#39).
+        /// <para>The draw spans two databases; the orthophoto converter alone can never answer it, which is what filed every county as "nothing left to verify" on the deployed host.</para>
+        /// </summary>
+        [Fact]
+        public async Task RandomBuilding2DReference_NoYearBuiltConverter_Answers503()
+        {
+            using GISWebAPIConfigurationFileWatcher watcher = new(ConfigurationFilePath());
+            SecurityKeyManager securityKeyManager = new();
+            _ = securityKeyManager.Generate();
+            TokenRevocationStore tokenRevocationStore = new();
+            string token = CreateToken(securityKeyManager, "reviewer@example.com");
+
+            DefaultHttpContext httpContext = new();
+            httpContext.Request.Headers.Authorization = "Bearer " + token;
+
+            OrtoDatasController controller = new(watcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
+            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
+
+            ObjectResult objectResult = Assert.IsType<ObjectResult>(await controller.GetRandomBuilding2DReferenceAsync());
+            Assert.Equal(503, objectResult.StatusCode);
+        }
+
+        /// <summary>
+        /// Verifies that, with every converter present but none connected, the random draw answers 404 - the pool cannot be read, which the two-database Query reports as null - rather than throwing.
+        /// </summary>
+        [Fact]
+        public async Task RandomBuilding2DReference_UnconnectedConverters_Answers404()
+        {
+            using GISWebAPIConfigurationFileWatcher watcher = new(ConfigurationFilePath());
+            SecurityKeyManager securityKeyManager = new();
+            _ = securityKeyManager.Generate();
+            TokenRevocationStore tokenRevocationStore = new();
+            string token = CreateToken(securityKeyManager, "reviewer@example.com");
+
+            DefaultHttpContext httpContext = new();
+            httpContext.Request.Headers.Authorization = "Bearer " + token;
+
+            OrtoDatasController controller = new(watcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null));
+            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
+
+            Assert.IsType<NotFoundResult>(await controller.GetRandomBuilding2DReferenceAsync(countyIds: [1]));
+        }
+
+        /// <summary>
         /// A valid user token but <c>AllowUpdateYearBuiltData=false</c>: the token check passes and the flag check
         /// denies, so the order (token before flag) is what produces the 400 rather than a 401.
         /// </summary>

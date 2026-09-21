@@ -10,75 +10,93 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync"/> answers null in both overloads when no connection is available, without touching a database.
+        /// Verifies that <see cref="Query.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(OrtoDatasPostgreSQLConverter, AdministrativeAreal2DPostgreSQLConverter, YearBuiltDataPostgreSQLConverter, IEnumerable{int}, int, int, int, System.Threading.CancellationToken)"/> answers null when any of its three converters is missing or the batch bounds are not positive, without touching a database.
         /// </summary>
         [Fact]
-        public async Task GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync_NullConnection_ReturnsNull()
+        public async Task RandomBuilding2DReferenceWithoutUserYearBuiltAsync_NullConverter_ReturnsNull()
         {
-            Building2DReference? result_Static = await OrtoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync(null);
-            Assert.Null(result_Static);
-
             OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
-            Building2DReference? result_Instance = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync();
-            Assert.Null(result_Instance);
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(null);
+            YearBuiltDataPostgreSQLConverter yearBuiltDataPostgreSQLConverter = new(null);
+
+            Assert.Null(await Query.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(null, administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter));
+            Assert.Null(await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(null, yearBuiltDataPostgreSQLConverter));
+            Assert.Null(await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, null));
+            Assert.Null(await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter, [1], batchSize: 0));
+            Assert.Null(await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter, [1], maxBatchCount: 0));
+
+            // Converters without connection data: the county read answers null and so does the draw.
+            Assert.Null(await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter));
+            Assert.Null(await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter, [1]));
         }
 
         /// <summary>
-        /// Verifies that the <c>countyIds</c>-filtering overloads of <see cref="OrtoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync"/> answer null when no connection is available, without touching a database.
+        /// Verifies that the two halves of the draw - <see cref="OrtoDatasPostgreSQLConverter.GetRandomReferencesByCountyIdsAsync(NpgsqlConnection, IEnumerable{int}, int, int, System.Threading.CancellationToken)"/> on the storage side and <see cref="YearBuiltDataPostgreSQLConverter.GetBuilding2DReferencesWithoutUserYearBuiltAsync(NpgsqlConnection, IEnumerable{int}, IEnumerable{string}, int, System.Threading.CancellationToken)"/> on the main side - answer null for a missing connection, missing parts or missing references, in both overloads, without touching a database.
         /// </summary>
         [Fact]
-        public async Task GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync_CountyIds_NullConnection_ReturnsNull()
+        public async Task RandomDrawHalves_NullConnection_ReturnsNull()
         {
-            Building2DReference? result_Static = await OrtoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync(null, [1]);
-            Assert.Null(result_Static);
+            Assert.Null(await OrtoDatasPostgreSQLConverter.GetRandomReferencesByCountyIdsAsync(null, [1], 8));
+            Assert.Null(await new OrtoDatasPostgreSQLConverter(null).GetRandomReferencesByCountyIdsAsync([1], 8));
+            Assert.Null(await new OrtoDatasPostgreSQLConverter(null).GetRandomReferencesByCountyIdsAsync(null, 8));
 
-            OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(null);
-            Building2DReference? result_Instance = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([1]);
-            Assert.Null(result_Instance);
+            Assert.Null(await YearBuiltDataPostgreSQLConverter.GetBuilding2DReferencesWithoutUserYearBuiltAsync(null, [1], ["XUNIT-RND"]));
+            Assert.Null(await new YearBuiltDataPostgreSQLConverter(null).GetBuilding2DReferencesWithoutUserYearBuiltAsync([1], ["XUNIT-RND"]));
+            Assert.Null(await new YearBuiltDataPostgreSQLConverter(null).GetBuilding2DReferencesWithoutUserYearBuiltAsync([1], null));
+            Assert.Null(await new YearBuiltDataPostgreSQLConverter(null).GetBuilding2DReferencesWithoutUserYearBuiltAsync(null, ["XUNIT-RND"]));
         }
 
         /// <summary>
         /// Verifies, measured on the development database, that a <c>countyIds</c> filter confines the draw to the requested <c>building_2d</c> parts.
         /// <para>The scratch county 990101 is one of hundreds of covered parts, so an unfiltered draw lands elsewhere with overwhelming probability; 20 filtered draws that all land on the scratch part is the differential that fails if the filter is dead. A part id that names nothing empties the pool and answers null; an empty filter behaves as the baseline.</para>
-        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database - never the deployed one.</para>
+        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> and <c>GIS_PostgreSQL_Storage.conf</c> beside the test assembly pointing at two different scratch databases - never the deployed ones.</para>
         /// </summary>
-        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf at a scratch database before running.")]
+        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf and GIS_PostgreSQL_Storage.conf at two different scratch databases before running.")]
         public async Task RandomBuilding2DReference_CountyIds_RestrictsToRequestedParts_DevDb()
         {
             (NpgsqlConnection? npgsqlConnection, YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter) = await ScratchConnectionAsync();
             Assert.NotNull(yearBuiltDataPostgreSQLConverter);
             Assert.NotNull(npgsqlConnection);
 
+            (NpgsqlConnection? npgsqlConnection_Storage, OrtoDatasPostgreSQLConverter? ortoDatasPostgreSQLConverter) = await ScratchStorageConnectionAsync();
+            Assert.NotNull(ortoDatasPostgreSQLConverter);
+            Assert.NotNull(npgsqlConnection_Storage);
+
+            // The regression this fact exists for: the two sides must be two databases, or a draw that joins
+            // across them on one connection passes here and answers nothing on the deployed host.
+            Assert.NotEqual(npgsqlConnection.Database, npgsqlConnection_Storage.Database);
+
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+
             int countyId = 0;
             try
             {
-                countyId = await SeedScratchCountyAsync(npgsqlConnection);
+                countyId = await SeedScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage);
 
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-PART");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-PART", "2010");
-                await AnalyzeOrtoDatasAsync(npgsqlConnection, countyId);
-
-                OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-PART", "2010");
+                await AnalyzeOrtoDatasAsync(npgsqlConnection_Storage, countyId);
 
                 for (int i = 0; i < 20; i++)
                 {
-                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([countyId]);
+                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter, [countyId]);
                     Assert.NotNull(drawn);
                     Assert.Equal(countyId, drawn.CountyId);
                     Assert.Equal("XUNIT-RND-PART", drawn.Reference);
                 }
 
                 // A part id that names nothing: the pool is empty, so the answer is null rather than a building from elsewhere.
-                Building2DReference? drawn_Unknown = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([countyId + 1_000_000]);
+                Building2DReference? drawn_Unknown = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter, [countyId + 1_000_000]);
                 Assert.Null(drawn_Unknown);
 
                 // An empty filter is the baseline: a draw is possible because the scratch part is covered.
-                Building2DReference? drawn_Empty = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync([]);
+                Building2DReference? drawn_Empty = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter, []);
                 Assert.NotNull(drawn_Empty);
             }
             finally
             {
-                await CleanupScratchCountyAsync(npgsqlConnection, countyId);
+                await CleanupScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
+                npgsqlConnection_Storage?.Dispose();
                 npgsqlConnection?.Dispose();
             }
         }
@@ -86,32 +104,40 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <summary>
         /// Verifies, measured on the development database, that the drawn building is orthophoto-covered with at least one card and carries no user year built entry.
         /// <para>The scratch county 990101 is seeded with one eligible building so a draw is always possible; the assertions are on the property of whatever is drawn, so the fact holds whether the draw lands on the scratch county or on any other covered county of the database.</para>
-        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database - never the deployed one.</para>
+        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> and <c>GIS_PostgreSQL_Storage.conf</c> beside the test assembly pointing at two different scratch databases - never the deployed ones.</para>
         /// </summary>
-        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf at a scratch database before running.")]
+        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf and GIS_PostgreSQL_Storage.conf at two different scratch databases before running.")]
         public async Task RandomBuilding2DReference_WithoutUserYearBuilt_DevDb()
         {
             (NpgsqlConnection? npgsqlConnection, YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter) = await ScratchConnectionAsync();
             Assert.NotNull(yearBuiltDataPostgreSQLConverter);
             Assert.NotNull(npgsqlConnection);
 
+            (NpgsqlConnection? npgsqlConnection_Storage, OrtoDatasPostgreSQLConverter? ortoDatasPostgreSQLConverter) = await ScratchStorageConnectionAsync();
+            Assert.NotNull(ortoDatasPostgreSQLConverter);
+            Assert.NotNull(npgsqlConnection_Storage);
+
+            // The regression this fact exists for: the two sides must be two databases, or a draw that joins
+            // across them on one connection passes here and answers nothing on the deployed host.
+            Assert.NotEqual(npgsqlConnection.Database, npgsqlConnection_Storage.Database);
+
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+
             int countyId = 0;
             try
             {
-                countyId = await SeedScratchCountyAsync(npgsqlConnection);
+                countyId = await SeedScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage);
 
                 // One eligible building: covered, one card, no year_built_data row at all.
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-ELIGIBLE");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-ELIGIBLE", "2010");
-                await AnalyzeOrtoDatasAsync(npgsqlConnection, countyId);
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-ELIGIBLE", "2010");
+                await AnalyzeOrtoDatasAsync(npgsqlConnection_Storage, countyId);
 
-                OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
-
-                Building2DReference? drawn = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync();
+                Building2DReference? drawn = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter);
                 Assert.NotNull(drawn);
 
                 // Orthophoto-covered with at least one card: the exact-years read answers non-empty.
-                List<short>? years = await OrtoDatasPostgreSQLConverter.GetYearsByReferenceAsync(npgsqlConnection, drawn.Reference!, drawn.CountyId);
+                List<short>? years = await OrtoDatasPostgreSQLConverter.GetYearsByReferenceAsync(npgsqlConnection_Storage, drawn.Reference!, drawn.CountyId);
                 Assert.NotNull(years);
                 Assert.NotEmpty(years);
 
@@ -120,7 +146,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             }
             finally
             {
-                await CleanupScratchCountyAsync(npgsqlConnection, countyId);
+                await CleanupScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
+                npgsqlConnection_Storage?.Dispose();
                 npgsqlConnection?.Dispose();
             }
         }
@@ -128,34 +155,42 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <summary>
         /// Verifies, measured on the development database, that a building holding a user year built entry is never drawn, and that every drawn building carries no user entry.
         /// <para>The exclusion is asserted over 25 draws: the seeded pair is in scratch county 990101, so it can only enter the pool when that county is drawn - and then the anti-join removes it. The property that every drawn building is user-entry-free is the invariant the fact pins, on whichever county the draw lands.</para>
-        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database - never the deployed one.</para>
+        /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> and <c>GIS_PostgreSQL_Storage.conf</c> beside the test assembly pointing at two different scratch databases - never the deployed ones.</para>
         /// </summary>
-        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf at a scratch database before running.")]
+        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf and GIS_PostgreSQL_Storage.conf at two different scratch databases before running.")]
         public async Task RandomBuilding2DReference_ExcludesUserVerified_DevDb()
         {
             (NpgsqlConnection? npgsqlConnection, YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter) = await ScratchConnectionAsync();
             Assert.NotNull(yearBuiltDataPostgreSQLConverter);
             Assert.NotNull(npgsqlConnection);
 
+            (NpgsqlConnection? npgsqlConnection_Storage, OrtoDatasPostgreSQLConverter? ortoDatasPostgreSQLConverter) = await ScratchStorageConnectionAsync();
+            Assert.NotNull(ortoDatasPostgreSQLConverter);
+            Assert.NotNull(npgsqlConnection_Storage);
+
+            // The regression this fact exists for: the two sides must be two databases, or a draw that joins
+            // across them on one connection passes here and answers nothing on the deployed host.
+            Assert.NotEqual(npgsqlConnection.Database, npgsqlConnection_Storage.Database);
+
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+
             int countyId = 0;
             try
             {
-                countyId = await SeedScratchCountyAsync(npgsqlConnection);
+                countyId = await SeedScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage);
 
                 // A verified building (user entry) and an eligible one in the same scratch county.
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-VERIFIED");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-VERIFIED", "2010");
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-VERIFIED", "2010");
                 await SeedYearBuiltDataAsync(npgsqlConnection, countyId, "XUNIT-RND-VERIFIED", "xunit-rnd-1", 1975, null);
 
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-ELIGIBLE");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-ELIGIBLE", "2010");
-                await AnalyzeOrtoDatasAsync(npgsqlConnection, countyId);
-
-                OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-ELIGIBLE", "2010");
+                await AnalyzeOrtoDatasAsync(npgsqlConnection_Storage, countyId);
 
                 for (int i = 0; i < 25; i++)
                 {
-                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync();
+                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter);
                     if (drawn is null)
                     {
                         continue;
@@ -167,7 +202,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             }
             finally
             {
-                await CleanupScratchCountyAsync(npgsqlConnection, countyId);
+                await CleanupScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
+                npgsqlConnection_Storage?.Dispose();
                 npgsqlConnection?.Dispose();
             }
         }
@@ -177,34 +213,43 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <para>Predictions never affect eligibility: the anti-join is an equality on the user entry's <c>_type</c>, so a prediction-only building passes it. The scratch county is the only candidate, so the draw lands on its single eligible building.</para>
         /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database where 990101 is the only county with orthophoto coverage - the fact asserts that precondition, so a database holding other covered counties fails it deliberately.</para>
         /// </summary>
-        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf at a scratch database where 990101 is the only ortho-covered county before running.")]
+        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf and GIS_PostgreSQL_Storage.conf at two different scratch databases where 990101 is the only ortho-covered county before running.")]
         public async Task RandomBuilding2DReference_PredictedOnlyIsEligible_DevDb()
         {
             (NpgsqlConnection? npgsqlConnection, YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter) = await ScratchConnectionAsync();
             Assert.NotNull(yearBuiltDataPostgreSQLConverter);
             Assert.NotNull(npgsqlConnection);
 
+            (NpgsqlConnection? npgsqlConnection_Storage, OrtoDatasPostgreSQLConverter? ortoDatasPostgreSQLConverter) = await ScratchStorageConnectionAsync();
+            Assert.NotNull(ortoDatasPostgreSQLConverter);
+            Assert.NotNull(npgsqlConnection_Storage);
+
+            // The regression this fact exists for: the two sides must be two databases, or a draw that joins
+            // across them on one connection passes here and answers nothing on the deployed host.
+            Assert.NotEqual(npgsqlConnection.Database, npgsqlConnection_Storage.Database);
+
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+
             int countyId = 0;
             try
             {
-                countyId = await SeedScratchCountyAsync(npgsqlConnection);
+                countyId = await SeedScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage);
 
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-PRED");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-PRED", "2010");
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-PRED", "2010");
                 await SeedYearBuiltDataAsync(npgsqlConnection, countyId, "XUNIT-RND-PRED", "xunit-rnd-2", null, 2008);
-                await AnalyzeOrtoDatasAsync(npgsqlConnection, countyId);
-                await AssertScratchCountyIsOnlyCandidateAsync(npgsqlConnection, countyId);
+                await AnalyzeOrtoDatasAsync(npgsqlConnection_Storage, countyId);
+                await AssertScratchCountyIsOnlyCandidateAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
 
-                OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
-
-                Building2DReference? drawn = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync();
+                Building2DReference? drawn = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter);
                 Assert.NotNull(drawn);
                 Assert.Equal(countyId, drawn.CountyId);
                 Assert.Equal("XUNIT-RND-PRED", drawn.Reference);
             }
             finally
             {
-                await CleanupScratchCountyAsync(npgsqlConnection, countyId);
+                await CleanupScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
+                npgsqlConnection_Storage?.Dispose();
                 npgsqlConnection?.Dispose();
             }
         }
@@ -214,33 +259,41 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <para>Without the guard the empty-Values building would enter the pool and the page would show it with zero cards. The scratch county is the only candidate, so the 25 draws alternate over its two buildings only: the empty one never appears, the covered one does.</para>
         /// <para>Skipped by default: it seeds scratch county 990101 and needs <c>GIS_PostgreSQL_Main.conf</c> beside the test assembly pointing at a scratch database where 990101 is the only county with orthophoto coverage - the fact asserts that precondition, so a database holding other covered counties fails it deliberately.</para>
         /// </summary>
-        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf at a scratch database where 990101 is the only ortho-covered county before running.")]
+        [Fact(Skip = "Seeds scratch county 990101. Point GIS_PostgreSQL_Main.conf and GIS_PostgreSQL_Storage.conf at two different scratch databases where 990101 is the only ortho-covered county before running.")]
         public async Task RandomBuilding2DReference_ExcludesEmptyValues_DevDb()
         {
             (NpgsqlConnection? npgsqlConnection, YearBuiltDataPostgreSQLConverter? yearBuiltDataPostgreSQLConverter) = await ScratchConnectionAsync();
             Assert.NotNull(yearBuiltDataPostgreSQLConverter);
             Assert.NotNull(npgsqlConnection);
 
+            (NpgsqlConnection? npgsqlConnection_Storage, OrtoDatasPostgreSQLConverter? ortoDatasPostgreSQLConverter) = await ScratchStorageConnectionAsync();
+            Assert.NotNull(ortoDatasPostgreSQLConverter);
+            Assert.NotNull(npgsqlConnection_Storage);
+
+            // The regression this fact exists for: the two sides must be two databases, or a draw that joins
+            // across them on one connection passes here and answers nothing on the deployed host.
+            Assert.NotEqual(npgsqlConnection.Database, npgsqlConnection_Storage.Database);
+
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+
             int countyId = 0;
             try
             {
-                countyId = await SeedScratchCountyAsync(npgsqlConnection);
+                countyId = await SeedScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage);
 
                 // Covered with a card, and covered with an empty Values array.
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-PHOTO");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-PHOTO", "2010");
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-PHOTO", "2010");
 
                 await SeedBuilding2DAsync(npgsqlConnection, countyId, "XUNIT-RND-EMPTY");
-                await SeedOrtoDatasAsync(npgsqlConnection, countyId, "XUNIT-RND-EMPTY", null);
-                await AnalyzeOrtoDatasAsync(npgsqlConnection, countyId);
-                await AssertScratchCountyIsOnlyCandidateAsync(npgsqlConnection, countyId);
-
-                OrtoDatasPostgreSQLConverter ortoDatasPostgreSQLConverter = new(yearBuiltDataPostgreSQLConverter.ConnectionData);
+                await SeedOrtoDatasAsync(npgsqlConnection_Storage, countyId, "XUNIT-RND-EMPTY", null);
+                await AnalyzeOrtoDatasAsync(npgsqlConnection_Storage, countyId);
+                await AssertScratchCountyIsOnlyCandidateAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
 
                 bool photoSeen = false;
                 for (int i = 0; i < 25; i++)
                 {
-                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.GetRandomBuilding2DReferenceWithoutUserYearBuiltAsync();
+                    Building2DReference? drawn = await ortoDatasPostgreSQLConverter.RandomBuilding2DReferenceWithoutUserYearBuiltAsync(administrativeAreal2DPostgreSQLConverter, yearBuiltDataPostgreSQLConverter);
                     if (drawn is null)
                     {
                         continue;
@@ -257,7 +310,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             }
             finally
             {
-                await CleanupScratchCountyAsync(npgsqlConnection, countyId);
+                await CleanupScratchCountyAsync(npgsqlConnection, npgsqlConnection_Storage, countyId);
+                npgsqlConnection_Storage?.Dispose();
                 npgsqlConnection?.Dispose();
             }
         }
@@ -285,11 +339,44 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Seeds the scratch county part in <c>administrative_areal_2d</c> and the three building-keyed partitions under it, returning the county's part id.
+        /// Opens the storage-side scratch connection of the <c>GIS_PostgreSQL_Storage.conf</c> beside the test assembly - the database the orthophoto rows live in.
+        /// </summary>
+        /// <returns>The open connection and the orthophoto converter it was built from.</returns>
+        private static async Task<(NpgsqlConnection? Connection, OrtoDatasPostgreSQLConverter? Converter)> ScratchStorageConnectionAsync()
+        {
+            GISPostgreSQLConverterManager? gISPostgreSQLConverterManager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(gISPostgreSQLConverterManager);
+
+            OrtoDatasPostgreSQLConverter? converter = gISPostgreSQLConverterManager.GetPostgreSQLConverter<OrtoDatasPostgreSQLConverter>();
+            Assert.NotNull(converter);
+            Assert.NotNull(converter.ConnectionData);
+
+            NpgsqlConnection? npgsqlConnection = DiGi.PostgreSQL.Create.NpgsqlConnection(converter.ConnectionData);
+            if (npgsqlConnection is not null)
+            {
+                await npgsqlConnection.OpenAsync();
+            }
+
+            return (npgsqlConnection, converter);
+        }
+
+        /// <summary>
+        /// Seeds the scratch county part in <c>administrative_areal_2d</c> and the three building-keyed partitions under it on one connection, returning the county's part id.
         /// </summary>
         /// <param name="npgsqlConnection">The open connection.</param>
         /// <returns>The identifier of the seeded county part.</returns>
         private static async Task<int> SeedScratchCountyAsync(NpgsqlConnection npgsqlConnection)
+        {
+            return await SeedScratchCountyAsync(npgsqlConnection, npgsqlConnection);
+        }
+
+        /// <summary>
+        /// Seeds the scratch county on the main side and its orthophoto partition on the storage side; the same connection twice puts everything in one database.
+        /// </summary>
+        /// <param name="npgsqlConnection">The open main-side connection.</param>
+        /// <param name="npgsqlConnection_Storage">The open storage-side connection.</param>
+        /// <returns>The identifier of the seeded county part.</returns>
+        private static async Task<int> SeedScratchCountyAsync(NpgsqlConnection npgsqlConnection, NpgsqlConnection npgsqlConnection_Storage)
         {
             await ExecuteAsync(npgsqlConnection, "DELETE FROM administrative_areal_2d WHERE reference = 'XUNIT-COUNTY-990101';");
             await ExecuteAsync(npgsqlConnection, "INSERT INTO administrative_areal_2d (reference, code, name, type_id) VALUES ('XUNIT-COUNTY-990101', '990101', 'xunit scratch county', 2);");
@@ -300,14 +387,14 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             int countyId = System.Convert.ToInt32(id);
 
             await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS building_2d_{countyId};");
-            await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS orto_datas_{countyId};");
+            await ExecuteAsync(npgsqlConnection_Storage, $"DROP TABLE IF EXISTS orto_datas_{countyId};");
             await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS year_built_data_{countyId};");
 
             Assert.True(await npgsqlConnection.TableAsync_Building2D());
-            Assert.True(await npgsqlConnection.TableAsync_OrtoDatas());
+            Assert.True(await npgsqlConnection_Storage.TableAsync_OrtoDatas());
             Assert.True(await npgsqlConnection.TableAsync_Building2DReferencedObject("year_built_data"));
             Assert.True(await npgsqlConnection.TableAsync_Building2D_Partition(countyId));
-            Assert.True(await npgsqlConnection.TableAsync_OrtoDatas_Partition(countyId));
+            Assert.True(await npgsqlConnection_Storage.TableAsync_OrtoDatas_Partition(countyId));
             Assert.True(await npgsqlConnection.TableAsync_Building2DReferencedObject_Partition("year_built_data", countyId));
 
             return countyId;
@@ -387,6 +474,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <param name="countyId">The scratch county part id.</param>
         private static async Task AssertScratchCountyIsOnlyCandidateAsync(NpgsqlConnection npgsqlConnection, int countyId)
         {
+            await AssertScratchCountyIsOnlyCandidateAsync(npgsqlConnection, npgsqlConnection, countyId);
+        }
+
+        private static async Task AssertScratchCountyIsOnlyCandidateAsync(NpgsqlConnection npgsqlConnection, NpgsqlConnection npgsqlConnection_Storage, int countyId)
+        {
             List<AdministrativeAreal2DReference>? countyReferences = await AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(npgsqlConnection, AdministrativeArealType.County);
             Assert.NotNull(countyReferences);
 
@@ -399,7 +491,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 }
             }
 
-            Dictionary<int, long>? estimates = await OrtoDatasPostgreSQLConverter.GetEstimatedCountsAsync(npgsqlConnection, countyIds_All);
+            Dictionary<int, long>? estimates = await OrtoDatasPostgreSQLConverter.GetEstimatedCountsAsync(npgsqlConnection_Storage, countyIds_All);
             Assert.NotNull(estimates);
 
             foreach (KeyValuePair<int, long> estimate in estimates)
@@ -443,10 +535,15 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <param name="countyId">The scratch county part id, or 0 when seeding did not reach that far.</param>
         private static async Task CleanupScratchCountyAsync(NpgsqlConnection npgsqlConnection, int countyId)
         {
+            await CleanupScratchCountyAsync(npgsqlConnection, npgsqlConnection, countyId);
+        }
+
+        private static async Task CleanupScratchCountyAsync(NpgsqlConnection npgsqlConnection, NpgsqlConnection npgsqlConnection_Storage, int countyId)
+        {
             if (countyId > 0)
             {
                 await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS year_built_data_{countyId};");
-                await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS orto_datas_{countyId};");
+                await ExecuteAsync(npgsqlConnection_Storage, $"DROP TABLE IF EXISTS orto_datas_{countyId};");
                 await ExecuteAsync(npgsqlConnection, $"DROP TABLE IF EXISTS building_2d_{countyId};");
             }
 
