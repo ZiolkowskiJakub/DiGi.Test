@@ -9,7 +9,7 @@ namespace DiGi.GIS.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that Constants.Column defines the 35 External Components Area columns, that Create.Columns_ExternalComponentsArea returns them in the stable order, and that their unique ids are distinct and disjoint from every pre-existing column.
+        /// Verifies that Constants.Column defines the 35 External Components Area columns, that Create.Columns_ExternalComponentsArea returns them in the stable order, that Create.Column_ClosingTolerance returns the open-envelope signal of the same classification, and that their unique ids are distinct and disjoint from every pre-existing column.
         /// </summary>
         [Fact]
         public void Columns_ExternalComponentsArea()
@@ -116,6 +116,17 @@ namespace DiGi.GIS.xUnit
             Assert.Equal(expectedUniqueIds, uniqueIds);
             Assert.Equal(35, uniqueIds.Distinct().Count());
 
+            // The closing tolerance column of the same classification: a distance signal addressed by its own accessor, separate from the 35 area columns.
+            Column column_ClosingTolerance = IO.Create.Column_ClosingTolerance();
+            Assert.Equal("Closing tolerance", column_ClosingTolerance.Name);
+            Assert.Equal("closing_tolerance", Core.IO.Query.UniqueId(column_ClosingTolerance));
+            Assert.IsType<UnitColumn>(column_ClosingTolerance);
+            Assert.Equal(typeof(float), ((ExtendedColumn)column_ClosingTolerance).Type);
+            Assert.Equal("External Components Area", ((ExtendedColumn)column_ClosingTolerance).Category);
+            Assert.Equal(Unit.Enums.UnitDataType.Float, ((UnitColumn)column_ClosingTolerance).UnitDataType);
+            Assert.False(string.IsNullOrWhiteSpace(((ExtendedColumn)column_ClosingTolerance).Description));
+            Assert.DoesNotContain("closing_tolerance", uniqueIds);
+
             Assert.DoesNotContain("floor_area", uniqueIds);
             Assert.DoesNotContain("total_area", uniqueIds);
 
@@ -153,7 +164,8 @@ namespace DiGi.GIS.xUnit
                 Assert.Contains("degrees", ((ExtendedColumn)tiltedRoofColumn).Description);
             }
 
-            // The 35 new fields are themselves members of Constants.Column; the disjointness claim is against the pre-existing columns only.
+            // The 35 new fields are themselves members of Constants.Column, as is the closing tolerance column the classification records beside them;
+            // the disjointness claim is against the pre-existing columns only.
             List<string> preExistingUniqueIds = [];
             foreach (FieldInfo fieldInfo in typeof(IO.Constants.Column).GetFields(BindingFlags.Public | BindingFlags.Static))
             {
@@ -171,7 +183,7 @@ namespace DiGi.GIS.xUnit
                 preExistingUniqueIds.Add(uniqueId_Temp);
             }
 
-            Assert.Equal(36, preExistingUniqueIds.Count);
+            Assert.Equal(37, preExistingUniqueIds.Count);
             Assert.Empty(uniqueIds.Intersect(preExistingUniqueIds));
 
             List<Column> dynamicColumns =

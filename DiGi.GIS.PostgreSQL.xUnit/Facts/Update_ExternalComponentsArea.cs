@@ -635,6 +635,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <summary>
         /// Verifies that a building with a stored model gets a row with zeros in its empty buckets, while envelopes the method cannot address get no row at all.
         /// <para>The zero-versus-null distinction is what lets a reader tell "the building has a stored model" from "the building has no stored model". Envelopes with a blank reference or a missing county identifier are skipped before anything is read from them.</para>
+        /// <para>A model with a space but no components is the degenerate case on the other side: it gets its row with every bucket zero and a null closing tolerance, which means "no envelope" rather than "open", so it is not counted as an open envelope either.</para>
         /// </summary>
         [Fact]
         public void Update_ExternalComponentsArea_ZeroVsNull()
@@ -674,6 +675,26 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             // An envelope the method cannot address is not an open envelope either: no shell was built for it, so it is not counted.
             Assert.Equal(0, result_Skipped.OpenEnvelopeCount);
             Assert.Equal(1, table_Skipped.RowCount);
+
+            // A model that carries no components at all still gets its row (all buckets zero), and its null closing tolerance means
+            // "no envelope", not "open" - so it too is not counted. The column and the count are the signal a reader acts on.
+            BuildingModel model_NoComponents = Model("ref_no_components", 5);
+
+            Table table_NoComponents = new();
+            ExternalComponentsAreaResult result_NoComponents = Modify.Update_ExternalComponentsArea(table_NoComponents, [model_NoComponents]);
+
+            Assert.Equal(0, result_NoComponents.SkippedComponentCount);
+            Assert.Equal(0, result_NoComponents.OpenEnvelopeCount);
+            Assert.Equal(1, table_NoComponents.RowCount);
+
+            Row? row_NoComponents = table_NoComponents.GetRow(0);
+            Assert.NotNull(row_NoComponents);
+
+            Assert.Null(ClosingToleranceValue(table_NoComponents, row_NoComponents!, ColumnName_ClosingTolerance));
+            for (int i = 0; i < ColumnNames_External.Length; i++)
+            {
+                Assert.Equal(0.0, Value(table_NoComponents, row_NoComponents, ColumnNames_External[i]), 1e-9);
+            }
         }
 
         /// <summary>
@@ -832,6 +853,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             float[] rungs_Closing = [(float)DiGi.Core.Constants.Tolerance.Distance, 1e-5f, 1e-4f, (float)DiGi.Core.Constants.Tolerance.MacroDistance, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f];
 
             int openCount = 0;
+            int noEnvelopeCount = 0;
             Dictionary<string, int> histogram_ClosingTolerance = [];
 
             for (int i = 0; i < table.RowCount; i++)
@@ -852,7 +874,16 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 float? closingTolerance = ClosingToleranceValue(table, row, ColumnName_ClosingTolerance);
                 if (closingTolerance is null)
                 {
-                    openCount++;
+                    // A row that carries areas but closes at no rung is the counted open envelope. A null tolerance on a zero row is
+                    // "no envelope" (no components, or only internal partitions), which is deliberately not an open envelope.
+                    if (total > 0)
+                    {
+                        openCount++;
+                    }
+                    else
+                    {
+                        noEnvelopeCount++;
+                    }
                 }
                 else
                 {
@@ -863,14 +894,15 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 }
             }
 
-            // The counted opens are exactly the rows with a null closing tolerance - the count and the column are one signal.
+            // The counted opens are exactly the rows the classification filled but could not close - the count and the column are one signal.
             Assert.Equal(result.OpenEnvelopeCount, openCount);
 
             // A non-zero skip count on deployed data is a finding to report before deciding whether the decision table needs a case for it.
             Assert.Equal(0, result.SkippedComponentCount);
 
             List<string> reportLines = [$"Update_ExternalComponentsArea_DeployedBuildingModels: {models_Latest.Count} models classified in {stopwatch.ElapsedMilliseconds} ms"];
-            reportLines.Add($"open envelopes (null closing tolerance): {openCount} of {table.RowCount}");
+            reportLines.Add($"open envelopes (null closing tolerance on a row carrying areas): {openCount} of {table.RowCount}");
+            reportLines.Add($"rows with no envelope (null closing tolerance, no areas): {noEnvelopeCount}");
             foreach (KeyValuePair<string, int> pair in histogram_ClosingTolerance)
             {
                 reportLines.Add($"closing tolerance {pair.Key} m: {pair.Value} rows");
