@@ -44,6 +44,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 // A year the building does not hold answers null, not a neighbour's image.
                 byte[]? bytes_Miss = await OrtoDatasPostgreSQLConverter.GetBytesByReferenceAsync(npgsqlConnection, "XUNIT-BYTES-MATCH", countyId, 2007);
                 Assert.Null(bytes_Miss);
+
+                // The fallback re-runs by reference alone after the county-scoped read found nothing; the first reader
+                // must be closed by then (DiGi.GIS.PostgreSQL#91).
+                byte[]? bytes_Fallback = await OrtoDatasPostgreSQLConverter.GetBytesByReferenceAsync(npgsqlConnection, "XUNIT-BYTES-MATCH", countyId + 1_000_000, 2010, fallbackByReference: true);
+                Assert.Equal([1, 2, 3], bytes_Fallback);
+                Assert.Null(await OrtoDatasPostgreSQLConverter.GetBytesByReferenceAsync(npgsqlConnection, "XUNIT-BYTES-MATCH", countyId + 1_000_000, 2007, fallbackByReference: true));
             }
             finally
             {

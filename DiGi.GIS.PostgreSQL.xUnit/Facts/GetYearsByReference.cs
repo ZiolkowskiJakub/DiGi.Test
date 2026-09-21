@@ -50,6 +50,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 List<short>? years_Empty = await OrtoDatasPostgreSQLConverter.GetYearsByReferenceAsync(npgsqlConnection, "XUNIT-YRS-EMPTY", countyId);
                 Assert.NotNull(years_Empty);
                 Assert.Empty(years_Empty);
+
+                // The fallback re-runs by reference alone on the same connection after the county-scoped read found
+                // nothing; it threw NpgsqlOperationInProgressException while the first reader was still open (DiGi.GIS.PostgreSQL#91).
+                List<short>? years_Fallback = await OrtoDatasPostgreSQLConverter.GetYearsByReferenceAsync(npgsqlConnection, "XUNIT-YRS-MULTI", countyId + 1_000_000, fallbackByReference: true);
+                Assert.NotNull(years_Fallback);
+                Assert.Equal([2004, 2010, 2015], years_Fallback);
             }
             finally
             {
