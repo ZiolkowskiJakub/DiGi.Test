@@ -58,6 +58,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         ];
 
         /// <summary>
+        /// The name of the closing tolerance column - the open-envelope signal the method writes beside the 35 area columns.
+        /// </summary>
+        private const string ColumnName_ClosingTolerance = "Closing tolerance";
+
+        /// <summary>
         /// Builds a polygonal face from a plane and the face's local 2D points.
         /// <para>The plane's origin and normal define the face's position and side in 3D; the points address the face within the plane. The origin is chosen for each stored normal so the face's 3D extent is the intended square, because the plane derives its local basis from the normal.</para>
         /// </summary>
@@ -272,6 +277,22 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
+        /// Reads the closing tolerance the method under test wrote into a table cell, addressed by the column's name.
+        /// </summary>
+        /// <param name="table">The table the row belongs to.</param>
+        /// <param name="row">The row to read.</param>
+        /// <param name="columnName">The name of the closing tolerance column.</param>
+        /// <returns>The cell's value, or null when the cell was never written - the open-envelope signal, distinct from any tolerance.</returns>
+        private static float? ClosingToleranceValue(Table table, Row row, string columnName)
+        {
+            Assert.True(table.TryGetColumn(columnName, out Column? column_Table), $"column {columnName} is missing from the table");
+            Assert.NotNull(column_Table);
+            Assert.NotNull(row);
+
+            return row.GetValue<float?>(column_Table.Index);
+        }
+
+        /// <summary>
         /// Verifies that the four walls of a closed box are each filed under the sector their outward normal's azimuth belongs to, and that nothing leaks across kinds.
         /// <para>The box's walls face north, east, south and west, so the four cardinal sectors are populated and the four diagonal sectors stay empty; a leak into a diagonal or a roof bucket would mean the classification is reading a normal wrong.</para>
         /// </summary>
@@ -281,9 +302,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model = Model("ref_walls", 5, [.. Box()]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -320,9 +342,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model = Model("ref_inward", 5, [.. Box(westStoredInward: true, floorStoredInward: true)]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -351,9 +374,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model = Model("ref_inward_concave", 5, [.. LShape(true)]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -398,9 +422,13 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model = Model("ref_roofs", 5, components);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+
+            // A tilted plane over the walls' flat tops leaves the wedge at each wall head open, so this fixture is a genuinely open envelope
+            // and the signal records it - the classification under test is unaffected, which is the point of counting rather than failing.
+            Assert.Equal(1, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -435,9 +463,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model = Model("ref_total", 5, [.. Box()]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -465,25 +494,26 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             DiGi.Analytical.Building.Classes.BuildingModel buildingModel = new();
             DiGi.Analytical.Building.Classes.Space space_West = new(new Point3D(-5, 5, 5), "Space west");
-            DiGi.Analytical.Building.Classes.Space space_East = new(new Point3D(5, 5, 5), "Space east");
-            Assert.True(buildingModel.Update(space_West));
+            DiGi.Analytical.Building.Classes.Space space_East = new(new Point3D(5, 5, 5), "Space east");            Assert.True(buildingModel.Update(space_West));
             Assert.True(buildingModel.Update(space_East));
 
             // The shared wall between the two boxes, at x = 0.
             DiGi.Analytical.Building.Classes.SurfaceWall sharedWall = Wall(new Point3D(0, 0, s), new Vector3D(1, 0, 0), s);
 
             // Space west: x in [-10, 0]. Its own walls: x = -10 (outward -x), y = 0 and y = 10.
+            // The floor plane's normal (0, 0, -1) runs its local y axis along -y, so the origin corner that spans y in [0, s]
+            // is (x, s, 0) - a floor given (x, 0, 0) would sit at y in [-s, 0] and leave the solid open, which no area assertion can see.
             Assert.True(buildingModel.Assign(Wall(new Point3D(-s, 0, s), new Vector3D(-1, 0, 0), s), space_West));
             Assert.True(buildingModel.Assign(Wall(new Point3D(0, 0, s), new Vector3D(0, -1, 0), s), space_West));
             Assert.True(buildingModel.Assign(Wall(new Point3D(-s, s, s), new Vector3D(0, 1, 0), s), space_West));
-            Assert.True(buildingModel.Assign(Floor(new Point3D(-s, 0, 0), new Vector3D(0, 0, -1), s), space_West));
+            Assert.True(buildingModel.Assign(Floor(new Point3D(-s, s, 0), new Vector3D(0, 0, -1), s), space_West));
             Assert.True(buildingModel.Assign(Roof(new Point3D(-s, 0, s), new Vector3D(0, 0, 1), s), space_West));
 
             // Space east: x in [0, 10]. Its own walls: x = 10 (outward +x), y = 0 and y = 10.
             Assert.True(buildingModel.Assign(Wall(new Point3D(s, s, s), new Vector3D(1, 0, 0), s), space_East));
             Assert.True(buildingModel.Assign(Wall(new Point3D(s, 0, s), new Vector3D(0, -1, 0), s), space_East));
             Assert.True(buildingModel.Assign(Wall(new Point3D(0, s, s), new Vector3D(0, 1, 0), s), space_East));
-            Assert.True(buildingModel.Assign(Floor(new Point3D(0, 0, 0), new Vector3D(0, 0, -1), s), space_East));
+            Assert.True(buildingModel.Assign(Floor(new Point3D(0, s, 0), new Vector3D(0, 0, -1), s), space_East));
             Assert.True(buildingModel.Assign(Roof(new Point3D(0, 0, s), new Vector3D(0, 0, 1), s), space_East));
 
             // The shared wall bounds both spaces in one call.
@@ -494,10 +524,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(envelope);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [envelope!]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [envelope!]);
 
-            // The one shared wall is the single skipped component.
-            Assert.Equal(1, skipped);
+            // The one shared wall is the single skipped component, and the two boxes' outer faces tessellate one watertight prism,
+            // so the envelope closes at the finest rung and nothing is counted as open.
+            Assert.Equal(1, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -563,9 +595,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model_Other = Model("ref_other", 5, [.. Box()]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model_First, model_Second, model_Other]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model_First, model_Second, model_Other]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(2, table.RowCount);
 
             int index_Reference = table.GetColumnIndex("Reference");
@@ -609,9 +642,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model_Box = Model("ref_zeros", 5, [.. Box()]);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, [model_Box]);
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model_Box]);
 
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
             Assert.Equal(1, table.RowCount);
 
             Row? row = table.GetRow(0);
@@ -633,10 +667,69 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel model_Valid = Model("ref_valid", 5, [.. Box()]);
 
             Table table_Skipped = new();
-            long skipped_Skipped = Modify.Update_ExternalComponentsArea(table_Skipped, [envelope_BlankReference, envelope_MissingCounty, model_Valid]);
+            ExternalComponentsAreaResult result_Skipped = Modify.Update_ExternalComponentsArea(table_Skipped, [envelope_BlankReference, envelope_MissingCounty, model_Valid]);
 
-            Assert.Equal(0, skipped_Skipped);
+            Assert.Equal(0, result_Skipped.SkippedComponentCount);
+
+            // An envelope the method cannot address is not an open envelope either: no shell was built for it, so it is not counted.
+            Assert.Equal(0, result_Skipped.OpenEnvelopeCount);
             Assert.Equal(1, table_Skipped.RowCount);
+        }
+
+        /// <summary>
+        /// Verifies that a model whose external envelope exists but does not close is still classified, carries a null closing tolerance, and is counted in the result - the open-envelope signal of the row.
+        /// <para>The fixture is a box without its roof: four walls and a floor, five faces - enough for the envelope to exist, open along the missing roof. Ray parity over an open face set decides the side of a face whose ray leaves through the gap arbitrarily, so the row's sector values may rest on an arbitrary side; the null closing tolerance and the open-envelope count are the signal a reader acts on, and null - not a sentinel zero - is what distinguishes it from a tolerance.</para>
+        /// </summary>
+        [Fact]
+        public void Update_ExternalComponentsArea_OpenEnvelopeSignal()
+        {
+            // The closed box minus its roof: five faces, an envelope that exists and cannot close at any rung of the ladder.
+            IComponent[] boxComponents = Box();
+            BuildingModel model = Model("ref_open_envelope", 5, boxComponents[0], boxComponents[1], boxComponents[2], boxComponents[3], boxComponents[4]);
+
+            Table table = new();
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
+
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(1, result.OpenEnvelopeCount);
+            Assert.Equal(1, table.RowCount);
+
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+
+            // The signal: a cell left unwritten reads null, which no rung of the ladder can be confused with.
+            Assert.Null(ClosingToleranceValue(table, row!, ColumnName_ClosingTolerance));
+
+            // The model is counted, not failed: its four walls and floor still classify, and the roof column stays zero.
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[0]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[2]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[4]), 1e-3);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[6]), 1e-3);
+            Assert.Equal(0.0, Value(table, row, ColumnNames_External[8]), 1e-9);
+            Assert.Equal(100.0, Value(table, row, ColumnNames_External[33]), 1e-3);
+        }
+
+        /// <summary>
+        /// Verifies that a model whose external envelope closes records the finest ladder rung it closes at, and is not counted as open.
+        /// <para>An exact box edge-pairs shut at the finest rung of the ladder - the canonical Distance tolerance, which the geometry facts prove directly on the polyhedron; this fact proves that value reaches the row.</para>
+        /// </summary>
+        [Fact]
+        public void Update_ExternalComponentsArea_ClosedEnvelopeClosingTolerance()
+        {
+            BuildingModel model = Model("ref_closed_envelope", 5, [.. Box()]);
+
+            Table table = new();
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model]);
+
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
+            Assert.Equal(1, table.RowCount);
+
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+
+            // An exact box closes at the finest rung of the ladder: the canonical Distance tolerance, stored as the float it was written as.
+            Assert.Equal((float)DiGi.Core.Constants.Tolerance.Distance, ClosingToleranceValue(table, row!, ColumnName_ClosingTolerance));
         }
 
         /// <summary>
@@ -727,9 +820,19 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.True(models_Latest.Count > 0);
 
             Table table = new();
-            long skipped = Modify.Update_ExternalComponentsArea(table, models_Latest);
+
+            // The ladder bisects IsClosed per model, so the classification time is the cost measurement the issue asks for.
+            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, models_Latest);
+            stopwatch.Stop();
 
             Assert.True(table.RowCount > 0);
+
+            // The rungs of the production ladder as the floats they are stored as, for telling a written tolerance from a foreign value.
+            float[] rungs_Closing = [(float)DiGi.Core.Constants.Tolerance.Distance, 1e-5f, 1e-4f, (float)DiGi.Core.Constants.Tolerance.MacroDistance, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f];
+
+            int openCount = 0;
+            Dictionary<string, int> histogram_ClosingTolerance = [];
 
             for (int i = 0; i < table.RowCount; i++)
             {
@@ -745,10 +848,38 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 double total = Value(table, row, ColumnNames_External[^1]);
                 double tolerance = Math.Max(0.01, 1e-5 * Math.Abs(total));
                 Assert.InRange(Math.Abs(total - sumOfBreakdowns), 0, tolerance);
+
+                float? closingTolerance = ClosingToleranceValue(table, row, ColumnName_ClosingTolerance);
+                if (closingTolerance is null)
+                {
+                    openCount++;
+                }
+                else
+                {
+                    Assert.Contains(closingTolerance.Value, rungs_Closing);
+
+                    string rung = closingTolerance.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    histogram_ClosingTolerance[rung] = histogram_ClosingTolerance.TryGetValue(rung, out int count) ? count + 1 : 1;
+                }
             }
 
+            // The counted opens are exactly the rows with a null closing tolerance - the count and the column are one signal.
+            Assert.Equal(result.OpenEnvelopeCount, openCount);
+
             // A non-zero skip count on deployed data is a finding to report before deciding whether the decision table needs a case for it.
-            Assert.Equal(0, skipped);
+            Assert.Equal(0, result.SkippedComponentCount);
+
+            List<string> reportLines = [$"Update_ExternalComponentsArea_DeployedBuildingModels: {models_Latest.Count} models classified in {stopwatch.ElapsedMilliseconds} ms"];
+            reportLines.Add($"open envelopes (null closing tolerance): {openCount} of {table.RowCount}");
+            foreach (KeyValuePair<string, int> pair in histogram_ClosingTolerance)
+            {
+                reportLines.Add($"closing tolerance {pair.Key} m: {pair.Value} rows");
+            }
+
+            string? pathReportsDirectory = Core.xUnit.Query.ReportsDirectory(System.Reflection.Assembly.GetExecutingAssembly());
+            Assert.False(string.IsNullOrWhiteSpace(pathReportsDirectory));
+
+            System.IO.File.WriteAllLines(System.IO.Path.Combine(pathReportsDirectory!, "Update_ExternalComponentsArea_DeployedBuildingModels.txt"), reportLines);
         }
     }
 }
