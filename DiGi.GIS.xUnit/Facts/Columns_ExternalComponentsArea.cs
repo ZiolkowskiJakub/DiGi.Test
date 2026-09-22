@@ -183,7 +183,7 @@ namespace DiGi.GIS.xUnit
                 preExistingUniqueIds.Add(uniqueId_Temp);
             }
 
-            Assert.Equal(37, preExistingUniqueIds.Count);
+            Assert.Equal(39, preExistingUniqueIds.Count);
             Assert.Empty(uniqueIds.Intersect(preExistingUniqueIds));
 
             List<Column> dynamicColumns =
