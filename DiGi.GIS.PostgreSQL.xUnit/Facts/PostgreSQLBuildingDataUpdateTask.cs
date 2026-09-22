@@ -524,12 +524,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that a <see cref="BuildingDataUpdateType.PredictedYearBuilt"/> run writes the predicted year to the
+        /// Verifies that a <see cref="BuildingDataUpdateType.YearBuilt"/> run writes the year built columns to the
         /// building data row even when the stored <c>year_built_data</c> row is filed under a sibling polygon part of the
         /// same county code rather than under the target part itself.
         /// <para>Without <c>fallbackByReference: true</c> the pruned read returns no rows, the projection is skipped, and the
-        /// <c>predicted_year_built</c> column stays at its default. With the flag the fallback finds the row under the sibling
-        /// part, and <c>Update_Building2D_PredictedYearBuilt</c> keys the write on the run's county, never on the record's.
+        /// year built columns stay at their defaults. With the flag the fallback finds the row under the sibling
+        /// part, and <c>Update_Building2D_YearBuilt</c> keys the write on the run's county, never on the record's.
         /// See DiGi.GIS.PostgreSQL#70.</para>
         /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database.</para>
         /// </summary>
@@ -586,10 +586,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.True(preState is not null, $"The building_data row for reference {reference} under part {targetCountyId} does not exist - the fact cannot restore the pre-state.");
             Assert.True(preState!.RowCount == 1, $"Expected exactly one building_data row for reference {reference} under part {targetCountyId}, got {preState.RowCount}.");
 
-            // Seed one year_built_data row under the sibling part with a known predicted year.
+            // Seed one year_built_data row under the sibling part with a known predicted year and an exact user year.
             string uniqueTestId = Guid.NewGuid().ToString("N");
             GIS.Classes.YearBuiltData gisObject = new(reference);
             gisObject.SetPredictedYearBuilt(DateTime.UtcNow, (short)1985);
+            gisObject.SetUserYearBuilt((short)1990);
             YearBuiltData seed = new()
             {
                 CountyId = siblingCountyId,
@@ -601,12 +602,12 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             try
             {
-                // Run the task scoped to the target part, PredictedYearBuilt only.
+                // Run the task scoped to the target part, YearBuilt only.
                 PostgreSQLBuildingDataUpdateTask task = new(manager)
                 {
                     PostgreSQLBuildingDataUpdateOptions = new()
                     {
-                        BuildingDataUpdateTypes = [BuildingDataUpdateType.PredictedYearBuilt],
+                        BuildingDataUpdateTypes = [BuildingDataUpdateType.YearBuilt],
                         CountyIds = [targetCountyId]
                     }
                 };
@@ -619,26 +620,35 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Assert.Null(task.Exception);
                 Assert.True(task.IsSucceeded);
 
-                // Assert the symptom is fixed: the building_data row now carries the seeded year.
+                // Assert the symptom is fixed: the building_data row now carries all three seeded year built columns.
                 Core.IO.Table.Classes.Table? result = await buildingDataConverter.PullAsync([reference], targetCountyId, commandTimeout: 600);
                 Assert.True(result is not null, $"The building_data pull for reference {reference} under part {targetCountyId} returned no table.");
                 Assert.True(result!.RowCount > 0, $"The building_data pull for reference {reference} under part {targetCountyId} returned no rows.");
 
-                Core.IO.Table.Classes.Column? column = result.Columns.FirstOrDefault(x => x.Name == "Predicted year built");
-                Assert.True(column is not null, "The pulled building data does not carry a 'Predicted year built' column.");
+                Core.IO.Table.Classes.Column? column_Predicted = result.Columns.FirstOrDefault(x => x.Name == "Predicted year built");
+                Core.IO.Table.Classes.Column? column_User = result.Columns.FirstOrDefault(x => x.Name == "User year built");
+                Core.IO.Table.Classes.Column? column_Calculated = result.Columns.FirstOrDefault(x => x.Name == "Calculated year built");
+                Assert.True(column_Predicted is not null, "The pulled building data does not carry a 'Predicted year built' column.");
+                Assert.True(column_User is not null, "The pulled building data does not carry a 'User year built' column.");
+                Assert.True(column_Calculated is not null, "The pulled building data does not carry a 'Calculated year built' column.");
 
                 bool found = false;
                 foreach (Core.IO.Table.Classes.Row row in result.Rows)
                 {
-                    if (row.TryGetValue(column!.Index, out ushort year))
+                    if (row.TryGetValue(column_Predicted!.Index, out ushort year_Predicted)
+                        && row.TryGetValue(column_User!.Index, out ushort year_User)
+                        && row.TryGetValue(column_Calculated!.Index, out ushort year_Calculated))
                     {
-                        Assert.True(year == (ushort)1985, $"The predicted year built for reference {reference} under part {targetCountyId} is {year}, expected 1985. The year_built_data row was filed under sibling part {siblingCountyId} and was not found by the pruned read.");
+                        Assert.True(year_Predicted == (ushort)1985, $"The predicted year built for reference {reference} under part {targetCountyId} is {year_Predicted}, expected 1985. The year_built_data row was filed under sibling part {siblingCountyId} and was not found by the pruned read.");
+                        Assert.True(year_User == (ushort)1990, $"The user year built for reference {reference} under part {targetCountyId} is {year_User}, expected 1990.");
+                        // The calculated year is the exact user year when one exists, otherwise the predicted year.
+                        Assert.True(year_Calculated == (ushort)1990, $"The calculated year built for reference {reference} under part {targetCountyId} is {year_Calculated}, expected 1990 (the exact user year).");
                         found = true;
                         break;
                     }
                 }
 
-                Assert.True(found, $"No row in the pulled building data carried a Predicted year built value for reference {reference} under part {targetCountyId}.");
+                Assert.True(found, $"No row in the pulled building data carried all three year built columns for reference {reference} under part {targetCountyId}.");
             }
             finally
             {
@@ -652,8 +662,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that a run selecting <see cref="BuildingDataUpdateType.General"/> together with <see cref="BuildingDataUpdateType.PredictedYearBuilt"/> writes the predicted year onto the row the general pass built, and that the run reports the write through <see cref="PostgreSQLBuildingDataUpdateTask.PredictedYearBuiltWrittenCount"/>.
-        /// <para>The sibling-part fact above runs the year built type alone, so its rows are appended by <c>Update_Building2D_PredictedYearBuilt</c> itself. Here the rows already exist - built by <c>Update_Building2D</c> from the buildings of a subdivision - and the year has to be matched onto them by county identifier and reference. DiGi.GIS.PostgreSQL#81 found the column empty nationwide after a rebuild that reported success, with no counter or log line able to say whether the type had run at all; the counter asserted here is that evidence.</para>
+        /// Verifies that a run selecting <see cref="BuildingDataUpdateType.General"/> together with <see cref="BuildingDataUpdateType.YearBuilt"/> writes the year built columns onto the row the general pass built, and that the run reports the write through <see cref="PostgreSQLBuildingDataUpdateTask.YearBuiltWrittenCount"/>.
+        /// <para>The sibling-part fact above runs the year built type alone, so its rows are appended by <c>Update_Building2D_YearBuilt</c> itself. Here the rows already exist - built by <c>Update_Building2D</c> from the buildings of a subdivision - and the year has to be matched onto them by county identifier and reference. DiGi.GIS.PostgreSQL#81 found the column empty nationwide after a rebuild that reported success, with no counter or log line able to say whether the type had run at all; the counter asserted here is that evidence.</para>
         /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database.</para>
         /// </summary>
         [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
@@ -719,6 +729,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             string uniqueTestId = Guid.NewGuid().ToString("N");
             GIS.Classes.YearBuiltData gisObject = new(reference);
             gisObject.SetPredictedYearBuilt(DateTime.UtcNow, (short)1991);
+            gisObject.SetUserYearBuilt((short)1995);
             YearBuiltData seed = new()
             {
                 CountyId = countyId,
@@ -734,7 +745,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 {
                     PostgreSQLBuildingDataUpdateOptions = new()
                     {
-                        BuildingDataUpdateTypes = [BuildingDataUpdateType.General, BuildingDataUpdateType.PredictedYearBuilt],
+                        BuildingDataUpdateTypes = [BuildingDataUpdateType.General, BuildingDataUpdateType.YearBuilt],
                         CountyIds = [countyId]
                     }
                 };
@@ -748,14 +759,18 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Assert.True(task.IsSucceeded);
 
                 // The seeded building is one of the rows given a year; the rest of the county has none, and that is reported, not failed.
-                Assert.True(task.PredictedYearBuiltWrittenCount >= 1, $"PredictedYearBuiltWrittenCount is {task.PredictedYearBuiltWrittenCount}, expected at least 1 for the seeded reference {reference}.");
-                Assert.True(task.PredictedYearBuiltMissingBuildingCount >= 0);
+                Assert.True(task.YearBuiltWrittenCount >= 1, $"YearBuiltWrittenCount is {task.YearBuiltWrittenCount}, expected at least 1 for the seeded reference {reference}.");
+                Assert.True(task.YearBuiltMissingBuildingCount >= 0);
 
                 Core.IO.Table.Classes.Table? result = await buildingDataConverter.PullAsync([reference], countyId, commandTimeout: 600);
                 Assert.True(result is not null && result.RowCount == 1, $"The building_data pull for reference {reference} under county {countyId} returned {result?.RowCount ?? 0} rows, expected 1.");
 
                 Core.IO.Table.Classes.Column? column_PredictedYearBuilt = result!.Columns.FirstOrDefault(x => x.Name == "Predicted year built");
+                Core.IO.Table.Classes.Column? column_UserYearBuilt = result.Columns.FirstOrDefault(x => x.Name == "User year built");
+                Core.IO.Table.Classes.Column? column_CalculatedYearBuilt = result.Columns.FirstOrDefault(x => x.Name == "Calculated year built");
                 Assert.True(column_PredictedYearBuilt is not null, "The pulled building data does not carry a 'Predicted year built' column.");
+                Assert.True(column_UserYearBuilt is not null, "The pulled building data does not carry a 'User year built' column.");
+                Assert.True(column_CalculatedYearBuilt is not null, "The pulled building data does not carry a 'Calculated year built' column.");
 
                 Core.IO.Table.Classes.Column? column_CountyName = result.Columns.FirstOrDefault(x => x.Name == "County name");
                 Assert.True(column_CountyName is not null, "The pulled building data does not carry a 'County name' column - the general pass did not write the row.");
@@ -763,8 +778,13 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Core.IO.Table.Classes.Row? row = result.GetRow(0);
                 Assert.NotNull(row);
 
-                Assert.True(row.TryGetValue(column_PredictedYearBuilt!.Index, out ushort year), $"The row for reference {reference} carries no predicted year built - the year was not matched onto the row the general pass built.");
-                Assert.Equal((ushort)1991, year);
+                Assert.True(row.TryGetValue(column_PredictedYearBuilt!.Index, out ushort year_Predicted), $"The row for reference {reference} carries no predicted year built - the year was not matched onto the row the general pass built.");
+                Assert.Equal((ushort)1991, year_Predicted);
+                Assert.True(row.TryGetValue(column_UserYearBuilt!.Index, out ushort year_User), $"The row for reference {reference} carries no user year built.");
+                Assert.Equal((ushort)1995, year_User);
+                // The calculated year is the exact user year when one exists, otherwise the predicted year.
+                Assert.True(row.TryGetValue(column_CalculatedYearBuilt!.Index, out ushort year_Calculated), $"The row for reference {reference} carries no calculated year built.");
+                Assert.Equal((ushort)1995, year_Calculated);
 
                 Assert.True(row.TryGetValue(column_CountyName!.Index, out string? countyName) && !string.IsNullOrWhiteSpace(countyName), $"The row for reference {reference} carries no county name - the general columns were not written in the same run.");
             }
