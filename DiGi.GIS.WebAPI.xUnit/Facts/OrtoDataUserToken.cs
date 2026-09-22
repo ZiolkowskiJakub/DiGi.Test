@@ -2,6 +2,7 @@ using DiGi.GIS.WebAPI.Classes;
 using DiGi.WebAPI.Classes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiGi.GIS.WebAPI.xUnit
@@ -55,6 +56,25 @@ namespace DiGi.GIS.WebAPI.xUnit
             Classes.Parameter.UserYearBuiltParameter parameter = new() { CountyId = 1, Reference = "reference", Year = 2000 };
 
             Assert.IsType<UnauthorizedResult>(await controller.SetUserYearBuiltAsync(parameter));
+        }
+
+        /// <summary>
+        /// Pins the wire shape of the random draw: the DiGi serializer's form (<c>_type</c>, declared property names), which is what <c>building2Dreferencebyreference</c> answers and every DiGi reader parses - and not the host's default <c>Ok(object)</c> form, which the deployed host writes through its own output formatter as camelCase with a <c>fullTypeName</c> member (<c>{"id":…,"countyId":…,"fullTypeName":…}</c>, observed live on 2026-09-22) and which <c>Core.Convert.ToDiGi</c> reads as no building at all - the UI rendered it as "nothing left to verify" (DiGi.GIS.WebAPI#39). The host formatter is not reproduced here; the fact pins the shape the action must write and that a DiGi reader round-trips it.
+        /// </summary>
+        [Fact]
+        public void RandomBuilding2DReference_WireShape_IsDiGiSerializer()
+        {
+            PostgreSQL.Classes.Building2DReference building2DReference = new() { Id = 13737260, SubdivisionId = 73837, CountyId = 73485, Reference = "b5b8b7fa-33ef-4f54-b95b-81c0aa8b7626" };
+
+            // The shape the action must write.
+            string? json_DiGi = Core.Convert.ToSystem_String(building2DReference);
+            Assert.NotNull(json_DiGi);
+            Assert.Contains("\"_type\":\"DiGi.GIS.PostgreSQL.Classes.Building2DReference,DiGi.GIS.PostgreSQL\"", json_DiGi);
+            Assert.Contains("\"CountyId\":73485", json_DiGi);
+            PostgreSQL.Classes.Building2DReference? building2DReference_Read = Core.Convert.ToDiGi<PostgreSQL.Classes.Building2DReference>(json_DiGi)?.FirstOrDefault();
+            Assert.NotNull(building2DReference_Read);
+            Assert.Equal(building2DReference.Reference, building2DReference_Read.Reference);
+            Assert.Equal(building2DReference.CountyId, building2DReference_Read.CountyId);
         }
 
         /// <summary>
