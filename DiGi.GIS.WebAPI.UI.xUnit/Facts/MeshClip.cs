@@ -119,7 +119,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         }
 
         /// <summary>
-        /// Validates that <see cref="Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> clips the terrain to a circular boundary and cuts out the building footprint.
+        /// Validates that <see cref="DiGi.GIS.WebAPI.UI.Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> clips the terrain to a circular boundary and cuts out the building footprint.
         /// </summary>
         [Fact]
         public void TerrainGLTFNode_WithCircleBoundaryAndBuildingCutout()
@@ -185,7 +185,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         }
 
         /// <summary>
-        /// Validates that <see cref="Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> cuts a dense set of footprints rather than stepping over it.
+        /// Validates that <see cref="DiGi.GIS.WebAPI.UI.Create.TerrainGLTFNode(GLTFNode?, IEnumerable{BuildingModel}?, Circle2D?, double, double)"/> cuts a dense set of footprints rather than stepping over it.
         /// <para>This case used to be refused. A <c>TerrainCuttingMaxBuildingCount</c> of 250 skipped the cut entirely above that many buildings, to work around a constraint enforcement failure in the triangulation underneath, and the cap was removed once that was fixed upstream (ZiolkowskiJakub/DiGi.Geometry#2).</para>
         /// <para>What makes this worth asserting is that the cut is wrapped in a catch that falls back to the uncut surface, so a regression upstream would not throw here - it would quietly return the terrain whole again, exactly as the cap used to. Comparing against the input mesh is the only thing that tells the two apart.</para>
         /// </summary>

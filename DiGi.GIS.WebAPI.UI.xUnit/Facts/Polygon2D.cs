@@ -6,7 +6,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Validates that <see cref="Create.Polygon2D(Circle2D?, int)"/> creates a valid regular polygon approximating the circle.
+        /// Validates that <see cref="DiGi.GIS.WebAPI.UI.Create.Polygon2D(Circle2D?, int)"/> creates a valid regular polygon approximating the circle.
         /// </summary>
         [Fact]
         public void Polygon2D_FromCircle_Valid()
@@ -32,7 +32,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         }
 
         /// <summary>
-        /// Validates that <see cref="Create.Polygon2D(Circle2D?, int)"/> returns null for invalid circle inputs.
+        /// Validates that <see cref="DiGi.GIS.WebAPI.UI.Create.Polygon2D(Circle2D?, int)"/> returns null for invalid circle inputs.
         /// </summary>
         [Fact]
         public void Polygon2D_FromCircle_InvalidInputs_ReturnsNull()
@@ -51,7 +51,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         }
 
         /// <summary>
-        /// Validates that <see cref="Create.Polygon2D(BoundingBox2D?)"/> creates a 4-corner rectangular polygon with matching area.
+        /// Validates that <see cref="DiGi.GIS.WebAPI.UI.Create.Polygon2D(BoundingBox2D?)"/> creates a 4-corner rectangular polygon with matching area.
         /// </summary>
         [Fact]
         public void Polygon2D_FromBoundingBox_Valid()
