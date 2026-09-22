@@ -8,7 +8,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByCodeAsync(string, AdministrativeArealType, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByCodeAsync(string, AdministrativeArealType, int, System.Threading.CancellationToken)"/>
         /// filters target entities matching the specified code and target administrative areal type.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>
@@ -34,7 +34,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, AdministrativeArealType?, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, AdministrativeArealType?, int, System.Threading.CancellationToken)"/>
         /// retrieves child administrative areal references belonging to parents identified by the specified parent code.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>
@@ -67,7 +67,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, AdministrativeArealType?, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByParentCodeAsync(string, AdministrativeArealType, AdministrativeArealType?, int, System.Threading.CancellationToken)"/>
         /// filters parent entities by parent type when specified, preventing code collisions across levels (such as code 10 for country vs voivodeship).
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>

@@ -11,7 +11,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByNameAsync(NpgsqlConnection?, string, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByNameAsync(NpgsqlConnection?, string, int, System.Threading.CancellationToken)"/>
         /// matches administrative areas regardless of Polish diacritics in either the stored name or the search text.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database with the unaccent extension enabled.</para>
         /// </summary>

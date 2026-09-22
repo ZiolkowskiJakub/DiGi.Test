@@ -8,7 +8,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{T}.GetLatestCreatedAtAsync(Npgsql.NpgsqlConnection?, int?, int, System.Threading.CancellationToken)"/> and its instance overload answer null, never throw, when there is no connection.
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetLatestCreatedAtAsync(Npgsql.NpgsqlConnection?, int?, int, System.Threading.CancellationToken)"/> and its instance overload answer null, never throw, when there is no connection.
         /// <para>The endpoint built on it turns null into 404, so a null here must mean "nothing to report" rather than a fault.</para>
         /// </summary>
         [Fact]

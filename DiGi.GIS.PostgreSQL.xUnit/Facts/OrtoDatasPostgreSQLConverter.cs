@@ -31,7 +31,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, int, CancellationToken)"/>
         /// and its instance overload return null when inputs or connection are null, and return empty list when input collection is empty.
         /// </summary>
         [Fact]
@@ -49,7 +49,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasByReferenceAsync(string, int?, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasByReferenceAsync(string, int?, bool, int, CancellationToken)"/>
         /// returns null when the reference is null or whitespace.
         /// </summary>
         [Fact]
@@ -64,7 +64,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasByBuilding2DReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{Building2DReference}?, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasByBuilding2DReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{Building2DReference}?, bool, int, CancellationToken)"/>
         /// and its instance overloads return null when inputs or connection are null, and return empty list when input collection is empty.
         /// </summary>
         [Fact]
@@ -88,7 +88,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.ContainsByReferencesAsync(IEnumerable{string}, int?, bool, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.ContainsByReferencesAsync(IEnumerable{string}, int?, bool, bool, int, CancellationToken)"/>
         /// returns null when input is null, and returns empty hash set when input collection is empty.
         /// </summary>
         [Fact]
@@ -150,7 +150,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, int, CancellationToken)"/>
         /// and its instance overload return null when inputs or connection are null.
         /// </summary>
         [Fact]
@@ -168,7 +168,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferenceByReferenceAsync(string, int?, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferenceByReferenceAsync(string, int?, bool, int, CancellationToken)"/>
         /// returns null when the reference is null or whitespace.
         /// </summary>
         [Fact]
@@ -183,7 +183,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByBuilding2DReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{Building2DReference}?, bool, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByBuilding2DReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{Building2DReference}?, bool, int, CancellationToken)"/>
         /// and its instance overloads return null when inputs or connection are null.
         /// </summary>
         [Fact]
@@ -207,8 +207,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByCountyIdAsync(NpgsqlConnection?, int, IEnumerable{int}?, CancellationToken)"/>
-        /// and <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferenceByIdAsync(long, int?, CancellationToken)"/>
+        /// Verifies that <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferencesByCountyIdAsync(NpgsqlConnection?, int, IEnumerable{int}?, int, CancellationToken)"/>
+        /// and <see cref="OrtoDatasPostgreSQLConverter.GetOrtoDatasReferenceByIdAsync(long, int?, int, CancellationToken)"/>
         /// return null when connection is null.
         /// </summary>
         [Fact]

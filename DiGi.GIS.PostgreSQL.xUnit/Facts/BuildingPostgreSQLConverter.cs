@@ -7,7 +7,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="BuildingPostgreSQLConverter.GetBuildingsByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="BuildingPostgreSQLConverter.GetBuildingsByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, int, System.Threading.CancellationToken)"/>
         /// and its instance overload return null when inputs or connection are null, and return empty list when input collection is empty.
         /// </summary>
         [Fact]
@@ -25,7 +25,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="BuildingPostgreSQLConverter.GetBuildingsByReferenceAsync(string, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="BuildingPostgreSQLConverter.GetBuildingsByReferenceAsync(string, int?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when the reference is null or whitespace.
         /// </summary>
         [Fact]
@@ -40,7 +40,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="BuildingPostgreSQLConverter.GetBuildingByReferenceAsync(string, int?, Geometry.Spatial.Classes.Point3D?, double, double, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="BuildingPostgreSQLConverter.GetBuildingByReferenceAsync(string, int?, Geometry.Spatial.Classes.Point3D?, double, double, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when the reference is null or whitespace.
         /// </summary>
         [Fact]
@@ -55,7 +55,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="BuildingPostgreSQLConverter.ContainsByReferencesAsync(IEnumerable{string}, int?, bool, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="BuildingPostgreSQLConverter.ContainsByReferencesAsync(IEnumerable{string}, int?, bool, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when input is null, and returns empty hash set when input collection is empty.
         /// </summary>
         [Fact]

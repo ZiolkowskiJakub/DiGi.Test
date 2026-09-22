@@ -9,8 +9,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetSubCodesAsync(NpgsqlConnection?, string?, System.Threading.CancellationToken)"/>
-        /// and <see cref="AdministrativeAreal2DPostgreSQLConverter.GetSubCodesAsync(string?, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetSubCodesAsync(NpgsqlConnection?, string?, int, System.Threading.CancellationToken)"/>
+        /// and <see cref="AdministrativeAreal2DPostgreSQLConverter.GetSubCodesAsync(string?, int, System.Threading.CancellationToken)"/>
         /// return an empty set when given null or whitespace input codes, and null when the connection is null.
         /// </summary>
         [Fact]
@@ -38,7 +38,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetSubCodesAsync(string?, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetSubCodesAsync(string?, int, System.Threading.CancellationToken)"/>
         /// excludes the exact query code match and returns only sub-codes starting with the prefix.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a populated database.</para>
         /// </summary>

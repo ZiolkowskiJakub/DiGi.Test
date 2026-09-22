@@ -47,7 +47,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(Npgsql.NpgsqlConnection, AdministrativeArealType, IEnumerable{int}, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(Npgsql.NpgsqlConnection, AdministrativeArealType, IEnumerable{int}, bool, int, System.Threading.CancellationToken)"/>
         /// resolves sibling part identifiers when given parent identifiers, returning all matching child references.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>
@@ -74,7 +74,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DsByAdministrativeArealType(AdministrativeArealType, int?, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DsByAdministrativeArealType(AdministrativeArealType, int?, int, System.Threading.CancellationToken)"/>
         /// resolves sibling voivodeship part identifiers when filtering by a single parent voivodeship ID, returning all full child county entities.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>
@@ -100,7 +100,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(Npgsql.NpgsqlConnection, AdministrativeArealType, IEnumerable{int}, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(Npgsql.NpgsqlConnection, AdministrativeArealType, IEnumerable{int}, bool, int, System.Threading.CancellationToken)"/>
         /// resolves sibling part identifiers using batched parent code lookups when given parent identifiers (such as Country level), returning all child references.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>

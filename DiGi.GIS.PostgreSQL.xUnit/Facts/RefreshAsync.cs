@@ -9,7 +9,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies that no stored subdivision is left without a parent chain after
-        /// <see cref="AdministrativeAreal2DPostgreSQLConverter.RefreshAsync(PostgreSQLAdministrativeAreal2DRefreshOptions, System.IProgress{long}, System.Threading.CancellationToken)"/> has run.
+        /// <see cref="AdministrativeAreal2DPostgreSQLConverter.RefreshAsync(PostgreSQLAdministrativeAreal2DRefreshOptions, System.IProgress{long}, int, System.Threading.CancellationToken)"/> has run.
         /// <para>91 rows used to store a null chain: 87 subdivisions of Poznan (<c>3064</c>), whose county holds no municipality feature in
         /// BDOT10k at all, and 4 settlements in <c>2412</c> / <c>3003</c> / <c>3015</c> whose sample point lands in a gap between
         /// municipality polygons. The four keep a real municipality, so they are asserted separately. See

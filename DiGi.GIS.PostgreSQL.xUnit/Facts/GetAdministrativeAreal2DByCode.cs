@@ -7,7 +7,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DByCodeAsync(string, AdministrativeArealType?, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="AdministrativeAreal2DPostgreSQLConverter.GetAdministrativeAreal2DByCodeAsync(string, AdministrativeArealType?, int, System.Threading.CancellationToken)"/>
         /// retrieves an administrative areal entity matching the specified code and optional administrative areal type.
         /// <para>Skipped by default: it executes an integration query requiring <c>GIS_PostgreSQL_Main.conf</c> pointing at a database.</para>
         /// </summary>

@@ -8,8 +8,8 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
-        /// and <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(Npgsql.NpgsqlConnection?, IEnumerable{string}?, int?, bool, int, System.Threading.CancellationToken)"/>
+        /// and <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, int, System.Threading.CancellationToken)"/>
         /// return null when given null inputs.
         /// </summary>
         [Fact]
@@ -24,7 +24,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when connection data is null and references are provided.
         /// </summary>
         [Fact]
@@ -36,7 +36,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, int, System.Threading.CancellationToken)"/>
         /// returns an empty list when given an empty collection of references.
         /// </summary>
         [Fact]
@@ -49,7 +49,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DPostgreSQLConverter.GetPoint2DsByReferencesAsync(IEnumerable{string}?, int?, bool, int, System.Threading.CancellationToken)"/>
         /// retrieves 2D points for existing building references both with and without providing an explicit county identifier.
         /// <para>Skipped by default: requires a live, populated PostgreSQL database.</para>
         /// </summary>

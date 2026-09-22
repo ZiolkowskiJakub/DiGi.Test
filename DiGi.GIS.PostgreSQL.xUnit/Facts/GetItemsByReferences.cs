@@ -8,7 +8,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemByReferenceAsync(string, int?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemByReferenceAsync(string, int?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when given a null or whitespace reference.
         /// </summary>
         [Fact]
@@ -23,7 +23,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemsByReferenceAsync(string, int?, long?, bool, System.Threading.CancellationToken)"/>
+        /// Verifies that <see cref="Building2DReferencedObjectPostgreSQLConverter{TBuilding2DReferencedObject, TUniqueObject}.GetItemsByReferenceAsync(string, int?, long?, bool, int, System.Threading.CancellationToken)"/>
         /// returns null when given a null or whitespace reference.
         /// </summary>
         [Fact]
