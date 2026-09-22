@@ -35,5 +35,22 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesAsync([null, string.Empty, "   "], [73482]));
             Assert.Empty(await Query.CountyIdsByReferencesAsync(null, ["reference_1"], [73482]));
         }
+
+        /// <summary>
+        /// Tests that the sibling-fallback resolver answers an empty map on degenerate inputs rather than throwing.
+        /// <para>It is the permissive-within-the-county companion to <c>CountyIdsByReferencesAsync</c>: a null building converter, a null reference list, an empty candidate set or blank references must each cost the caller an unresolved reference, not a 500. The widening it would run cannot run on a null connection, and that must cost an unresolved reference, not a throw.</para>
+        /// </summary>
+        [Fact]
+        public async Task CountyIdsByReferencesWithSiblingFallback_DegenerateInputs()
+        {
+            Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
+            AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(null);
+
+            Assert.Empty(await Query.CountyIdsByReferencesWithSiblingFallbackAsync(null, null, null, null));
+            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, ["reference_1"], null));
+            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, ["reference_1"], []));
+            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, [null, string.Empty, "   "], [73482]));
+            Assert.Empty(await Query.CountyIdsByReferencesWithSiblingFallbackAsync(null, administrativeAreal2DPostgreSQLConverter, ["reference_1"], [73482]));
+        }
     }
 }
