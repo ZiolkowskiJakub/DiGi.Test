@@ -317,6 +317,59 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
+        /// Tests that cutting shapes out of a consistently up-facing surface leaves the result up-facing.
+        /// <para>The triangulation of the clipped remainder does not preserve the winding of the triangle it was cut from, so without the positive-Z normalisation a height field comes back with some triangles facing down. This is the terrain half of DiGi.GLTF#1: the batched payload must not carry down-facing triangles.</para>
+        /// </summary>
+        [Fact]
+        public void Mesh3D_Difference_Winding()
+        {
+            Mesh3D mesh3D = Mesh3D_Difference_Terrain(0, 0, 10, 4, 0.1, 0.05);
+            Assert.Equal(32, mesh3D.TrianglesCount);
+
+            Assert.True(Mesh3D_Difference_AllUpFacing(mesh3D), "The input height field is not up-facing; the test is invalid.");
+
+            List<PolygonalFace2D> polygonalFace2Ds =
+            [
+                Mesh3D_Difference_Square(6, 2, 2),
+                Mesh3D_Difference_Square(24, 12, 3),
+                Mesh3D_Difference_Square(12, 26, 4)
+            ];
+
+            Mesh3D? mesh3D_Result = mesh3D.Difference(polygonalFace2Ds);
+            Assert.NotNull(mesh3D_Result);
+            Assert.True(mesh3D_Result.TrianglesCount > mesh3D.TrianglesCount, "The cut did not leave any remainder to re-triangulate; the test is invalid.");
+
+            Assert.True(Mesh3D_Difference_AllUpFacing(mesh3D_Result), "The cut surface came back with down-facing triangles; the positive-Z winding normalisation did not run.");
+        }
+
+        private static bool Mesh3D_Difference_AllUpFacing(Mesh3D mesh3D)
+        {
+            List<Triangle3D>? triangle3Ds = mesh3D.GetTriangles();
+            if (triangle3Ds is null)
+            {
+                return false;
+            }
+
+            foreach (Triangle3D triangle3D in triangle3Ds)
+            {
+                List<Point3D>? points = triangle3D.GetPoints();
+                if (points is null || points.Count != 3)
+                {
+                    continue;
+                }
+
+                Point3D p0 = points[0], p1 = points[1], p2 = points[2];
+                double nz = (p1.X - p0.X) * (p2.Y - p0.Y) - (p1.Y - p0.Y) * (p2.X - p0.X);
+                if (nz < -1e-9)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Measures cutting building sized outlines out of a surface at the size, resolution and building density the terrain service and the building store answer with for the largest area the 3D views ask for.
         /// <para>Two surfaces are measured over the same 1 km square in PL-1992 coordinates, because the cost is driven by the resolution rather than by the triangle count. A 10 m lattice is finer than the buildings, so a cut leaves simple remainders. A 50 m lattice is coarser than them, so whole buildings fall inside single triangles and every remainder carries holes - far fewer triangles, and the slower of the two. The stored counties are sampled at 10 m to 100 m, so both occur.</para>
         /// </summary>
