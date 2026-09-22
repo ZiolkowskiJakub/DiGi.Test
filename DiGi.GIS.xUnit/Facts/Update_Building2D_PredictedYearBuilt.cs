@@ -10,7 +10,7 @@ namespace DiGi.GIS.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that Update_Building2D_PredictedYearBuilt writes the latest predicted year of each building, appends a reference the table does not hold yet, and leaves a building carrying no prediction alone.
+        /// Verifies that Update_Building2D_PredictedYearBuilt writes the latest predicted year of each building, appends a reference the table does not hold yet, leaves a building carrying no prediction alone, and returns the number of rows it gave a year.
         /// <para>A building may hold several stored YearBuiltData records, so the fact also covers the newest prediction winning across records that share a reference.</para>
         /// </summary>
         [Fact]
@@ -47,10 +47,13 @@ namespace DiGi.GIS.xUnit
 
             Assert.Equal(2, table.RowCount);
 
-            IO.Modify.Update_Building2D_PredictedYearBuilt(table, countyId, [yearBuiltData_Older, yearBuiltData_Newer, yearBuiltData_Appended, yearBuiltData_UserOnly]);
+            int count = IO.Modify.Update_Building2D_PredictedYearBuilt(table, countyId, [yearBuiltData_Older, yearBuiltData_Newer, yearBuiltData_Appended, yearBuiltData_UserOnly]);
 
             //b_ref_002 was not in the table and is appended; b_ref_003 stays as the row it already was
             Assert.Equal(3, table.RowCount);
+
+            //The count is the rows given a year: b_ref_001 updated and b_ref_002 appended, never the user-only b_ref_003
+            Assert.Equal(2, count);
 
             Column? column_PredictedYearBuilt = table.Columns?.FirstOrDefault(x => x.Name == IO.Constants.Column.PredictedYearBuilt.Name);
             Assert.NotNull(column_PredictedYearBuilt);
@@ -79,7 +82,7 @@ namespace DiGi.GIS.xUnit
 
             //A county the rows do not belong to leaves the table untouched
             Table table_OtherCounty = new();
-            IO.Modify.Update_Building2D_PredictedYearBuilt(table_OtherCounty, countyId, null);
+            Assert.Equal(0, IO.Modify.Update_Building2D_PredictedYearBuilt(table_OtherCounty, countyId, null));
             Assert.Equal(0, table_OtherCounty.RowCount);
         }
 

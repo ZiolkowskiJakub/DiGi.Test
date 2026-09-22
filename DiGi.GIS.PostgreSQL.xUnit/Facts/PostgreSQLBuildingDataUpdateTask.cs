@@ -652,6 +652,133 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
+        /// Verifies that a run selecting <see cref="BuildingDataUpdateType.General"/> together with <see cref="BuildingDataUpdateType.PredictedYearBuilt"/> writes the predicted year onto the row the general pass built, and that the run reports the write through <see cref="PostgreSQLBuildingDataUpdateTask.PredictedYearBuiltWrittenCount"/>.
+        /// <para>The sibling-part fact above runs the year built type alone, so its rows are appended by <c>Update_Building2D_PredictedYearBuilt</c> itself. Here the rows already exist - built by <c>Update_Building2D</c> from the buildings of a subdivision - and the year has to be matched onto them by county identifier and reference. DiGi.GIS.PostgreSQL#81 found the column empty nationwide after a rebuild that reported success, with no counter or log line able to say whether the type had run at all; the counter asserted here is that evidence.</para>
+        /// <para>Skipped by default: requires PostgreSQL configuration files pointing at a database.</para>
+        /// </summary>
+        [Fact(Skip = "Requires the PostgreSQL configuration files pointing at a database.")]
+        public async Task PostgreSQLBuildingDataUpdateTask_YearBuilt_CombinedGeneral_Integration()
+        {
+            GISPostgreSQLConverterManager? manager = Create.GISPostgreSQLConverterManager();
+            Assert.NotNull(manager);
+
+            AdministrativeAreal2DPostgreSQLConverter? adminConverter = manager.GetPostgreSQLConverter<AdministrativeAreal2DPostgreSQLConverter>();
+            Assert.NotNull(adminConverter);
+
+            Building2DPostgreSQLConverter? building2DConverter = manager.GetPostgreSQLConverter<Building2DPostgreSQLConverter>();
+            Assert.NotNull(building2DConverter);
+
+            BuildingDataPostgreSQLConverter? buildingDataConverter = manager.GetPostgreSQLConverter<BuildingDataPostgreSQLConverter>();
+            Assert.NotNull(buildingDataConverter);
+
+            YearBuiltDataPostgreSQLConverter? yearBuiltDataConverter = manager.GetPostgreSQLConverter<YearBuiltDataPostgreSQLConverter>();
+            Assert.NotNull(yearBuiltDataConverter);
+
+            List<AdministrativeAreal2DReference>? subdivisions = await adminConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.Subdivision, commandTimeout: 600);
+            Assert.NotNull(subdivisions);
+
+            // A single-part county keeps the run to one partition; the subdivision pass is what builds the rows here.
+            List<AdministrativeAreal2DReference>? countyReferences = await adminConverter.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County, commandTimeout: 600);
+            Assert.NotNull(countyReferences);
+
+            Dictionary<int, HashSet<int>> siblingCountyGroups = countyReferences.SiblingCountyGroups();
+
+            // The first subdivisions of a development database are often empty, so the search walks the single-part
+            // ones until it finds a subdivision with buildings, bounded so an empty database fails as vacuous rather than hanging.
+            int countyId = -1;
+            int subdivisionId = -1;
+            List<Building2D>? buildings = null;
+            Building2D? building = null;
+
+            foreach (AdministrativeAreal2DReference subdivision in subdivisions.Where(x => x.CountyId is int countyId_Subdivision && (!siblingCountyGroups.TryGetValue(countyId_Subdivision, out HashSet<int>? siblingCountyIds) || siblingCountyIds is null || siblingCountyIds.Count == 1)).Take(200))
+            {
+                List<Building2D>? buildings_Subdivision = await building2DConverter.GetBuilding2DsByCountyIdAsync(subdivision.CountyId!.Value, subdivision.Id, excludedReferences: null, commandTimeout: 600);
+                building = buildings_Subdivision?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Reference));
+                if (building is null)
+                {
+                    continue;
+                }
+
+                countyId = subdivision.CountyId.Value;
+                subdivisionId = subdivision.Id;
+                buildings = buildings_Subdivision;
+                break;
+            }
+
+            Assert.True(building is not null && buildings is not null, "No subdivision of a single-part county with a referenced building found among the first 200 - the fact is vacuous.");
+            string reference = building!.Reference!;
+
+            // Guard: no stored year_built_data row for this reference under the county, or a pre-existing prediction could be what the run writes.
+            List<YearBuiltData>? existingRows = await yearBuiltDataConverter.GetItemsByReferencesAsync([reference], countyId, fallbackByReference: true, commandTimeout: 600);
+            Assert.True(existingRows is null || existingRows.Count == 0, $"A year_built_data row already exists for reference {reference} - the fact cannot tell its own seed from the stored one.");
+
+            // The building_data rows of the whole subdivision are rewritten by the general pass, so the pre-state kept is the subdivision's.
+            List<string> references = [.. buildings!.Where(x => !string.IsNullOrWhiteSpace(x.Reference)).Select(x => x.Reference!)];
+            Core.IO.Table.Classes.Table? preState = await buildingDataConverter.PullAsync(references, countyId, commandTimeout: 600);
+
+            string uniqueTestId = Guid.NewGuid().ToString("N");
+            GIS.Classes.YearBuiltData gisObject = new(reference);
+            gisObject.SetPredictedYearBuilt(DateTime.UtcNow, (short)1991);
+            YearBuiltData seed = new()
+            {
+                CountyId = countyId,
+                Reference = reference,
+                UniqueId = uniqueTestId,
+                Object = gisObject.ToJsonObject()
+            };
+            await yearBuiltDataConverter.UpdateAsync([seed], commandTimeout: 600);
+
+            try
+            {
+                PostgreSQLBuildingDataUpdateTask task = new(manager)
+                {
+                    PostgreSQLBuildingDataUpdateOptions = new()
+                    {
+                        BuildingDataUpdateTypes = [BuildingDataUpdateType.General, BuildingDataUpdateType.PredictedYearBuilt],
+                        CountyIds = [countyId]
+                    }
+                };
+
+                TaskCompletionSource<bool> taskCompletionSource = new();
+                task.Stopped += (object? sender, EventArgs e) => taskCompletionSource.TrySetResult(true);
+                task.Start();
+                await taskCompletionSource.Task;
+
+                Assert.Null(task.Exception);
+                Assert.True(task.IsSucceeded);
+
+                // The seeded building is one of the rows given a year; the rest of the county has none, and that is reported, not failed.
+                Assert.True(task.PredictedYearBuiltWrittenCount >= 1, $"PredictedYearBuiltWrittenCount is {task.PredictedYearBuiltWrittenCount}, expected at least 1 for the seeded reference {reference}.");
+                Assert.True(task.PredictedYearBuiltMissingBuildingCount >= 0);
+
+                Core.IO.Table.Classes.Table? result = await buildingDataConverter.PullAsync([reference], countyId, commandTimeout: 600);
+                Assert.True(result is not null && result.RowCount == 1, $"The building_data pull for reference {reference} under county {countyId} returned {result?.RowCount ?? 0} rows, expected 1.");
+
+                Core.IO.Table.Classes.Column? column_PredictedYearBuilt = result!.Columns.FirstOrDefault(x => x.Name == "Predicted year built");
+                Assert.True(column_PredictedYearBuilt is not null, "The pulled building data does not carry a 'Predicted year built' column.");
+
+                Core.IO.Table.Classes.Column? column_CountyName = result.Columns.FirstOrDefault(x => x.Name == "County name");
+                Assert.True(column_CountyName is not null, "The pulled building data does not carry a 'County name' column - the general pass did not write the row.");
+
+                Core.IO.Table.Classes.Row? row = result.GetRow(0);
+                Assert.NotNull(row);
+
+                Assert.True(row.TryGetValue(column_PredictedYearBuilt!.Index, out ushort year), $"The row for reference {reference} carries no predicted year built - the year was not matched onto the row the general pass built.");
+                Assert.Equal((ushort)1991, year);
+
+                Assert.True(row.TryGetValue(column_CountyName!.Index, out string? countyName) && !string.IsNullOrWhiteSpace(countyName), $"The row for reference {reference} carries no county name - the general columns were not written in the same run.");
+            }
+            finally
+            {
+                await yearBuiltDataConverter.RemoveByUniqueIdsAsync([uniqueTestId], countyId, commandTimeout: 600);
+                if (preState is not null && preState.RowCount > 0)
+                {
+                    await buildingDataConverter.PushAsync(preState, commandTimeout: 600);
+                }
+            }
+        }
+
+        /// <summary>
         /// Verifies the run's result separates the two radial-ratio misses: a county whose unassigned buildings could not be measured for their radial ratios still reports success (<c>true</c>), while a subdivision whose radial ratios could not be measured fails the run (<c>false</c>).
         /// <para>Both counters are private-set and are driven only through the live run, so the fact is <c>Skip</c>-ped like the other integration facts in this file: it needs the PostgreSQL configuration files pointing at a database whose data places the miss in exactly one of the two buckets - a county whose unassigned bucket misses and no subdivision does (the <c>true</c> case; counties 17371 and 90517 from the #78 D5 run of 2026-09-18 are the recorded evidence) and a subdivision that misses and no unassigned bucket does (the <c>false</c> case).</para>
         /// </summary>
