@@ -1,6 +1,7 @@
 using DiGi.Core.IO.Table.Classes;
 using DiGi.GIS.IO;
 using DiGi.GIS.ML;
+using DiGi.GIS.ML.Classes;
 using System.Collections.Generic;
 
 namespace DiGi.GIS.ML.xUnit
@@ -140,6 +141,61 @@ namespace DiGi.GIS.ML.xUnit
             }
 
             Assert.True(table!.GetColumnIndex(Constants.Column.YearBuilt.Name) > 0);
+        }
+
+        /// <summary>
+        /// Verifies that the assembled training table never carries any of the three stored year built columns - the pipeline&apos;s own output, the label&apos;s source and its fallback - so the regressor is not trained on its predecessor or on the answer.
+        /// <para>The schema is asserted exactly - Reference, then every allow-list column, then the label, in that order - and the disjointness of the year built columns from both the materialised table and the inference allow-list is pinned on the materialised table, which is what reaches the trainer.</para>
+        /// </summary>
+        [Fact]
+        public void YearBuiltPredictionTrainingTable_ExcludesYearBuiltColumns()
+        {
+            Table table_Source = new();
+            table_Source.AddColumn(IO.Constants.Column.Reference);
+            table_Source.AddColumn(IO.Constants.Column.FloorArea);
+            table_Source.AddColumn(IO.Constants.Column.Storeys);
+            table_Source.AddColumn(IO.Constants.Column.PredictedYearBuilt);
+            table_Source.AddColumn(IO.Constants.Column.UserYearBuilt);
+            table_Source.AddColumn(IO.Constants.Column.CalculatedYearBuilt);
+            table_Source.AddRow(["REF-1", 120.5F, (ushort)3, (ushort)2008, (ushort)1975, (ushort)1975]);
+
+            Dictionary<string, short> labels = new() { ["REF-1"] = 1975 };
+            Table? table = table_Source.YearBuiltPredictionTrainingTable(labels);
+            Assert.NotNull(table);
+
+            // The schema, exactly and in order: Reference, then every allow-list column, then the label.
+            List<Column> columns_Input = IO.Query.YearBuiltPredictionInputColumns();
+            Assert.Equal(columns_Input.Count + 2, table!.ColumnCount);
+
+            Column? column_First = table.GetColumn(0);
+            Assert.NotNull(column_First);
+            Assert.Equal(IO.Constants.Column.Reference.Name, column_First.Name);
+
+            Column? column_Last = table.GetColumn(table.ColumnCount - 1);
+            Assert.NotNull(column_Last);
+            Assert.Equal(Constants.Column.YearBuilt.Name, column_Last.Name);
+
+            // The three stored year built columns are the label&apos;s source (User), its fallback (Calculated) and the pipeline&apos;s own output (Predicted). None may become a feature.
+            // Fully qualified: the slug overload (DiGi.Core.IO) rather than the content-hash overload (DiGi.Core) - both apply to IColumn, and the using block would silently decide which one runs.
+            List<string> uniqueIds_YearBuilt =
+            [
+                DiGi.Core.IO.Query.UniqueId(IO.Constants.Column.PredictedYearBuilt)!,
+                DiGi.Core.IO.Query.UniqueId(IO.Constants.Column.UserYearBuilt)!,
+                DiGi.Core.IO.Query.UniqueId(IO.Constants.Column.CalculatedYearBuilt)!
+            ];
+
+            for (int i = 0; i < table.ColumnCount; i++)
+            {
+                string? uniqueId_Output = DiGi.Core.IO.Query.UniqueId(table.GetColumn(i));
+                Assert.False(uniqueId_Output is not null && uniqueIds_YearBuilt.Contains(uniqueId_Output), $"Year built column '{uniqueId_Output}' leaked into the training table.");
+            }
+
+            // And none of them is in the inference allow-list the trainer projects through.
+            List<string> columnUniqueIds = YearBuiltPredictor.InputColumnUniqueIds();
+            foreach (string uniqueId in uniqueIds_YearBuilt)
+            {
+                Assert.False(columnUniqueIds.Contains(uniqueId), $"Year built column '{uniqueId}' is in the inference allow-list.");
+            }
         }
     }
 }
