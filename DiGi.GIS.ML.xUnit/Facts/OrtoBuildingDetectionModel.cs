@@ -48,6 +48,17 @@ namespace DiGi.GIS.ML.xUnit
             Assert.True(missing_FromAllowList.Count == 0, $"ModelInput members absent from the allow-list: {string.Join(", ", missing_FromAllowList)}");
             Assert.Equal(172, names_Model.Count);
 
+            // The trained contract must name exactly the features the generated model binds: a retrain that moves the
+            // range but forgets the contract would still compile, and this is the check that catches it.
+            HashSet<string> names_Contract = IO.Query.YearBuiltPredictionInputColumnNames(OrtoBuildingDetectionModel.TrainedYears, OrtoBuildingDetectionModel.TrainedRadiuses);
+            Assert.Empty(names_Model.Except(names_Contract));
+            Assert.Empty(names_Contract.Except(names_Model));
+
+            // And the predictor's readiness must state that same contract, so the orchestrator checks the options against the right range.
+            IO.Classes.YearBuiltPredictorReadiness yearBuiltPredictorReadiness = new Classes.YearBuiltPredictor().YearBuiltPredictorReadiness();
+            Assert.Equal(OrtoBuildingDetectionModel.TrainedYears, yearBuiltPredictorReadiness.Years);
+            Assert.Equal(OrtoBuildingDetectionModel.TrainedRadiuses, yearBuiltPredictorReadiness.Radiuses);
+
             // The pipeline's own output must not be readable as a feature from either side.
             foreach (Column column in IO.Query.YearBuiltPredictionOutputColumns())
             {

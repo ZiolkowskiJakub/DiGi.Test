@@ -1,5 +1,6 @@
 using DiGi.Core.IO.Table.Classes;
 using DiGi.GIS.IO.Interfaces;
+using System.Collections.Generic;
 
 namespace DiGi.GIS.YOLO.UI.xUnit
 {
@@ -12,16 +13,22 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         {
             private readonly short year;
             private readonly bool runnable;
+            private readonly DiGi.Core.Classes.Range<int>? years;
+            private readonly List<double>? radiuses;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="YearBuiltPredictorStub"/> class.
             /// </summary>
             /// <param name="year">The construction year to answer with for every row handed in.</param>
             /// <param name="runnable">Whether the readiness probe reports this predictor can score.</param>
-            public YearBuiltPredictorStub(short year, bool runnable = true)
+            /// <param name="years">The year range the predictor's readiness reports it was trained on, or null when it states no contract.</param>
+            /// <param name="radiuses">The radiuses the predictor's readiness reports it was trained on, or null when it states no contract.</param>
+            public YearBuiltPredictorStub(short year, bool runnable = true, DiGi.Core.Classes.Range<int>? years = null, List<double>? radiuses = null)
             {
                 this.year = year;
                 this.runnable = runnable;
+                this.years = years;
+                this.radiuses = radiuses;
             }
 
             /// <summary>
@@ -32,10 +39,10 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             {
                 if (this.runnable)
                 {
-                    return new IO.Classes.YearBuiltPredictorReadiness(true);
+                    return new IO.Classes.YearBuiltPredictorReadiness(true, years: this.years, radiuses: this.radiuses);
                 }
 
-                return new IO.Classes.YearBuiltPredictorReadiness(false, ["the year built model is missing (stub)"]);
+                return new IO.Classes.YearBuiltPredictorReadiness(false, ["the year built model is missing (stub)"], years: this.years, radiuses: this.radiuses);
             }
 
             /// <summary>

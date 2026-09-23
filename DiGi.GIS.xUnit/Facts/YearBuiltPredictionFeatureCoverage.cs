@@ -1,5 +1,6 @@
 using DiGi.Core.IO.Table.Classes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DiGi.GIS.xUnit
 {
@@ -61,6 +62,35 @@ namespace DiGi.GIS.xUnit
             //The groups that do not vary with the range stay where they are
             Assert.Equal(31, columns_ByGroup[IO.Constants.YearBuiltPredictionFeatureGroup.Base].Count);
             Assert.Equal(25, columns_ByGroup[IO.Constants.YearBuiltPredictionFeatureGroup.GridCellCoverage].Count);
+        }
+
+        /// <summary>
+        /// Verifies that the feature-contract names move with the range exactly as the column allow-list does, so the orchestrator's comparison is against the same names the model binds by.
+        /// <para>The defaults give the full 172 names; narrowing the years to 2008..2020 drops the detection and population features of 2021-2025 - exactly 30 - and narrowing the radiuses to 200, 400, 600 drops the two ratio features of the 1000 radius. Widening is the reverse: a superset, so nothing the model needs is ever missing.</para>
+        /// </summary>
+        [Fact]
+        public void YearBuiltPredictionInputColumnNames_Range()
+        {
+            HashSet<string> names_Default = IO.Query.YearBuiltPredictionInputColumnNames();
+            Assert.Equal(172, names_Default.Count);
+
+            HashSet<string> names_NarrowedYears = IO.Query.YearBuiltPredictionInputColumnNames(new Core.Classes.Range<int>(2008, 2020), null);
+            Assert.Equal(142, names_NarrowedYears.Count);
+
+            List<string> missing_Years = [.. names_Default.Except(names_NarrowedYears).OrderBy(x => x)];
+            Assert.Equal(30, missing_Years.Count);
+            foreach (string name in missing_Years)
+            {
+                //Every dropped name is a detection or population feature of one of 2021-2025
+                Assert.Matches("(2021|2022|2023|2024|2025)", name);
+            }
+
+            HashSet<string> names_NarrowedRadiuses = IO.Query.YearBuiltPredictionInputColumnNames(null, [200, 400, 600]);
+            Assert.Equal(170, names_NarrowedRadiuses.Count);
+
+            //Widening adds nothing the model needs, so the full set is a subset of the widened one
+            HashSet<string> names_WidenedYears = IO.Query.YearBuiltPredictionInputColumnNames(new Core.Classes.Range<int>(2005, 2025), null);
+            Assert.Empty(names_Default.Except(names_WidenedYears));
         }
 
         /// <summary>
