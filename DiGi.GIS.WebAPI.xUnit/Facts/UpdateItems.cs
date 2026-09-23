@@ -54,6 +54,12 @@ namespace DiGi.GIS.WebAPI.xUnit
                 // single part the write decides by geometry and the resolver is never reached.
                 AssertLookupNotRun(await ortoDatasController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.OrtoDatas("reference", null)), [1, 2]));
 
+                BuildingController buildingController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.BuildingPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                AssertInternalServerError(await buildingController.UpdateItemsByCountyIdsAsync(JsonArray(Building()), [1]));
+                // Several candidate parts, so the resolver runs before the geometry fallback; a single part
+                // never reaches it, and an empty map must not send the batch to the fallback instead.
+                AssertLookupNotRun(await buildingController.UpdateItemsByCountyIdsAsync(JsonArray(Building()), [1, 2]));
+
                 YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.YearBuiltData("reference")), [1]));
                 AssertLookupNotRun(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.YearBuiltData("reference")), [1]));
@@ -147,6 +153,11 @@ namespace DiGi.GIS.WebAPI.xUnit
         private static GIS.Classes.Building2D Building2D()
         {
             return new(Guid.NewGuid(), "reference", null, 1, null, null, []);
+        }
+
+        private static CityGML.Classes.Building Building()
+        {
+            return new(Guid.NewGuid().ToString(), -1, null);
         }
 
         private static BuildingModel BuildingModel()
