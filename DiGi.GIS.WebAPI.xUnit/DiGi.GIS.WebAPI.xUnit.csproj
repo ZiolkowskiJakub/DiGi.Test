@@ -47,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="DiGi.Analytical">
+      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Analytical.Building">
       <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.dll</HintPath>
     </Reference>
@@ -65,8 +68,17 @@
     <Reference Include="DiGi.Geometry">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
     </Reference>
+    <!-- BuildingModel's interface surface (IGeometryObject, IGeometry3DObject) lives here. -->
+    <Reference Include="DiGi.Geometry.Object">
+      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.GIS">
       <HintPath>..\..\DiGi.GIS\bin\DiGi.GIS.dll</HintPath>
+    </Reference>
+    <!-- Required only to name the BuildingModelParameter the BuildingModel facts set: DiGi.GIS.WebAPI
+         reaches DiGi.GIS.Analytical by HintPath, so the enum is not visible here without this entry. -->
+    <Reference Include="DiGi.GIS.Analytical">
+      <HintPath>..\..\DiGi.GIS.Analytical\bin\DiGi.GIS.Analytical.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.GIS.PostgreSQL">
       <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.GIS.PostgreSQL.dll</HintPath>
