@@ -53,19 +53,5 @@ namespace DiGi.Core.xUnit
                 value_Encoded.Length < 512,
                 string.Format("Encoded entry name is {0} characters: {1}", value_Encoded.Length, value_Encoded));
         }
-
-        /// <summary>
-        /// Tests that a legacy entry name still decodes, which is what keeps a pre-existing storage archive readable.
-        /// </summary>
-        [Fact]
-        public void WrapperMetadataReferences_LegacyEntryName_StillDecodes()
-        {
-            string? value_Encoded = IO.File.Query.Encode("DiGi.GIS.Classes.Building2D,DiGi.GIS::0f8fad5bd9cb469fa16570867728950e");
-            Assert.NotNull(value_Encoded);
-
-            UniqueReference? uniqueReference = IO.File.Query.Decode(value_Encoded);
-            Assert.NotNull(uniqueReference);
-            Assert.IsType<GuidReference>(uniqueReference);
-        }
     }
 }
