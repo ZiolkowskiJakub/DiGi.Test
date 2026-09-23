@@ -21,7 +21,6 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.Equal("gis/yearbuiltdata/countbycountyid", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetCountByCountyIdAsync)));
             Assert.Equal("gis/yearbuiltdata/itemsbyreferences", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetItemsByReferencesAsync)));
             Assert.Equal("gis/yearbuiltdata/itemsbyreference", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetItemsByReferenceAsync)));
-            Assert.Equal("gis/yearbuiltdata/useryearbuiltbycountyid", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetUserYearBuiltsByCountyIdAsync)));
             Assert.Equal("gis/yearbuiltdata/referenceduplicates", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetReferenceDuplicatesAsync)));
             Assert.Equal("gis/yearbuiltdata/countypartmismatches", DiGi.WebAPI.Query.Path<YearBuiltDataController>(nameof(YearBuiltDataController.GetCountyPartMismatchesAsync)));
         }
