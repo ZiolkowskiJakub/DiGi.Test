@@ -29,10 +29,24 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         {
             Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
 
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesAsync(null, [73482]));
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesAsync(["reference_1"], null));
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesAsync(["reference_1"], []));
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesAsync([null, string.Empty, "   "], [73482]));
+            Dictionary<string, int>? countyIds_ByReference;
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesAsync(null, [73482]);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesAsync(["reference_1"], null);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesAsync(["reference_1"], []);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesAsync([null, string.Empty, "   "], [73482]);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
             Assert.Null(await Query.CountyIdsByReferencesAsync(null, ["reference_1"], [73482]));
         }
 
@@ -46,10 +60,22 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Building2DPostgreSQLConverter building2DPostgreSQLConverter = new(null);
             AdministrativeAreal2DPostgreSQLConverter administrativeAreal2DPostgreSQLConverter = new(null);
 
+            Dictionary<string, int>? countyIds_ByReference;
+
             Assert.Null(await Query.CountyIdsByReferencesWithSiblingFallbackAsync(null, null, null, null));
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, ["reference_1"], null));
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, ["reference_1"], []));
-            Assert.Empty(await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, [null, string.Empty, "   "], [73482]));
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, ["reference_1"], null);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, ["reference_1"], []);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
+            countyIds_ByReference = await building2DPostgreSQLConverter.CountyIdsByReferencesWithSiblingFallbackAsync(administrativeAreal2DPostgreSQLConverter, [null, string.Empty, "   "], [73482]);
+            Assert.NotNull(countyIds_ByReference);
+            Assert.Empty(countyIds_ByReference);
+
             Assert.Null(await Query.CountyIdsByReferencesWithSiblingFallbackAsync(null, administrativeAreal2DPostgreSQLConverter, ["reference_1"], [73482]));
         }
 
