@@ -17,9 +17,11 @@ namespace DiGi.ComputeSharp.xUnit
         /// the output of one full dispatch (rowOffset = 0) through the same shader, with the row stride equal to
         /// the external triangle count, and the out-of-range guard leaves the sentinel pre-fill of the rows beyond
         /// the block's valid range untouched.
-        /// <para>The reference is this shader's own full dispatch rather than <see cref="Triangle3ExternalShadingComputeShader"/>, so the fact
-        /// isolates the row-offset mechanics (block slicing, row stride and offset indexing) from the intersection
-        /// computation, which both shaders share.</para>
+        /// <para>The blocked reference is this shader's own full dispatch, so that part isolates the row-offset mechanics
+        /// (block slicing, row stride and offset indexing) from the intersection computation. Separately, the full dispatch
+        /// must equal <see cref="Triangle3ExternalShadingComputeShader"/> cell for cell for an axis-aligned and an oblique
+        /// direction and two tolerances: the row-offset struct has its own constant buffer layout, and a layout the driver
+        /// mishandles corrupts the results without failing (ZiolkowskiJakub/DiGi.ComputeSharp#3).</para>
         /// Handles UnsupportedDoubleOperationException gracefully for FP64 unsupported GPUs.
         /// </summary>
         [Fact]
@@ -94,6 +96,31 @@ namespace DiGi.ComputeSharp.xUnit
                 }
 
                 Assert.True(nonNaN > 0 && nonNaN < fullResults.Count, "Expected a mix of intersecting and non-intersecting cells.");
+
+                // Parity with the existing struct, which pins the constant buffer layout (vector and tolerance must be read correctly).
+                double length = Math.Sqrt((0.3 * 0.3) + (0.2 * 0.2) + 1.0);
+                Coordinate3[] parityVectors = [vector, new(0.3 / length, -0.2 / length, -1.0 / length)];
+                double[] parityTolerances = [tolerance, 1e-3];
+                foreach (Coordinate3 parityVector in parityVectors)
+                {
+                    foreach (double parityTolerance in parityTolerances)
+                    {
+                        using ReadWriteBuffer<Triangle3Intersection> oldBuffer = graphicsDevice.AllocateReadWriteBuffer<Triangle3Intersection>(count * count_External);
+                        using ReadWriteBuffer<Triangle3Intersection> newBuffer = graphicsDevice.AllocateReadWriteBuffer<Triangle3Intersection>(count * count_External);
+                        graphicsDevice.For(count, count_External, new Triangle3ExternalShadingComputeShader(trianglesBuffer, externalBuffer, oldBuffer, parityVector, parityTolerance));
+                        graphicsDevice.For(count, count_External, new Triangle3ExternalShadingRowOffsetComputeShader(trianglesBuffer, externalBuffer, newBuffer, parityVector, 0, parityTolerance));
+                        List<Triangle3Intersection>? oldResults = Core.Create.List(oldBuffer);
+                        List<Triangle3Intersection>? newResults = Core.Create.List(newBuffer);
+                        Assert.NotNull(oldResults);
+                        Assert.NotNull(newResults);
+                        Assert.Equal(oldResults!.Count, newResults!.Count);
+
+                        for (int i = 0; i < oldResults.Count; i++)
+                        {
+                            Assert.True(AreEqual(oldResults[i], newResults[i]), $"Cell {i} (vector ({parityVector.X}, {parityVector.Y}, {parityVector.Z}), tolerance {parityTolerance}) differs from Triangle3ExternalShadingComputeShader.");
+                        }
+                    }
+                }
 
                 // A negative offset must be refused rather than read out of bounds.
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
