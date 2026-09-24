@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <core:CityModel xmlns:core="http://www.opengis.net/citygml/2.0" xmlns:gen="http://www.opengis.net/citygml/generics/2.0" xmlns:bldg="http://www.opengis.net/citygml/building/2.0" xmlns:gml="http://www.opengis.net/gml" gml:id="BUD3D_3024_N-33-117-d-d-4-2">
-<!-- Building e189b2a2-9f5e-46f6-a540-235c03e5afcb of county 3024 (szamotulski), LOD1 2022, 3024_N-33-117-d-d-4-2.gml. DiGi.GIS.Analytical#1: the ground (PG_1) and roof (PG_5) rings are sliver triangles with a 0.34 degree corner. -->
+<!-- Building e189b2a2-9f5e-46f6-a540-235c03e5afcb of county 3024 (szamotulski), LOD1 2022, 3024_N-33-117-d-d-4-2.gml. DiGi.GIS.Analytical#1: the ground (PG_1) and roof (PG_5) rings are sliver triangles with a 0.34 degree corner. Building 4cd84061-a535-4eee-9e73-ca8250b59122, its nearest neighbour on the sheet, is kept beside it as the geometry the extruded fallback takes its base elevation from. -->
 <core:cityObjectMember>
 <bldg:Building gml:id="ID-3024-e189b2a2-9f5e-46f6-a540-235c03e5afcb">
 			<gen:stringAttribute name="buildingId">
@@ -64,6 +64,97 @@
 									<gml:exterior>
 										<gml:LinearRing>
 											<gml:posList>331031.13 539125.71 70.59287559416632 331030.79 539124.54 70.59287559416632 331030.36 539122.98 70.59287559416632 331031.13 539125.71 70.59287559416632</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+						</gml:CompositeSurface>
+					</gml:exterior>
+				</gml:Solid>
+			</bldg:lod1Solid>
+		</bldg:Building>
+</core:cityObjectMember>
+<core:cityObjectMember>
+<bldg:Building gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122">
+			<gen:stringAttribute name="buildingId">
+				<gen:value>4cd84061-a535-4eee-9e73-ca8250b59122</gen:value>
+			</gen:stringAttribute>
+			<gen:stringAttribute name="przestNazw">
+				<gen:value>PL.PZGiK.308.BDOT10k</gen:value>
+			</gen:stringAttribute>
+			<gen:stringAttribute name="wersjaId">
+				<gen:value>2021-07-29T00:00:00</gen:value>
+			</gen:stringAttribute>
+			<gen:stringAttribute name="zrodloDach">
+				<gen:value>ALS_I</gen:value>
+			</gen:stringAttribute>
+			<gen:stringAttribute name="aktZrodla">
+				<gen:value>2011</gen:value>
+			</gen:stringAttribute>
+			<bldg:roofType>1000</bldg:roofType>
+			<bldg:lod1Solid>
+				<gml:Solid srsName="urn:ogc:def:crs,crs:EPSG::2180,crs:PL-EVRF2007-NH" srsDimension="3">
+					<gml:exterior>
+						<gml:CompositeSurface>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_1">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331033.3 539122.22 61.8128755941663 331034.05 539124.81 61.8128755941663 331044.09 539121.97 61.8128755941663 331040.99 539110.99 61.8128755941663 331031.32 539113.72 61.8128755941663 331033.3 539122.22 61.8128755941663</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_2">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331033.3 539122.22 61.8128755941663 331031.32 539113.72 61.8128755941663 331031.32 539113.72 66.34287559416632 331033.3 539122.22 66.34287559416632 331033.3 539122.22 61.8128755941663</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_3">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331031.32 539113.72 61.8128755941663 331040.99 539110.99 61.8128755941663 331040.99 539110.99 66.34287559416632 331031.32 539113.72 66.34287559416632 331031.32 539113.72 61.8128755941663</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_4">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331040.99 539110.99 61.8128755941663 331044.09 539121.97 61.8128755941663 331044.09 539121.97 66.34287559416632 331040.99 539110.99 66.34287559416632 331040.99 539110.99 61.8128755941663</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_5">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331044.09 539121.97 61.8128755941663 331034.05 539124.81 61.8128755941663 331034.05 539124.81 66.34287559416632 331044.09 539121.97 66.34287559416632 331044.09 539121.97 61.8128755941663</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_6">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331034.05 539124.81 61.8128755941663 331033.3 539122.22 61.8128755941663 331033.3 539122.22 66.34287559416632 331034.05 539124.81 66.34287559416632 331034.05 539124.81 61.8128755941663</gml:posList>
+										</gml:LinearRing>
+									</gml:exterior>
+								</gml:Polygon>
+							</gml:surfaceMember>
+							<gml:surfaceMember>
+								<gml:Polygon gml:id="ID-3024-4cd84061-a535-4eee-9e73-ca8250b59122_PG_7">
+									<gml:exterior>
+										<gml:LinearRing>
+											<gml:posList>331033.3 539122.22 66.34287559416632 331031.32 539113.72 66.34287559416632 331040.99 539110.99 66.34287559416632 331044.09 539121.97 66.34287559416632 331034.05 539124.81 66.34287559416632 331033.3 539122.22 66.34287559416632</gml:posList>
 										</gml:LinearRing>
 									</gml:exterior>
 								</gml:Polygon>

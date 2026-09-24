@@ -1,7 +1,9 @@
 using DiGi.Analytical.Building.Classes;
 using DiGi.CityGML.Classes;
+using DiGi.CityGML.Interfaces;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
+using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.GIS.Classes;
 using System.Collections.Generic;
 using System.Linq;
@@ -137,9 +139,23 @@ namespace DiGi.GIS.Analytical.xUnit
 
             PolygonalFace3D polygonalFace3D = new(polygon3D);
 
-            GroundSurface groundSurface = new("GroundSurface_1", polygonalFace3D);
+            // A closed box rather than the ground surface alone: a building converting to fewer than four surfaces
+            // cannot enclose a volume and is refused by Create.BuildingModel(Building), which would send this fixture
+            // down the extruded fallback whatever its reference (DiGi.GIS.Analytical#1).
+            Polyhedron? polyhedron = Geometry.Spatial.Create.Polyhedron(polygonalFace3D, new Vector3D(0, 0, 6));
+            Assert.NotNull(polyhedron);
 
-            Building result = new("Building_1", -1, [groundSurface]);
+            // The extrusion lists the base face first, and it is already carried as the ground surface
+            List<IPolygonalFace3D> polygonalFace3Ds = polyhedron.PolygonalFaces ?? [];
+            List<ISurface> surfaces = [new GroundSurface("GroundSurface_1", polygonalFace3D)];
+            for (int i = 1; i < polygonalFace3Ds.Count; i++)
+            {
+                surfaces.Add(new UndefinedSurface($"Surface_{i + 1}", polygonalFace3Ds[i]));
+            }
+
+            Assert.Equal(6, surfaces.Count);
+
+            Building result = new("Building_1", -1, surfaces);
             result.SetValue(CityGML.Enums.BuildingParameter.buildingId, reference, new Core.Parameter.Classes.SetValueSettings(true, false));
 
             return result;
