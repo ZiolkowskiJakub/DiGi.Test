@@ -4,7 +4,6 @@ using DiGi.Geometry.Planar.Interfaces;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.Spatial.Interfaces;
 using DiGi.Solar.Classes;
-using DiGi.Solar.ComputeSharp.Classes;
 using DiGi.Solar.Enums;
 using System.Runtime.Versioning;
 

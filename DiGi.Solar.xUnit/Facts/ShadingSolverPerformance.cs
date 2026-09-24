@@ -2,7 +2,6 @@ using DiGi.Core.Classes;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Solar.Classes;
-using DiGi.Solar.ComputeSharp.Classes;
 using DiGi.Solar.Interfaces;
 using System.Diagnostics;
 using System.Runtime.Versioning;
@@ -14,13 +13,16 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Measures the end-to-end execution time of <see cref="ShadingSolver.Solve"/> on a large model.
         /// <para>The model contains a grid of receiver panels shaded by elevated shading-only canopies, evaluated across a full day of sun directions.</para>
-        /// <para>A warm-up solve is performed first to trigger JIT compilation and ComputeSharp shader compilation before timing.</para>
+        /// <para>A warm-up solve is performed first to trigger JIT compilation and, for the ComputeSharp solver, shader compilation before timing.</para>
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_Performance()
+        public void ShadingSolver_Solve_Performance(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_Performance because ComputeSharp is not supported on this machine.");
                 return;
@@ -29,13 +31,13 @@ namespace DiGi.Solar.xUnit
             // Warm-up: small model, single date-time, exercises both the self-shading and external-shading shaders so they are compiled before timing.
             ShadingModel shadingModel_WarmUp = CreatePerformanceShadingModel(2, 2);
             DateTime[] dateTimes_WarmUp = [new DateTime(2026, 6, 26, 12, 0, 0)];
-            ShadingSolver shadingSolver_WarmUp = new(shadingModel_WarmUp, dateTimes_WarmUp);
+            ShadingSolver shadingSolver_WarmUp = CreateShadingSolver(shadingModel_WarmUp, dateTimes_WarmUp, computeSharp);
             Assert.True(shadingSolver_WarmUp.Solve());
 
             // Timed run: large model across a full day of daylight.
             ShadingModel shadingModel = CreatePerformanceShadingModel(20, 10);
             DateTime[] dateTimes = CreateDaytimeSeries(10);
-            ShadingSolver shadingSolver = new(shadingModel, dateTimes);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, dateTimes, computeSharp);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             bool isSolved = shadingSolver.Solve();
@@ -43,7 +45,7 @@ namespace DiGi.Solar.xUnit
 
             Assert.True(isSolved);
 
-            testOutputHelper.WriteLine($"ShadingSolver.Solve elapsed: {stopwatch.ElapsedMilliseconds} ms (dateTimes: {dateTimes.Length})");
+            testOutputHelper.WriteLine($"{shadingSolver.GetType().FullName}.Solve elapsed: {stopwatch.ElapsedMilliseconds} ms (dateTimes: {dateTimes.Length})");
 
             // Loose threshold: this test exists to report timing, not to enforce a tight bound that could flake across machines.
             Assert.True(stopwatch.ElapsedMilliseconds < 180000, $"Solve took {stopwatch.ElapsedMilliseconds} ms, which exceeds the safety threshold.");
@@ -53,11 +55,14 @@ namespace DiGi.Solar.xUnit
         /// Verifies that a receiver panel covered by an elevated shading-only canopy reports a substantial shading factor at solar noon.
         /// <para>Acts as the behavioural anchor for the solver: re-running it before and after the invariant-hoisting optimization confirms results are unchanged.</para>
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_Shadows()
+        public void ShadingSolver_Solve_Shadows(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_Shadows because ComputeSharp is not supported on this machine.");
                 return;
@@ -81,7 +86,7 @@ namespace DiGi.Solar.xUnit
             Assert.True(shadingModel.Update(shadingElement_Canopy));
 
             DateTime dateTime_Noon = new(2026, 6, 26, 12, 0, 0);
-            ShadingSolver shadingSolver = new(shadingModel, [dateTime_Noon]);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, [dateTime_Noon], computeSharp);
             Assert.True(shadingSolver.Solve());
 
             bool hasFactor = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Noon, out double factor, false);
@@ -92,11 +97,14 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Verifies a receiver with no obstacle reports shading factor 0 (fully sunlit) rather than failing.
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_FullySunlit()
+        public void ShadingSolver_Solve_FullySunlit(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_FullySunlit because ComputeSharp is not supported on this machine.");
                 return;
@@ -113,7 +121,7 @@ namespace DiGi.Solar.xUnit
             Assert.True(shadingModel.Update(shadingElement_Receiver));
 
             DateTime dateTime_Noon = new(2026, 6, 26, 12, 0, 0);
-            ShadingSolver shadingSolver = new(shadingModel, [dateTime_Noon]);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, [dateTime_Noon], computeSharp);
             Assert.True(shadingSolver.Solve());
 
             // No obstacle exists, so the receiver is fully sunlit: one result with shaded area 0.
@@ -133,11 +141,14 @@ namespace DiGi.Solar.xUnit
         /// Verifies that a fully sunlit sample between two shaded ones is reported as factor 0 rather than interpolated across the sunlit gap.
         /// <para>Geometry: a 4 x 4 m receiver at z = 0 (x in [0, 4], y in [0, 4]); a 12 m tall shading-only wall at x = 6 (east) and one at x = -2 (west), each spanning y in [-2, 6]. On 2026-06-26 at (50.0, 20.0) the low morning and evening suns cast the walls' shadows across the receiver, while the high noon sun casts them north of it, so noon is fully sunlit.</para>
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_SunlitGapNotInterpolated()
+        public void ShadingSolver_Solve_SunlitGapNotInterpolated(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_SunlitGapNotInterpolated because ComputeSharp is not supported on this machine.");
                 return;
@@ -159,7 +170,7 @@ namespace DiGi.Solar.xUnit
             DateTime dateTime_Morning = new(2026, 6, 26, 7, 0, 0);
             DateTime dateTime_Noon = new(2026, 6, 26, 12, 0, 0);
             DateTime dateTime_Evening = new(2026, 6, 26, 17, 0, 0);
-            ShadingSolver shadingSolver = new(shadingModel, [dateTime_Morning, dateTime_Noon, dateTime_Evening]);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, [dateTime_Morning, dateTime_Noon, dateTime_Evening], computeSharp);
             Assert.True(shadingSolver.Solve());
 
             bool hasFactor_Morning = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Morning, out double factor_Morning, false);
@@ -184,11 +195,14 @@ namespace DiGi.Solar.xUnit
         /// Verifies that every receiver in the performance grid gains exactly one result per daytime timestamp, and that shading-only casters gain none.
         /// <para>Runs the 3 x 3 receiver model of <see cref="ShadingSolver_Solve_Performance"/> over an hourly series; the expected daytime timestamps are derived from Query.SunDirection with the same includeNight flag the solver uses, so the counts adapt to the sun algorithm.</para>
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_ResultPerTimestamp()
+        public void ShadingSolver_Solve_ResultPerTimestamp(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_ResultPerTimestamp because ComputeSharp is not supported on this machine.");
                 return;
@@ -196,7 +210,7 @@ namespace DiGi.Solar.xUnit
 
             ShadingModel shadingModel = CreatePerformanceShadingModel(3, 3);
             DateTime[] dateTimes = CreateDaytimeSeries(60);
-            ShadingSolver shadingSolver = new(shadingModel, dateTimes);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, dateTimes, computeSharp);
             Assert.True(shadingSolver.Solve());
 
             List<DateTime> dateTimes_Daytime = [];
@@ -361,11 +375,14 @@ namespace DiGi.Solar.xUnit
         /// Verifies the shading union de-duplicates overlapping obstacles: two coincident canopies produce the same shading factor as a single canopy, never double.
         /// <para>The canopy only partially covers the receiver, so a summing (double-counting) bug would push the factor toward twice its correct value. This guards the post-processing union semantics end-to-end through the GPU pipeline.</para>
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_OverlapNotDoubleCounted()
+        public void ShadingSolver_Solve_OverlapNotDoubleCounted(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_OverlapNotDoubleCounted because ComputeSharp is not supported on this machine.");
                 return;
@@ -373,8 +390,8 @@ namespace DiGi.Solar.xUnit
 
             DateTime dateTime_Noon = new(2026, 6, 26, 12, 0, 0);
 
-            double factor_OneCanopy = SolvePartialShadingFactor(1, dateTime_Noon);
-            double factor_TwoCanopies = SolvePartialShadingFactor(2, dateTime_Noon);
+            double factor_OneCanopy = SolvePartialShadingFactor(1, dateTime_Noon, computeSharp);
+            double factor_TwoCanopies = SolvePartialShadingFactor(2, dateTime_Noon, computeSharp);
 
             // Partial coverage: a double-counting bug would roughly double this value.
             Assert.True(factor_OneCanopy > 0.02 && factor_OneCanopy < 0.5, $"Expected partial shading, got {factor_OneCanopy}.");
@@ -388,9 +405,10 @@ namespace DiGi.Solar.xUnit
         /// </summary>
         /// <param name="canopyCount">The number of identical, fully overlapping canopies to add.</param>
         /// <param name="dateTime">The date and time to evaluate.</param>
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
         /// <returns>The shading factor for the receiver, or <see cref="double.NaN"/> if it could not be evaluated.</returns>
         [SupportedOSPlatform("windows")]
-        private static double SolvePartialShadingFactor(int canopyCount, DateTime dateTime)
+        private static double SolvePartialShadingFactor(int canopyCount, DateTime dateTime, bool computeSharp)
         {
             Coordinates coordinates = new(50.0, 20.0);
             ShadingModel shadingModel = new(Core.Enums.UTC.Plus0100, coordinates);
@@ -420,7 +438,7 @@ namespace DiGi.Solar.xUnit
                 shadingModel.Update(shadingElement_Canopy);
             }
 
-            ShadingSolver shadingSolver = new(shadingModel, [dateTime]);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, [dateTime], computeSharp);
             shadingSolver.Solve();
 
             shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime, out double factor, false);
@@ -431,11 +449,14 @@ namespace DiGi.Solar.xUnit
         /// Verifies that an interior void in a shadow is preserved by the hole-aware union.
         /// <para>Four shading-only bars form a square frame above the receiver, casting a ring shadow with an unshaded centre. The shaded fraction therefore reflects the ring area (~48/196 ≈ 0.245); had the void been filled it would be ~64/196 ≈ 0.327.</para>
         /// </summary>
-        [Fact]
+        /// <param name="computeSharp">True to run the ComputeSharp (GPU) solver; false to run the CPU solver.</param>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [SupportedOSPlatform("windows")]
-        public void ShadingSolver_Solve_HolePreserved()
+        public void ShadingSolver_Solve_HolePreserved(bool computeSharp)
         {
-            if (!IsComputeSharpSupported(testOutputHelper))
+            if (!IsShadingSolverSupported(computeSharp, testOutputHelper))
             {
                 testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_HolePreserved because ComputeSharp is not supported on this machine.");
                 return;
@@ -471,7 +492,7 @@ namespace DiGi.Solar.xUnit
             }
 
             DateTime dateTime_Noon = new(2026, 6, 26, 12, 0, 0);
-            ShadingSolver shadingSolver = new(shadingModel, [dateTime_Noon]);
+            ShadingSolver shadingSolver = CreateShadingSolver(shadingModel, [dateTime_Noon], computeSharp);
             Assert.True(shadingSolver.Solve());
 
             bool hasFactor = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Noon, out double factor, false);
