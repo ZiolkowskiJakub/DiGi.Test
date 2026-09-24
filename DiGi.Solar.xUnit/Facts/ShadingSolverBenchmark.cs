@@ -21,11 +21,6 @@ namespace DiGi.Solar.xUnit
         private const int ShadingSolverBenchmarkRepeatSurfaceCount = 720;
 
         /// <summary>
-        /// Wall-clock budget, in minutes, of the whole WARP (<see cref="ComputeDeviceType.Software"/>) sweep; a solve still running when it expires is reported as not finished and the sweep stops.
-        /// </summary>
-        private const int ShadingSolverBenchmarkSoftwareBudgetMinutes = 30;
-
-        /// <summary>
         /// Largest allowed fraction of sun-facing samples in which a ComputeSharp engine drops a shadow the CPU solver finds (see the parity helper in <c>ShadingSolverCPU.cs</c>).
         /// </summary>
         private const double ShadingSolverBenchmarkDroppedFraction = 0.001;
@@ -38,7 +33,7 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Benchmarks the shading solvers on a grid of buildings in which every surface is a receiver, so the buildings shade each other.
         /// <para>Compares the CPU <see cref="ShadingSolver"/> with the ComputeSharp solver on a hardware GPU (<see cref="ComputeDeviceType.Hardware"/>) for grids of 1 to 144 buildings (5 to 720 surfaces).
-        /// WARP is measured separately by <see cref="ShadingSolver_Benchmark_Software"/>. Results are written to <c>ShadingSolver_Benchmark_Receivers.txt</c> in the reports directory.</para>
+        /// WARP is not measured: it was withdrawn in ZiolkowskiJakub/DiGi.Solar#10. Results are written to <c>ShadingSolver_Benchmark_Receivers.txt</c> in the reports directory.</para>
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
@@ -56,66 +51,6 @@ namespace DiGi.Solar.xUnit
         public void ShadingSolver_Benchmark_Surroundings()
         {
             RunShadingSolverBenchmark(nameof(ShadingSolver_Benchmark_Surroundings), true);
-        }
-
-        /// <summary>
-        /// Benchmarks the ComputeSharp solver on the WARP software device (<see cref="ComputeDeviceType.Software"/>) over the same receiver grids as <see cref="ShadingSolver_Benchmark_Receivers"/>.
-        /// <para>Each solve runs on a worker task and is abandoned when the wall-clock budget <see cref="ShadingSolverBenchmarkSoftwareBudgetMinutes"/> expires, so a solve that does not finish is reported rather than hanging the run.
-        /// The abandoned solve keeps one core busy until the test host exits, which is why this fact is separate from the CPU and hardware sweeps and skipped by default.</para>
-        /// <para>WARP loses shadows cast between buildings (it reports factor 0 where the CPU and hardware GPU solvers agree on shade), so the lost shadows are counted and reported rather than bounded;
-        /// any other disagreement with the CPU solver still fails. Each row is appended to <c>ShadingSolver_Benchmark_Software.txt</c> in the reports directory as soon as it is measured.</para>
-        /// </summary>
-        [Fact(Skip = "Benchmark. Runs up to 30 minutes on the WARP software device and keeps one core busy afterwards; remove Skip and run it alone to measure.")]
-        [SupportedOSPlatform("windows")]
-        public async Task ShadingSolver_Benchmark_Software()
-        {
-            if (ComputeSharp.Create.GraphicsDevice(ComputeDeviceType.Software) is null)
-            {
-                testOutputHelper.WriteLine("Skipping ShadingSolver_Benchmark_Software because no WARP device is available on this machine.");
-                return;
-            }
-
-            DateTime[] dateTimes = CreateDaytimeSeries(ShadingSolverBenchmarkStepMinutes);
-            TimeSpan timeSpan_Budget = TimeSpan.FromMinutes(ShadingSolverBenchmarkSoftwareBudgetMinutes);
-            Stopwatch stopwatch_Budget = Stopwatch.StartNew();
-
-            string path = System.IO.Path.Combine(Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly())!, nameof(ShadingSolver_Benchmark_Software) + ".txt");
-            System.IO.File.WriteAllLines(path, [$"{nameof(ShadingSolver_Benchmark_Software)}: {dateTimes.Length} timestamps, step {ShadingSolverBenchmarkStepMinutes} min, budget {ShadingSolverBenchmarkSoftwareBudgetMinutes} min", "Buildings | Surfaces | Software (ms/solve; the first solve includes pipeline creation) | Sun-facing samples | Lost shadows"]);
-
-            void write(string line)
-            {
-                testOutputHelper.WriteLine(line);
-                System.IO.File.AppendAllLines(path, [line]);
-            }
-
-            foreach (int gridSize in ShadingSolverBenchmarkGridSizes)
-            {
-                ShadingModel shadingModel = CreateBuildingGridShadingModel(gridSize, false);
-                int count_Surface = shadingModel.GetShadingElements<ShadingElement>()?.Count ?? 0;
-
-                ShadingModel shadingModel_Software = new(shadingModel);
-                ComputeSharp.Classes.ShadingSolver shadingSolver = new(shadingModel_Software, dateTimes) { ComputeDeviceType = ComputeDeviceType.Software };
-
-                TimeSpan timeSpan_Remaining = timeSpan_Budget - stopwatch_Budget.Elapsed;
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                Task<bool> task = Task.Run(shadingSolver.Solve);
-                bool completed = timeSpan_Remaining > TimeSpan.Zero && await Task.WhenAny(task, Task.Delay(timeSpan_Remaining)) == task;
-                stopwatch.Stop();
-
-                if (!completed)
-                {
-                    write($"{gridSize * gridSize} | {count_Surface} | did not finish within {stopwatch.Elapsed.TotalMinutes:F1} min | - | -");
-                    break;
-                }
-
-                Assert.True(await task);
-
-                ShadingModel shadingModel_CPU = new(shadingModel);
-                Assert.True(new ShadingSolver(shadingModel_CPU, dateTimes).Solve());
-                (int count_Compared, int count_Dropped) = AssertSameShadingFactors(shadingModel_CPU, shadingModel_Software, dateTimes, 1.0);
-
-                write($"{gridSize * gridSize} | {count_Surface} | {stopwatch.Elapsed.TotalMilliseconds:F1} | {count_Compared} | {count_Dropped}");
-            }
         }
 
         /// <summary>

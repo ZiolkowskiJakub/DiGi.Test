@@ -82,23 +82,40 @@ namespace DiGi.Solar.xUnit
         }
 
         /// <summary>
-        /// Verifies the device selection of the ComputeSharp solver: <see cref="ComputeDeviceType.Software"/> selects the WARP device, <see cref="ComputeDeviceType.Hardware"/> a hardware-accelerated one,
+        /// Verifies the device selection of the ComputeSharp solver: the WARP software device is never selected, <see cref="ComputeDeviceType.Hardware"/> selects a hardware-accelerated device,
         /// and a solve forced onto the hardware device matches the CPU solver.
-        /// <para>No solve runs on WARP here: creating the double-precision pipeline on WARP takes about 16 minutes on the development machine, and WARP loses shadows cast between buildings.
-        /// Both are measured by <see cref="ShadingSolver_Benchmark_Software"/>; the CPU solver is the software path.</para>
+        /// <para>WARP loses shadows cast between buildings and needs about 16 minutes to create its pipeline (ZiolkowskiJakub/DiGi.Solar#10), so the obsolete <c>ComputeDeviceType.Software</c> gets no device
+        /// and its solve returns false without assigning results, while <see cref="ComputeDeviceType.Default"/> gets no device rather than WARP on a machine without a hardware adapter.</para>
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
         public void ShadingSolver_ComputeDeviceType()
         {
-            global::ComputeSharp.GraphicsDevice? graphicsDevice_Software = ComputeSharp.Create.GraphicsDevice(ComputeDeviceType.Software);
-            if (graphicsDevice_Software is null)
+#pragma warning disable CS0618 // ComputeDeviceType.Software is obsolete; this fact verifies it is withdrawn (ZiolkowskiJakub/DiGi.Solar#10).
+            ComputeDeviceType computeDeviceType_Software = ComputeDeviceType.Software;
+#pragma warning restore CS0618
+
+            Assert.Null(ComputeSharp.Create.GraphicsDevice(computeDeviceType_Software));
+
+            ShadingModel shadingModel_Software = CreatePerformanceShadingModel(1, 1);
+            DateTime[] dateTimes_Software = CreateDaytimeSeries(120);
+            Assert.False(new ComputeSharp.Classes.ShadingSolver(shadingModel_Software, dateTimes_Software) { ComputeDeviceType = computeDeviceType_Software }.Solve());
+
+            List<ShadingElement>? shadingElements_Software = shadingModel_Software.GetShadingElements<ShadingElement>(shadingOnly: false);
+            Assert.NotNull(shadingElements_Software);
+            Assert.NotEmpty(shadingElements_Software);
+            foreach (ShadingElement shadingElement in shadingElements_Software)
             {
-                testOutputHelper.WriteLine("No WARP device is available on this machine.");
+                foreach (DateTime dateTime in dateTimes_Software)
+                {
+                    Assert.False(shadingModel_Software.TryGetShadingFactor(shadingElement, dateTime, out _, false));
+                }
             }
-            else
+
+            global::ComputeSharp.GraphicsDevice? graphicsDevice_Default = ComputeSharp.Create.GraphicsDevice(ComputeDeviceType.Default);
+            if (graphicsDevice_Default is not null)
             {
-                Assert.False(graphicsDevice_Software.IsHardwareAccelerated);
+                Assert.True(graphicsDevice_Default.IsHardwareAccelerated);
             }
 
             global::ComputeSharp.GraphicsDevice? graphicsDevice_Hardware = ComputeSharp.Create.GraphicsDevice(ComputeDeviceType.Hardware);
