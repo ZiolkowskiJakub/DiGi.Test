@@ -1,6 +1,9 @@
 using DiGi.Geometry.Planar;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Planar.Interfaces;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
+using System.Reflection;
 
 namespace DiGi.Geometry.xUnit
 {
@@ -182,6 +185,41 @@ namespace DiGi.Geometry.xUnit
             double area_Faces = polygonalFace2Ds.Sum(x => x.GetArea());
 
             Assert.Equal(area_Union, area_Faces, 3);
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="Query.Union(IEnumerable{IPolygonalFace2D}?, double)"/> recovers with its snap-rounding fallback when NetTopologySuite throws a <c>TopologyException</c>, instead of returning <c>null</c>.
+        /// <para>The fixture is the input reported in ZiolkowskiJakub/DiGi.Geometry#8: the 190 shadow polygons (as WKT) of the east wall (plane origin (64, 18, 0)) of the 12 x 12 benchmark building grid at 2026-06-26 04:00, whose union fails in <c>UnaryUnionOp</c> with a robustness error and succeeds at 112.402 m^2 under snap-rounding.</para>
+        /// </summary>
+        [Fact]
+        public void Union_TopologyException()
+        {
+            string? path = DiGi.Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "Union_TopologyException.wkt");
+            Assert.False(string.IsNullOrWhiteSpace(path));
+            Assert.True(System.IO.File.Exists(path));
+
+            WKTReader reader = new();
+            List<PolygonalFace2D> polygonalFace2Ds = [];
+            foreach (string line in System.IO.File.ReadAllLines(path!))
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
+                Polygon? polygon = reader.Read(line) as Polygon;
+                Assert.NotNull(polygon);
+
+                PolygonalFace2D? polygonalFace2D = polygon.ToDiGi();
+                Assert.NotNull(polygonalFace2D);
+                polygonalFace2Ds.Add(polygonalFace2D);
+            }
+
+            Assert.Equal(190, polygonalFace2Ds.Count);
+
+            List<PolygonalFace2D>? polygonalFace2Ds_Union = Query.Union(polygonalFace2Ds);
+            Assert.NotNull(polygonalFace2Ds_Union);
+            Assert.Equal(112.402, polygonalFace2Ds_Union.Sum(x => x.GetArea()), 3);
         }
     }
 }
