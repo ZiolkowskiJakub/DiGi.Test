@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 
 namespace DiGi.YOLO.xUnit
 {
@@ -152,7 +151,7 @@ namespace DiGi.YOLO.xUnit
         [Fact]
         public void Predict_BoundingBoxCoordinateContract()
         {
-            string? pythonPath = Query.PythonPaths().FirstOrDefault();
+            string? pythonPath = PythonPath_Runnable();
             if (string.IsNullOrWhiteSpace(pythonPath))
             {
                 return;
@@ -248,7 +247,7 @@ namespace DiGi.YOLO.xUnit
         [Fact]
         public void Predict_Batch()
         {
-            string? pythonPath = Query.PythonPaths().FirstOrDefault();
+            string? pythonPath = PythonPath_Runnable();
             if (string.IsNullOrWhiteSpace(pythonPath))
             {
                 return;
@@ -334,6 +333,25 @@ namespace DiGi.YOLO.xUnit
                     Directory.Delete(directory, true);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the first interpreter on PATH that actually starts, or <c>null</c> when none does.
+        /// <para>A path that exists is not enough: with no Python installed, Windows still puts the App Installer redirector (a Microsoft Store app execution alias) on PATH as python.exe, which exits non-zero without running anything.</para>
+        /// </summary>
+        /// <returns>The path of a working interpreter, or <c>null</c>.</returns>
+        private static string? PythonPath_Runnable()
+        {
+            foreach (string pythonPath in Query.PythonPaths())
+            {
+                (int exitCode, _, _) = Query.ExecuteProcess(pythonPath, "-c \"import sys\"", Path.GetTempPath());
+                if (exitCode == 0)
+                {
+                    return pythonPath;
+                }
+            }
+
+            return null;
         }
     }
 }
