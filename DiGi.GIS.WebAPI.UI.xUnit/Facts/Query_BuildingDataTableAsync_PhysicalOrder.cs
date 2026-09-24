@@ -14,7 +14,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Verifies the paged read of one county part, <see cref="Query.BuildingDataTableAsync(HttpClient?, int, List{string}, System.Action{string}?, int, int, System.Threading.CancellationToken)"/>, against a scripted GIS Web API (DiGi.GIS.WebAPI.UI#51).
         /// <para><b>Physical order.</b> Every request asks for <c>PhysicalOrder</c>. The read follows the <c>DiGi-Next-Cursor</c> header from page to page, sending it back as <c>Cursor</c>, and stops on the first response without it. A building repeated across pages - a row rewritten while its part was paged - is kept once.</para>
-        /// <para><b>Reference-order host.</b> A full page without the header comes from a host answering in reference order (<c>TODO [PhysicalOrderPaging]</c>). The read continues from the last row's reference and still ends on a short page.</para>
+        /// <para><b>No reference-order fallback.</b> A full page without the header still ends the part: the read never continues from the last row's reference (DiGi.GIS.WebAPI.UI#54).</para>
         /// <para><b>Failures.</b> A physical cursor that does not move fails the part rather than looping, and an upstream 404 is a part with no building data - an empty table.</para>
         /// </summary>
         [Fact]
@@ -46,16 +46,14 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal("(1,2)", bodies_Physical[2]["Cursor"]!.GetValue<string>());
             Assert.All(scriptedWebApi_Physical.Requests, x => Assert.EndsWith("/gis/BuildingData/tablebybuildingdatabypagingparameter", x.RequestUri!.AbsolutePath));
 
-            // ----- a host answering in reference order: a full headerless page continues from the last reference -----
+            // ----- a full headerless page ends the part: no reference-order continuation -----
             string[] references_Full = [.. Enumerable.Range(0, Constants.Default.BuildingDataPageSize).Select(i => $"S{i:D5}")];
-            int index_Reference = 0;
-            ScriptedWebApi scriptedWebApi_Reference = new((request, body) => index_Reference++ == 0 ? Page(references_Full, null) : Page(["T1", "T2"], null));
+            ScriptedWebApi scriptedWebApi_Full = new((request, body) => Page(references_Full, null));
 
-            Table? table_Reference = await new HttpClient(scriptedWebApi_Reference).BuildingDataTableAsync(55417, columnUniqueIds);
-            Assert.NotNull(table_Reference);
-            Assert.Equal(Constants.Default.BuildingDataPageSize + 2, table_Reference.RowCount);
-            Assert.Equal(2, scriptedWebApi_Reference.Requests.Count);
-            Assert.Equal(references_Full[^1], JsonNode.Parse(scriptedWebApi_Reference.Requests[1].Body!)!["Cursor"]!.GetValue<string>());
+            Table? table_Full = await new HttpClient(scriptedWebApi_Full).BuildingDataTableAsync(55417, columnUniqueIds);
+            Assert.NotNull(table_Full);
+            Assert.Equal(Constants.Default.BuildingDataPageSize, table_Full.RowCount);
+            Assert.Single(scriptedWebApi_Full.Requests);
 
             // ----- a physical cursor that does not move fails the part instead of looping -----
             ScriptedWebApi scriptedWebApi_Stuck = new((request, body) => Page(["U1"], "(0,4)"));
