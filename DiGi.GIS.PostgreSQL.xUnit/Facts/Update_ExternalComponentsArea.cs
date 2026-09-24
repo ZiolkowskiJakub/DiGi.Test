@@ -553,11 +553,11 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that a component that bounds no space is refused with an exception naming the building, rather than silently skipped or mis-classified.
-        /// <para>A closed box plus an unassigned wall: the wall bounds no space, so the external envelope leaves it out and it cannot be classified - the method throws and names the reference. The presence of the box's own (assigned) components does not save the model.</para>
+        /// Verifies that a component that bounds no space fails its model - recorded with a reason naming the building, and no row - rather than being silently skipped or mis-classified, and that the failure costs that model alone.
+        /// <para>A closed box plus an unassigned wall: the wall bounds no space, so the external envelope leaves it out and it cannot be classified. The presence of the box's own (assigned) components does not save the model. A valid box classified in the same call still gets its row, which is what keeps one defective building from dropping the rest of its batch.</para>
         /// </summary>
         [Fact]
-        public void Update_ExternalComponentsArea_UncoveredComponentThrows()
+        public void Update_ExternalComponentsArea_UncoveredComponentFailsModel()
         {
             IComponent[] boxComponents = Box();
             DiGi.Analytical.Building.Classes.SurfaceWall orphanWall = Wall(new Point3D(50, 0, 0), new Vector3D(1, 0, 0), 10);
@@ -577,11 +577,27 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             BuildingModel? envelope = buildingModel.ToPostgreSQL(5);
             Assert.NotNull(envelope);
 
-            Table table = new();
-            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => Modify.Update_ExternalComponentsArea(table, [envelope!]));
+            BuildingModel model_Valid = Model("ref_valid", 5, [.. Box()]);
 
-            Assert.Contains("ref_orphan", exception!.Message);
-            Assert.Contains("wall", exception.Message);
+            Table table = new();
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [envelope!, model_Valid]);
+
+            Assert.Equal(1, result.FailedModelCount);
+            Assert.Equal(0, result.DegenerateModelCount);
+            Assert.Equal(0, result.SkippedComponentCount);
+
+            List<string>? references_Failed = result.FailedReferences;
+            Assert.NotNull(references_Failed);
+            string failure = Assert.Single(references_Failed);
+            Assert.StartsWith("ref_orphan: ", failure);
+            Assert.Contains("wall", failure);
+
+            // Only the valid box is written; the failed model leaves no partial row.
+            Assert.Equal(1, table.RowCount);
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+            Assert.Equal("ref_valid", row.GetValue<string>(table.GetColumnIndex("Reference"), string.Empty));
+            Assert.Equal(600.0, Value(table, row, ColumnNames_External[34]), 1e-3);
         }
 
         /// <summary>
@@ -754,22 +770,35 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Verifies that a model whose external components are too few to close an envelope is refused with an exception naming the building, rather than classified from an open face set.
-        /// <para>One space with three assigned components - a floor and two walls - yields no external envelope, since a closed solid needs at least four faces. Every component then bounds one space and is carried by no envelope face, so the method throws and names the reference and the space count. The pre-switch per-space path threw too, but for a shell that came back with no face at all - the polyhedron silently keeps nothing below four faces - so the message on the space count is what this fact tells apart.</para>
+        /// Verifies that a model whose external components are too few to close an envelope is degenerate - listed in the result and given no row - rather than classified from an open face set or failed, and that it does not stop the other models of the call.
+        /// <para>One space with three assigned components - a floor and two walls - yields no external envelope, since a closed solid needs at least four faces, so no component has an outward normal to be classified by. This is the shape of the sliver buildings of the 2026-09-24 production run (one space, three walls, no roof or floor), each of which failed a whole batch and the rest of its county while the method still threw for it.</para>
         /// </summary>
         [Fact]
-        public void Update_ExternalComponentsArea_EnvelopeBelowFourFacesThrows()
+        public void Update_ExternalComponentsArea_EnvelopeBelowFourFacesIsDegenerate()
         {
             IComponent[] boxComponents = Box();
 
             // The west and east walls and the floor of the box; the south and north walls and the roof are left out.
             BuildingModel model = Model("ref_three_faces", 5, boxComponents[0], boxComponents[1], boxComponents[4]);
+            BuildingModel model_Valid = Model("ref_valid", 5, [.. Box()]);
 
             Table table = new();
-            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => Modify.Update_ExternalComponentsArea(table, [model]));
+            ExternalComponentsAreaResult result = Modify.Update_ExternalComponentsArea(table, [model, model_Valid]);
 
-            Assert.Contains("ref_three_faces", exception!.Message);
-            Assert.Contains("bounds 1 space", exception.Message);
+            Assert.Equal(1, result.DegenerateModelCount);
+            Assert.Equal(0, result.FailedModelCount);
+            Assert.Equal(0, result.SkippedComponentCount);
+            Assert.Equal(0, result.OpenEnvelopeCount);
+
+            List<string>? references_Degenerate = result.DegenerateReferences;
+            Assert.NotNull(references_Degenerate);
+            Assert.Equal("ref_three_faces", Assert.Single(references_Degenerate));
+
+            // Only the valid box is written.
+            Assert.Equal(1, table.RowCount);
+            Row? row = table.GetRow(0);
+            Assert.NotNull(row);
+            Assert.Equal("ref_valid", row.GetValue<string>(table.GetColumnIndex("Reference"), string.Empty));
         }
 
         /// <summary>
@@ -899,6 +928,9 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             // A non-zero skip count on deployed data is a finding to report before deciding whether the decision table needs a case for it.
             Assert.Equal(0, result.SkippedComponentCount);
+
+            // A refused model no longer throws, so the failure list is where a defect on deployed data surfaces now.
+            Assert.Equal(0, result.FailedModelCount);
 
             List<string> reportLines = [$"Update_ExternalComponentsArea_DeployedBuildingModels: {models_Latest.Count} models classified in {stopwatch.ElapsedMilliseconds} ms"];
             reportLines.Add($"open envelopes (null closing tolerance on a row carrying areas): {openCount} of {table.RowCount}");
