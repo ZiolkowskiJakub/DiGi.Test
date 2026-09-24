@@ -90,9 +90,7 @@ namespace DiGi.Solar.xUnit
         }
 
         /// <summary>
-        /// Characterizes the current behaviour for a fully sunlit element (finding #1).
-        /// <para>A receiver with no obstacle casts no shadow at any time. The solver therefore stores no result for it, so the element gains no relation and <see cref="ShadingModel.TryGetShadingFactor"/> reports failure (NaN) rather than a factor of 0.</para>
-        /// <para>This test locks in the present behaviour; if the sparse-result gap is later closed it should be updated to expect a factor of 0.</para>
+        /// Verifies a receiver with no obstacle reports shading factor 0 (fully sunlit) rather than failing.
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
@@ -118,13 +116,169 @@ namespace DiGi.Solar.xUnit
             ShadingSolver shadingSolver = new(shadingModel, [dateTime_Noon]);
             Assert.True(shadingSolver.Solve());
 
-            // No obstacle exists, so the receiver is fully sunlit. Current behaviour: no result is recorded.
+            // No obstacle exists, so the receiver is fully sunlit: one result with shaded area 0.
             bool hasFactor = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Noon, out double factor, false);
-            Assert.False(hasFactor);
-            Assert.True(double.IsNaN(factor));
+            Assert.True(hasFactor);
+            Assert.Equal(0.0, factor);
 
             List<IShadingSolverResult>? shadingSolverResults = shadingModel.GetShadingSolverResults<IShadingSolverResult>(shadingElement_Receiver);
-            Assert.True(shadingSolverResults == null || shadingSolverResults.Count == 0);
+            Assert.NotNull(shadingSolverResults);
+            Assert.Single(shadingSolverResults);
+            IShadingSolverResult shadingSolverResult = shadingSolverResults[0];
+            Assert.Equal(dateTime_Noon, shadingSolverResult.DateTime);
+            Assert.Equal(0.0, shadingSolverResult.Area);
+        }
+
+        /// <summary>
+        /// Verifies that a fully sunlit sample between two shaded ones is reported as factor 0 rather than interpolated across the sunlit gap.
+        /// <para>Geometry: a 4 x 4 m receiver at z = 0 (x in [0, 4], y in [0, 4]); a 12 m tall shading-only wall at x = 6 (east) and one at x = -2 (west), each spanning y in [-2, 6]. On 2026-06-26 at (50.0, 20.0) the low morning and evening suns cast the walls' shadows across the receiver, while the high noon sun casts them north of it, so noon is fully sunlit.</para>
+        /// </summary>
+        [Fact]
+        [SupportedOSPlatform("windows")]
+        public void ShadingSolver_Solve_SunlitGapNotInterpolated()
+        {
+            if (!IsComputeSharpSupported(testOutputHelper))
+            {
+                testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_SunlitGapNotInterpolated because ComputeSharp is not supported on this machine.");
+                return;
+            }
+
+            Coordinates coordinates = new(50.0, 20.0);
+            ShadingModel shadingModel = new(Core.Enums.UTC.Plus0100, coordinates);
+
+            Vector3D vector3D_Normal = new(0.0, 0.0, 1.0);
+            Plane plane_Receiver = new(new Point3D(0.0, 0.0, 0.0), vector3D_Normal);
+            PolygonalFace3D? polygonalFace3D_Receiver = Geometry.Spatial.Create.PolygonalFace3D(plane_Receiver, new Point2D(0.0, 0.0), new Point2D(4.0, 0.0), new Point2D(4.0, 4.0), new Point2D(0.0, 4.0));
+            Assert.NotNull(polygonalFace3D_Receiver);
+            ShadingElement shadingElement_Receiver = new(polygonalFace3D_Receiver, false);
+            Assert.True(shadingModel.Update(shadingElement_Receiver));
+
+            CreateVerticalWall(shadingModel, 6.0);
+            CreateVerticalWall(shadingModel, -2.0);
+
+            DateTime dateTime_Morning = new(2026, 6, 26, 7, 0, 0);
+            DateTime dateTime_Noon = new(2026, 6, 26, 12, 0, 0);
+            DateTime dateTime_Evening = new(2026, 6, 26, 17, 0, 0);
+            ShadingSolver shadingSolver = new(shadingModel, [dateTime_Morning, dateTime_Noon, dateTime_Evening]);
+            Assert.True(shadingSolver.Solve());
+
+            bool hasFactor_Morning = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Morning, out double factor_Morning, false);
+            Assert.True(hasFactor_Morning);
+            Assert.True(factor_Morning > 0.0, $"Expected the low morning sun to cast the east wall's shadow across the receiver, got {factor_Morning}.");
+
+            bool hasFactor_Evening = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Evening, out double factor_Evening, false);
+            Assert.True(hasFactor_Evening);
+            Assert.True(factor_Evening > 0.0, $"Expected the low evening sun to cast the west wall's shadow across the receiver, got {factor_Evening}.");
+
+            // Noon is fully sunlit: exactly 0 without interpolation and, once the sunlit gap is filled, with it.
+            bool hasFactor_Noon = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Noon, out double factor_Noon, false);
+            Assert.True(hasFactor_Noon);
+            Assert.Equal(0.0, factor_Noon);
+
+            bool hasFactor_Noon_Interpolated = shadingModel.TryGetShadingFactor(shadingElement_Receiver, dateTime_Noon, out double factor_Noon_Interpolated, true);
+            Assert.True(hasFactor_Noon_Interpolated);
+            Assert.Equal(0.0, factor_Noon_Interpolated);
+        }
+
+        /// <summary>
+        /// Verifies that every receiver in the performance grid gains exactly one result per daytime timestamp, and that shading-only casters gain none.
+        /// <para>Runs the 3 x 3 receiver model of <see cref="ShadingSolver_Solve_Performance"/> over an hourly series; the expected daytime timestamps are derived from Query.SunDirection with the same includeNight flag the solver uses, so the counts adapt to the sun algorithm.</para>
+        /// </summary>
+        [Fact]
+        [SupportedOSPlatform("windows")]
+        public void ShadingSolver_Solve_ResultPerTimestamp()
+        {
+            if (!IsComputeSharpSupported(testOutputHelper))
+            {
+                testOutputHelper.WriteLine("Skipping ShadingSolver_Solve_ResultPerTimestamp because ComputeSharp is not supported on this machine.");
+                return;
+            }
+
+            ShadingModel shadingModel = CreatePerformanceShadingModel(3, 3);
+            DateTime[] dateTimes = CreateDaytimeSeries(60);
+            ShadingSolver shadingSolver = new(shadingModel, dateTimes);
+            Assert.True(shadingSolver.Solve());
+
+            List<DateTime> dateTimes_Daytime = [];
+            foreach (DateTime dateTime in dateTimes)
+            {
+                if (Query.SunDirection(shadingModel, dateTime, false) is not null)
+                {
+                    dateTimes_Daytime.Add(dateTime);
+                }
+            }
+
+            Assert.True(dateTimes_Daytime.Count > 0);
+
+            List<ShadingElement>? receivers = shadingModel.GetShadingElements<ShadingElement>(shadingOnly: false);
+            Assert.NotNull(receivers);
+            Assert.Equal(9, receivers.Count);
+
+            foreach (ShadingElement receiver in receivers)
+            {
+                List<IShadingSolverResult>? results = shadingModel.GetShadingSolverResults<IShadingSolverResult>(receiver);
+                Assert.NotNull(results);
+                Assert.Equal(dateTimes_Daytime.Count, results.Count);
+
+                foreach (DateTime dateTime in dateTimes_Daytime)
+                {
+                    int count_Match = 0;
+                    foreach (IShadingSolverResult result in results)
+                    {
+                        if (result.DateTime.Equals(dateTime))
+                        {
+                            count_Match++;
+                        }
+                    }
+
+                    Assert.Equal(1, count_Match);
+                }
+            }
+
+            List<ShadingElement>? casters = shadingModel.GetShadingElements<ShadingElement>(shadingOnly: true);
+            Assert.NotNull(casters);
+            Assert.Equal(2, casters.Count);
+
+            foreach (ShadingElement caster in casters)
+            {
+                Assert.Null(shadingModel.GetShadingSolverResults<IShadingSolverResult>(caster));
+            }
+        }
+
+        /// <summary>
+        /// Adds a 12 m tall shading-only wall at the given world X position, spanning y in [-2, 6] and z in [0, 12], to the model.
+        /// </summary>
+        /// <param name="shadingModel">The shading model to add the wall to.</param>
+        /// <param name="x">The world X coordinate of the wall's plane.</param>
+        /// <returns>The added shading-only <see cref="ShadingElement"/>.</returns>
+        private static ShadingElement CreateVerticalWall(ShadingModel shadingModel, double x)
+        {
+            Plane plane_Wall = new(new Point3D(x, 0.0, 0.0), new Vector3D(1.0, 0.0, 0.0));
+
+            Point3D[] point3Ds =
+            [
+                new Point3D(x, -2.0, 0.0),
+                new Point3D(x, 6.0, 0.0),
+                new Point3D(x, 6.0, 12.0),
+                new Point3D(x, -2.0, 12.0)
+            ];
+
+            List<Point2D> point2Ds = [];
+            foreach (Point3D point3D in point3Ds)
+            {
+                if (Geometry.Spatial.Query.Convert(plane_Wall, point3D) is Point2D point2D)
+                {
+                    point2Ds.Add(point2D);
+                }
+            }
+
+            Polygon3D polygon3D_Wall = new(plane_Wall, point2Ds);
+            PolygonalFace3D? polygonalFace3D_Wall = Geometry.Spatial.Create.PolygonalFace3D(polygon3D_Wall, []);
+            Assert.NotNull(polygonalFace3D_Wall);
+            ShadingElement shadingElement_Wall = new(polygonalFace3D_Wall, true);
+            Assert.True(shadingModel.Update(shadingElement_Wall));
+
+            return shadingElement_Wall;
         }
 
         /// <summary>
