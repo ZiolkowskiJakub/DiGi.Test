@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical.Building.HVAC\DiGi.Analytical.Building.HVAC.csproj" />
     <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical.Building\DiGi.Analytical.Building.csproj" />
+    <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical.Building.Solar\DiGi.Analytical.Building.Solar.csproj" />
     <ProjectReference Include="..\..\DiGi.Analytical\DiGi.Analytical\DiGi.Analytical.csproj" />
     <ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
     <ProjectReference Include="..\..\DiGi.Geometry.PointCloud\DiGi.Geometry.PointCloud\DiGi.Geometry.PointCloud.csproj" />
@@ -46,6 +47,9 @@
     </Reference>
     <Reference Include="DiGi.Core.Relation">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.Relation.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Solar">
+      <HintPath>..\..\DiGi.Solar\bin\DiGi.Solar.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Geometry.Object">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.Object.dll</HintPath>
