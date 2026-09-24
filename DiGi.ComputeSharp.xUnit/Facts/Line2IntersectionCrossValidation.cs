@@ -76,7 +76,7 @@ namespace DiGi.ComputeSharp.xUnit
 
             try
             {
-                using GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
+                GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
 
                 using ReadOnlyBuffer<Line2> linesBuffer = graphicsDevice.AllocateReadOnlyBuffer(line2s);
                 using ReadWriteBuffer<Line2Intersection> intersectionsBuffer = graphicsDevice.AllocateReadWriteBuffer(new Line2Intersection[segmentCount]);

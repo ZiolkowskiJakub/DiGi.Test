@@ -64,7 +64,7 @@ namespace DiGi.ComputeSharp.xUnit
 
             try
             {
-                using GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
+                GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
 
                 // Warm-up: force HLSL compilation / JIT on a small batch so it is excluded from the measured runs.
                 int warmUpCount = Math.Min(256, maxCount);
