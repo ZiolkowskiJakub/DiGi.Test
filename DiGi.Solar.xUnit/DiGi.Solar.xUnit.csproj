@@ -35,6 +35,7 @@
 		<ProjectReference Include="..\..\DiGi.Geometry\DiGi.Geometry\DiGi.Geometry.csproj" />
 		<ProjectReference Include="..\..\DiGi.Solar\DiGi.Solar\DiGi.Solar.csproj" />
 		<ProjectReference Include="..\..\DiGi.Solar\DiGi.Solar.ComputeSharp\DiGi.Solar.ComputeSharp.csproj" />
+		<ProjectReference Include="..\..\DiGi.ComputeSharp\DiGi.ComputeSharp\DiGi.ComputeSharp.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
