@@ -3,6 +3,7 @@ using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Solar.Classes;
 using DiGi.Solar.ComputeSharp.Enums;
+using System.Reflection;
 using System.Runtime.Versioning;
 
 namespace DiGi.Solar.xUnit
@@ -224,6 +225,101 @@ namespace DiGi.Solar.xUnit
             Assert.True(count_Dropped <= droppedFraction * count, $"{count_Dropped} of {count} samples lost their shadow on the other engine.");
 
             return (count, count_Dropped);
+        }
+
+        /// <summary>
+        /// Verifies that the CPU <see cref="ShadingSolver"/> is insensitive to the absolute position of the scene.
+        /// <para>Solves the 4 x 4 benchmark grid at the origin and again shifted by (+500 000, +500 000) m - the magnitude of EPSG:2180 coordinates - and compares the shading factors of every sun-facing receiver sample. Both solvers work in double precision, so the shift must change the factors by floating point round-off only: the 95th percentile stays below 1e-9 and the maximum below 1e-6.</para>
+        /// <para>If this fails, the scene must be recentred on the model origin before solving - open a separate issue for that instead of fixing it here. The measured figures are written to <c>ShadingSolver_AbsoluteCoordinates.txt</c> in the reports directory.</para>
+        /// </summary>
+        [Fact]
+        public void ShadingSolver_Solve_AbsoluteCoordinates()
+        {
+            DateTime[] dateTimes = CreateDaytimeSeries(60);
+
+            ShadingModel shadingModel = CreateBuildingGridShadingModel(4, false);
+            Assert.True(new ShadingSolver(shadingModel, dateTimes).Solve());
+
+            Vector3D vector3D_Shift = new(500000.0, 500000.0, 0.0);
+            ShadingModel shadingModel_Shifted = ShiftShadingModel(shadingModel, vector3D_Shift);
+            Assert.True(new ShadingSolver(shadingModel_Shifted, dateTimes).Solve());
+
+            List<ShadingElement>? receivers = shadingModel.GetShadingElements<ShadingElement>(shadingOnly: false);
+            List<ShadingElement>? receivers_Shifted = shadingModel_Shifted.GetShadingElements<ShadingElement>(shadingOnly: false);
+            Assert.NotNull(receivers);
+            Assert.NotNull(receivers_Shifted);
+            Assert.Equal(receivers.Count, receivers_Shifted.Count);
+
+            List<double> differences = [];
+            for (int index = 0; index < receivers.Count; index++)
+            {
+                ShadingElement receiver = receivers[index];
+                ShadingElement receiver_Shifted = receivers_Shifted[index];
+
+                Vector3D? normal = receiver.PolygonalFace3D?.Plane?.Normal;
+                Assert.NotNull(normal);
+
+                foreach (DateTime dateTime in dateTimes)
+                {
+                    bool hasFactor = shadingModel.TryGetShadingFactor(receiver, dateTime, out double factor, false);
+                    bool hasFactor_Shifted = shadingModel_Shifted.TryGetShadingFactor(receiver_Shifted, dateTime, out double factor_Shifted, false);
+                    Assert.Equal(hasFactor, hasFactor_Shifted);
+                    if (!hasFactor)
+                    {
+                        continue;
+                    }
+
+                    Vector3D? sunDirection = Query.SunDirection(shadingModel, dateTime, false);
+                    Assert.NotNull(sunDirection);
+                    if (sunDirection.DotProduct(normal) >= 0)
+                    {
+                        continue;
+                    }
+
+                    differences.Add(Math.Abs(factor - factor_Shifted));
+                }
+            }
+
+            Assert.True(differences.Count > 0);
+
+            differences.Sort();
+            double difference_95thPercentile = differences[(int)Math.Ceiling(0.95 * differences.Count) - 1];
+            double difference_Max = differences[^1];
+
+            string path_Report = System.IO.Path.Combine(Core.xUnit.Query.ReportsDirectory(Assembly.GetExecutingAssembly())!, "ShadingSolver_AbsoluteCoordinates.txt");
+            System.IO.File.WriteAllLines(path_Report, [
+                $"{dateTimes.Length} timestamps, {receivers.Count} receivers, {differences.Count} sun-facing samples",
+                $"95th percentile difference {difference_95thPercentile:R}",
+                $"Maximum difference {difference_Max:R}"
+            ]);
+
+            testOutputHelper.WriteLine($"Compared {differences.Count} sun-facing factors across {receivers.Count} receivers after a shift of {vector3D_Shift.X} m; 95th percentile {difference_95thPercentile:R}, maximum {difference_Max}.");
+
+            Assert.True(difference_95thPercentile < 1e-9, $"The 95th percentile shading factor difference is {difference_95thPercentile} after shifting the scene by {vector3D_Shift.X} m.");
+            Assert.True(difference_Max < 1e-6, $"The largest shading factor difference is {difference_Max} after shifting the scene by {vector3D_Shift.X} m.");
+        }
+
+        /// <summary>
+        /// Builds a copy of a shading model with every element translated by a vector, keeping the coordinates and the UTC offset.
+        /// </summary>
+        /// <param name="shadingModel">The shading model to shift.</param>
+        /// <param name="vector3D_Shift">The translation vector.</param>
+        /// <returns>The shifted shading model.</returns>
+        private static ShadingModel ShiftShadingModel(ShadingModel shadingModel, Vector3D vector3D_Shift)
+        {
+            ShadingModel shadingModel_Shifted = new(shadingModel.UTC, shadingModel.Coordinates);
+
+            List<ShadingElement>? shadingElements = shadingModel.GetShadingElements<ShadingElement>();
+            Assert.NotNull(shadingElements);
+            foreach (ShadingElement shadingElement in shadingElements)
+            {
+                PolygonalFace3D? polygonalFace3D = shadingElement.PolygonalFace3D as PolygonalFace3D;
+                Assert.NotNull(polygonalFace3D);
+                Assert.True(polygonalFace3D.Move(vector3D_Shift));
+                Assert.True(shadingModel_Shifted.Update(new ShadingElement(polygonalFace3D, shadingElement.ShadingOnly)));
+            }
+
+            return shadingModel_Shifted;
         }
     }
 }
