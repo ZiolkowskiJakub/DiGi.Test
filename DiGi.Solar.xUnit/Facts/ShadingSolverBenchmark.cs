@@ -22,8 +22,9 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Largest allowed fraction of sun-facing samples in which a ComputeSharp engine drops a shadow the CPU solver finds (see the parity helper in <c>ShadingSolverCPU.cs</c>).
+        /// <para>It is 0. The tolerance of 0.001 covered the failed shadow union of ZiolkowskiJakub/DiGi.Solar#8, fixed there and in ZiolkowskiJakub/DiGi.Geometry#8; the dropped count is still reported as a column, so a drop that comes back is seen rather than absorbed.</para>
         /// </summary>
-        private const double ShadingSolverBenchmarkDroppedFraction = 0.001;
+        private const double ShadingSolverBenchmarkDroppedFraction = 0;
 
         /// <summary>
         /// Minutes between the timestamps of the benchmark day (2026-06-26, 04:00 to 21:00).
