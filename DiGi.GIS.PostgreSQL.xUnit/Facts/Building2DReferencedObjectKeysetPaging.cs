@@ -4,6 +4,7 @@ using DiGi.PostgreSQL.Classes;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
@@ -62,6 +63,28 @@ namespace DiGi.GIS.PostgreSQL.xUnit
 
             await using NpgsqlCommand npgsqlCommand = new($"DROP TABLE IF EXISTS {buildingModelPostgreSQLConverter.TableName};", npgsqlConnection);
             await npgsqlCommand.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// Serializes a JSON node with the members of every object ordered by key, so two nodes carrying the same content compare equal regardless of the order their members were inserted in or stored in.
+        /// <para>PostgreSQL's jsonb sorts the keys of an object on write, so a value read back from the table carries a different member order than the value that was sent; the comparisons this exists for are over content, not order.</para>
+        /// </summary>
+        /// <param name="node">The node to serialize.</param>
+        /// <returns>The canonical JSON text of the node.</returns>
+        private static string CanonicalJson(JsonNode? node)
+        {
+            if (node is JsonObject jsonObject)
+            {
+                List<string> parts = [];
+                foreach ((string key, JsonNode? value) in jsonObject.OrderBy(x => x.Key, StringComparer.Ordinal))
+                {
+                    parts.Add("\"" + key + "\":" + CanonicalJson(value));
+                }
+
+                return "{" + string.Join(",", parts) + "}";
+            }
+
+            return node?.ToJsonString() ?? "null";
         }
 
         /// <summary>
@@ -270,7 +293,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 long id_0 = objects[0].Id;
                 long id_1 = objects[1].Id;
 
-                // The stamped value the backfill writes: the rest of the row must come back byte for byte.
+                // The stamped value the backfill writes: the rest of the row must come back unchanged.
                 JsonObject value_Stamped = ParseJsonObject("""{ "Coordinates": { "Latitude": 52.2543, "Longitude": 20.9108 }, "UTC": 16 }""");
 
                 // The third pair names an identifier the partition does not hold - a row a concurrent run removed in the meantime.
@@ -293,15 +316,17 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 {
                     Assert.NotNull(item.Object);
 
-                    // The named key carries the new value.
-                    Assert.Equal(value_Stamped.ToJsonString(), item.Object!["BuildingInformation"]?.ToJsonString());
+                    // The named key carries the new value. The comparison is over content, not over the
+                    // member order: jsonb sorts the keys of an object on write, so the value read back
+                    // carries a different order than the value that was sent.
+                    Assert.Equal(CanonicalJson(value_Stamped), CanonicalJson(item.Object!["BuildingInformation"]));
 
                     // Every other member of the object is untouched, member for member.
                     JsonObject object_Before = (JsonObject)object_Seeded.DeepClone()!;
                     object_Before.Remove("BuildingInformation");
                     JsonObject object_After = (JsonObject)item.Object!.DeepClone()!;
                     object_After.Remove("BuildingInformation");
-                    Assert.Equal(object_Before.ToJsonString(), object_After.ToJsonString());
+                    Assert.Equal(CanonicalJson(object_Before), CanonicalJson(object_After));
 
                     // The addressing columns of the row are untouched.
                     Assert.Equal(countyId, item.CountyId);
@@ -333,7 +358,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 List<BuildingModel>? items_AfterRollback = await scratchConverter.GetItemsByIdsAsync([id_0], countyId);
                 Assert.NotNull(items_AfterRollback);
                 Assert.Single(items_AfterRollback);
-                Assert.Equal(value_Stamped.ToJsonString(), items_AfterRollback[0].Object!["BuildingInformation"]?.ToJsonString());
+                Assert.Equal(CanonicalJson(value_Stamped), CanonicalJson(items_AfterRollback[0].Object!["BuildingInformation"]));
             }
             finally
             {
