@@ -12,7 +12,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         [Fact]
         public void SurfaceSolarRadiationResult_Serialization()
         {
-            SurfaceSolarRadiationResult surfaceSolarRadiationResult = new("DiGi.Core.Classes.GuidReference::6f0c7d4e-2a39-4a57-9d1f-3a1b5c2d7e80", 12.5, 640.25, 410.5, 200.75, 29.0, 701.125, 8003.125);
+            SurfaceSolarRadiationResult surfaceSolarRadiationResult = new("DiGi.Core.Classes.GuidReference::6f0c7d4e-2a39-4a57-9d1f-3a1b5c2d7e80", 12.5, 640.25, 410.5, 200.75, 29.0, 701.125, 8003.125, 0.625, 0.375);
 
             Assert.Equal("DiGi.Core.Classes.GuidReference::6f0c7d4e-2a39-4a57-9d1f-3a1b5c2d7e80", surfaceSolarRadiationResult.Reference);
             Assert.Equal(12.5, surfaceSolarRadiationResult.Area);
@@ -22,6 +22,8 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal(29.0, surfaceSolarRadiationResult.Ground);
             Assert.Equal(701.125, surfaceSolarRadiationResult.IrradiationUnshaded);
             Assert.Equal(8003.125, surfaceSolarRadiationResult.Energy);
+            Assert.Equal(0.625, surfaceSolarRadiationResult.SkyVisibility);
+            Assert.Equal(0.375, surfaceSolarRadiationResult.GroundVisibility);
 
             string? json = Core.Convert.ToSystem_String(surfaceSolarRadiationResult);
             Assert.False(string.IsNullOrWhiteSpace(json));
@@ -52,6 +54,8 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal(expected.Ground, actual.Ground);
             Assert.Equal(expected.IrradiationUnshaded, actual.IrradiationUnshaded);
             Assert.Equal(expected.Energy, actual.Energy);
+            Assert.Equal(expected.SkyVisibility, actual.SkyVisibility);
+            Assert.Equal(expected.GroundVisibility, actual.GroundVisibility);
         }
     }
 }
