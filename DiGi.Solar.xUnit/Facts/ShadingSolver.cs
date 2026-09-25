@@ -1,3 +1,4 @@
+using ComputeSharp;
 using DiGi.Core.Classes;
 using DiGi.Solar.Classes;
 using System.Runtime.Versioning;
@@ -76,6 +77,9 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Determines whether ComputeSharp is supported on the current machine and graphics device.
+        /// <para>The shared ComputeSharp default device is never disposed here: disposing it would reset ComputeSharp's default device cache
+        /// and invalidate the device held by every other caller in the process (ZiolkowskiJakub/DiGi.ComputeSharp#2), which <see cref="ShadingSolver_IsComputeSharpSupported_KeepsDefaultDevice"/> guards.</para>
+        /// <para>The WARP software device is rejected even though it reports double precision as available, aligning the test gate with <see cref="ComputeSharp.Query.IsSupported(global::ComputeSharp.GraphicsDevice?)"/> (ZiolkowskiJakub/DiGi.Solar#10).</para>
         /// </summary>
         /// <param name="testOutputHelper">The test output helper to write warning messages to.</param>
         /// <returns>True if ComputeSharp is supported; otherwise, false.</returns>
@@ -84,24 +88,67 @@ namespace DiGi.Solar.xUnit
         {
             try
             {
-                using global::ComputeSharp.GraphicsDevice graphicsDevice = global::ComputeSharp.GraphicsDevice.GetDefault();
+                if (DiGi.ComputeSharp.Core.Create.GraphicsDevice() != null)
+                {
+                    return true;
+                }
+
+                global::ComputeSharp.GraphicsDevice? graphicsDevice = global::ComputeSharp.GraphicsDevice.GetDefault();
                 if (graphicsDevice == null)
                 {
                     testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (no default GraphicsDevice found).");
-                    return false;
                 }
-                if (!graphicsDevice.IsDoublePrecisionSupportAvailable())
+                else if (!graphicsDevice.IsHardwareAccelerated)
+                {
+                    testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (default graphics device '" + graphicsDevice.Name + "' is not hardware-accelerated).");
+                }
+                else
                 {
                     testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (graphics device does not support double precision operations).");
-                    return false;
                 }
-                return true;
+
+                return false;
             }
             catch (Exception exception)
             {
                 testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine: " + exception.Message);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Verifies that IsComputeSharpSupported leaves the shared ComputeSharp default device alive (ZiolkowskiJakub/DiGi.ComputeSharp#2).
+        /// <para>A device obtained via GraphicsDevice.GetDefault before the call must still be the cached default afterwards and must still be able to allocate buffers.
+        /// Disposing the default device resets ComputeSharp's cache, so a disposing implementation fails this with an identity change or ObjectDisposedException.</para>
+        /// </summary>
+        [Fact]
+        [SupportedOSPlatform("windows")]
+        public void ShadingSolver_IsComputeSharpSupported_KeepsDefaultDevice()
+        {
+            global::ComputeSharp.GraphicsDevice? graphicsDevice_Before;
+            try
+            {
+                graphicsDevice_Before = global::ComputeSharp.GraphicsDevice.GetDefault();
+            }
+            catch (Exception exception) when (exception is System.NotSupportedException or System.InvalidOperationException)
+            {
+                testOutputHelper.WriteLine("WARNING: no default graphics device on this machine. Skipping the keeps-default-device check.");
+                return;
+            }
+
+            if (graphicsDevice_Before == null)
+            {
+                testOutputHelper.WriteLine("WARNING: no default graphics device on this machine. Skipping the keeps-default-device check.");
+                return;
+            }
+
+            bool supported = IsComputeSharpSupported(testOutputHelper);
+            testOutputHelper.WriteLine($"IsComputeSharpSupported: {supported}.");
+
+            Assert.Same(graphicsDevice_Before, global::ComputeSharp.GraphicsDevice.GetDefault());
+
+            using global::ComputeSharp.ReadWriteBuffer<int> readWriteBuffer = graphicsDevice_Before.AllocateReadWriteBuffer<int>(1);
+            Assert.Equal(1, readWriteBuffer.Length);
         }
 
         /// <summary>
