@@ -21,7 +21,7 @@ namespace DiGi.Solar.xUnit
         private const int ShadingSolverBenchmarkRepeatSurfaceCount = 720;
 
         /// <summary>
-        /// Largest allowed fraction of sun-facing samples in which a ComputeSharp engine drops a shadow the CPU solver finds (see the parity helper in <c>ShadingSolverCPU.cs</c>).
+        /// Largest allowed fraction of compared samples in which a ComputeSharp engine drops a shadow the CPU solver finds (see the parity helper in <c>ShadingSolverCPU.cs</c>).
         /// <para>It is 0. The tolerance of 0.001 covered the failed shadow union of ZiolkowskiJakub/DiGi.Solar#8, fixed there and in ZiolkowskiJakub/DiGi.Geometry#8; the dropped count is still reported as a column, so a drop that comes back is seen rather than absorbed.</para>
         /// </summary>
         private const double ShadingSolverBenchmarkDroppedFraction = 0;
@@ -66,7 +66,7 @@ namespace DiGi.Solar.xUnit
 
             bool hardware = ComputeSharp.Create.GraphicsDevice(ComputeDeviceType.Hardware) is not null;
 
-            List<string> lines = [$"{name}: {dateTimes.Length} timestamps, step {ShadingSolverBenchmarkStepMinutes} min", "Buildings | Surfaces | Receivers | Casters | Solves | CPU (ms/solve) | Hardware (ms/solve) | Hardware / CPU | Dropped shadows"];
+            List<string> lines = [$"{name}: {dateTimes.Length} timestamps, step {ShadingSolverBenchmarkStepMinutes} min", "Buildings | Surfaces | Receivers | Casters | Solves | CPU (ms/solve) | Hardware (ms/solve) | Hardware / CPU | Dropped shadows | Factor difference p99 | Factor difference max"];
 
             // Warm-up on the single-building model: JIT for the CPU solver, shader and pipeline creation for the GPU.
             ShadingModel shadingModel_WarmUp = CreateBuildingGridShadingModel(1, surroundingsShadingOnly);
@@ -86,12 +86,12 @@ namespace DiGi.Solar.xUnit
                 int repeats = Math.Max(1, ShadingSolverBenchmarkRepeatSurfaceCount / count_Surface);
 
                 // Correctness first: the GPU solver must reproduce the CPU solver on this model.
-                int count_Dropped = hardware ? AssertSameShadingFactors(shadingModel, dateTimes, ComputeDeviceType.Hardware, ShadingSolverBenchmarkDroppedFraction).Dropped : 0;
+                (int Compared, int Dropped, double Percentile, double Max) parity = hardware ? AssertSameShadingFactors(shadingModel, dateTimes, ComputeDeviceType.Hardware, ShadingSolverBenchmarkDroppedFraction) : (0, 0, double.NaN, double.NaN);
 
                 double milliseconds_CPU = MeasureShadingSolver(shadingModel, dateTimes, repeats, null);
                 double milliseconds_Hardware = hardware ? MeasureShadingSolver(shadingModel, dateTimes, repeats, ComputeDeviceType.Hardware) : double.NaN;
 
-                string line = $"{gridSize * gridSize} | {count_Surface} | {count_Receiver} | {count_Caster} | {repeats} | {milliseconds_CPU:F1} | {milliseconds_Hardware:F1} | {milliseconds_Hardware / milliseconds_CPU:F2} | {count_Dropped}";
+                string line = $"{gridSize * gridSize} | {count_Surface} | {count_Receiver} | {count_Caster} | {repeats} | {milliseconds_CPU:F1} | {milliseconds_Hardware:F1} | {milliseconds_Hardware / milliseconds_CPU:F2} | {parity.Dropped} | {parity.Percentile:E1} | {parity.Max:E1}";
                 lines.Add(line);
                 testOutputHelper.WriteLine(line);
 
