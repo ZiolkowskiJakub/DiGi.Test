@@ -1,3 +1,4 @@
+using ComputeSharp;
 using DiGi.Communication.Classes;
 using DiGi.Communication.Enums;
 using DiGi.Communication.Interfaces;
@@ -41,6 +42,8 @@ namespace DiGi.Communication.xUnit
                 [1.5e-6] = 3.0
             };
             SimpleMultipathPowerDelayProfile profile = new(values);
+
+            bool computeSharpSupported = IsComputeSharpSupported(testOutputHelper);
 
             // 1. Warm Up Run (to JIT compile CPU and compile GPU shaders)
             {
@@ -122,64 +125,69 @@ namespace DiGi.Communication.xUnit
                 bool cpuSuccess = cpuSolver.Solve();
                 cpuSw.Stop();
 
-                // GPU Solving
-                ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
-                {
-                    GeometricalPropagationModel = model,
-                    ScatteringSolverOptions = options
-                };
-
-                Stopwatch gpuSw = Stopwatch.StartNew();
-                bool gpuSuccess = gpuSolver.Solve();
-                gpuSw.Stop();
-
                 testOutputHelper.WriteLine($"[Triangles={expectedTriangles}] CPU Solve Success: {cpuSuccess} in {cpuSw.Elapsed.TotalMilliseconds:F3} ms");
-                testOutputHelper.WriteLine($"[Triangles={expectedTriangles}] GPU Solve Success: {gpuSuccess} in {gpuSw.Elapsed.TotalMilliseconds:F3} ms");
 
                 Assert.True(cpuSuccess);
-                Assert.True(gpuSuccess);
-
-                // Compare results
                 Assert.NotNull(cpuSolver.ScatteringProfiles);
-                Assert.NotNull(gpuSolver.ScatteringProfiles);
-                Assert.Equal(gpuSolver.ScatteringProfiles.Count, cpuSolver.ScatteringProfiles.Count);
 
-                for (int i = 0; i < cpuSolver.ScatteringProfiles.Count; i++)
+                if (computeSharpSupported)
                 {
-                    IScatteringProfile cpuProfile = cpuSolver.ScatteringProfiles[i];
-                    IScatteringProfile gpuProfile = gpuSolver.ScatteringProfiles[i];
-
-                    Assert.Equal(gpuProfile.Visible, cpuProfile.Visible);
-                    Assert.NotNull(cpuProfile.Scatterings);
-                    Assert.NotNull(gpuProfile.Scatterings);
-
-                    List<Scattering> cpuScatterings = new(cpuProfile.Scatterings);
-                    List<Scattering> gpuScatterings = new(gpuProfile.Scatterings);
-
-                    Assert.Equal(gpuScatterings.Count, cpuScatterings.Count);
-
-                    for (int j = 0; j < cpuScatterings.Count; j++)
+                    // GPU Solving
+                    ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
                     {
-                        Scattering cpuScattering = cpuScatterings[j];
-                        Scattering gpuScattering = gpuScatterings[j];
+                        GeometricalPropagationModel = model,
+                        ScatteringSolverOptions = options
+                    };
 
-                        Assert.Equal(gpuScattering.Delay, cpuScattering.Delay, 9);
-                        Assert.NotNull(cpuScattering.ScatteringPointGroups);
-                        Assert.NotNull(gpuScattering.ScatteringPointGroups);
-                        Assert.Equal(gpuScattering.ScatteringPointGroups.Count, cpuScattering.ScatteringPointGroups.Count);
+                    Stopwatch gpuSw = Stopwatch.StartNew();
+                    bool gpuSuccess = gpuSolver.Solve();
+                    gpuSw.Stop();
 
-                        for (int k = 0; k < cpuScattering.ScatteringPointGroups.Count; k++)
+                    testOutputHelper.WriteLine($"[Triangles={expectedTriangles}] GPU Solve Success: {gpuSuccess} in {gpuSw.Elapsed.TotalMilliseconds:F3} ms");
+
+                    Assert.True(gpuSuccess);
+
+                    // Compare results
+                    Assert.NotNull(gpuSolver.ScatteringProfiles);
+                    Assert.Equal(gpuSolver.ScatteringProfiles.Count, cpuSolver.ScatteringProfiles.Count);
+
+                    for (int i = 0; i < cpuSolver.ScatteringProfiles.Count; i++)
+                    {
+                        IScatteringProfile cpuProfile = cpuSolver.ScatteringProfiles[i];
+                        IScatteringProfile gpuProfile = gpuSolver.ScatteringProfiles[i];
+
+                        Assert.Equal(gpuProfile.Visible, cpuProfile.Visible);
+                        Assert.NotNull(cpuProfile.Scatterings);
+                        Assert.NotNull(gpuProfile.Scatterings);
+
+                        List<Scattering> cpuScatterings = new(cpuProfile.Scatterings);
+                        List<Scattering> gpuScatterings = new(gpuProfile.Scatterings);
+
+                        Assert.Equal(gpuScatterings.Count, cpuScatterings.Count);
+
+                        for (int j = 0; j < cpuScatterings.Count; j++)
                         {
-                            ScatteringPointGroup cpuGroup = cpuScattering.ScatteringPointGroups[k];
-                            ScatteringPointGroup gpuGroup = gpuScattering.ScatteringPointGroups[k];
+                            Scattering cpuScattering = cpuScatterings[j];
+                            Scattering gpuScattering = gpuScatterings[j];
 
-                            Assert.Equal(gpuGroup.Reference, cpuGroup.Reference);
-                            Assert.NotNull(cpuGroup.Points);
-                            Assert.NotNull(gpuGroup.Points);
+                            Assert.Equal(gpuScattering.Delay, cpuScattering.Delay, 9);
+                            Assert.NotNull(cpuScattering.ScatteringPointGroups);
+                            Assert.NotNull(gpuScattering.ScatteringPointGroups);
+                            Assert.Equal(gpuScattering.ScatteringPointGroups.Count, cpuScattering.ScatteringPointGroups.Count);
 
-                            // Check point count matching approximately (due to slightly different precision on GPU vs CPU)
-                            Assert.True(Math.Abs(gpuGroup.Points.Count - cpuGroup.Points.Count) <= 2,
-                                $"Point count mismatch on group {cpuGroup.Reference}: CPU={cpuGroup.Points.Count}, GPU={gpuGroup.Points.Count}");
+                            for (int k = 0; k < cpuScattering.ScatteringPointGroups.Count; k++)
+                            {
+                                ScatteringPointGroup cpuGroup = cpuScattering.ScatteringPointGroups[k];
+                                ScatteringPointGroup gpuGroup = gpuScattering.ScatteringPointGroups[k];
+
+                                Assert.Equal(gpuGroup.Reference, cpuGroup.Reference);
+                                Assert.NotNull(cpuGroup.Points);
+                                Assert.NotNull(gpuGroup.Points);
+
+                                // Check point count matching approximately (due to slightly different precision on GPU vs CPU)
+                                Assert.True(Math.Abs(gpuGroup.Points.Count - cpuGroup.Points.Count) <= 2,
+                                    $"Point count mismatch on group {cpuGroup.Reference}: CPU={cpuGroup.Points.Count}, GPU={gpuGroup.Points.Count}");
+                            }
                         }
                     }
                 }
@@ -268,6 +276,8 @@ namespace DiGi.Communication.xUnit
 
             ScatteringSolverOptions options = new(0.2, 0.5, 0.001);
 
+            bool computeSharpSupported = IsComputeSharpSupported(testOutputHelper);
+
             // CPU Solver verification
             ScatteringSolver cpuSolver = new()
             {
@@ -288,24 +298,164 @@ namespace DiGi.Communication.xUnit
             Assert.Equal("U-Shape", cpuScattering.ScatteringPointGroups[0].Reference);
             Assert.Equal("U-Shape", cpuScattering.ScatteringPointGroups[1].Reference);
 
-            // GPU Solver verification
+            if (computeSharpSupported)
+            {
+                // GPU Solver verification
+                ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
+                {
+                    GeometricalPropagationModel = model,
+                    ScatteringSolverOptions = options
+                };
+                Assert.True(gpuSolver.Solve());
+                Assert.NotNull(gpuSolver.ScatteringProfiles);
+                Assert.Single(gpuSolver.ScatteringProfiles);
+                IScatteringProfile gpuProfile = gpuSolver.ScatteringProfiles[0];
+                Assert.NotNull(gpuProfile.Scatterings);
+                List<Scattering> gpuScatterings = [.. gpuProfile.Scatterings];
+                Assert.Single(gpuScatterings);
+                Scattering gpuScattering = gpuScatterings[0];
+                Assert.NotNull(gpuScattering.ScatteringPointGroups);
+                Assert.Equal(2, gpuScattering.ScatteringPointGroups.Count);
+                Assert.Equal("U-Shape", gpuScattering.ScatteringPointGroups[0].Reference);
+                Assert.Equal("U-Shape", gpuScattering.ScatteringPointGroups[1].Reference);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that the ComputeSharp <see cref="ScatteringSolver"/> returns <c>false</c> instead of running when no supported graphics device is available
+        /// (ZiolkowskiJakub/DiGi.Communication#2).
+        /// <para>A model with at least one scatterable triangle must not run the shaders on a machine whose default device is the WARP software renderer or lacks double precision.
+        /// On a supported machine the branch cannot be exercised, so the fact reports a warning and returns, mirroring the DiGi.ComputeSharp.xUnit Create_GraphicsDevice gate.</para>
+        /// </summary>
+        [Fact]
+        [SupportedOSPlatform("windows6.2")]
+        public void ScatteringSolver_WithoutSupportedDevice_ReturnsFalse()
+        {
+            if (IsComputeSharpSupported(testOutputHelper))
+            {
+                testOutputHelper.WriteLine("WARNING: a supported graphics device is present; the unsupported-device branch is not exercised on this machine.");
+                return;
+            }
+
+            Antenna antenna_Transmitter = new(new Point3D(0, 0, 5), Function.Transmitter);
+            Antenna antenna_Receiver = new(new Point3D(100.0, 100.0, 5), Function.Receiver);
+
+            Dictionary<double, double> values = new()
+            {
+                [0.5e-6] = 2.0
+            };
+            SimpleMultipathPowerDelayProfile profile = new(values);
+
+            GeometricalPropagationModel model = new();
+            Assert.True(model.Assign(profile, antenna_Transmitter, antenna_Receiver));
+
+            List<Point3D> point3Ds = [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(0, 10, 0)];
+            List<int[]> indexArrays = [[0, 1, 2]];
+            Mesh3D mesh3D = new(point3Ds, indexArrays);
+
+            ScatteringObject scatteringObject = new("Blocker", mesh3D, Constants.ElectricalProperties.Concrete);
+            Assert.True(model.Update(scatteringObject));
+
             ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
             {
                 GeometricalPropagationModel = model,
-                ScatteringSolverOptions = options
+                ScatteringSolverOptions = new(0.2, 0.5, 0.001)
             };
-            Assert.True(gpuSolver.Solve());
-            Assert.NotNull(gpuSolver.ScatteringProfiles);
-            Assert.Single(gpuSolver.ScatteringProfiles);
-            IScatteringProfile gpuProfile = gpuSolver.ScatteringProfiles[0];
-            Assert.NotNull(gpuProfile.Scatterings);
-            List<Scattering> gpuScatterings = [.. gpuProfile.Scatterings];
-            Assert.Single(gpuScatterings);
-            Scattering gpuScattering = gpuScatterings[0];
-            Assert.NotNull(gpuScattering.ScatteringPointGroups);
-            Assert.Equal(2, gpuScattering.ScatteringPointGroups.Count);
-            Assert.Equal("U-Shape", gpuScattering.ScatteringPointGroups[0].Reference);
-            Assert.Equal("U-Shape", gpuScattering.ScatteringPointGroups[1].Reference);
+
+            Assert.False(gpuSolver.Solve());
+        }
+
+        /// <summary>
+        /// Verifies that the ComputeSharp <see cref="ScatteringSolver"/> leaves the shared ComputeSharp default device alive (ZiolkowskiJakub/DiGi.Communication#2).
+        /// <para>A device obtained from <see cref="GraphicsDevice.GetDefault"/> before Solve() must still be the cached default afterwards and must still allocate buffers.
+        /// Disposing the default device resets ComputeSharp's cache, so a disposing implementation fails this with an identity change or <see cref="ObjectDisposedException"/>.</para>
+        /// <para>This is a regression guard for the disposal half of the defect class, not a repro: the unmodified solver already passes it.</para>
+        /// </summary>
+        [Fact]
+        [SupportedOSPlatform("windows6.2")]
+        public void ScatteringSolver_KeepsDefaultDevice()
+        {
+            if (!IsComputeSharpSupported(testOutputHelper))
+            {
+                return;
+            }
+
+            GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
+
+            Antenna antenna_Transmitter = new(new Point3D(0, 0, 5), Function.Transmitter);
+            Antenna antenna_Receiver = new(new Point3D(100.0, 100.0, 5), Function.Receiver);
+
+            Dictionary<double, double> values = new()
+            {
+                [0.5e-6] = 2.0
+            };
+            SimpleMultipathPowerDelayProfile profile = new(values);
+
+            GeometricalPropagationModel model = new();
+            Assert.True(model.Assign(profile, antenna_Transmitter, antenna_Receiver));
+
+            List<Point3D> point3Ds = [new Point3D(0, 0, 0), new Point3D(10, 0, 0), new Point3D(0, 10, 0)];
+            List<int[]> indexArrays = [[0, 1, 2]];
+            Mesh3D mesh3D = new(point3Ds, indexArrays);
+
+            ScatteringObject scatteringObject = new("Blocker", mesh3D, Constants.ElectricalProperties.Concrete);
+            Assert.True(model.Update(scatteringObject));
+
+            ComputeSharp.Classes.ScatteringSolver gpuSolver = new()
+            {
+                GeometricalPropagationModel = model,
+                ScatteringSolverOptions = new(0.2, 0.5, 0.001)
+            };
+
+            try
+            {
+                Assert.True(gpuSolver.Solve());
+
+                using ReadWriteBuffer<int> readWriteBuffer = graphicsDevice.AllocateReadWriteBuffer<int>(1);
+                Assert.Equal(1, readWriteBuffer.Length);
+
+                Assert.Same(graphicsDevice, GraphicsDevice.GetDefault());
+            }
+            catch (Exception exception) when (exception.GetType().Name == "UnsupportedDoubleOperationException")
+            {
+                testOutputHelper.WriteLine("WARNING: GPU FP64 double-precision operations are not supported on this graphics card: " + exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the DiGi.ComputeSharp shaders can run on the current machine: the ComputeSharp default device must be hardware-accelerated and support double precision
+        /// (<c>DiGi.ComputeSharp.Core.Create.GraphicsDevice</c>). Writes a warning to the test output helper if not supported.
+        /// <para>The default device is shared by ComputeSharp and is never disposed here: disposing it would invalidate the device held by every other fact running in parallel (ZiolkowskiJakub/DiGi.ComputeSharp#2).</para>
+        /// </summary>
+        /// <param name="testOutputHelper">The test output helper to write warning messages to.</param>
+        /// <returns>True if ComputeSharp is supported; otherwise, false.</returns>
+        [SupportedOSPlatform("windows6.2")]
+        private static bool IsComputeSharpSupported(ITestOutputHelper testOutputHelper)
+        {
+            try
+            {
+                if (DiGi.ComputeSharp.Core.Create.GraphicsDevice() != null)
+                {
+                    return true;
+                }
+
+                GraphicsDevice graphicsDevice = GraphicsDevice.GetDefault();
+                if (!graphicsDevice.IsHardwareAccelerated)
+                {
+                    testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (default graphics device '" + graphicsDevice.Name + "' is not hardware-accelerated).");
+                }
+                else
+                {
+                    testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine (graphics device does not support double precision operations).");
+                }
+
+                return false;
+            }
+            catch (Exception exception)
+            {
+                testOutputHelper.WriteLine("WARNING: ComputeSharp is not supported on this machine: " + exception.Message);
+                return false;
+            }
         }
     }
 }
