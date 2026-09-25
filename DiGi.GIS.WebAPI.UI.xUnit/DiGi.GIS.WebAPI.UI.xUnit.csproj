@@ -23,6 +23,8 @@
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <!-- SolarCalculator is a NuGet dependency of DiGi.Solar (referenced via HintPath), so it must be re-added here to reach the test output. -->
+    <PackageReference Include="SolarCalculator" Version="3.6.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -48,11 +50,17 @@
     <Reference Include="DiGi.Analytical.Building.HVAC">
       <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.HVAC.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Analytical.Building.Solar">
+      <HintPath>..\..\DiGi.Analytical\bin\DiGi.Analytical.Building.Solar.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Core.IO">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.EPW">
+      <HintPath>..\..\DiGi.EPW\bin\DiGi.EPW.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Geometry">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
@@ -69,6 +77,9 @@
     <Reference Include="DiGi.GIS">
       <HintPath>..\..\DiGi.GIS\bin\DiGi.GIS.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.GIS.Analytical">
+      <HintPath>..\..\DiGi.GIS.Analytical\bin\DiGi.GIS.Analytical.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.GIS.PostgreSQL">
       <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.GIS.PostgreSQL.dll</HintPath>
     </Reference>
@@ -81,11 +92,17 @@
     <Reference Include="DiGi.PostgreSQL.Table">
       <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.Table.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Solar">
+      <HintPath>..\..\DiGi.Solar\bin\DiGi.Solar.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Typology">
       <HintPath>..\..\DiGi.Typology\bin\DiGi.Typology.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Typology.Visual">
       <HintPath>..\..\DiGi.Typology\bin\DiGi.Typology.Visual.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Weather">
+      <HintPath>..\..\DiGi.Weather\bin\DiGi.Weather.dll</HintPath>
     </Reference>
   </ItemGroup>
 
