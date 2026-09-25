@@ -1,11 +1,15 @@
 using DiGi.Analytical.Building.Classes;
 using DiGi.Analytical.Building.Solar;
+using DiGi.CityGML.Classes;
 using DiGi.Core.Classes;
 using DiGi.Core.Enums;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Spatial.Classes;
+using DiGi.GIS.Classes;
 using DiGi.Solar.Classes;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DiGi.GIS.Analytical.xUnit
 {
@@ -135,6 +139,64 @@ namespace DiGi.GIS.Analytical.xUnit
             Assert.NotNull(address_Result);
             Assert.Equal("ul. Testowa 1", address_Result.Street);
             Assert.Equal("Warszawa", address_Result.City);
+        }
+
+        /// <summary>
+        /// Tests that the footprint extrusion fallback of the batch creation stamps the WGS 84 coordinates and the Polish standard time zone, so the models of the directory import path are located rather than computing their sun path at (0, 0).
+        /// <para>The sliver fixture of the <c>BuildingModelSliver</c> facts reaches the fallback: the LOD1 model converts to fewer than four surfaces, so the single-creation path refuses it and the batch creation extrudes the footprint through the CRS-agnostic <c>Create.BuildingModel(Polyhedron, double)</c> overload. Before DiGi.GIS.PostgreSQL.UI#17 that branch stamped nothing.</para>
+        /// </summary>
+        [Fact]
+        public void BuildingModels_Unidentified_HasCoordinates()
+        {
+            Building building = CityGML_Building_Sliver_3024();
+            Assert.Null(Create.BuildingModel(building));
+
+            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "3024_e189b2a2_CityGML.gml");
+            List<CityModel>? cityModels = CityGML.Create.CityModels(path);
+            Assert.NotNull(cityModels);
+
+            PolygonalFace2D? polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(new Point2D(331032.97, 539122.27), new Point2D(331030.36, 539122.98), new Point2D(331030.79, 539124.54), new Point2D(331033.39, 539123.84));
+            Assert.NotNull(polygonalFace2D);
+
+            Building2D building2D = new(Guid.NewGuid(), reference_Sliver_3024, polygonalFace2D, 1, null, null, []);
+
+            List<BuildingModel>? buildingModels = Create.BuildingModels([building2D], cityModels, Constants.Tolerance.Coordinate);
+            Assert.NotNull(buildingModels);
+
+            BuildingModel buildingModel = Assert.Single(buildingModels);
+
+            // The extrusion names its space "Building"; a model joined to a CityGML building carries that building's UniqueId instead -
+            // so this asserts the model came out of the fallback the fact exists for, not of a stamped branch.
+            List<Space>? spaces = buildingModel.GetSpaces<Space>();
+            Assert.NotNull(spaces);
+            Assert.Equal("Building", Assert.Single(spaces).Name);
+
+            Assert.True(Query.IsLocated(buildingModel), "The extruded fallback model carries no located BuildingInformation.");
+            Assert.Equal(UTC.Plus0100, buildingModel.BuildingInformation.UTC);
+        }
+
+        /// <summary>
+        /// Tests that IsLocated reports each unlocated state - the (0, 0) coordinate default and an undefined UTC offset - and a stamped model as located.
+        /// </summary>
+        [Fact]
+        public void IsLocated()
+        {
+            // The unlocated default: (0, 0) coordinates and an undefined UTC offset.
+            BuildingModel buildingModel_Default = new();
+            Assert.False(Query.IsLocated(buildingModel_Default));
+
+            BuildingModel? buildingModel = Create.BuildingModel(Building2D_55417());
+            Assert.NotNull(buildingModel);
+            Assert.True(Query.IsLocated(buildingModel));
+
+            // Located coordinates but the UTC offset still undefined - the sun path would carry a not-a-number offset.
+            buildingModel.BuildingInformation.UTC = UTC.Undefined;
+            Assert.False(Query.IsLocated(buildingModel));
+
+            // The UTC offset defined but the coordinates still at the unlocated origin - the sun path would sit at (0, 0).
+            BuildingModel buildingModel_Origin = new();
+            buildingModel_Origin.BuildingInformation.UTC = UTC.Plus0100;
+            Assert.False(Query.IsLocated(buildingModel_Origin));
         }
     }
 }
