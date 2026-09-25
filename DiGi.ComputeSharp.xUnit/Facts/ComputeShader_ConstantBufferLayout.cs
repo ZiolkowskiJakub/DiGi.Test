@@ -36,6 +36,7 @@ namespace DiGi.ComputeSharp.xUnit
                 ["Triangle3IntersectionsComputeShader"] = (24, 3),
                 ["Triangle3ShadingComputeShader"] = (56, 2),
                 ["Triangle3ShadingRowOffsetComputeShader"] = (56, 2),
+                ["Triangle3ShadowProjectionComputeShader"] = (56, 5),
             };
 
             Assembly assembly = typeof(Spatial.Classes.Triangle3).Assembly;
