@@ -61,6 +61,33 @@ namespace DiGi.Core.xUnit
             }
         }
 
+        private class TestTimingOutBackgroundTask : CancelableBackgroundTask
+        {
+            protected override Task<bool> ExecuteAsync(CancellationToken token)
+            {
+                // A request timeout: canceled by the HTTP layer, not by the task's own source.
+                throw new TaskCanceledException("Request timed out after 20s");
+            }
+        }
+
+        private class TestTimingOutAfterStopBackgroundTask : CancelableBackgroundTask
+        {
+            protected override async Task<bool> ExecuteAsync(CancellationToken token)
+            {
+                try
+                {
+                    await Task.Delay(Timeout.Infinite, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Rethrown without the token, the way a callee's timeout surfaces after a stop.
+                    throw new TaskCanceledException();
+                }
+
+                return true;
+            }
+        }
+
         private class TestConfigurableBackgroundTask : BackgroundTask
         {
             public bool ShouldSucceed { get; set; } = true;
@@ -281,6 +308,53 @@ namespace DiGi.Core.xUnit
             // IsCompleted returns false (as Task is null), IsRunning is false, and Status resets to Idle.
             Assert.False(task.IsRunning);
             Assert.Equal(CancelableBackgroundTaskStatus.Idle, task.CancelableBackgroundTaskStatus);
+            Assert.True(canceledFired);
+        }
+
+        /// <summary>
+        /// Tests that an <see cref="OperationCanceledException"/> the task's own source did not request - a request timeout - is kept as the task's exception instead of being swallowed as a cancellation and replaced by the generic <see cref="BackgroundTaskFailureException"/>.
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_Timeout_KeepsException()
+        {
+            TestTimingOutBackgroundTask task = new();
+
+            bool canceledFired = false;
+            task.Canceled += (s, e) => canceledFired = true;
+
+            task.Start();
+
+            int timeoutMs = 1000;
+            while ((task.IsRunning || !task.IsCompleted) && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            TaskCanceledException taskCanceledException = Assert.IsType<TaskCanceledException>(task.Exception);
+            Assert.Equal("Request timed out after 20s", taskCanceledException.Message);
+            Assert.False(task.IsSucceeded);
+            Assert.Equal(CancelableBackgroundTaskStatus.Failed, task.CancelableBackgroundTaskStatus);
+            Assert.False(canceledFired);
+        }
+
+        /// <summary>
+        /// Tests that an <see cref="OperationCanceledException"/> thrown after the operator stopped the task is still a cancellation, even when it does not carry the task's token: the filter keys on the task's source, not on the exception.
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_TimeoutAfterStop_IsCancel()
+        {
+            TestTimingOutAfterStopBackgroundTask task = new();
+
+            bool canceledFired = false;
+            task.Canceled += (s, e) => canceledFired = true;
+
+            task.Start();
+
+            await Task.Delay(50);
+            await task.StopAsync();
+
+            Assert.Null(task.Exception);
             Assert.True(canceledFired);
         }
     }
