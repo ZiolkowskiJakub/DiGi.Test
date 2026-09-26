@@ -51,6 +51,17 @@ namespace DiGi.Core.xUnit
             }
         }
 
+        private class TestTimeoutCancelableBackgroundTask : CancelableBackgroundTask
+        {
+            protected override async Task<bool> ExecuteAsync(CancellationToken token)
+            {
+                // A request timeout: an OperationCanceledException raised by a source the task does not own.
+                using CancellationTokenSource cancellationTokenSource = new(20);
+                await Task.Delay(5000, cancellationTokenSource.Token);
+                return true;
+            }
+        }
+
         private class TestRefusingBackgroundTask : BackgroundTask
         {
             protected override Task<bool> ExecuteAsync()
@@ -277,11 +288,87 @@ namespace DiGi.Core.xUnit
             // Stop the task (this requests cancellation and awaits task completion)
             await task.StopAsync();
 
-            // Since production code's StopAsync calls Cleanup() which sets the Task reference to null,
-            // IsCompleted returns false (as Task is null), IsRunning is false, and Status resets to Idle.
+            // The stopped run keeps its task, so it reports Canceled until the next Start.
             Assert.False(task.IsRunning);
-            Assert.Equal(CancelableBackgroundTaskStatus.Idle, task.CancelableBackgroundTaskStatus);
+            Assert.True(task.IsCanceled);
+            Assert.Equal(CancelableBackgroundTaskStatus.Canceled, task.CancelableBackgroundTaskStatus);
             Assert.True(canceledFired);
+        }
+
+        /// <summary>
+        /// Tests that a run stopped by the synchronous Stop reports the canceled status.
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_Stop_Canceled()
+        {
+            TestCancelableBackgroundTask task = new(delayMs: 2000);
+
+            bool canceledFired = false;
+            task.Canceled += (s, e) => canceledFired = true;
+
+            task.Start();
+
+            await Task.Delay(50);
+            task.Stop();
+
+            Assert.False(task.IsRunning);
+            Assert.True(task.IsCanceled);
+            Assert.Equal(CancelableBackgroundTaskStatus.Canceled, task.CancelableBackgroundTaskStatus);
+            Assert.True(canceledFired);
+        }
+
+        /// <summary>
+        /// Tests that a timeout inside the run is a failure, not a cancellation.
+        /// <para>The OperationCanceledException comes from a source the task does not own, so it is kept as the exception.</para>
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_Timeout_KeepsException()
+        {
+            TestTimeoutCancelableBackgroundTask task = new();
+
+            task.Start();
+
+            int timeoutMs = 2000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(task.IsCompleted);
+            Assert.IsAssignableFrom<OperationCanceledException>(task.Exception);
+            Assert.False(task.IsCanceled);
+            Assert.Equal(CancelableBackgroundTaskStatus.Failed, task.CancelableBackgroundTaskStatus);
+        }
+
+        /// <summary>
+        /// Tests that starting a stopped task again clears the canceled state once the new run completes.
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_RestartClearsCanceled()
+        {
+            TestCancelableBackgroundTask task = new(delayMs: 200);
+
+            task.Start();
+            await Task.Delay(50);
+            await task.StopAsync();
+
+            Assert.True(task.IsCanceled);
+
+            task.Start();
+
+            Assert.False(task.IsCanceled);
+
+            int timeoutMs = 2000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.True(task.IsCompleted);
+            Assert.False(task.IsCanceled);
+            Assert.Equal(CancelableBackgroundTaskStatus.Completed, task.CancelableBackgroundTaskStatus);
         }
     }
 }
