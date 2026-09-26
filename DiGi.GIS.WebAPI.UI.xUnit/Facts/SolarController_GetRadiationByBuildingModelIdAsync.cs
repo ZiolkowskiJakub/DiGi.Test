@@ -3,6 +3,7 @@ using DiGi.EPW.Classes;
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.GIS.WebAPI.UI.Classes;
 using DiGi.GIS.WebAPI.UI.Controllers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -61,10 +62,14 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal(20 + Math.Sqrt(50), double.Parse(QueryHelpers.ParseQuery(request_Circle_GLB.RequestUri!.Query)["radius"]!, CultureInfo.InvariantCulture), 6);
         }
 
-        // The controller under test on a scripted GIS Web API, wired as Program.cs wires it: its own one-slot gate.
-        private static SolarController SolarController_Controller(ScriptedWebApi scriptedWebApi)
+        // The controller under test on a scripted GIS Web API, wired as Program.cs wires it: a one-slot gate and a
+        // job queue, its own unless a fact shares them, and an HTTP context for the headers it writes (Retry-After).
+        private static SolarController SolarController_Controller(ScriptedWebApi scriptedWebApi, SemaphoreSlim? semaphoreSlim = null, SolarJobQueue? solarJobQueue = null)
         {
-            return new SolarController(new ScriptedHttpClientFactory(scriptedWebApi), new SemaphoreSlim(1, 1), NullLogger<SolarController>.Instance);
+            return new SolarController(new ScriptedHttpClientFactory(scriptedWebApi), semaphoreSlim ?? new SemaphoreSlim(1, 1), solarJobQueue ?? new SolarJobQueue(TimeProvider.System), NullLogger<SolarController>.Instance)
+            {
+                ControllerContext = new ControllerContext() { HttpContext = new DefaultHttpContext() },
+            };
         }
 
         // A GIS Web API serving one building model, its neighbours and a weather file. A null argument answers
