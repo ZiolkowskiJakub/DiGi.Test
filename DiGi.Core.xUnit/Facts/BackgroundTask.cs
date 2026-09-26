@@ -370,5 +370,34 @@ namespace DiGi.Core.xUnit
             Assert.False(task.IsCanceled);
             Assert.Equal(CancelableBackgroundTaskStatus.Completed, task.CancelableBackgroundTaskStatus);
         }
+
+        /// <summary>
+        /// Tests that a task restarted after a natural completion can still be stopped and reports the canceled status.
+        /// <para>The restart disposes the source of the completed run before it creates a new one.</para>
+        /// </summary>
+        [Fact]
+        public async Task CancelableBackgroundTask_RestartAfterCompletion()
+        {
+            TestCancelableBackgroundTask task = new(delayMs: 50);
+
+            task.Start();
+
+            int timeoutMs = 2000;
+            while (!task.IsCompleted && timeoutMs > 0)
+            {
+                await Task.Delay(10);
+                timeoutMs -= 10;
+            }
+
+            Assert.Equal(CancelableBackgroundTaskStatus.Completed, task.CancelableBackgroundTaskStatus);
+
+            task.Start();
+            await task.StopAsync();
+
+            Assert.False(task.IsRunning);
+            Assert.True(task.IsCanceled);
+            Assert.Null(task.Exception);
+            Assert.Equal(CancelableBackgroundTaskStatus.Canceled, task.CancelableBackgroundTaskStatus);
+        }
     }
 }
