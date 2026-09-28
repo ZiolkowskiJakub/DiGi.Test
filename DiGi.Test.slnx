@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/Analytical/">
     <Project Path="../DiGi.Analytical/DiGi.Analytical.Building.HVAC/DiGi.Analytical.Building.HVAC.csproj">
       <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
@@ -188,6 +188,13 @@
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
       <BuildDependency Project="../DiGi.GIS.IO/DiGi.GIS.IO/DiGi.GIS.IO.csproj" />
       <BuildDependency Project="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
+    <Project Path="DiGi.GIS.IO.xUnit/DiGi.GIS.IO.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.IO/DiGi.Core.IO.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj" />
+      <BuildDependency Project="../DiGi.GIS.IO/DiGi.GIS.IO/DiGi.GIS.IO.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
     <Project Path="DiGi.GIS.ML.xUnit/DiGi.GIS.ML.xUnit.csproj">

@@ -12,6 +12,7 @@ The repository contains the following core components and assemblies:
 * **[DiGi.Core.Test](DiGi.Core.Test)** (Path: `DiGi.Test\DiGi.Core.Test`)
 * **[DiGi.Core.xUnit](DiGi.Core.xUnit)** (Path: `DiGi.Test\DiGi.Core.xUnit`)
 * **[DiGi.GIS.xUnit](DiGi.GIS.xUnit)** (Path: `DiGi.Test\DiGi.GIS.xUnit`)
+* **[DiGi.GIS.IO.xUnit](DiGi.GIS.IO.xUnit)** (Path: `DiGi.Test\DiGi.GIS.IO.xUnit`)
 * **[DiGi.Geometry.Test](DiGi.Geometry.Test)** (Path: `DiGi.Test\DiGi.Geometry.Test`)
 * **[DiGi.Geometry.xUnit](DiGi.Geometry.xUnit)** (Path: `DiGi.Test\DiGi.Geometry.xUnit`)
 * **[DiGi.PostgreSQL.PartitionReference.xUnit](DiGi.PostgreSQL.PartitionReference.xUnit)** (Path: `DiGi.Test\DiGi.PostgreSQL.PartitionReference.xUnit`)
