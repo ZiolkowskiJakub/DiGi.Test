@@ -1,0 +1,5 @@
+Reference	CountyId	Category	Label	Legacy	LegacySource
+A	5	0	2010	False	None
+B	5	0	2011	True	DataFile
+C	5	0	2012	False	None
+D	5	0	2013	False	None
