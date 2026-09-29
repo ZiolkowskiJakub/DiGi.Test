@@ -1,5 +1,8 @@
+using DiGi.Core.IO.DelimitedData;
 using DiGi.Core.IO.DelimitedData.Classes;
+using DiGi.Core.IO.Table.Classes;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace DiGi.Core.xUnit
@@ -91,6 +94,35 @@ namespace DiGi.Core.xUnit
 
             // DelimitedDataRow.Text uses custom separator formatting. Let's make sure it writes the expected text.
             Assert.Contains("ID,Name", result);
+        }
+
+        /// <summary>
+        /// Tests that Create.Table(path) releases the file after reading: writes a temp TSV, reads it with the path overload,
+        /// asserts the content, and deletes the file in finally without an IOException.
+        /// <para>Regression guard for ZiolkowskiJakub/DiGi.Core#11 — before the fix the DelimitedDataReader created by the path overloads was never disposed, so the file stayed open and File.Delete threw an IOException on Windows.</para>
+        /// </summary>
+        [Fact]
+        public void CreateTable_ReadsFileAndReleasesIt()
+        {
+            string path_Temp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName() + ".tsv");
+            try
+            {
+                File.WriteAllText(path_Temp, "ID\tName\tAge\n1\tJan\t30\n2\tAnna\t25");
+
+                Table? table = DiGi.Core.IO.DelimitedData.Create.Table(path_Temp, '\t');
+                Assert.NotNull(table);
+
+                Assert.Equal(3, table.Columns.Count());
+                Assert.Equal("ID", table.GetColumn(0)?.Name);
+                Assert.Equal("Age", table.GetColumn(2)?.Name);
+                Assert.Equal(2, table.Rows.Count());
+                Assert.Equal("Jan", table[0, 1]);
+                Assert.Equal("25", table[1, 2]);
+            }
+            finally
+            {
+                File.Delete(path_Temp);
+            }
         }
     }
 }
