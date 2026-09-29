@@ -68,6 +68,19 @@ namespace DiGi.YOLO.xUnit
                 Classes.BoundingBox boundingBox = labelFile!.GetBoundingBoxes(0).Single();
                 Assert.Equal(0.5, boundingBox.X);
                 Assert.Equal(0.125, boundingBox.Height);
+
+                //Writing a dataset whose images are already in place - here under an upper-cased spelling of the same paths - must not copy a file onto itself
+                Classes.YOLOModel yOLOModel_InPlace = new(directory_Dataset);
+                yOLOModel_InPlace.Add("Building");
+                foreach (Classes.Image image in images_Train)
+                {
+                    string path_InPlace = image.Path!.ToUpperInvariant();
+                    yOLOModel_InPlace.Add(path_InPlace, Enums.Category.Train);
+                    yOLOModel_InPlace.Add(path_InPlace, "Building", new Classes.BoundingBox(0.5, 0.5, 0.25, 0.125));
+                }
+
+                Assert.True(Modify.Write(yOLOModel_InPlace));
+                Assert.Equal(2, Modify.Read(path_Configuration)?.GetImages(Enums.Category.Train).Count());
             }
             finally
             {
