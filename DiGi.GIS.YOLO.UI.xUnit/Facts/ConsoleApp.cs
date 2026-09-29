@@ -1,4 +1,5 @@
 using DiGi.GIS.YOLO.UI.Classes;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -170,6 +171,42 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                     File.Delete(tempFile);
                 }
             }
+        }
+
+        /// <summary>
+        /// Tests that each training dataset mode of <see cref="ConsoleApp.Program.Main(string[])"/> returns exit code 1 - a configuration error - for an options file that cannot be read, one with no absolute output directory, and an unknown mode flag; and that <c>--dataset</c> also refuses options naming no county.
+        /// <para>None of these reaches the Web API or the detector, so the codes are the same on any machine.</para>
+        /// </summary>
+        [Fact]
+        public async Task ConsoleApp_DatasetModes_Configuration_ReturnsExitCode1()
+        {
+            List<string> modes = ["--dataset", "--check-labels", "--evaluate-detector"];
+            foreach (string mode in modes)
+            {
+                Assert.Equal(1, await ConsoleApp.Program.Main([mode, "non_existent_file_path_12345.json"]));
+
+                string tempFilePath = Path.Combine(Path.GetTempPath(), $"options_test_{System.Guid.NewGuid()}.json");
+                try
+                {
+                    File.WriteAllText(tempFilePath, "{\"CountyIds\":[73485],\"OutputDirectory\":\"relative\"}");
+                    Assert.Equal(1, await ConsoleApp.Program.Main([mode, tempFilePath]));
+
+                    if (mode == "--dataset")
+                    {
+                        File.WriteAllText(tempFilePath, "{\"CountyIds\":[],\"OutputDirectory\":\"C:/dataset\"}");
+                        Assert.Equal(1, await ConsoleApp.Program.Main([mode, tempFilePath]));
+                    }
+                }
+                finally
+                {
+                    if (File.Exists(tempFilePath))
+                    {
+                        File.Delete(tempFilePath);
+                    }
+                }
+            }
+
+            Assert.Equal(1, await ConsoleApp.Program.Main(["--unknown"]));
         }
     }
 }
