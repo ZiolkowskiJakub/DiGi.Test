@@ -20,6 +20,7 @@ namespace DiGi.YOLO.xUnit
 
                 string exportPath = Path.Combine(tempDirectory, "export.py");
                 string trainPath = Path.Combine(tempDirectory, "train.py");
+                string validatePath = Path.Combine(tempDirectory, "val.py");
                 string predictPath = Path.Combine(tempDirectory, "predict.py");
                 string utilsPath = Path.Combine(tempDirectory, "utils.py");
                 string checkPath = Path.Combine(tempDirectory, "check.py");
@@ -28,6 +29,7 @@ namespace DiGi.YOLO.xUnit
 
                 Assert.True(File.Exists(exportPath));
                 Assert.True(File.Exists(trainPath));
+                Assert.True(File.Exists(validatePath));
                 Assert.True(File.Exists(predictPath));
                 Assert.True(File.Exists(utilsPath));
                 Assert.True(File.Exists(checkPath));
@@ -47,8 +49,19 @@ namespace DiGi.YOLO.xUnit
                 Assert.Contains("--opset", exportContent);
                 Assert.Contains("SHA256", exportContent);
 
+                //train.py and val.py are argument driven, and print the lines Modify.Train and Modify.Validate parse
                 string trainContent = File.ReadAllText(trainPath);
-                Assert.Contains("epochs=150", trainContent);
+                Assert.Contains("argparse", trainContent);
+                Assert.Contains("--patience", trainContent);
+                Assert.Contains("\"--epochs\", type=int, default=150", trainContent);
+                Assert.Contains(Constants.OutputPrefix.Weights, trainContent);
+                Assert.Contains(Constants.OutputPrefix.SHA256, trainContent);
+                Assert.Contains(Constants.OutputPrefix.AMP, trainContent);
+
+                string validateContent = File.ReadAllText(validatePath);
+                Assert.Contains("--split", validateContent);
+                Assert.Contains(Constants.OutputPrefix.MAP50, validateContent);
+                Assert.Contains(Constants.OutputPrefix.MAP50_95, validateContent);
 
                 string utilsContent = File.ReadAllText(utilsPath);
                 Assert.Contains("isdigit()", utilsContent);
@@ -73,6 +86,13 @@ namespace DiGi.YOLO.xUnit
 
                 string confContent = File.ReadAllText(confPath);
                 Assert.Contains("path: training", confContent);
+
+                //The template is written only into a directory without a conf.yaml; the scripts are rewritten every time
+                File.WriteAllText(confPath, "path: dataset");
+                File.WriteAllText(trainPath, "stale");
+                Assert.True(Modify.WriteScripts(tempDirectory));
+                Assert.Equal("path: dataset", File.ReadAllText(confPath));
+                Assert.Contains("argparse", File.ReadAllText(trainPath));
             }
             finally
             {
