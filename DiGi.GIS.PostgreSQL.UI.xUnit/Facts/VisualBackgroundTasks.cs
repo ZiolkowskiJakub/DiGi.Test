@@ -50,7 +50,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         }
 
         /// <summary>
-        /// Tests that the Year Built prediction task is offered where it can actually run, and nowhere else.
+        /// Tests that the Year Built prediction task, and the YOLO training task hosted by the same runner, are offered where they can actually run, and nowhere else.
         /// <para>The task reads the county rows the dialog is scoped from over the Web API, so a null manager has to leave it out rather than produce a row that throws when it is clicked - the failure ZiolkowskiJakub/DiGi.GIS.PostgreSQL.UI#1 was about. It belongs to the client side for the same reason: it holds no PostgreSQL converter and reaches the estate only through the API.</para>
         /// <para>It is registered rather than constructed here, because constructing it proves nothing - the registration is what decides whether the row appears at all, and a task added under the wrong mode builds and tests green while being invisible in the tab an operator opens.</para>
         /// <para>The runner it hands the run to is an optional part of the deployment, so the row is gated on that being present too. A machine that will never score a building must not be offered a task whose only possible outcome is that it found no executable - which would be discovered after the counties had been chosen and the imagery scoped.</para>
@@ -75,16 +75,19 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 List<IVisualBackgroundTask>? visualBackgroundTasks_Client = Create.VisualBackgroundTasks(null, null, gISWebAPIManager, Mode.Client, path_ConsoleApp);
                 Assert.NotNull(visualBackgroundTasks_Client);
                 Assert.Contains(visualBackgroundTasks_Client, x => x.TypeName == typeof(UIYearBuiltPredictionsTask).Name);
+                Assert.Contains(visualBackgroundTasks_Client, x => x.TypeName == typeof(UIYOLOTrainingTask).Name);
 
                 // The server tab holds the tasks driven by a PostgreSQL converter; this one is not among them.
                 List<IVisualBackgroundTask>? visualBackgroundTasks_Server = Create.VisualBackgroundTasks(new GISPostgreSQLConverterManager(), null, gISWebAPIManager, Mode.Server, path_ConsoleApp);
                 Assert.NotNull(visualBackgroundTasks_Server);
                 Assert.DoesNotContain(visualBackgroundTasks_Server, x => x.TypeName == typeof(UIYearBuiltPredictionsTask).Name);
+                Assert.DoesNotContain(visualBackgroundTasks_Server, x => x.TypeName == typeof(UIYOLOTrainingTask).Name);
 
                 // Without a manager there is nothing to read the counties with, so the row must not be offered at all.
                 List<IVisualBackgroundTask>? visualBackgroundTasks_NoManager = Create.VisualBackgroundTasks(new GISPostgreSQLConverterManager(), null, null, Mode.ServerAndCient, path_ConsoleApp);
                 Assert.NotNull(visualBackgroundTasks_NoManager);
                 Assert.DoesNotContain(visualBackgroundTasks_NoManager, x => x.TypeName == typeof(UIYearBuiltPredictionsTask).Name);
+                Assert.DoesNotContain(visualBackgroundTasks_NoManager, x => x.TypeName == typeof(UIYOLOTrainingTask).Name);
             }
             finally
             {
@@ -101,6 +104,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
             List<IVisualBackgroundTask>? visualBackgroundTasks_NoRunner = Create.VisualBackgroundTasks(null, null, gISWebAPIManager, Mode.Client, path_Absent);
             Assert.NotNull(visualBackgroundTasks_NoRunner);
             Assert.DoesNotContain(visualBackgroundTasks_NoRunner, x => x.TypeName == typeof(UIYearBuiltPredictionsTask).Name);
+            Assert.DoesNotContain(visualBackgroundTasks_NoRunner, x => x.TypeName == typeof(UIYOLOTrainingTask).Name);
 
             // The rest of the client list is unaffected by the runner being absent
             Assert.NotEmpty(visualBackgroundTasks_NoRunner);
