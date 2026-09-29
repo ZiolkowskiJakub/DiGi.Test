@@ -1,4 +1,4 @@
-﻿using DiGi.YOLO;
+using DiGi.YOLO;
 using System.IO;
 
 namespace DiGi.YOLO.xUnit
@@ -63,9 +63,11 @@ namespace DiGi.YOLO.xUnit
                 Assert.Contains("warnings.append", checkContent);
                 Assert.Contains("\"warnings\": warnings", checkContent);
 
-                //The detector is frozen, so ultralytics is pinned to the version the checkpoint records as having written it
+                //The detector is frozen, so ultralytics is pinned exactly: 8.4.165 was adopted in ZiolkowskiJakub/DiGi.YOLO#17
+                //only after reproducing the 8.3.130 checkpoint's detections on 1000 held images, and a different ultralytics
+                //can be a different detector
                 string requirementsContent = File.ReadAllText(requirementsPath);
-                Assert.Contains("ultralytics==8.3.130", requirementsContent);
+                Assert.Contains("ultralytics==8.4.165", requirementsContent);
                 Assert.Contains("torch", requirementsContent);
                 Assert.Contains("onnx", requirementsContent);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace DiGi.YOLO.xUnit
 {
@@ -168,6 +169,187 @@ namespace DiGi.YOLO.xUnit
                 if (File.Exists(path_Model_Unreadable))
                 {
                     File.Delete(path_Model_Unreadable);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies that running the main (8.4.165) and the venv (8.3.130) environment one after the other in one working directory no longer prints a settings notice or rewrites the other's settings file.
+        /// <para>Both interpreters are machine specific, so their paths are read from a git-ignored conf (DiGi.YOLO_Preflight.conf) and the fact returns without asserting when that conf or either interpreter is absent. Before the YOLO_CONFIG_DIR isolation this fact failed with the reported symptom: a settings notice on stdout and the shared %APPDATA% settings file rewritten across every switch.</para>
+        /// </summary>
+        [Fact]
+        public void YOLOEnvironmentResult_SettingsIsolation()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            string? directory_UserFiles = Core.xUnit.Query.UserFilesDirectory(assembly);
+            if (string.IsNullOrWhiteSpace(directory_UserFiles))
+            {
+                return;
+            }
+
+            string path_Configuration = Path.Combine(directory_UserFiles!, "DiGi.YOLO_Preflight.conf");
+            if (!File.Exists(path_Configuration))
+            {
+                return;
+            }
+
+            Dictionary<string, string> settings = [];
+            foreach (string line in File.ReadAllLines(path_Configuration))
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                int index = line.IndexOf('=');
+                if (index <= 0)
+                {
+                    continue;
+                }
+
+                settings[line.Substring(0, index).Trim()] = line.Substring(index + 1).Trim();
+            }
+
+            settings.TryGetValue("PythonPath", out string? path_Python);
+            settings.TryGetValue("VenvPythonPath", out string? path_Python_Venv);
+
+            if (string.IsNullOrWhiteSpace(path_Python) || !File.Exists(path_Python) || string.IsNullOrWhiteSpace(path_Python_Venv) || !File.Exists(path_Python_Venv))
+            {
+                return;
+            }
+
+            const string directoryName_Config = Constants.DirectoryName.YoloConfig;
+
+            string workingDirectory = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Isolation_" + Path.GetRandomFileName());
+            string path_Check = Path.Combine(workingDirectory, "check.py");
+
+            List<List<string>> runs_Report = [];
+
+            static string Quoted(string? value)
+            {
+                return string.Concat("\"", value, "\"");
+            }
+
+            static string? Hash(string path)
+            {
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+
+                using FileStream stream = File.OpenRead(path);
+                return Convert.ToBase64String(SHA256.HashData(stream));
+            }
+
+            static bool IsSettingsNotice(string line)
+            {
+                return line.Contains("Ultralytics Settings") || line.Contains("Error reading from") || line.Contains("settings updated");
+            }
+
+            try
+            {
+                Directory.CreateDirectory(workingDirectory);
+                Assert.True(Modify.WriteScripts(workingDirectory));
+
+                string path_SharedSettings = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Ultralytics", "settings.json");
+                string? hash_Shared_Before = Hash(path_SharedSettings);
+
+                //The public API: one preflight run per environment, same working directory
+                Classes.YOLOEnvironmentResult result_Main = Query.YOLOEnvironmentResult(path_Python, null, workingDirectory);
+                Classes.YOLOEnvironmentResult result_Venv = Query.YOLOEnvironmentResult(path_Python_Venv, null, workingDirectory);
+
+                List<string> report_Preflight = ["Part A: preflight via Query.YOLOEnvironmentResult", string.Concat("main runnable ", result_Main.Runnable.ToString()), string.Concat("venv runnable ", result_Venv.Runnable.ToString())];
+                if (result_Main.Messages != null)
+                {
+                    report_Preflight.AddRange(result_Main.Messages);
+                }
+
+                if (result_Venv.Messages != null)
+                {
+                    report_Preflight.AddRange(result_Venv.Messages);
+                }
+
+                runs_Report.Add(report_Preflight);
+
+                Assert.True(result_Main.Runnable);
+                Assert.True(result_Venv.Runnable);
+
+                //Each environment keeps its own settings file under the working directory: the venv writes <config>\\settings.json, the main environment <config>\\Ultralytics\\settings.json
+                string path_Config = Path.Combine(workingDirectory, directoryName_Config);
+                string path_Settings_Venv = Path.Combine(path_Config, "settings.json");
+                string path_Settings_Main = Path.Combine(path_Config, "Ultralytics", "settings.json");
+
+                Assert.True(File.Exists(path_Settings_Venv), "The 8.3.130 settings file is missing from the isolated working directory.");
+                Assert.True(File.Exists(path_Settings_Main), "The 8.4.165 settings file is missing from the isolated working directory.");
+
+                //The shared machine-wide settings file is never touched by a run
+                Assert.Equal(hash_Shared_Before, Hash(path_SharedSettings));
+
+                //Steady state: the exact process launch the runners perform - including the isolated settings directory - must print no settings notice, carry the marker-framed payload, and leave both files untouched
+                Dictionary<string, string> environmentVariables = Query.ConfigEnvironmentVariables(workingDirectory);
+
+                (int exitCode, List<string> standardOutput, List<string> standardError)[] runs =
+                [
+                    Query.ExecuteProcess(path_Python, Quoted(path_Check), workingDirectory, environmentVariables),
+                    Query.ExecuteProcess(path_Python_Venv, Quoted(path_Check), workingDirectory, environmentVariables),
+                    Query.ExecuteProcess(path_Python, Quoted(path_Check), workingDirectory, environmentVariables),
+                    Query.ExecuteProcess(path_Python_Venv, Quoted(path_Check), workingDirectory, environmentVariables)
+                ];
+
+                string? hash_Venv_Before = Hash(path_Settings_Venv);
+                string? hash_Main_Before = Hash(path_Settings_Main);
+                string[] interpreters = [path_Python, path_Python_Venv, path_Python, path_Python_Venv];
+
+                for (int i = 0; i < runs.Length; i++)
+                {
+                    (int exitCode, List<string> standardOutput, List<string> standardError) run = runs[i];
+
+                    List<string> report_Run = [string.Concat("Part B run ", i + 1, ": ", interpreters[i]), string.Concat("exit code ", run.exitCode.ToString()), "--stdout--"];
+                    report_Run.AddRange(run.standardOutput);
+                    report_Run.Add("--stderr--");
+                    report_Run.AddRange(run.standardError);
+                    runs_Report.Add(report_Run);
+
+                    Assert.Equal(0, run.exitCode);
+
+                    foreach (string line in run.standardOutput)
+                    {
+                        Assert.False(IsSettingsNotice(line), string.Concat("Settings notice on stdout: ", line));
+                    }
+
+                    string? line_Json = Query.CheckJsonLine(run.standardOutput);
+                    Assert.False(string.IsNullOrWhiteSpace(line_Json), "check.py printed no marker-framed JSON payload.");
+
+                    System.Text.Json.Nodes.JsonNode? jsonNode = System.Text.Json.Nodes.JsonNode.Parse(line_Json!);
+                    Assert.True(jsonNode?["runnable"]?.GetValue<bool>() == true, "The check.py payload does not report a runnable environment.");
+
+                    Assert.Equal(hash_Venv_Before, Hash(path_Settings_Venv));
+                    Assert.Equal(hash_Main_Before, Hash(path_Settings_Main));
+                }
+            }
+            catch (Exception)
+            {
+                string? directory_Reports = Core.xUnit.Query.ReportsDirectory(assembly);
+                if (!string.IsNullOrWhiteSpace(directory_Reports))
+                {
+                    List<string> reportLines = ["YOLOEnvironmentResult_SettingsIsolation failure report", DateTimeOffset.Now.ToString("O"), string.Empty];
+                    foreach (List<string> lines in runs_Report)
+                    {
+                        reportLines.AddRange(lines);
+                        reportLines.Add(string.Empty);
+                    }
+
+                    File.WriteAllLines(Path.Combine(directory_Reports!, "YOLOEnvironmentResult_SettingsIsolation_" + DateTimeOffset.Now.ToString("yyyyMMdd_HHmmss") + ".txt"), reportLines);
+                }
+
+                throw;
+            }
+            finally
+            {
+                if (Directory.Exists(workingDirectory))
+                {
+                    Directory.Delete(workingDirectory, true);
                 }
             }
         }

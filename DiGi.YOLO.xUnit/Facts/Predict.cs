@@ -336,6 +336,45 @@ namespace DiGi.YOLO.xUnit
         }
 
         /// <summary>
+        /// Verifies that a run reaching process start isolates the ultralytics settings in the working directory's .yolo-config folder.
+        /// <para>The interpreter path is deliberately nonsense so the process cannot run; the folder is created by the runner before the start is attempted, which is what the assertion needs.</para>
+        /// </summary>
+        [Fact]
+        public void Predict_ConfigDirectory()
+        {
+            string directory = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Test_" + Path.GetRandomFileName());
+
+            try
+            {
+                Directory.CreateDirectory(directory);
+
+                string sourceDirectory = Path.Combine(directory, "input");
+                Directory.CreateDirectory(sourceDirectory);
+                File.WriteAllBytes(Path.Combine(sourceDirectory, "0207_2021.jpeg"), [0xFF, 0xD8, 0xFF, 0xD9]);
+
+                Classes.YOLOPredictionOptions yOLOPredictionOptions = new()
+                {
+                    ModelPath = Path.Combine(directory, "best.pt"),
+                    OutputPath = Path.Combine(directory, "output", "results.bbrf"),
+                    PythonPath = Path.Combine(directory, "no_such_interpreter.exe"),
+                    SourceDirectory = sourceDirectory,
+                    WorkingDirectory = directory
+                };
+
+                Modify.Predict(yOLOPredictionOptions);
+
+                Assert.True(Directory.Exists(Path.Combine(directory, Constants.DirectoryName.YoloConfig)));
+            }
+            finally
+            {
+                if (Directory.Exists(directory))
+                {
+                    Directory.Delete(directory, true);
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the first interpreter on PATH that actually starts, or <c>null</c> when none does.
         /// <para>A path that exists is not enough: with no Python installed, Windows still puts the App Installer redirector (a Microsoft Store app execution alias) on PATH as python.exe, which exits non-zero without running anything.</para>
         /// </summary>
