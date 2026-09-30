@@ -172,6 +172,68 @@ namespace DiGi.YOLO.ONNX.xUnit
         }
 
         /// <summary>
+        /// Verifies that a single undecodable image is reported and skipped rather than aborting the run, so one bad file among many no longer discards the whole directory's result.
+        /// <para>Emgu 4.12's Imread throws instead of returning an empty Mat when a file will not decode - a truncated image raises ArgumentException and a 0-byte file raises CvException - so without handling both the exception escapes the per-image loop, the run is marked failed, and the half-written result file is deleted. The three images use one extension each so the listing order is fixed by the *.jpg / *.jpeg / *.png glob, and the valid one is black so it scores to a name-only line like the undecodable ones.</para>
+        /// </summary>
+        [Fact]
+        public void Predict_UndecodableImage()
+        {
+            string? path_Model = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YOLO_Raw.onnx");
+            Assert.True(File.Exists(path_Model), "YOLO_Raw.onnx");
+
+            string directory = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_ONNX_Test_" + Path.GetRandomFileName());
+
+            try
+            {
+                string directory_Source = Path.Combine(directory, "input");
+                Directory.CreateDirectory(directory_Source);
+
+                //One image per extension, so the listing order is fixed by the glob: the truncated image, the valid black image, the 0-byte file
+                File.WriteAllBytes(Path.Combine(directory_Source, "undecodable_4byte.jpg"), [0xFF, 0xD8, 0xFF, 0xD9]);
+
+                using (Mat mat = new(32, 32, DepthType.Cv8U, 3))
+                {
+                    mat.SetTo(new MCvScalar(0, 0, 0));
+                    CvInvoke.Imwrite(Path.Combine(directory_Source, "0207_2021.jpeg"), mat);
+                }
+
+                File.WriteAllBytes(Path.Combine(directory_Source, "undecodable_0byte.png"), []);
+
+                string path_Output = Path.Combine(directory, "output", "results.bbrf");
+                Directory.CreateDirectory(Path.GetDirectoryName(path_Output)!);
+                File.WriteAllText(path_Output, "0000_1900\t0\t1\t2\t3\t4\t0.5");
+
+                Classes.YOLOONNXPredictionOptions yOLOONNXPredictionOptions = new()
+                {
+                    ModelPath = path_Model,
+                    OutputPath = path_Output,
+                    SourceDirectory = directory_Source
+                };
+
+                Classes.YOLOONNXPredictionResult? yOLOONNXPredictionResult = Modify.Predict(yOLOONNXPredictionOptions);
+
+                Assert.NotNull(yOLOONNXPredictionResult);
+                Assert.True(yOLOONNXPredictionResult!.Succeeded, string.Join(" | ", yOLOONNXPredictionResult.Messages ?? []));
+
+                string[] values_Expected = ["undecodable_4byte", "0207_2021", "undecodable_0byte"];
+                Assert.Equal(values_Expected, yOLOONNXPredictionResult.Values);
+
+                Assert.Contains(yOLOONNXPredictionResult.Messages!, x => x.Contains("Image could not be decoded") && x.Contains("undecodable_4byte.jpg"));
+                Assert.Contains(yOLOONNXPredictionResult.Messages!, x => x.Contains("Image could not be decoded") && x.Contains("undecodable_0byte.png"));
+
+                //A run that got this far must have written its result file, not deleted it
+                Assert.True(File.Exists(path_Output));
+            }
+            finally
+            {
+                if (Directory.Exists(directory))
+                {
+                    Directory.Delete(directory, true);
+                }
+            }
+        }
+
+        /// <summary>
         /// Runs <see cref="Modify.Predict(Classes.YOLOONNXPredictionOptions, System.Threading.CancellationToken)"/> with one of the shared ONNX fixtures on one black image, over a result file left by an earlier run.
         /// </summary>
         /// <param name="fileName">The fixture's file name in the shared test data folder.</param>
