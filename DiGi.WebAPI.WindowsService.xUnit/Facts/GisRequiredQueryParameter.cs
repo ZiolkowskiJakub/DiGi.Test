@@ -125,7 +125,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.Null(GisDocument_Minimum(openApiOperation_Gaps, "commandtimeout"));
 
             OpenApiOperation openApiOperation_Densities = GisDocument_Operation(openApiDocument, "/gis/terrain/densitiesbycountyids", HttpMethod.Get);
-            Assert.Equal("0", GisDocument_Minimum(openApiOperation_Densities, "gridsize"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_Densities, "gridsize"));
             Assert.Equal("0", GisDocument_ExclusiveMinimum(openApiOperation_Densities, "gridsize"));
             Assert.Null(GisDocument_Minimum(openApiOperation_Densities, "commandtimeout"));
 
