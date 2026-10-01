@@ -106,6 +106,36 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Directory.CreateDirectory(Path.Combine(directory_Runs, "train9"));
                 Assert.Contains(nameof(Classes.YOLOTrainingRunOptions.RunName), (await RunAsync(Options("train9", directory_Runs, path_Python, path_Start))).FailedStepNames);
 
+                // A resume requires the training step and refuses a dataset rebuild, before any process starts.
+                Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_ResumeNoTrain = Options("resume9", directory_Runs, path_Python, path_Start);
+                yOLOTrainingRunOptions_ResumeNoTrain.ResumeTraining = true;
+                yOLOTrainingRunOptions_ResumeNoTrain.Steps = [YOLOTrainingStep.Validate];
+                Assert.Contains(nameof(Classes.YOLOTrainingRunOptions.ResumeTraining), (await RunAsync(yOLOTrainingRunOptions_ResumeNoTrain)).FailedStepNames);
+
+                Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_ResumeDataset = Options("resume9", directory_Runs, path_Python, path_Start);
+                yOLOTrainingRunOptions_ResumeDataset.ResumeTraining = true;
+                yOLOTrainingRunOptions_ResumeDataset.Steps = [YOLOTrainingStep.Train, YOLOTrainingStep.Dataset];
+                Assert.Contains(nameof(Classes.YOLOTrainingRunOptions.ResumeTraining), (await RunAsync(yOLOTrainingRunOptions_ResumeDataset)).FailedStepNames);
+
+                // Nothing to resume: no folder at all, and a folder with no weights\last.pt.
+                Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_ResumeMissing = Options("missingresume", directory_Runs, path_Python, null);
+                yOLOTrainingRunOptions_ResumeMissing.ResumeTraining = true;
+                Classes.YOLOTrainingRunResult yOLOTrainingRunResult_ResumeMissing = await RunAsync(yOLOTrainingRunOptions_ResumeMissing);
+                Assert.Contains(nameof(Classes.YOLOTrainingRunOptions.ResumeTraining), yOLOTrainingRunResult_ResumeMissing.FailedStepNames);
+                Assert.Equal(Enums.YearBuiltPredictionExitCode.Configuration, Query.YOLOTrainingRunExitCode(yOLOTrainingRunResult_ResumeMissing));
+
+                Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_ResumeEmpty = Options("emptyresume", directory_Runs, path_Python, null);
+                yOLOTrainingRunOptions_ResumeEmpty.ResumeTraining = true;
+                Directory.CreateDirectory(Path.Combine(directory_Runs, "emptyresume"));
+                Assert.Contains(nameof(Classes.YOLOTrainingRunOptions.ResumeTraining), (await RunAsync(yOLOTrainingRunOptions_ResumeEmpty)).FailedStepNames);
+
+                // A completed run is not resumed: the run's own weights file marks it finished.
+                Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_ResumeCompleted = Options("completedresume", directory_Runs, path_Python, null);
+                yOLOTrainingRunOptions_ResumeCompleted.ResumeTraining = true;
+                Directory.CreateDirectory(Path.Combine(directory_Runs, "completedresume"));
+                File.WriteAllText(Path.Combine(directory_Runs, "completedresume", "completedresume.pt"), "completed");
+                Assert.Contains(nameof(Classes.YOLOTrainingRunOptions.RunName), (await RunAsync(yOLOTrainingRunOptions_ResumeCompleted)).FailedStepNames);
+
                 // The start weights are hashed and reported under their full path.
                 Classes.YOLOTrainingRunResult yOLOTrainingRunResult_Identity = await RunAsync(Options("train9", directory_Runs, Path.Combine(directory, "nope", "python.exe"), path_Start));
                 Assert.Equal(path_Start, yOLOTrainingRunResult_Identity.StartWeightsPath);

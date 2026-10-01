@@ -18,7 +18,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             Classes.YOLODetectorEvaluation yOLODetectorEvaluation = new(@"C:\YOLO\runs\train9_fresh\train9_fresh.pt", new string('b', 64), Enums.YOLODetectorEvaluationSubset.Clean, 120, 1.5, 2.25, 0.4);
 
-            Classes.YOLOTrainingRunResult yOLOTrainingRunResult = new("train9_fresh", @"C:\YOLO\models\model.pt", new string('a', 64), @"C:\YOLO\runs\train9_fresh\train9_fresh.pt", new string('b', 64), 0.75, 0.5, [yOLODetectorEvaluation], false, ["YOLOTrainingStep.Validate"], ["a note"], start, end);
+            Classes.YOLOTrainingRunResult yOLOTrainingRunResult = new("train9_fresh", @"C:\YOLO\models\model.pt", new string('a', 64), @"C:\YOLO\runs\train9_fresh\train9_fresh.pt", new string('b', 64), 0.75, 0.5, [yOLODetectorEvaluation], false, ["YOLOTrainingStep.Validate"], ["a note"], start, end, true, 7);
 
             void AssertMembers(Classes.YOLOTrainingRunResult? yOLOTrainingRunResult_Actual)
             {
@@ -31,6 +31,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Assert.Equal(0.75, yOLOTrainingRunResult_Actual.MAP50);
                 Assert.Equal(0.5, yOLOTrainingRunResult_Actual.MAP50_95);
                 Assert.False(yOLOTrainingRunResult_Actual.Cancelled);
+                Assert.True(yOLOTrainingRunResult_Actual.Resumed);
+                Assert.Equal(7, yOLOTrainingRunResult_Actual.ResumedFromEpoch);
                 Assert.Equal(["YOLOTrainingStep.Validate"], yOLOTrainingRunResult_Actual.FailedStepNames);
                 Assert.Equal(["a note"], yOLOTrainingRunResult_Actual.Messages);
                 Assert.Equal(start, yOLOTrainingRunResult_Actual.Start);

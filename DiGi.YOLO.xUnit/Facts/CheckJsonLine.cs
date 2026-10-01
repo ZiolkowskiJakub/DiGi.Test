@@ -43,6 +43,22 @@ namespace DiGi.YOLO.xUnit
             ];
 
             Assert.Null(Query.CheckJsonLine(standardOutput_NoMarkers));
+
+            //The same contract serves checkpoint.py through its own marker pair
+            string payload_Checkpoint = "{\"readable\": true, \"epoch\": 0, \"finished\": false}";
+
+            List<string> standardOutput_Checkpoint =
+            [
+                "Ultralytics 8.4.165 Python-3.13.14 torch-2.7.0+cu128 CUDA:0",
+                Constants.Marker.CheckpointJsonBegin,
+                payload_Checkpoint,
+                Constants.Marker.CheckpointJsonEnd
+            ];
+
+            Assert.Equal(payload_Checkpoint, Query.CheckJsonLine(standardOutput_Checkpoint, Constants.Marker.CheckpointJsonBegin, Constants.Marker.CheckpointJsonEnd));
+
+            //The check.py markers must not find the checkpoint payload
+            Assert.Null(Query.CheckJsonLine(standardOutput_Checkpoint));
         }
     }
 }

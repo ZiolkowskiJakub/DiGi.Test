@@ -33,11 +33,13 @@ namespace DiGi.YOLO.xUnit
                 {
                     CultureInfo.CurrentCulture = new CultureInfo(name);
 
-                    (string? weightsPath, long? bytes, string? sHA256, bool? amp) = Query.YOLOTrainingOutput(standardOutput);
+                    (string? weightsPath, long? bytes, string? sHA256, bool? amp, int? resumedFromEpoch, int? resumedEpochs) = Query.YOLOTrainingOutput(standardOutput);
                     Assert.Equal(@"C:\YOLO\runs\detect\train9 fresh\weights\best.pt", weightsPath);
                     Assert.Equal(118311525, bytes);
                     Assert.Equal("a9d76b442833f35a6bd38bdd4937a40209e40ecbae32121088f2e26eca10deb5", sHA256);
                     Assert.True(amp);
+                    Assert.Null(resumedFromEpoch);
+                    Assert.Null(resumedEpochs);
                 }
             }
             finally
@@ -46,14 +48,35 @@ namespace DiGi.YOLO.xUnit
             }
 
             //A run that failed prints no success block; the start model SHA256 line must not be read as the output digest
-            (string? weightsPath_Failed, long? bytes_Failed, string? sHA256_Failed, bool? amp_Failed) = Query.YOLOTrainingOutput(standardOutput.GetRange(0, 5));
+            (string? weightsPath_Failed, long? bytes_Failed, string? sHA256_Failed, bool? amp_Failed, int? resumedFromEpoch_Failed, int? resumedEpochs_Failed) = Query.YOLOTrainingOutput(standardOutput.GetRange(0, 5));
             Assert.Null(weightsPath_Failed);
             Assert.Null(bytes_Failed);
             Assert.Null(sHA256_Failed);
             Assert.Null(amp_Failed);
+            Assert.Null(resumedFromEpoch_Failed);
+            Assert.Null(resumedEpochs_Failed);
+
+            //A resumed run repeats its resume lines in the success block; "Resume epoch:" must not swallow the plural "Resume epochs:"
+            List<string> standardOutput_Resume =
+            [
+                @"Start model: C:\YOLO\runs\detect\train9\weights\last.pt",
+                "Start model kind: resume",
+                "Resume epoch: 2",
+                "Resume epochs: 6",
+                @"Weights: C:\YOLO\runs\detect\train9\weights\best.pt",
+                "Bytes: 118311525",
+                "SHA256: a9d76b442833f35a6bd38bdd4937a40209e40ecbae32121088f2e26eca10deb5",
+                "AMP: True",
+                "Resume epoch: 2",
+                "Resume epochs: 6"
+            ];
+
+            (_, _, _, _, int? resumedFromEpoch_Resume, int? resumedEpochs_Resume) = Query.YOLOTrainingOutput(standardOutput_Resume);
+            Assert.Equal(2, resumedFromEpoch_Resume);
+            Assert.Equal(6, resumedEpochs_Resume);
 
             //A grouped or truncated number is rejected rather than misread
-            (_, long? bytes_Grouped, string? sHA256_Short, _) = Query.YOLOTrainingOutput(["Bytes: 118 311 525", "SHA256: a9d7"]);
+            (_, long? bytes_Grouped, string? sHA256_Short, _, _, _) = Query.YOLOTrainingOutput(["Bytes: 118 311 525", "SHA256: a9d7"]);
             Assert.Null(bytes_Grouped);
             Assert.Null(sHA256_Short);
 

@@ -34,6 +34,8 @@ namespace DiGi.YOLO.xUnit
             Assert.True(yOLOTrainingResult.Amp);
             Assert.Null(yOLOTrainingResult.StandardError);
             Assert.Equal(TimeSpan.FromHours(5), yOLOTrainingResult.Duration);
+            Assert.False(yOLOTrainingResult.Resumed);
+            Assert.Null(yOLOTrainingResult.ResumedFromEpoch);
 
             string? json = Core.Convert.ToSystem_String(yOLOTrainingResult);
             Classes.YOLOTrainingResult? yOLOTrainingResult_Actual = Core.Convert.ToDiGi<Classes.YOLOTrainingResult>(json)?.FirstOrDefault();
@@ -45,6 +47,21 @@ namespace DiGi.YOLO.xUnit
             Assert.Equal(start, yOLOTrainingResult_Actual.Start);
 
             Core.xUnit.Query.SerializationCheck(yOLOTrainingResult);
+
+            //A resume keeps the epoch it entered and the flag through the round trip and the clone
+            Classes.YOLOTrainingResult yOLOTrainingResult_Resumed = new(0, @"C:\YOLO\runs\detect\train9\weights\last.pt", "9fdd44a31c504547ffb81d2c6d9e6dac3493c8eaa8b0398d3f43bae6c7003e92", Enums.ModelKind.Checkpoint, @"C:\YOLO\runs\detect\train9\weights\best.pt", 118311525, "a9d76b442833f35a6bd38bdd4937a40209e40ecbae32121088f2e26eca10deb5", true, null, null, start, end, true, 2);
+
+            Assert.True(yOLOTrainingResult_Resumed.Succeeded);
+            Assert.True(yOLOTrainingResult_Resumed.Resumed);
+            Assert.Equal(2, yOLOTrainingResult_Resumed.ResumedFromEpoch);
+
+            string? json_Resumed = Core.Convert.ToSystem_String(yOLOTrainingResult_Resumed);
+            Classes.YOLOTrainingResult? yOLOTrainingResult_ResumedActual = Core.Convert.ToDiGi<Classes.YOLOTrainingResult>(json_Resumed)?.FirstOrDefault();
+            Assert.NotNull(yOLOTrainingResult_ResumedActual);
+            Assert.True(yOLOTrainingResult_ResumedActual!.Resumed);
+            Assert.Equal(2, yOLOTrainingResult_ResumedActual.ResumedFromEpoch);
+
+            Core.xUnit.Query.SerializationCheck(yOLOTrainingResult_Resumed);
 
             //A run that wrote weights whose digest could not be confirmed does not succeed
             Classes.YOLOTrainingResult yOLOTrainingResult_Unconfirmed = new(0, null, null, Enums.ModelKind.Definition, @"C:\best.pt", 10, null, null, null, ["mismatch"], start, end);
