@@ -43,10 +43,15 @@
   <!-- The host reaches DiGi.Core, DiGi.Serilog and DiGi.WebAPI by HintPath, which does not carry the reference
        onward. The remaining entries name the payload types whose schemas the facts generate: IPolygonal2D
        (DiGi.Geometry), AdministrativeAreal2DReference (DiGi.GIS.PostgreSQL), UpdateItemsResult (DiGi.GIS.WebAPI),
-       EPWFile and DataRecord (DiGi.EPW) and WeatherRecord (DiGi.Weather). -->
+       EPWFile and DataRecord (DiGi.EPW), WeatherRecord (DiGi.Weather), and the table wire-format facts' Core.IO
+       Table/Column/Row beside the PostgreSQL Column its schema-id collision is guarded against
+       (TableWireFormatSchemaFilter, DiGi.GIS.WebAPI#44). -->
   <ItemGroup>
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Core.IO">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.IO.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.EPW">
       <HintPath>..\..\DiGi.EPW\bin\DiGi.EPW.dll</HintPath>
@@ -59,6 +64,9 @@
     </Reference>
     <Reference Include="DiGi.GIS.WebAPI">
       <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.PostgreSQL.Table">
+      <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.Table.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Serilog">
       <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
