@@ -6,7 +6,7 @@ namespace DiGi.Geometry.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Query.On(IReadOnlyList{Point2D}, Point2D, bool, double)"/> answers exactly what the segment path answers over <see cref="Create.Segment2Ds(IEnumerable{Point2D}, bool)"/> of the same ring - inside, outside, on an edge within and beyond the tolerance, on a vertex and on the closing edge - so that the allocation-free path of <see cref="Polygon2D.On(Point2D, double)"/> is a pure speed-up (ZiolkowskiJakub/DiGi.Geometry#5).
+        /// Verifies that <see cref="Query.On(IReadOnlyList{Point2D}, Point2D, bool, double)"/> answers exactly what the segment path answers over <see cref="Create.Segment2Ds(IEnumerable{Point2D}, bool)"/> of the same ring - inside, outside, on an edge within and beyond the tolerance, on a vertex and on the closing edge - so that the allocation-free path of <see cref="Polygon2D"/>'s inherited <see cref="Segmentable2D.On(Point2D, double)"/> is a pure speed-up (ZiolkowskiJakub/DiGi.Geometry#5).
         /// </summary>
         [Fact]
         public void On_Points_MatchesSegmentPath()

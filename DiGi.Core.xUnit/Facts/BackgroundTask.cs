@@ -304,10 +304,9 @@ namespace DiGi.Core.xUnit
             // Stop the task (this requests cancellation and awaits task completion)
             await task.StopAsync();
 
-            // Since production code's StopAsync calls Cleanup() which sets the Task reference to null,
-            // IsCompleted returns false (as Task is null), IsRunning is false, and Status resets to Idle.
+            // A stopped run reports Canceled until the next Start (DiGi.Core#9).
             Assert.False(task.IsRunning);
-            Assert.Equal(CancelableBackgroundTaskStatus.Idle, task.CancelableBackgroundTaskStatus);
+            Assert.Equal(CancelableBackgroundTaskStatus.Canceled, task.CancelableBackgroundTaskStatus);
             Assert.True(canceledFired);
         }
 
