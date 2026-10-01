@@ -136,18 +136,27 @@ namespace DiGi.WebAPI.WindowsService.xUnit
 
             OpenApiSchema? openApiSchema_Health = openApiSchema.Properties[nameof(SerializableObjectFixture.Health)] as OpenApiSchema;
             Assert.NotNull(openApiSchema_Health);
-            Assert.NotNull(openApiSchema_Health.AllOf);
-            OpenApiSchemaReference? openApiSchemaReference = Assert.Single(openApiSchema_Health.AllOf) as OpenApiSchemaReference;
+            Assert.NotNull(openApiSchema_Health.AnyOf);
+            Assert.Equal(2, openApiSchema_Health.AnyOf.Count);
+            
+            // First item should be the reference to ServiceHealthInformation
+            OpenApiSchemaReference? openApiSchemaReference = openApiSchema_Health.AnyOf[0] as OpenApiSchemaReference;
             Assert.NotNull(openApiSchemaReference);
             Assert.Equal(nameof(ServiceHealthInformation), openApiSchemaReference.Reference.Id);
+            
+            // Second item should be a schema that allows null
+            OpenApiSchema? openApiSchema_Null = openApiSchema_Health.AnyOf[1] as OpenApiSchema;
+            Assert.NotNull(openApiSchema_Null);
+            Assert.Equal(JsonSchemaType.Null, openApiSchema_Null.Type);
 
             StringWriter stringWriter = new();
             openApiSchema_Health.SerializeAsV3(new OpenApiJsonWriter(stringWriter));
             JsonObject? jsonObject_Health = JsonNode.Parse(stringWriter.ToString()) as JsonObject;
             Assert.NotNull(jsonObject_Health);
-            Assert.True(jsonObject_Health["nullable"]?.GetValue<bool>());
-            Assert.NotNull(jsonObject_Health["allOf"]);
-            Assert.False(jsonObject_Health.ContainsKey("type"), stringWriter.ToString());
+            Assert.False(jsonObject_Health.ContainsKey("nullable"));
+            Assert.NotNull(jsonObject_Health["anyOf"]);
+            Assert.False(jsonObject_Health.ContainsKey("allOf"));
+            Assert.False(jsonObject_Health.ContainsKey("type"));
         }
 
         /// <summary>
