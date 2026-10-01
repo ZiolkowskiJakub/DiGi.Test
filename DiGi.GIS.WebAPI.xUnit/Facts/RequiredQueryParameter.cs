@@ -140,6 +140,137 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.Equal(2 * Constants.Terrain.MaximumRadius, System.Convert.ToDouble(rangeAttribute_Diameter.Maximum));
         }
 
+        /// <summary>
+        /// Asserts every genuinely mandatory query parameter on the endpoints hidden from the OpenAPI document (those inheriting <c>IgnoreApi = true</c>) carries <see cref="BindRequiredAttribute"/>.
+        /// <para>The attribute is invisible in the document for these actions, so it is the reflection fact - not Swashbuckle - that keeps the requirement declared. The case that used to answer with the wrong scope is the non-nullable coordinate: an omitted <c>x</c> or <c>y</c> binds <c>0.0</c>, which passes an <c>IsNaN</c> guard and runs the query at the origin. The key-gated write selectors are included because the action already rejects a missing one with 400, so the attribute only moves that decision ahead of the authorization check.</para>
+        /// </summary>
+        [Fact]
+        public void GisControllers_HiddenMandatoryQueryParameters_AreBindRequired()
+        {
+            (Type Type, string Method, string Parameter)[] parameters =
+            [
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemByCodeAsync), "code"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemByIdAsync), "id"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByAdministrativeArealTypeAsync), "administrativeArealType"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByBoundingBoxAsync), "x_1"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByBoundingBoxAsync), "y_1"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByBoundingBoxAsync), "x_2"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByBoundingBoxAsync), "y_2"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync), "x"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync), "y"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCodeAsync), "code"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByPointAsync), "x"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByPointAsync), "y"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByIdAsync), "id"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByPointAsync), "x"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByPointAsync), "y"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByReferenceAsync), "reference"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByBoundingBoxAsync), "x_1"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByBoundingBoxAsync), "y_1"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByBoundingBoxAsync), "x_2"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByBoundingBoxAsync), "y_2"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCircleAsync), "x"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCircleAsync), "y"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCountyIdAsync), "countyId"),
+                (typeof(HeatTransferCoefficientController), nameof(HeatTransferCoefficientController.GetRegulatedHeatTransferCoefficientsByYearAsync), "year"),
+                (typeof(OccupancyDataController), nameof(OccupancyDataController.GetAdministrativeAreal2DItemsByReferenceAsync), "reference"),
+                (typeof(OccupancyDataController), nameof(OccupancyDataController.GetBuilding2DItemsByReferenceAsync), "reference"),
+                (typeof(YearBuiltDataController), nameof(YearBuiltDataController.GetItemsByReferenceAsync), "reference"),
+                (typeof(BuildingController), nameof(BuildingController.UpdateItemsAsync), "code"),
+                (typeof(BuildingController), nameof(BuildingController.UpdateItemsByCountyIdsAsync), "countyIds"),
+                (typeof(Building2DController), nameof(Building2DController.UpdateItemsByCountyIdsAsync), "countyIds"),
+                (typeof(BuildingModelController), nameof(BuildingModelController.UpdateItemsAsync), "code"),
+                (typeof(BuildingModelController), nameof(BuildingModelController.UpdateItemsByCountyIdsAsync), "countyIds"),
+                (typeof(OccupancyDataController), nameof(OccupancyDataController.Building2DUpdateItemsAsync), "code"),
+                (typeof(OccupancyDataController), nameof(OccupancyDataController.Building2DUpdateItemsByCountyIdsAsync), "countyIds"),
+                (typeof(YearBuiltDataController), nameof(YearBuiltDataController.UpdateItemsAsync), "code"),
+                (typeof(YearBuiltDataController), nameof(YearBuiltDataController.UpdateItemsByCountyIdsAsync), "countyIds")
+            ];
+
+            Assert.NotEmpty(parameters);
+
+            foreach ((Type type, string method, string parameter) in parameters)
+            {
+                ParameterInfo parameterInfo = FindQueryParameter(type, method, parameter);
+
+                Assert.NotNull(parameterInfo.GetCustomAttribute<FromQueryAttribute>());
+                Assert.True(parameterInfo.GetCustomAttribute<BindRequiredAttribute>() is not null, $"Missing [BindRequired] on {type.Name}.{method}({parameter}).");
+            }
+        }
+
+        /// <summary>
+        /// Asserts the hidden endpoints' query parameters whose absence is meaningful stay optional, so the hidden set is pinned the way the document set is.
+        /// <para>Named explicitly rather than derived, because the classification is a per-endpoint decision: a type filter that means every type when omitted, the optional county the reference may be narrowed to, the circle tolerance, and the two write endpoints where <c>code</c> genuinely may be absent all look like a mandatory selector to a rule and are not.</para>
+        /// </summary>
+        [Fact]
+        public void GisControllers_HiddenOptionalQueryParameters_AreNotBindRequired()
+        {
+            (Type Type, string Method, string Parameter)[] parameters =
+            [
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemByCodeAsync), "administrativeArealType"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCodeAsync), "administrativeArealType"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByBoundingBoxAsync), "tolerance"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByBoundingBoxAsync), "administrativeArealType"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync), "radius"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync), "diameter"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync), "tolerance"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync), "administrativeArealType"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByPointAsync), "tolerance"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByPointAsync), "administrativeArealType"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByIdAsync), "countyId"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByPointAsync), "tolerance"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemByReferenceAsync), "countyId"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByBoundingBoxAsync), "tolerance"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCircleAsync), "radius"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCircleAsync), "diameter"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCircleAsync), "tolerance"),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByReferencesAsync), "countyId"),
+                (typeof(Building2DController), nameof(Building2DController.GetPoint2DsByReferencesAsync), "countyId"),
+                (typeof(Building2DController), nameof(Building2DController.UpdateItemAsync), "code"),
+                (typeof(Building2DController), nameof(Building2DController.UpdateItemAsync), "countyId"),
+                (typeof(Building2DController), nameof(Building2DController.UpdateItemsAsync), "code"),
+                (typeof(Building2DController), nameof(Building2DController.UpdateItemsByCountyIdsAsync), "code"),
+                (typeof(OccupancyDataController), nameof(OccupancyDataController.GetBuilding2DItemsByReferenceAsync), "countyId"),
+                (typeof(YearBuiltDataController), nameof(YearBuiltDataController.GetItemsByReferenceAsync), "countyId")
+            ];
+
+            Assert.NotEmpty(parameters);
+
+            foreach ((Type type, string method, string parameter) in parameters)
+            {
+                ParameterInfo parameterInfo = FindQueryParameter(type, method, parameter);
+
+                Assert.Null(parameterInfo.GetCustomAttribute<BindRequiredAttribute>());
+            }
+        }
+
+        /// <summary>
+        /// Asserts the two hidden circle endpoints carry the <see cref="Constants.Terrain.MaximumRadius"/> ceiling as a <see cref="RangeAttribute"/> maximum, mirroring the terrain mesh circle.
+        /// <para>Unlike the terrain action these endpoints do not enforce the cap in their own body - <c>[ApiController]</c> model-state validation is the enforcement - so the attribute is the cap rather than a description of one. Radius and diameter are both optional (either may be supplied) but each is bounded; the diameter uses twice the radius because it is halved before use.</para>
+        /// </summary>
+        [Fact]
+        public void GisControllers_HiddenCircleRadii_CarryMaximum()
+        {
+            (Type Type, string Method)[] actions =
+            [
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetItemsByCircleAsync)),
+                (typeof(Building2DController), nameof(Building2DController.GetItemsByCircleAsync))
+            ];
+
+            Assert.NotEmpty(actions);
+
+            foreach ((Type type, string method) in actions)
+            {
+                RangeAttribute? rangeAttribute_Radius = FindRange(type, method, "radius");
+                Assert.NotNull(rangeAttribute_Radius);
+                Assert.Equal(Constants.Terrain.MaximumRadius, System.Convert.ToDouble(rangeAttribute_Radius.Maximum));
+
+                RangeAttribute? rangeAttribute_Diameter = FindRange(type, method, "diameter");
+                Assert.NotNull(rangeAttribute_Diameter);
+                Assert.Equal(2 * Constants.Terrain.MaximumRadius, System.Convert.ToDouble(rangeAttribute_Diameter.Maximum));
+            }
+        }
+
         private static ParameterInfo FindQueryParameter(Type type, string method, string parameter)
         {
             MethodInfo? methodInfo = type.GetMethod(method, BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);

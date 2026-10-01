@@ -16,6 +16,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// <summary>
         /// Drives a real request through the host's MVC pipeline and asserts that an omitted mandatory query parameter answers HTTP 400 naming it, rather than silently binding <c>default(T)</c>.
         /// <para><c>[BindRequired]</c> is enforced by <c>ParameterBinder</c>, not by the attribute alone: Swashbuckle reads the attribute for the document, but only a request proves the runtime half. A non-nullable value type is the case that used to succeed with the wrong scope - a county id of 0 or a coordinate of 0 - so both an <c>int</c> and a <c>double</c> are asserted. The action is never reached: model state is invalidated before it runs, which is why the converters registered here are never used (ZiolkowskiJakub/DiGi.GIS.WebAPI#43).</para>
+        /// <para>The heat transfer action proves the same half for the hidden set. Its controller has a parameterless constructor, so no further service registration is needed, and its <c>year</c> is a <c>short</c> that previously bound <c>0</c> and reached the action, where <c>new DateTime(0, 1, 1)</c> threw - a hidden endpoint whose omitted mandatory parameter answered 500 rather than 400 (ZiolkowskiJakub/DiGi.GIS.WebAPI#45).</para>
         /// </summary>
         [Fact]
         public async Task GisControllers_OmittedMandatoryQueryParameter_Answers400()
@@ -42,6 +43,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
             await AssertBindRequired400(httpClient, "/gis/terrain/countbycountyid", "countyid");
             await AssertBindRequired400(httpClient, "/gis/terrain/mesh3dbycircle?y=1", "x");
+            await AssertBindRequired400(httpClient, "/gis/heattransfercoefficient/regulatedheattransfercoefficientsbyyear", "year");
         }
 
         private static async Task AssertBindRequired400(HttpClient httpClient, string requestUri, string parameterName)
