@@ -43,6 +43,127 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.False(GisDocument_Parameter(openApiOperation_ReferenceByCode, "administrativearealtype").Required);
         }
 
+        /// <summary>
+        /// Generates the gis document from the real controllers through the host's own Swagger configuration - with <c>ParameterMinimumSchemaFilter</c> registered the way the host discovers it for a loaded extension assembly - and asserts that a query parameter whose action guard already refuses a value below a floor carries that floor as <c>minimum</c>, with no <c>maximum</c>, and that a parameter without such a guard carries neither (ZiolkowskiJakub/DiGi.GIS.WebAPI#47).
+        /// <para>This is the served contract, not the attribute: the filter turns <c>[Minimum]</c> into <c>minimum</c> and <c>exclusiveMinimum</c> the way Swashbuckle turns <c>[Range]</c> into <c>maximum</c>, so a fact that only inspected the attributes would still pass if that mapping changed. The unguarded <c>commandtimeout</c> endpoints are asserted unbounded beside the guarded ones, so over-marking is caught beside under-marking.</para>
+        /// </summary>
+        [Fact]
+        public void GisDocument_FlooredQueryParameters()
+        {
+            OpenApiDocument openApiDocument = SchemaGeneratorFixture_Document(
+                [
+                    typeof(AdministrativeAreal2DController),
+                    typeof(BuildingController),
+                    typeof(Building2DController),
+                    typeof(BuildingDataController),
+                    typeof(BuildingModelController),
+                    typeof(OccupancyDataController),
+                    typeof(OrtoDatasController),
+                    typeof(TerrainController),
+                    typeof(YearBuiltDataController)
+                ],
+                types_SchemaFilter: [typeof(ParameterMinimumSchemaFilter)]);
+
+            // commandTimeout: floor 0 where the action guards it - and neither bound where it does not.
+            OpenApiOperation openApiOperation_BuildingCount = GisDocument_Operation(openApiDocument, "/gis/building/count", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_BuildingCount, "commandtimeout"));
+            Assert.Null(GisDocument_Maximum(openApiOperation_BuildingCount, "commandtimeout"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_BuildingCount, "countyid"));
+
+            OpenApiOperation openApiOperation_ReferencesByCountyId = GisDocument_Operation(openApiDocument, "/gis/building2d/referencesbycountyid", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_ReferencesByCountyId, "commandtimeout"));
+            Assert.Null(GisDocument_Maximum(openApiOperation_ReferencesByCountyId, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_BuildingDataCount = GisDocument_Operation(openApiDocument, "/gis/buildingdata/countbycountyid", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_BuildingDataCount, "commandtimeout"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_BuildingDataCount, "countyid"));
+
+            OpenApiOperation openApiOperation_BuildingModelCount = GisDocument_Operation(openApiDocument, "/gis/buildingmodel/countbycountyid", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_BuildingModelCount, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_TerrainSummaries = GisDocument_Operation(openApiDocument, "/gis/terrain/summariesbycountyids", HttpMethod.Get);
+            Assert.Null(GisDocument_Minimum(openApiOperation_TerrainSummaries, "commandtimeout"));
+            Assert.Null(GisDocument_Maximum(openApiOperation_TerrainSummaries, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_TerrainCount = GisDocument_Operation(openApiDocument, "/gis/terrain/countbycountyid", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_TerrainCount, "commandtimeout"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_TerrainCount, "countyid"));
+
+            OpenApiOperation openApiOperation_RandomReference = GisDocument_Operation(openApiDocument, "/gis/ortodatas/randombuilding2dreference", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_RandomReference, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_OrtoDatasCount = GisDocument_Operation(openApiDocument, "/gis/ortodatas/countbycountyid", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_OrtoDatasCount, "commandtimeout"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_OrtoDatasCount, "countyid"));
+
+            // limit: floor 1 on the duplicates endpoints, floor 0 on the lattice endpoints.
+            OpenApiOperation openApiOperation_ReferenceDuplicates = GisDocument_Operation(openApiDocument, "/gis/building2d/referenceduplicates", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_ReferenceDuplicates, "limit"));
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_ReferenceDuplicates, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_DuplicateReferences = GisDocument_Operation(openApiDocument, "/gis/buildingdata/duplicatereferences", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_DuplicateReferences, "limit"));
+
+            OpenApiOperation openApiOperation_OccupancyDuplicates = GisDocument_Operation(openApiDocument, "/gis/occupancydata/building2d/duplicatereferences", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_OccupancyDuplicates, "limit"));
+
+            OpenApiOperation openApiOperation_YearBuiltDuplicates = GisDocument_Operation(openApiDocument, "/gis/yearbuiltdata/referenceduplicates", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_YearBuiltDuplicates, "limit"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_YearBuiltDuplicates, "countyid"));
+
+            // gridSize: the lattice floor on the two lattice endpoints, an exclusive zero on the density endpoint.
+            string gridSize_Minimum = DiGi.GIS.WebAPI.Constants.Terrain.MinimumGridSize.ToString(CultureInfo.InvariantCulture);
+            OpenApiOperation openApiOperation_Coverage = GisDocument_Operation(openApiDocument, "/gis/terrain/coveragebycountyid", HttpMethod.Get);
+            Assert.Equal(gridSize_Minimum, GisDocument_Minimum(openApiOperation_Coverage, "gridsize"));
+            Assert.Null(GisDocument_Maximum(openApiOperation_Coverage, "gridsize"));
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_Coverage, "limit"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_Coverage, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_Gaps = GisDocument_Operation(openApiDocument, "/gis/terrain/gapsbyboundingbox", HttpMethod.Get);
+            Assert.Equal(gridSize_Minimum, GisDocument_Minimum(openApiOperation_Gaps, "gridsize"));
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_Gaps, "limit"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_Gaps, "commandtimeout"));
+
+            OpenApiOperation openApiOperation_Densities = GisDocument_Operation(openApiDocument, "/gis/terrain/densitiesbycountyids", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_Densities, "gridsize"));
+            Assert.Equal("0", GisDocument_ExclusiveMinimum(openApiOperation_Densities, "gridsize"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_Densities, "commandtimeout"));
+
+            // the update queue: count, claimtimeoutminutes and maxattempts carry floor 1; its unguarded commandtimeout carries nothing.
+            OpenApiOperation openApiOperation_NextReferences = GisDocument_Operation(openApiDocument, "/gis/ortodatas/nextbuilding2dreferences", HttpMethod.Post);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_NextReferences, "count"));
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_NextReferences, "claimtimeoutminutes"));
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_NextReferences, "maxattempts"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_NextReferences, "commandtimeout"));
+
+            // positive-identifier selectors: floor 1 exactly where the action guards it.
+            OpenApiOperation openApiOperation_ReferenceById = GisDocument_Operation(openApiDocument, "/gis/administrativeareal2d/administrativeareal2Dreferencebyid", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_ReferenceById, "id"));
+            Assert.Null(GisDocument_Maximum(openApiOperation_ReferenceById, "id"));
+
+            OpenApiOperation openApiOperation_Point2Ds = GisDocument_Operation(openApiDocument, "/gis/building2d/point2dsbyadministrativeareal2Did", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_Point2Ds, "administrativeareal2Did"));
+
+            OpenApiOperation openApiOperation_Building2DReferencesByCountyId = GisDocument_Operation(openApiDocument, "/gis/building2d/referencesbycountyid", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_Building2DReferencesByCountyId, "countyid"));
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_Building2DReferencesByCountyId, "subdivisionid"));
+
+            OpenApiOperation openApiOperation_YearBuiltReferencesByCountyId = GisDocument_Operation(openApiDocument, "/gis/yearbuiltdata/referencesbycountyid", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_YearBuiltReferencesByCountyId, "countyid"));
+
+            OpenApiOperation openApiOperation_OrtoDatasReferenceByReference = GisDocument_Operation(openApiDocument, "/gis/ortodatas/ortodatasreferencebyreference", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_OrtoDatasReferenceByReference, "countyid"));
+
+            OpenApiOperation openApiOperation_OrtoDatasReferencesByCountyId = GisDocument_Operation(openApiDocument, "/gis/ortodatas/ortodatasreferencesbycountyid", HttpMethod.Get);
+            Assert.Equal("1", GisDocument_Minimum(openApiOperation_OrtoDatasReferencesByCountyId, "countyid"));
+
+            // the one parameter with a real ceiling: samplecount carries both bounds through the built-in [Range].
+            OpenApiOperation openApiOperation_SubdivisionLinks = GisDocument_Operation(openApiDocument, "/gis/ortodatas/subdivisionlinksbycountyid", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_SubdivisionLinks, "samplecount"));
+            Assert.Equal(DiGi.GIS.WebAPI.Constants.OrtoDatas.MaximumSampleCount.ToString(CultureInfo.InvariantCulture), GisDocument_Maximum(openApiOperation_SubdivisionLinks, "samplecount"));
+            Assert.Null(GisDocument_Minimum(openApiOperation_SubdivisionLinks, "commandtimeout"));
+        }
+
         private static OpenApiOperation GisDocument_Operation(OpenApiDocument openApiDocument, string path, HttpMethod httpMethod)
         {
             // The [controller] route token keeps the controller name's casing here, while the served document
@@ -75,6 +196,22 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.NotNull(openApiSchema);
 
             return openApiSchema.Maximum;
+        }
+
+        private static string? GisDocument_Minimum(OpenApiOperation openApiOperation, string name)
+        {
+            OpenApiSchema? openApiSchema = GisDocument_Parameter(openApiOperation, name).Schema as OpenApiSchema;
+            Assert.NotNull(openApiSchema);
+
+            return openApiSchema.Minimum;
+        }
+
+        private static string? GisDocument_ExclusiveMinimum(OpenApiOperation openApiOperation, string name)
+        {
+            OpenApiSchema? openApiSchema = GisDocument_Parameter(openApiOperation, name).Schema as OpenApiSchema;
+            Assert.NotNull(openApiSchema);
+
+            return openApiSchema.ExclusiveMinimum;
         }
     }
 }
