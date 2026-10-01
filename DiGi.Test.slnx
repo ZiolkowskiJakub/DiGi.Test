@@ -248,9 +248,11 @@
     </Project>
     <Project Path="DiGi.WebAPI.WindowsService.xUnit/DiGi.WebAPI.WindowsService.xUnit.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.EPW/DiGi.EPW/DiGi.EPW.csproj" />
       <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
       <BuildDependency Project="../DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL/DiGi.GIS.PostgreSQL.csproj" />
       <BuildDependency Project="../DiGi.WebAPI/DiGi.WebAPI/DiGi.WebAPI.csproj" />
+      <BuildDependency Project="../DiGi.Weather/DiGi.Weather/DiGi.Weather.csproj" />
       <BuildDependency Project="../DiGi.WebAPI.WindowsService/DiGi.WebAPI.WindowsService/DiGi.WebAPI.WindowsService.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>

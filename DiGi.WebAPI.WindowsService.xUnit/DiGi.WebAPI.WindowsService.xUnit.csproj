@@ -42,10 +42,14 @@
 
   <!-- The host reaches DiGi.Core, DiGi.Serilog and DiGi.WebAPI by HintPath, which does not carry the reference
        onward. The remaining entries name the payload types whose schemas the facts generate: IPolygonal2D
-       (DiGi.Geometry), AdministrativeAreal2DReference (DiGi.GIS.PostgreSQL) and UpdateItemsResult (DiGi.GIS.WebAPI). -->
+       (DiGi.Geometry), AdministrativeAreal2DReference (DiGi.GIS.PostgreSQL), UpdateItemsResult (DiGi.GIS.WebAPI),
+       EPWFile and DataRecord (DiGi.EPW) and WeatherRecord (DiGi.Weather). -->
   <ItemGroup>
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.EPW">
+      <HintPath>..\..\DiGi.EPW\bin\DiGi.EPW.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.Geometry">
       <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
@@ -58,6 +62,9 @@
     </Reference>
     <Reference Include="DiGi.Serilog">
       <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Weather">
+      <HintPath>..\..\DiGi.Weather\bin\DiGi.Weather.dll</HintPath>
     </Reference>
     <Reference Include="DiGi.WebAPI">
       <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>

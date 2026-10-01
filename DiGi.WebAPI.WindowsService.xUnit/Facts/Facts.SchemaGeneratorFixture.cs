@@ -10,7 +10,8 @@ namespace DiGi.WebAPI.WindowsService.xUnit
 {
     public partial class Facts
     {
-        // Generates the component schema of a type through the host's own MVC JSON and schema configuration
+        // Generates the schema of a type - its component, or the inline schema of a type Swashbuckle gives no component -
+        // through the host's own MVC JSON and schema configuration
         // (Modify.ConfigureJsonSerializerOptions, Modify.ConfigureSchemaGeneration), with the XML documentation of the
         // type's assembly attached as the host attaches it. configureSchemaGeneration: false leaves out the host's schema
         // configuration and keeps only the camelCase parameters, which is what the served document would be without it.
@@ -43,7 +44,14 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             ISchemaGenerator schemaGenerator = serviceProvider.GetRequiredService<ISchemaGenerator>();
 
             schemaRepository = new();
-            schemaGenerator.GenerateSchema(type, schemaRepository);
+            IOpenApiSchema openApiSchema_Generated = schemaGenerator.GenerateSchema(type, schemaRepository);
+
+            // Swashbuckle gives an enumerable type (a DiGi Weather is an IEnumerable<WeatherRecord>) no component and
+            // returns its schema inline.
+            if (openApiSchema_Generated is OpenApiSchema openApiSchema_Inline)
+            {
+                return openApiSchema_Inline;
+            }
 
             Assert.True(schemaRepository.TryLookupByType(type, out OpenApiSchemaReference? openApiSchemaReference), $"No component schema was generated for {type.FullName}.");
             Assert.NotNull(openApiSchemaReference);

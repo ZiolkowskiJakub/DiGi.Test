@@ -1,9 +1,11 @@
 using DiGi.Core.Classes;
 using DiGi.Core.Interfaces;
+using DiGi.EPW.Classes;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Planar.Interfaces;
 using DiGi.GIS.PostgreSQL.Classes;
 using DiGi.GIS.WebAPI.Classes;
+using DiGi.Weather.Classes;
 using DiGi.WebAPI.Classes;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -114,6 +116,53 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.True(jsonObject_Health["nullable"]?.GetValue<bool>());
             Assert.NotNull(jsonObject_Health["allOf"]);
             Assert.False(jsonObject_Health.ContainsKey("type"), stringWriter.ToString());
+        }
+
+        /// <summary>
+        /// Tests that a DiGi payload which is also an <c>IEnumerable</c> is documented as the JSON object the DiGi serializer writes, not as the array Swashbuckle infers from the interface.
+        /// <para>Found by strict validation of <c>GET /gis/epwfile/item</c> (2026-10-01): <see cref="EPWFile"/> derives from <c>Weather</c>, an <c>IEnumerable&lt;WeatherRecord&gt;</c>, so its schema was <c>type: array</c> - before the fix bare, after the first fix with the object's properties bolted on - while the wire is an object carrying <c>WeatherRecords</c>, <c>Location</c>, ....</para>
+        /// </summary>
+        [Fact]
+        public void ConfigureSchemaGeneration_Enumerable()
+        {
+            Assert.True(typeof(IEnumerable<WeatherRecord>).IsAssignableFrom(typeof(EPWFile)));
+
+            EPWFile ePWFile = new(location: null);
+            List<string> names_Wire = SchemaGeneratorFixture_WireNames(ePWFile);
+            Assert.Contains("WeatherRecords", names_Wire);
+
+            OpenApiSchema openApiSchema = SchemaGeneratorFixture_Schema(typeof(EPWFile));
+
+            Assert.Equal(JsonSchemaType.Object, openApiSchema.Type & ~JsonSchemaType.Null);
+            Assert.Null(openApiSchema.Items);
+            Assert.NotNull(openApiSchema.Properties);
+            Assert.Equal(names_Wire.Order(StringComparer.Ordinal), openApiSchema.Properties.Keys.Order(StringComparer.Ordinal));
+        }
+
+        /// <summary>
+        /// Tests that a concrete payload type with a loaded subclass lists its own members but admits additional ones, because a member typed by it may hold the subclass, which the DiGi serializer writes with the subclass's extra members; a type nothing derives from stays closed.
+        /// <para>Found by strict validation of <c>GET /gis/epwfile/item</c> (2026-10-01): <c>EPWFile.WeatherRecords</c> is a list of <see cref="WeatherRecord"/> holding <see cref="DataRecord"/>s, whose <c>Albedo</c>, <c>Visibility</c>, ... were rejected by the closed <see cref="WeatherRecord"/> schema on all 8 760 records.</para>
+        /// </summary>
+        [Fact]
+        public void ConfigureSchemaGeneration_DerivedType()
+        {
+            Assert.True(typeof(WeatherRecord).IsAssignableFrom(typeof(DataRecord)));
+
+            List<string> names_Wire = SchemaGeneratorFixture_WireNames(new WeatherRecord((WeatherRecord?)null));
+            List<string> names_Wire_Derived = SchemaGeneratorFixture_WireNames(new DataRecord((DataRecord?)null));
+            Assert.NotEmpty(names_Wire_Derived.Except(names_Wire, StringComparer.Ordinal));
+
+            OpenApiSchema openApiSchema = SchemaGeneratorFixture_Schema(typeof(WeatherRecord));
+
+            Assert.NotNull(openApiSchema.Properties);
+            Assert.Equal(names_Wire.Order(StringComparer.Ordinal), openApiSchema.Properties.Keys.Order(StringComparer.Ordinal));
+            Assert.True(openApiSchema.AdditionalPropertiesAllowed);
+
+            OpenApiSchema openApiSchema_Derived = SchemaGeneratorFixture_Schema(typeof(DataRecord));
+
+            Assert.NotNull(openApiSchema_Derived.Properties);
+            Assert.Equal(names_Wire_Derived.Order(StringComparer.Ordinal), openApiSchema_Derived.Properties.Keys.Order(StringComparer.Ordinal));
+            Assert.False(openApiSchema_Derived.AdditionalPropertiesAllowed);
         }
 
         /// <summary>
