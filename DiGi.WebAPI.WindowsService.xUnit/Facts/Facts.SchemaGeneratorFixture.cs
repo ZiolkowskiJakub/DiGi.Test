@@ -1,4 +1,5 @@
 using DiGi.GIS.PostgreSQL.Enums;
+using DiGi.WebAPI.WindowsService.Modify;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
@@ -124,10 +125,10 @@ namespace DiGi.WebAPI.WindowsService.xUnit
         // EnumControllerFixture - plus those of any controllers named by types_Controller, a real extension's controllers -
         // with the XML documentation of the test assembly, of the enum's assembly and of those controllers' assemblies
         // attached: what the host serves for a route prefix, minus the per-prefix document registration in Program, and,
-        // through types_SchemaFilter and types_DocumentFilter, plus the schema and document filters the host's Program
+        // through types_SchemaFilter, types_DocumentFilter and types_OperationFilter, plus the schema, document and operation filters the host's Program
         // appends for a loaded extension assembly, after its own. Unlike a schema generated on its own, it runs the
-        // parameter and document filters too.
-        private static OpenApiDocument SchemaGeneratorFixture_Document(Type[]? types_Controller = null, Type[]? types_SchemaFilter = null, Type[]? types_DocumentFilter = null)
+        // parameter, operation and document filters too.
+        private static OpenApiDocument SchemaGeneratorFixture_Document(Type[]? types_Controller = null, Type[]? types_SchemaFilter = null, Type[]? types_DocumentFilter = null, Type[]? types_OperationFilter = null)
         {
             const string documentName = "fixture";
 
@@ -157,6 +158,15 @@ namespace DiGi.WebAPI.WindowsService.xUnit
                     swaggerGenOptions.DocumentFilterDescriptors.Add(new FilterDescriptor
                     {
                         Type = type_DocumentFilter,
+                        Arguments = []
+                    });
+                }
+
+                foreach (Type type_OperationFilter in types_OperationFilter ?? [])
+                {
+                    swaggerGenOptions.OperationFilterDescriptors.Add(new FilterDescriptor
+                    {
+                        Type = type_OperationFilter,
                         Arguments = []
                     });
                 }

@@ -8,6 +8,7 @@ using DiGi.GIS.PostgreSQL.Enums;
 using DiGi.GIS.WebAPI.Classes;
 using DiGi.Weather.Classes;
 using DiGi.WebAPI.Classes;
+using DiGi.WebAPI.WindowsService.Modify;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
@@ -144,10 +145,12 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.NotNull(openApiSchemaReference);
             Assert.Equal(nameof(ServiceHealthInformation), openApiSchemaReference.Reference.Id);
             
-            // Second item should be a schema that allows null
+            // Second item should be a schema that allows null: an enum listing null, which the writer keeps as a
+            // distinct anyOf entry rather than folding into a nullable the typeless wrapper could not widen.
             OpenApiSchema? openApiSchema_Null = openApiSchema_Health.AnyOf[1] as OpenApiSchema;
             Assert.NotNull(openApiSchema_Null);
-            Assert.Equal(JsonSchemaType.Null, openApiSchema_Null.Type);
+            Assert.NotNull(openApiSchema_Null.Enum);
+            Assert.Contains(openApiSchema_Null.Enum, jsonNode => jsonNode is null);
 
             StringWriter stringWriter = new();
             openApiSchema_Health.SerializeAsV3(new OpenApiJsonWriter(stringWriter));
