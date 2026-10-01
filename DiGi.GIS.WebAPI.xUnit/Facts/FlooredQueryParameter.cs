@@ -119,6 +119,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 // commandTimeout with no action guard - a floor here would be a behaviour change, not a description of one.
                 (typeof(BuildingDataController), nameof(BuildingDataController.UpdateItemsByCountyIdsAsync), "commandTimeout"),
                 (typeof(OrtoDatasController), nameof(OrtoDatasController.GetEstimatedCoverageFactorAsync), "commandTimeout"),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetEstimatedCoverageFactorsAsync), "commandTimeout"),
                 (typeof(OrtoDatasController), nameof(OrtoDatasController.GetSummariesByCountyIdsAsync), "commandTimeout"),
                 (typeof(OrtoDatasController), nameof(OrtoDatasController.GetSubdivisionLinksByCountyIdAsync), "commandTimeout"),
                 (typeof(OrtoDatasController), nameof(OrtoDatasController.GetQueueSummariesByCountyIdsAsync), "commandTimeout"),
