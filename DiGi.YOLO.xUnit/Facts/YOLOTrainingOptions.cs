@@ -20,6 +20,7 @@ namespace DiGi.YOLO.xUnit
             Assert.Equal(0, yOLOTrainingOptions_Default.Seed);
             Assert.Null(yOLOTrainingOptions_Default.Device);
             Assert.Null(yOLOTrainingOptions_Default.Name);
+            Assert.Null(yOLOTrainingOptions_Default.ResumePath);
 
             Classes.YOLOTrainingOptions yOLOTrainingOptions = new()
             {
@@ -34,6 +35,7 @@ namespace DiGi.YOLO.xUnit
                 Patience = 75,
                 Project = @"C:\YOLO\runs\detect",
                 PythonPath = @"C:\Python\python.exe",
+                ResumePath = @"C:\YOLO\runs\detect\train9\weights\last.pt",
                 Seed = 3,
                 WorkingDirectory = @"C:\YOLO\training"
             };
@@ -48,6 +50,7 @@ namespace DiGi.YOLO.xUnit
             Assert.Equal("train9_fresh", yOLOTrainingOptions_Actual.Name);
             Assert.Equal(75, yOLOTrainingOptions_Actual.Patience);
             Assert.Equal(3, yOLOTrainingOptions_Actual.Seed);
+            Assert.Equal(@"C:\YOLO\runs\detect\train9\weights\last.pt", yOLOTrainingOptions_Actual.ResumePath);
 
             Core.xUnit.Query.SerializationCheck(yOLOTrainingOptions);
         }

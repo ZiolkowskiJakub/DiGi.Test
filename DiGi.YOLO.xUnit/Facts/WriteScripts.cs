@@ -24,6 +24,7 @@ namespace DiGi.YOLO.xUnit
                 string predictPath = Path.Combine(tempDirectory, "predict.py");
                 string utilsPath = Path.Combine(tempDirectory, "utils.py");
                 string checkPath = Path.Combine(tempDirectory, "check.py");
+                string checkpointPath = Path.Combine(tempDirectory, "checkpoint.py");
                 string requirementsPath = Path.Combine(tempDirectory, "requirements.txt");
                 string confPath = Path.Combine(tempDirectory, "conf.yaml");
 
@@ -33,6 +34,7 @@ namespace DiGi.YOLO.xUnit
                 Assert.True(File.Exists(predictPath));
                 Assert.True(File.Exists(utilsPath));
                 Assert.True(File.Exists(checkPath));
+                Assert.True(File.Exists(checkpointPath));
                 Assert.True(File.Exists(requirementsPath));
                 Assert.True(File.Exists(confPath));
 
@@ -54,9 +56,20 @@ namespace DiGi.YOLO.xUnit
                 Assert.Contains("argparse", trainContent);
                 Assert.Contains("--patience", trainContent);
                 Assert.Contains("\"--epochs\", type=int, default=150", trainContent);
+                Assert.Contains("--resume", trainContent);
+                Assert.Contains("resume=True", trainContent);
                 Assert.Contains(Constants.OutputPrefix.Weights, trainContent);
                 Assert.Contains(Constants.OutputPrefix.SHA256, trainContent);
                 Assert.Contains(Constants.OutputPrefix.AMP, trainContent);
+                Assert.Contains(Constants.OutputPrefix.ResumeEpoch, trainContent);
+                Assert.Contains(Constants.OutputPrefix.ResumeEpochs, trainContent);
+
+                //checkpoint.py reads a .pt without ultralytics and states its own torch.load intent, exactly as check.py does
+                string checkpointContent = File.ReadAllText(checkpointPath);
+                Assert.Contains("weights_only=False", checkpointContent);
+                Assert.Contains(Constants.Marker.CheckpointJsonBegin, checkpointContent);
+                Assert.Contains(Constants.Marker.CheckpointJsonEnd, checkpointContent);
+                Assert.Contains("\"finished\"", checkpointContent);
 
                 string validateContent = File.ReadAllText(validatePath);
                 Assert.Contains("--split", validateContent);

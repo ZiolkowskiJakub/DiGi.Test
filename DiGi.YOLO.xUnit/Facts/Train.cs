@@ -68,6 +68,32 @@ namespace DiGi.YOLO.xUnit
                 Assert.Equal(Enums.ModelKind.Undefined, yOLOTrainingResults[0]!.StartModelKind);
                 Assert.Equal(Enums.ModelKind.Checkpoint, yOLOTrainingResults[1]!.StartModelKind);
 
+                //Resume mode refuses a start file that is not an existing .pt before any interpreter is started
+                Classes.YOLOTrainingResult? Resume(string resumePath)
+                {
+                    return Modify.Train(new Classes.YOLOTrainingOptions()
+                    {
+                        PythonPath = pythonPath,
+                        ResumePath = resumePath,
+                        WorkingDirectory = directory
+                    });
+                }
+
+                foreach (Classes.YOLOTrainingResult? yOLOTrainingResult_Resume in new Classes.YOLOTrainingResult?[]
+                {
+                    Resume(Path.Combine(directory, "missing.pt")),
+                    Resume(path_Onnx),
+                    Resume(path_Configuration)
+                })
+                {
+                    Assert.NotNull(yOLOTrainingResult_Resume);
+                    Assert.Equal(-1, yOLOTrainingResult_Resume!.ExitCode);
+                    Assert.False(yOLOTrainingResult_Resume.Succeeded);
+                    Assert.True(yOLOTrainingResult_Resume.Resumed);
+                    Assert.Single(yOLOTrainingResult_Resume.StandardError ?? []);
+                    Assert.Null(yOLOTrainingResult_Resume.StandardOutput);
+                }
+
                 //The refused runs never reached the working directory
                 Assert.False(File.Exists(Path.Combine(directory, "train.py")));
             }
