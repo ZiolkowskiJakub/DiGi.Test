@@ -26,6 +26,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Patience = 7,
                 ProjectDirectory = @"C:\YOLO\runs",
                 PythonPath = @"C:\Python\python.exe",
+                ResumeTraining = true,
                 RunName = "train9_fresh",
                 Seed = 42,
                 StartWeightsPath = @"C:\YOLO\models\base\yolo26x.pt",
@@ -47,6 +48,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Assert.Equal(yOLOTrainingRunOptions.Patience, yOLOTrainingRunOptions_Actual.Patience);
                 Assert.Equal(yOLOTrainingRunOptions.ProjectDirectory, yOLOTrainingRunOptions_Actual.ProjectDirectory);
                 Assert.Equal(yOLOTrainingRunOptions.PythonPath, yOLOTrainingRunOptions_Actual.PythonPath);
+                Assert.Equal(yOLOTrainingRunOptions.ResumeTraining, yOLOTrainingRunOptions_Actual.ResumeTraining);
                 Assert.Equal(yOLOTrainingRunOptions.RunName, yOLOTrainingRunOptions_Actual.RunName);
                 Assert.Equal(yOLOTrainingRunOptions.Seed, yOLOTrainingRunOptions_Actual.Seed);
                 Assert.Equal(yOLOTrainingRunOptions.StartWeightsPath, yOLOTrainingRunOptions_Actual.StartWeightsPath);
@@ -77,6 +79,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(640, yOLOTrainingRunOptions_Default.ImageSize);
             Assert.Equal(16, yOLOTrainingRunOptions_Default.Batch);
             Assert.Equal(0, yOLOTrainingRunOptions_Default.Seed);
+            Assert.False(yOLOTrainingRunOptions_Default.ResumeTraining);
             Assert.Null(yOLOTrainingRunOptions_Default.StartWeightsPath);
             Assert.Null(yOLOTrainingRunOptions_Default.RunName);
             Assert.Null(yOLOTrainingRunOptions_Default.ProjectDirectory);
@@ -128,6 +131,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.NotNull(yOLOTrainingRunOptions!.DatasetOptions);
             Assert.True(yOLOTrainingRunOptions.DatasetOptions!.CountOnly);
             Assert.True(yOLOTrainingRunOptions.DatasetOptions.CountyIds is null || yOLOTrainingRunOptions.DatasetOptions.CountyIds.Count == 0);
+            Assert.False(yOLOTrainingRunOptions.ResumeTraining);
             Assert.Equal([YOLOTrainingStep.Dataset], yOLOTrainingRunOptions.Steps);
         }
     }
