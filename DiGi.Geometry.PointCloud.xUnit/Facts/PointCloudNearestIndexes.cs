@@ -10,8 +10,9 @@ namespace DiGi.Geometry.PointCloud.xUnit
         /// <para>This is the test that actually proves the descent. A search that prunes a node holding a genuinely nearer point returns a plausible answer that no smoke test would catch, and the three points it returns would still form a triangle.</para>
         /// <para>Three answers are compared, not two. The reference sort establishes the truth, the exhaustive vectorised kernel is checked against it, and the indexed descent is checked against both, so a fault in either search path is attributed rather than merely detected.</para>
         /// <para>The density is deliberately uneven, with a tight cluster inside a sparse halo. Uniform data hides exactly the failure modes a spatial hierarchy is prone to, because every cell then holds a similar number of points.</para>
+        /// <para>Medium test (5.1 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void PointCloudNearestIndexes()
         {
             Random random = new(12345);

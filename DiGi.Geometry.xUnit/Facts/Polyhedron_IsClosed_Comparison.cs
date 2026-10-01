@@ -1244,8 +1244,9 @@ namespace DiGi.Geometry.xUnit
         /// Pins the defect reported on DiGi.Geometry issue 1 against the implementation that carried it, and its absence from the shipped one.
         /// <para>The vertex-welding algorithm reports a watertight 9 800-face ellipsoid as open from a tolerance of 0.01 upwards, having reported it closed at every finer value: welding at a tolerance past the edge length of the tessellation collapses whole triangles, and the edge counts stop pairing. The same happens to a solid with a 0.1 m slot once the tolerance passes 0.15.</para>
         /// <para>Neither is a borderline case - both solids are exactly watertight and closed at 1E-06 - which is what makes the old result wrong rather than merely different. The shipped predicate welds nothing and reports both closed at every tolerance on the ladder.</para>
+        /// <para>Medium test (18.1 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Polyhedron_IsClosed_Comparison_Monotonicity()
         {
             Ellipsoid ellipsoid = new(new Point3D(1, 2, 3), 3, 2, 1);
@@ -1293,8 +1294,9 @@ namespace DiGi.Geometry.xUnit
         /// <para>Four implementations on identical inputs: the vertex welding that shipped previously, the greedy two-pass edge matching of the first proposal, the component perfect matching of the second, and the shipped weld-free predicate.</para>
         /// <para>Each implementation is warmed up before it is timed and the repeat count is scaled by the size of the input. Results are asserted to agree before any timing is taken on the solids that carry no feature at the scale of the tolerance; on the ones that do, the divergence is the point of the exercise and is asserted explicitly instead.</para>
         /// <para>Writes IsClosed_Benchmark.md to the reports directory. Run in Release for figures worth quoting.</para>
+        /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
-        [Fact]
+        [LongFact]
         public void Polyhedron_IsClosed_Benchmark()
         {
             System.Text.StringBuilder stringBuilder = new();

@@ -77,9 +77,10 @@ namespace DiGi.PostgreSQL.Table.xUnit
         /// Verifies that a caller-supplied commandTimeout reaches the command: while a second connection holds an ACCESS EXCLUSIVE lock on the columns table, a one second commandTimeout must abort the blocked query (Npgsql 10 surfaces it as an NpgsqlException wrapping a TimeoutException) instead of waiting out the 30 second Npgsql default.
         /// <para>Reproduces ZiolkowskiJakub/DiGi.GIS.WebAPI#33: the unmodified chain never assigns npgsqlCommand.CommandTimeout, so the query completes normally once the lock is released.</para>
         /// <para>Afterwards a generous commandTimeout completes the same query and returns the seeded columns, proving that a longer timeout lets the operation finish.</para>
+        /// <para>Medium test (3.2 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        [SkippableFact]
+        [MediumSkippableFact]
         public async Task GetColumnsByUniqueIdsAsync_CommandTimeout()
         {
             if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))

@@ -119,8 +119,9 @@ namespace DiGi.Geometry.xUnit
         /// <summary>
         /// Verifies that <see cref="Query.IsClosed{TPolygonalFace3D}(Polyhedron{TPolygonalFace3D}?, bool, double)"/> holds up when a coarse tolerance draws many edges into one group.
         /// <para>At the poles of a finely tessellated ellipsoid a hundred triangles meet, so a tolerance of 0.1 m or more puts far more than the thirty-two edges a bitmask search can enumerate into a single group. The pairing is decided by a general graph matching, which has no such ceiling; a ceiling would return open for a watertight solid and would break monotonicity at exactly the tolerance where the group outgrows it.</para>
+        /// <para>Medium test (17.9 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Polyhedron_IsClosed_LargeComponent()
         {
             Ellipsoid ellipsoid = new(new Point3D(1, 2, 3), 3, 2, 1);

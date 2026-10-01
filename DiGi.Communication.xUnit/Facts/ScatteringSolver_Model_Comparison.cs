@@ -11,8 +11,9 @@ namespace DiGi.Communication.xUnit
         /// <summary>
         /// Compares the CPU-based ScatteringSolver and GPU-based (ComputeSharp) ScatteringSolver using a saved GeometricalPropagationModel json fixture.
         /// <para>Verifies that both solvers return matching results (visibility, delays, scattering point group references, and point counts/coordinates).</para>
+        /// <para>Medium test (7.5 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         [SupportedOSPlatform("windows6.2")]
         public void ScatteringSolver_GeometricalPropagationModel_Comparison()
         {

@@ -90,8 +90,9 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Tests that ShadingModel.TryGetShadingFactors reads out exactly the shaded fraction of every stored timestamp of a receiver, matching TryGetShadingFactor on every sample.
         /// <para>Part 1 is exhaustive on a solved single-building model (every receiver, every timestamp of the day). Part 2 pins the GeometricalShadingSolverResult path, whose Area is computed from its shadow polygons on each access. Part 3 solves a 4x4 grid (80 receivers) for the full year and checks, for every receiver, that the dictionary holds one entry per daytime timestamp and that a sampled timestamp grid matches TryGetShadingFactor exactly (a full every-timestamp cross-check per receiver is the 9-75 ms per call cost this issue removes, so it is sampled, not exhaustive). Part 4 covers the contract edges: unsolved, shading-only, zero-area, NaN face area and NaN result areas.</para>
+        /// <para>Medium test (11.9 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void ShadingModel_TryGetShadingFactors()
         {
             // Part 1: exhaustive small model - every receiver, every timestamp of the day.
@@ -268,8 +269,9 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Benchmarks the bulk read-out of a solved 12x12 grid (720 receivers, all surfaces) over the full year against the cloning consumer pattern (GetShadingSolverResults plus a per-receiver dictionary), per ZiolkowskiJakub/DiGi.Solar#13.
         /// <para>Each path is measured three times; the reported range and ratio go to the reports directory. The issue's 10x target is met in typical machine states (13.7x-17.5x measured isolated and in-suite), but the legacy path's O(relation count x result count) relation lookup varies 2.3x with the machine state (baseline 15 963-38 491 ms observed; the new path holds 1 918-2 681 ms), so the committed ratio floor is 4x - the worst observed ratio is 5.95x - and the absolute bound on the bulk time (12 000 ms, 4.5x the slowest measured new run) is the primary regression guard: the pre-fix bulk read-out measured 14 908-32 522 ms isolated. Run this fact in isolation for the baseline figures.</para>
+        /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
-        [Fact]
+        [LongFact]
         public void ShadingModel_TryGetShadingFactors_Performance()
         {
             // Warm-up: solve a single-building model for one day and run both read-out paths once (JIT).

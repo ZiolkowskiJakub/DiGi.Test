@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Runs every test whose TestDuration is Medium or shorter. See DiGi.Core.xUnit/Enums/TestDuration.cs. -->
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <DIGI_TEST_MAX_DURATION>Medium</DIGI_TEST_MAX_DURATION>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>

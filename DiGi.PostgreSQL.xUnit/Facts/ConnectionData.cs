@@ -108,8 +108,9 @@ namespace DiGi.PostgreSQL.xUnit
         /// <summary>
         /// Replicates pool exhaustion against the development database named by <c>PostgreSQL_PartitionReference.conf</c> (git-ignored <c>user files/</c>), holding the pool's single slot and asserting the exact transient shape the deployed 503 filter consumes (DiGi.GIS.WebAPI #30/#31).
         /// <para>Skips without a reachable development database; it opens and closes pooled connections only — no table in the target database is touched, because the failure happens before any SQL executes.</para>
+        /// <para>Medium test (5.2 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [SkippableFact]
+        [MediumSkippableFact]
         public async Task ConnectionData_PoolExhaustion()
         {
             if (!Create.IsAvailable(Enums.StorageMethod.PartitionReference, out ConnectionData? connectionData) || connectionData is null)

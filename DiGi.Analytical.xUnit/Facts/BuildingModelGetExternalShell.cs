@@ -315,8 +315,9 @@ namespace DiGi.Analytical.xUnit
         /// <summary>
         /// Measures the envelope of the number of building models the 3D view of the largest area it offers has to carry, against the per-space path in use today.
         /// <para>Both paths are warmed up over the whole set, then timed three times each over the same two thousand four hundred models in alternating order, and the ranges are written to the test reports directory. Two of the three stored models are single-space, where the two paths do the same work, and the third is a two-storey split, where the per-space path builds and orients its slab twice; the slowest envelope run is asserted against the threshold.</para>
+        /// <para>Medium test (10.5 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void BuildingModelGetExternalShell_Performance()
         {
             const int count_Models = 2400;

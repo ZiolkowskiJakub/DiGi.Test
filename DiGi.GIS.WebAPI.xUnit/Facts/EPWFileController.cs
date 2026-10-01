@@ -11,8 +11,9 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// A transient database failure is a "retry can succeed" class, so it must answer 503 with a Retry-After header rather than the uniform 500.
         /// <para>Drives a real transient failure through the real stack with no server: a dead loopback host makes the converter's OpenAsync throw a genuine NpgsqlException, which Npgsql classifies IsTransient = true. The read action of <see cref="EPWFileController"/> is asserted, so a 503 mapping added to it cannot be missing.</para>
         /// <para>Red before the 503 mapping existed (the path answered 500); green after.</para>
+        /// <para>Medium test (2.0 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task EPWFileController_TransientDatabaseFailure_Answers503()
         {
             string path = ConfigurationFilePath();

@@ -284,8 +284,9 @@ namespace DiGi.YOLO.xUnit
         /// <summary>
         /// Runs a real 1-epoch training through <see cref="Modify.Train(Classes.YOLOTrainingOptions?, System.Threading.CancellationToken)"/> from the frozen model.pt and from the base checkpoint yolo26x.pt, then validates the continued weights with <see cref="Modify.Validate(Classes.YOLOValidationOptions?, System.Threading.CancellationToken)"/>, on a small synthetic dataset written by <see cref="Modify.Write(Classes.YOLOModel?)"/>.
         /// <para>The interpreter and both checkpoints are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf (PythonPath, ModelPath, BaseModelPath) and the fact returns without asserting when any is absent. It needs a GPU to finish in reasonable time and is meant to be run on its own. The images - a light rectangle on noise, labelled "Building" - are generated with Pillow, which ultralytics depends on. The frozen model.pt is hashed before and after: no run may change it.</para>
+        /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
-        [Fact]
+        [LongFact]
         public void Train_Smoke()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();

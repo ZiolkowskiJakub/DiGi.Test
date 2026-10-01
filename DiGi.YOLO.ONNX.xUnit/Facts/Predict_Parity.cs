@@ -18,8 +18,9 @@ namespace DiGi.YOLO.ONNX.xUnit
         /// <para>The tolerance is not zero and cannot be. One path runs an fp32 CUDA graph through torch and the other an fp32 CPU graph through ONNX Runtime, so the last bits of every number differ. A detection whose confidence sits on the reporting threshold therefore legitimately appears on one side and not the other, which is why detections inside a guard band around the threshold are left out of the count comparison instead of being counted as disagreements.</para>
         /// <para>Coordinates are bounded at a percentile rather than at a maximum, which is the one part of this worth reading carefully. YOLOv8 regresses each box edge as a softmax expectation over sixteen bins measured in units of the feature stride, and that expectation is far more sensitive to the last bits than the single sigmoid the class score comes from - so a handful of detections move by whole pixels while their confidence agrees to five decimal places. Bounding the maximum would mean stating a tolerance loose enough to swallow those, and a tolerance that loose would no longer notice a real coordinate regression. Every individual detection is instead guarded by the overlap of its matched pair, which stays high however the edges wander.</para>
         /// <para>Nothing here runs unless the machine is set up for it. The 130 MB checkpoint, its ONNX export, a CPython carrying ultralytics and a directory of held images are all named in a git-ignored conf beside the test assets; without that file the fact returns, because requiring any of those on every machine running the suite is not reasonable.</para>
+        /// <para>Medium test (12.9 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Predict_Parity()
         {
             //The stated tolerance, set from what 2 000 held images actually show rather than from a guess.

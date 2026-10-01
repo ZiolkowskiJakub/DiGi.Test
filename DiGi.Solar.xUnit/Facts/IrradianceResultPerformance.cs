@@ -21,8 +21,9 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Measures the per-call cost of the irradiance layer, and separates it from the cost of the sun position it consumes.
         /// <para>The three measured paths are the irradiance factory alone, the power factory alone, and the whole per-hour pipeline including <see cref="Query.SunDirection(Coordinates, Core.Enums.UTC, System.DateTime, bool)"/>. The comparison shows what a caller pays for a sun direction it could have cached, which is the decision the benchmark exists to inform.</para>
+        /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
-        [Fact]
+        [LongFact]
         public void IrradianceResult_Performance()
         {
             Coordinates coordinates = new(52.4064, 16.9252);

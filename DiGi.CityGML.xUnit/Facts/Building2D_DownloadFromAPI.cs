@@ -13,8 +13,9 @@ namespace DiGi.CityGML.xUnit
     {
         /// <summary>
         /// Downloads matching Building2D objects from api.digiproject.uk for each Building in Buildings.json using buildingId, saves the result to Building2D.json, and reports missing pairs.
+        /// <para>Medium test (8.5 s, live API): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async System.Threading.Tasks.Task DownloadBuilding2DsFromAPIAsync()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();

@@ -101,8 +101,9 @@ namespace DiGi.YOLO.xUnit
         /// <summary>
         /// Verifies that the preflight probe reports a readable checkpoint as runnable and names the ultralytics version that wrote it, and that a present but unreadable model is reported as a warning rather than making the machine unrunnable.
         /// <para>The interpreter and checkpoint are machine specific - a CPython carrying ultralytics and torch plus the frozen model - so both are read from a git-ignored conf (DiGi.YOLO_Preflight.conf) and the fact returns without asserting when that conf is absent. The split between <see cref="Classes.YOLOEnvironmentResult.Messages"/> and <see cref="Classes.YOLOEnvironmentResult.Warnings"/> is what makes the second half hold: runnable is about the machine, and the model header is diagnostic.</para>
+        /// <para>Medium test (2.6 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void YOLOEnvironmentResult_Model()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -176,8 +177,9 @@ namespace DiGi.YOLO.xUnit
         /// <summary>
         /// Verifies that running the main (8.4.165) and the venv (8.3.130) environment one after the other in one working directory no longer prints a settings notice or rewrites the other's settings file.
         /// <para>Both interpreters are machine specific, so their paths are read from a git-ignored conf (DiGi.YOLO_Preflight.conf) and the fact returns without asserting when that conf or either interpreter is absent. Before the YOLO_CONFIG_DIR isolation this fact failed with the reported symptom: a settings notice on stdout and the shared %APPDATA% settings file rewritten across every switch.</para>
+        /// <para>Medium test (8.4 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void YOLOEnvironmentResult_SettingsIsolation()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();

@@ -16,8 +16,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests every refusal of the solar radiation routes on a scripted GIS Web API: 400 for a radius outside (0, <see cref="Constants.Default.SolarSurroundingRadiusMax"/>] before any request is sent, 204 when the building or its weather file is not found, 422 when the building cannot be located or is degenerate, 413 above the receiver and caster triangle limits, and 502 when the neighbours cannot be read.
         /// <para>The 502 is the fail-open case the issue's first design missed: the upstream helpers answer null for every failure, and the neighbour circle always contains the building itself, so a missing answer is a failed read. Treating it as "no neighbours" would have answered an unshaded result with 200.</para>
+        /// <para>Medium test (1.7 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task SolarController_GetRadiationByBuildingModelIdAsync_Refusals()
         {
             EPWFile ePWFile = SolarFixture_EPWFile();

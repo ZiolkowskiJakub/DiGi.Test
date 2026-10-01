@@ -18,8 +18,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests that background jobs and synchronous requests share one solve gate and never solve at the same time.
         /// <para>While a synchronous solve holds the gate, a job stays queued at position 1 and its calculation does not start. While the job calculates, a synchronous request is refused with a 503 and a <c>Retry-After</c> once its (shortened) wait for the gate runs out, instead of waiting for the job to finish; after the job, the same request is answered.</para>
+        /// <para>Medium test (2.9 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task Modify_SolveAsync_SharedGate()
         {
             SemaphoreSlim semaphoreSlim = new(1, 1);

@@ -18,8 +18,9 @@ namespace DiGi.GIS.Analytical.xUnit
         /// Writes a report comparing the terrain elevation of the stored building models against the extents they were stored with.
         /// <para>This is a survey rather than an assertion - it exists to tell how far the models already in the database sit from the ground, which is what motivated threading a base elevation through the extrusion. The report lands in the reports directory, next to the ones written by the other surveys.</para>
         /// <para>Depends on the live GUGiK terrain service and produces an empty column for every building it cannot resolve. It does not fail when the service is unavailable, because it asserts nothing about the elevations themselves.</para>
+        /// <para>Medium test (live elevation service): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task BuildingModel_ElevationReportAsync()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -65,8 +66,9 @@ namespace DiGi.GIS.Analytical.xUnit
         /// Verifies that extruding a Building2D using BuildingModelAsync queries terrain elevation and sets the base elevation to the retrieved ground height.
         /// <para>Depends on the live GUGiK terrain service and will fail when it cannot be reached - the offline behaviour of the same creator is covered by <see cref="BuildingModelAsync_ElevationUnavailable"/>, which asserts that an unreachable service falls back to an elevation of zero rather than losing the building.</para>
         /// <para>The footprint is taken from a real building in county 0201, in the easting-northing order a <see cref="Point2D"/> holds and the database stores, so the test exercises the axis order the terrain service is actually queried with. A literal chosen the other way round passes whichever way the query is built and hides the swap. The terrain there is around 190 metres, so the assertion distinguishes a resolved elevation from the zero the fallback would produce without pinning an exact ground height that the service may revise.</para>
+        /// <para>Medium test (live elevation service): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task BuildingModel_2DExtrusion_WithElevationAsync()
         {
             PolygonalFace2D? polygonalFace2D = Geometry.Planar.Create.PolygonalFace2D(

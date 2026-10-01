@@ -69,8 +69,9 @@ namespace DiGi.GIS.ML.xUnit
         /// <summary>
         /// Verifies that the deployed scoring path reads a real feature table and returns one plausible year per building, deterministically.
         /// <para>Runs against a committed sample of the assembled training table, so it exercises the binding by column slug and by display name against the shapes those columns actually have - which is what caught the model being handed content hashes instead of stored column identifiers.</para>
+        /// <para>Medium test (1.5 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void OrtoBuildingDetectionModel_Predict()
         {
             string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YearBuiltPrediction_Sample.tsv");

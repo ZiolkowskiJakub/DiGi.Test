@@ -79,8 +79,9 @@ namespace DiGi.GIS.Analytical.xUnit
         /// <summary>
         /// Tests the conversion of Building2D objects from the "2476_GML.gmf" file to BuildingModel objects,
         /// verifying that the geometry and storey count are processed correctly.
+        /// <para>Medium test (3.0 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void BuildingModel_FromGmfFile()
         {
             string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");
@@ -121,8 +122,9 @@ namespace DiGi.GIS.Analytical.xUnit
         /// to BuildingModel is closed within <see cref="Core.Constants.Tolerance.MacroDistance"/>.
         /// Escalates tolerance from default (<see cref="Core.Constants.Tolerance.Distance"/>) upward
         /// until the shell is closed or the maximum tolerance is exceeded.
+        /// <para>Medium test (5.0 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void BuildingModel_FromGmfFile_ShellsAreClosed()
         {
             string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");

@@ -9,8 +9,11 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Facts
     {
-        /// <summary>Runs the solver against every building in the sample 2476_GML.gmf GIS model and verifies that each footprint with a positive-area external edge resolves to a defined shape, that classification is deterministic across repeated runs, and that simple rectangular and square footprints form the majority.</summary>
-        [Fact]
+        /// <summary>
+        /// Runs the solver against every building in the sample 2476_GML.gmf GIS model and verifies that each footprint with a positive-area external edge resolves to a defined shape, that classification is deterministic across repeated runs, and that simple rectangular and square footprints form the majority.
+        /// <para>Medium test (3.4 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
+        /// </summary>
+        [MediumFact]
         public void BuildingShapeSolver_GISModel()
         {
             string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");

@@ -11,8 +11,9 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         /// <summary>
         /// Verifies the resume path of <c>Modify.RunYOLOTrainingAsync</c>: a finished checkpoint, one whose dataset is gone, one that cannot be read and one whose recorded run folder was moved or renamed are each refused by name before the training starts, and a valid interrupted folder passes, hands ultralytics only <c>resume</c> and <c>device</c>, and copies the produced weights the way a fresh run does.
         /// <para>The checkpoint is read through stand-in torch and ultralytics modules written into the working directory, so no real ultralytics or GPU is needed. The interpreter is machine specific, so the fact returns without asserting when none is installed.</para>
+        /// <para>Medium test (1.6 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task RunYOLOTrainingAsync_Resume()
         {
             string? pythonPath = PythonPath_Runnable();

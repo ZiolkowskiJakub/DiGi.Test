@@ -15,8 +15,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     {
         /// <summary>
         /// Tests a background solar radiation job end to end on a scripted GIS Web API and the real calculation: before it runs, its results and view answer 409; once its consumer has run it, the results are the JSON the synchronous route answers for the same building, and the view - built from them without solving again - matches the synchronous view route surface by surface and names the weather station. An unknown job answers 404.
+        /// <para>Medium test (6.7 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task SolarController_GetJobResult()
         {
             BuildingModel buildingModel = SolarFixture_Box();

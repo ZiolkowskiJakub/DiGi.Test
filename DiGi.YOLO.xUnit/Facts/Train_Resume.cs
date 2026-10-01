@@ -145,8 +145,9 @@ namespace DiGi.YOLO.xUnit
         /// <summary>
         /// Verifies that <see cref="Classes.YOLOCheckpointInformation"/> keeps what it is given through the string round trip and the clone - including the raw train_args, held as JSON text and answered as a JSON object - and that <see cref="Query.YOLOCheckpointInformation(string?, string?, string?, System.Threading.CancellationToken)"/> reads the epoch, ceiling and finished state of real ultralytics checkpoints written by the pinned version, and answers <c>null</c> for a missing or unreadable file.
         /// <para>The real checkpoints are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf; the fact still asserts the serialization and missing-file behaviour without it.</para>
+        /// <para>Medium test (8.6 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void YOLOCheckpointInformation()
         {
             Classes.YOLOCheckpointInformation yOLOCheckpointInformation_Serialized = new(0.31, @"C:\data\conf.yaml", 2, 6, false, "train9", @"C:\YOLO\runs\detect", "{\"data\":\"conf.yaml\",\"epochs\":6}");
@@ -212,8 +213,9 @@ namespace DiGi.YOLO.xUnit
         /// <summary>
         /// Continues a real interrupted training run through <see cref="Modify.Train(Classes.YOLOTrainingOptions?, System.Threading.CancellationToken)"/>: a 2-epoch run with save_period is cut back to its first per-epoch checkpoint, read by <see cref="Query.YOLOCheckpointInformation(string?, string?, string?, System.Threading.CancellationToken)"/>, and resumed, on a synthetic dataset.
         /// <para>The interpreter and start checkpoint are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf and the fact returns without asserting when either is absent. It needs a GPU to finish in reasonable time and is meant to be run on its own. The frozen model.pt is hashed before and after: no run may change it.</para>
+        /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
-        [Fact]
+        [LongFact]
         public void Train_Smoke_Resume()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();

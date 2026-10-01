@@ -35,8 +35,9 @@ namespace DiGi.Solar.xUnit
         /// Benchmarks the shading solvers on a grid of buildings in which every surface is a receiver, so the buildings shade each other.
         /// <para>Compares the CPU <see cref="ShadingSolver"/> with the ComputeSharp solver on a hardware GPU (<see cref="ComputeDeviceType.Hardware"/>) for grids of 1 to 144 buildings (5 to 720 surfaces).
         /// WARP is not measured: it was withdrawn in ZiolkowskiJakub/DiGi.Solar#10. Results are written to <c>ShadingSolver_Benchmark_Receivers.txt</c> in the reports directory.</para>
+        /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
-        [Fact]
+        [LongFact]
         [SupportedOSPlatform("windows")]
         public void ShadingSolver_Benchmark_Receivers()
         {
@@ -46,8 +47,9 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Benchmarks the shading solvers on one receiving building surrounded by shading-only buildings, the configuration of a per-building solar analysis.
         /// <para>The receiving building (5 surfaces) sits at the centre of grids of 1 to 144 buildings; every other building only casts shadows. Results are written to <c>ShadingSolver_Benchmark_Surroundings.txt</c> in the reports directory.</para>
+        /// <para>Medium test (10.1 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         [SupportedOSPlatform("windows")]
         public void ShadingSolver_Benchmark_Surroundings()
         {

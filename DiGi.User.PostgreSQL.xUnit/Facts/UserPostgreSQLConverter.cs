@@ -14,8 +14,9 @@ namespace DiGi.User.PostgreSQL.xUnit
         /// Tests that a user can be created against a server holding no database for it at all - the database, the table and the credential columns are all brought into existence by the write path.
         /// <para>The order is the one <c>UIPostgreSQLUserCreateTask</c> uses, and it is the point of the fact: the duplicate check is a read, and a read repairs neither an absent database (the connection fails to open with 3D000) nor a database without the table (the statement fails with 42P01).</para>
         /// <para>Runs against a throwaway database name that is dropped either side of the run, so nothing it does can reach the real one. Requires a database: returns without asserting when User_PostgreSQL_Main.conf is absent or unreachable.</para>
+        /// <para>Medium test (1.6 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task UserPostgreSQLConverter_CreatesDatabase()
         {
             const string database = "user_xunit_createsdatabase";

@@ -15,8 +15,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests the solar radiation view the Building Viewer applies in place: every surface names a node of the Building Viewer scene of the same building (<c>ToGLTF_GLTFNodes</c> with the root <c>PostgreSQL.Create.Reference(buildingModel, null, countyId)</c>), takes the colour of <see cref="Query.SolarIrradiationColor(double)"/> for its irradiation and carries its <see cref="SurfaceSolarRadiationResult"/>; the floor, which receives nothing, is left out.
         /// <para>Without a root the references fall back to the component's own unique reference, as the viewer conversion does. A missing building or missing results give no view.</para>
+        /// <para>Medium test (2.1 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Create_SolarRadiationViewModel()
         {
             BuildingModel buildingModel = SolarFixture_Box();

@@ -11,9 +11,10 @@ namespace DiGi.PostgreSQL.Table.xUnit
         /// Verifies that a caller-supplied commandTimeout reaches the DetectSeparatorAsync command: while a second connection holds an ACCESS EXCLUSIVE lock on the basetable, a one second commandTimeout must abort the blocked separator query (Npgsql 10 surfaces it as an NpgsqlException wrapping a TimeoutException) instead of waiting out the 30 second Npgsql default.
         /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#4: the unmodified DetectSeparatorAsync never assigns npgsqlCommand.CommandTimeout, so with the lock released after 3 seconds the query completes normally instead of throwing at one second. The control leg then shows a generous commandTimeout completes the same query and returns a detected separator.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// <para>Medium test (3.3 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        [SkippableFact]
+        [MediumSkippableFact]
         public async Task DetectSeparatorAsync_CommandTimeout()
         {
             if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))

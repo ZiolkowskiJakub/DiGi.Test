@@ -6,8 +6,11 @@ namespace DiGi.GIS.xUnit
 {
     public partial class Facts
     {
-        /// <summary>Loads a real GIS model from the 2476_GML.gmf sample file and recalculates occupancy, verifying that the calculation completes without throwing and assigns occupancy results to the model's administrative subdivisions.</summary>
-        [Fact]
+        /// <summary>
+        /// Loads a real GIS model from the 2476_GML.gmf sample file and recalculates occupancy, verifying that the calculation completes without throwing and assigns occupancy results to the model's administrative subdivisions.
+        /// <para>Medium test (2.8 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
+        /// </summary>
+        [MediumFact]
         public void CalculateOccupancy()
         {
             string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "2476_GML.gmf");

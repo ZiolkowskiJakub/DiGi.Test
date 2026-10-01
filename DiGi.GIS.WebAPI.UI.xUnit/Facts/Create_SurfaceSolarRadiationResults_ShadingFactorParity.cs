@@ -21,8 +21,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// Tests that the bulk shading factor read-out (<c>ShadingModel.TryGetShadingFactors</c>, DiGi.GIS.WebAPI.UI#63) gives the beam irradiation the cloning per-receiver read-out gave, on the box behind the 60 m screen of <see cref="Create_SurfaceSolarRadiationResults_Surroundings"/>.
         /// <para>The reference is the former aggregation, rebuilt here: <c>GetShadingSolverResults</c> per receiver, shaded area over face area clamped to [0, 1], and the beam of <c>SolarPowerResult_ByShadingFactor</c> summed over the same EPW hours. Two bounds, not the max alone: the 95th percentile and a loose max of the per-hour beam difference between the two read-outs over every receiver and hour, and each receiver's annual beam against the served result. Diffuse and ground do not depend on the shading factor and are left to the other facts.</para>
         /// <para>The screen shades the south wall at most daytime hours, so a wrong lookup or a wrong clamp bound changes its beam. Measured: 19 168 shaded receiver-hours, no raw factor outside [0, 1], and every annual beam equal to the reference bit for bit, so a clamp that is only missing cannot be observed on this fixture - it guards against an overshoot of a few ulps.</para>
+        /// <para>Medium test (7.7 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Create_SurfaceSolarRadiationResults_ShadingFactorParity()
         {
             BuildingModel buildingModel = SolarFixture_Box();

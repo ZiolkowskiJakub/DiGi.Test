@@ -14,8 +14,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests that a wall stored with its normal pointing into the building gets the results of its outward side: a box whose west wall is stored inward gives the same results as the box stored outward.
         /// <para>A component's stored normal is its drawing orientation, and many downloaded models store their walls inward. The irradiance of a surface depends on which way it faces, so the calculation takes the outward normals of the external envelope. The fact also shows what it guards against: solving the inward box with the west wall's stored normal gives that wall the east wall's morning sun instead of its own afternoon sun.</para>
+        /// <para>Medium test (6.1 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Create_SurfaceSolarRadiationResults_InwardNormal()
         {
             EPWFile ePWFile = SolarFixture_EPWFile();

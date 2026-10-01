@@ -45,9 +45,10 @@ namespace DiGi.PostgreSQL.xUnit
         /// <para>The seed gives every name a 4096 character payload, which makes the client-side row loop dominate the read - measured warm on the development database: 126-171 ms of loop in a 132-181 ms total, the server-side reader phase only 6-14 ms - with about 10% variance between runs. The cancellation at 40% of the measured warm control total then lands inside the loop, which keeps running for well over 40% of the total, so the throw can only come from the loop honouring the token. At this cancellation point the unmodified code shape completed with all 32 767 rows on 12 of 12 runs and the fixed shape threw OperationCanceledException on 12 of 12.</para>
         /// <para>If the warm control total is under 100 ms the cancellation window is too small to attribute a throw to the loop, and the fact skips; the pin above still carries the token contract.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_PartitionReference.conf</c> (localhost), never production.</para>
+        /// <para>Medium test (2.7 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        [SkippableFact]
+        [MediumSkippableFact]
         public async Task PartitionsAsync_Cancellation_ReaderLoop()
         {
             if (!Create.IsAvailable(Enums.StorageMethod.PartitionReference, out ConnectionData? connectionData) || connectionData is null)

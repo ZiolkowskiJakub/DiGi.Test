@@ -163,8 +163,9 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// <summary>
         /// Verifies that the real image action answers a failed photo read with a status-carrying <see cref="ObjectResult"/> (500 or 503, never 404) and that no action-level <see cref="ProducesAttribute"/> remains to turn that answer into a 406.
         /// <para>The converter points at a port nothing listens on, so the read faults the way a broken database read does instead of answering null.</para>
+        /// <para>Medium test (2.1 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task OrtoDatasController_ImageByReference_FaultPath()
         {
             string path = ConfigurationFilePath();

@@ -465,6 +465,9 @@
     <File Path="DefaultDocumentation.json" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
+    <File Path="TestDuration.Long.runsettings" />
+    <File Path="TestDuration.Medium.runsettings" />
+    <File Path="TestDuration.Short.runsettings" />
   </Folder>
   <Folder Name="/Serilog/">
     <Project Path="../DiGi.Serilog/DiGi.Serilog/DiGi.Serilog.csproj" />

@@ -17,8 +17,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests that posting a background solar radiation job answers the refusals of the synchronous routes on a scripted GIS Web API, with the job ceilings in place of the synchronous ones: 400 for an invalid radius before any request is sent, 204 without a building or weather file, 422 for a building that cannot be located or is degenerate, 502 when the neighbours cannot be read, and 413 only above <see cref="Constants.Default.SolarJobReceiverCountMax"/> receivers or <see cref="Constants.Default.SolarJobCasterTriangleCountMax"/> caster triangles. None of them queues a job.
         /// <para>The 104-receiver building the synchronous routes refuse with 413 is accepted as a job with 202.</para>
+        /// <para>Medium test (2.3 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task SolarController_PostJobAsync_Refusals()
         {
             EPWFile ePWFile = SolarFixture_EPWFile();

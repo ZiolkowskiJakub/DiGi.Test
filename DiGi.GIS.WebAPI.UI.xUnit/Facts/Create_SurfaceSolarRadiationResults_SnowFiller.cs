@@ -12,8 +12,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests that the filler snow depth of the IWEC Warsaw file does not turn the ground into snow: a wall's ground-reflected irradiation uses the 0.2 default albedo in every hour.
         /// <para><c>gis/epwfile/item</c> serves this file for Warsaw Ursynów, and it reports lying snow for most hours of the year, a filler value (ZiolkowskiJakub/DiGi.Solar#2). Deriving snow cover from it applied the 0.7 snow albedo almost all year and read a north wall at 658 kWh/m² instead of 410 (DiGi.GIS.WebAPI.UI#59, comment 5830021444). The fact first asserts the file really carries the filler, so it keeps testing the case it exists for. A vertical wall sees half the ground, so its ground component is the annual global horizontal irradiation times 0.2 / 2.</para>
+        /// <para>Medium test (2.0 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public void Create_SurfaceSolarRadiationResults_SnowFiller()
         {
             BuildingModel buildingModel = SolarFixture_Box();

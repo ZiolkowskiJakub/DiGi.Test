@@ -25,8 +25,9 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         /// <summary>
         /// Tests the solar radiation routes end to end on a scripted GIS Web API: the JSON route answers one DiGi-readable result per external wall and roof, the view route one coloured surface per result with the radius and the weather station, and the requests sent upstream are the declared ones.
         /// <para>The neighbour request is the wire contract with <c>gis/buildingmodel/itemsbycircle</c> (Coding - WebAPI Contracts, section 4): <c>x</c> and <c>y</c> are the centre of the footprint and <c>radius</c> reaches the requested radius beyond its farthest corner - 50 m plus the half-diagonal of the 10 m box. The weather is asked for at the same centre.</para>
+        /// <para>Medium test (4.4 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
-        [Fact]
+        [MediumFact]
         public async Task SolarController_GetRadiationByBuildingModelIdAsync()
         {
             BuildingModel buildingModel = SolarFixture_BuildingModel(SolarFixture_BoxComponents(SolarFixture_Origin.X, SolarFixture_Origin.Y, 10), new Point3D(SolarFixture_Origin.X + 5, SolarFixture_Origin.Y + 5, 5));
