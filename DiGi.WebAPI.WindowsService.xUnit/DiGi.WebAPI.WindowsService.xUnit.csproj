@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <LangVersion>latest</LangVersion>
+    <OutputPath>..\bin\$(MSBuildProjectName)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- The facts build the MVC and Swagger services the host registers, so the ASP.NET Core framework assemblies
+       have to be on the reference set even though this is a plain test project, not a web app. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- A ProjectReference rather than a HintPath to the host's bin: the host is rebuilt before every test run, and its
+       Swashbuckle and Microsoft.OpenApi packages flow here at exactly the versions it serves with. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiGi.WebAPI.WindowsService\DiGi.WebAPI.WindowsService\DiGi.WebAPI.WindowsService.csproj" />
+    <ProjectReference Include="..\DiGi.Core.xUnit\DiGi.Core.xUnit.csproj" />
+  </ItemGroup>
+
+  <!-- The host reaches DiGi.Core, DiGi.Serilog and DiGi.WebAPI by HintPath, which does not carry the reference
+       onward. The remaining entries name the payload types whose schemas the facts generate: IPolygonal2D
+       (DiGi.Geometry), AdministrativeAreal2DReference (DiGi.GIS.PostgreSQL) and UpdateItemsResult (DiGi.GIS.WebAPI). -->
+  <ItemGroup>
+    <Reference Include="DiGi.Core">
+      <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Geometry">
+      <HintPath>..\..\DiGi.Geometry\bin\DiGi.Geometry.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.PostgreSQL">
+      <HintPath>..\..\DiGi.GIS.PostgreSQL\bin\DiGi.GIS.PostgreSQL.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GIS.WebAPI">
+      <HintPath>..\..\DiGi.GIS.WebAPI\bin\DiGi.GIS.WebAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Serilog">
+      <HintPath>..\..\DiGi.Serilog\bin\DiGi.Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.WebAPI">
+      <HintPath>..\..\DiGi.WebAPI\bin\DiGi.WebAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
