@@ -1,5 +1,8 @@
+using DiGi.GIS.PostgreSQL.Enums;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
@@ -63,6 +66,47 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.NotNull(openApiSchema);
 
             return openApiSchema;
+        }
+
+        // Generates a whole document through the host's MVC JSON and schema configuration, holding exactly the operations of
+        // EnumControllerFixture, with the XML documentation of the test assembly and of the enum's assembly attached: what
+        // the host serves for a route prefix, minus the per-prefix document registration in Program. Unlike a schema
+        // generated on its own, it runs the parameter and document filters too.
+        private static OpenApiDocument SchemaGeneratorFixture_Document()
+        {
+            const string documentName = "fixture";
+
+            // A web application builder rather than a bare service collection: document generation needs the hosting
+            // environment. The application is built but never run.
+            WebApplicationBuilder webApplicationBuilder = WebApplication.CreateBuilder();
+            webApplicationBuilder.Services.AddControllers()
+                .AddJsonOptions(jsonOptions => jsonOptions.JsonSerializerOptions.ConfigureJsonSerializerOptions())
+                .ConfigureApplicationPartManager(applicationPartManager => applicationPartManager.FeatureProviders.Add(new ControllerFeatureProviderFixture()));
+            webApplicationBuilder.Services.AddSwaggerGen(swaggerGenOptions =>
+            {
+                swaggerGenOptions.SwaggerDoc(documentName, new OpenApiInfo { Title = documentName, Version = "1" });
+                swaggerGenOptions.ConfigureSchemaGeneration();
+                swaggerGenOptions.IncludeAssemblyXmlComments([typeof(Facts).Assembly, typeof(AdministrativeArealType).Assembly]);
+            });
+
+            using WebApplication webApplication = webApplicationBuilder.Build();
+
+            return webApplication.Services.GetRequiredService<ISwaggerProvider>().GetSwagger(documentName);
+        }
+
+        // The strings of an array-valued schema extension (x-enum-varnames, x-enumNames); null when the schema does not
+        // carry the extension.
+        private static List<string?>? SchemaGeneratorFixture_ExtensionStrings(IOpenApiSchema? openApiSchema, string name)
+        {
+            if (openApiSchema?.Extensions is null || !openApiSchema.Extensions.TryGetValue(name, out IOpenApiExtension? openApiExtension))
+            {
+                return null;
+            }
+
+            JsonArray? jsonArray = (openApiExtension as JsonNodeExtension)?.Node as JsonArray;
+            Assert.NotNull(jsonArray);
+
+            return [.. jsonArray.Select(jsonNode => jsonNode?.GetValue<string>())];
         }
 
         // The property names the DiGi serializer actually writes for an instance, in the order it writes them: the wire

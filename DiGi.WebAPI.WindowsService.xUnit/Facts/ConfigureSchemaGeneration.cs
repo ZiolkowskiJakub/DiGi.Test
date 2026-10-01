@@ -4,6 +4,7 @@ using DiGi.EPW.Classes;
 using DiGi.Geometry.Planar.Classes;
 using DiGi.Geometry.Planar.Interfaces;
 using DiGi.GIS.PostgreSQL.Classes;
+using DiGi.GIS.PostgreSQL.Enums;
 using DiGi.GIS.WebAPI.Classes;
 using DiGi.Weather.Classes;
 using DiGi.WebAPI.Classes;
@@ -13,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -24,6 +26,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
         /// <summary>
         /// Reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#3 on the payload it was reported with: the schema of <see cref="AdministrativeAreal2DReference"/> must name exactly the properties the DiGi serializer writes (PascalCase, <c>_type</c> included), require all of them because the serializer always writes every member (<c>null</c> explicitly), keep a nullable member nullable, and give <c>_type</c> the serialized type name as its example.
         /// <para>The expected names come from serializing a real instance, and the wire itself is pinned against the response quoted in the issue, so the fact cannot pass because the schema and the serializer drifted together.</para>
+        /// <para>Also reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6 on the same payload: its <see cref="AdministrativeArealType"/> travels as an integer, so the property must be an inline integer schema listing the values in numeric order, naming them for code generators and keeping the member's own description - while the shared component stays the string schema query parameters bind against.</para>
         /// </summary>
         [Fact]
         public void ConfigureSchemaGeneration_SerializableObject()
@@ -39,7 +42,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             string? fullTypeName = jsonObject[Core.Constants.Serialization.PropertyName.Type]?.GetValue<string>();
             Assert.Equal("DiGi.GIS.PostgreSQL.Classes.AdministrativeAreal2DReference,DiGi.GIS.PostgreSQL", fullTypeName);
 
-            OpenApiSchema openApiSchema = SchemaGeneratorFixture_Schema(typeof(AdministrativeAreal2DReference));
+            OpenApiSchema openApiSchema = SchemaGeneratorFixture_Schema(typeof(AdministrativeAreal2DReference), out SchemaRepository schemaRepository);
 
             Assert.NotNull(openApiSchema.Properties);
             Assert.Equal(names_Wire.Order(StringComparer.Ordinal), openApiSchema.Properties.Keys.Order(StringComparer.Ordinal));
@@ -56,6 +59,35 @@ namespace DiGi.WebAPI.WindowsService.xUnit
 
             Assert.Equal(JsonSchemaType.Null, openApiSchema.Properties["CountyId"].Type & JsonSchemaType.Null);
             Assert.NotEqual(JsonSchemaType.Null, openApiSchema.Properties["Id"].Type & JsonSchemaType.Null);
+
+            // ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6: the serializer writes the enum as its underlying integer, as in the
+            // response quoted there ("AdministrativeArealType": 2), so the property declares exactly those integers.
+            JsonNode? jsonNode_AdministrativeArealType = Core.Convert.ToJson(new AdministrativeAreal2DReference() { AdministrativeArealType = AdministrativeArealType.County })?["AdministrativeArealType"];
+            Assert.NotNull(jsonNode_AdministrativeArealType);
+            Assert.Equal(JsonValueKind.Number, jsonNode_AdministrativeArealType.GetValueKind());
+            Assert.Equal((int)AdministrativeArealType.County, jsonNode_AdministrativeArealType.GetValue<int>());
+
+            OpenApiSchema? openApiSchema_AdministrativeArealType = openApiSchema.Properties["AdministrativeArealType"] as OpenApiSchema;
+            Assert.NotNull(openApiSchema_AdministrativeArealType);
+            Assert.Equal(JsonSchemaType.Integer, openApiSchema_AdministrativeArealType.Type);
+            Assert.Equal("int32", openApiSchema_AdministrativeArealType.Format);
+
+            // In numeric order: Enum.GetValues orders by the unsigned bit pattern and would put Undefined = -1 last.
+            Assert.NotNull(openApiSchema_AdministrativeArealType.Enum);
+            Assert.Equal([-1, 0, 1, 2, 3, 4], openApiSchema_AdministrativeArealType.Enum.Select(jsonNode => jsonNode?.GetValue<int>()));
+            Assert.Equal(["Undefined", "Country", "Voivodeship", "County", "Municipality", "Subdivision"], SchemaGeneratorFixture_ExtensionStrings(openApiSchema_AdministrativeArealType, "x-enum-varnames"));
+            Assert.Equal(["Undefined", "Country", "Voivodeship", "County", "Municipality", "Subdivision"], SchemaGeneratorFixture_ExtensionStrings(openApiSchema_AdministrativeArealType, "x-enumNames"));
+
+            // The member's own description (lost beside a $ref in OpenAPI 3.0), then the enum's, then the wire mapping.
+            Assert.NotNull(openApiSchema_AdministrativeArealType.Description);
+            Assert.Contains("Gets or sets the type of the administrative area", openApiSchema_AdministrativeArealType.Description);
+            Assert.Contains("Represents the type of administrative area.", openApiSchema_AdministrativeArealType.Description);
+            Assert.Contains("Undefined = -1", openApiSchema_AdministrativeArealType.Description);
+            Assert.Contains("County = 2", openApiSchema_AdministrativeArealType.Description);
+
+            // The shared component keeps describing what the query parameters bind: member names.
+            Assert.True(schemaRepository.Schemas.TryGetValue(nameof(AdministrativeArealType), out IOpenApiSchema? openApiSchema_Component));
+            Assert.Equal(JsonSchemaType.String, openApiSchema_Component.Type);
         }
 
         /// <summary>
@@ -116,6 +148,136 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.True(jsonObject_Health["nullable"]?.GetValue<bool>());
             Assert.NotNull(jsonObject_Health["allOf"]);
             Assert.False(jsonObject_Health.ContainsKey("type"), stringWriter.ToString());
+        }
+
+        /// <summary>
+        /// Reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6 on every enum shape a DiGi payload can carry, each of which the DiGi serializer writes as integers: a nullable enum, a list and a dictionary of enums, a <c>[Flags]</c> enum and a long-backed enum.
+        /// <para>A nullable enum lists <c>null</c> among its values, because OpenAPI 3.0's <c>nullable</c> widens <c>type</c> only and an <c>enum</c> without <c>null</c> still rejects the explicit <c>null</c> the serializer writes; the rendered 3.0 form is asserted for that reason. A <c>[Flags]</c> enum lists no values, because a combined value (<c>Read | Write = 3</c>) is in no member list, and describes its bits instead.</para>
+        /// </summary>
+        [Fact]
+        public void ConfigureSchemaGeneration_EnumMember()
+        {
+            EnumSerializableObjectFixture enumSerializableObjectFixture = new(null, [AdministrativeArealType.County], new Dictionary<string, AdministrativeArealType>() { ["2412"] = AdministrativeArealType.County }, FlagsEnumFixture.Read | FlagsEnumFixture.Write, LongEnumFixture.Large);
+
+            JsonObject? jsonObject = Core.Convert.ToJson(enumSerializableObjectFixture);
+            Assert.NotNull(jsonObject);
+            Assert.True(jsonObject.ContainsKey(nameof(EnumSerializableObjectFixture.Level)));
+            Assert.Null(jsonObject[nameof(EnumSerializableObjectFixture.Level)]);
+            Assert.Equal((int)AdministrativeArealType.County, jsonObject[nameof(EnumSerializableObjectFixture.Levels)]?[0]?.GetValue<int>());
+            Assert.Equal((int)AdministrativeArealType.County, jsonObject[nameof(EnumSerializableObjectFixture.LevelsByCode)]?["2412"]?.GetValue<int>());
+            Assert.Equal(3, jsonObject[nameof(EnumSerializableObjectFixture.Flags)]?.GetValue<int>());
+            Assert.Equal((long)LongEnumFixture.Large, jsonObject[nameof(EnumSerializableObjectFixture.Long)]?.GetValue<long>());
+
+            OpenApiSchema openApiSchema = SchemaGeneratorFixture_Schema(typeof(EnumSerializableObjectFixture));
+            Assert.NotNull(openApiSchema.Properties);
+
+            List<int?> values_AdministrativeArealType = [-1, 0, 1, 2, 3, 4];
+            List<string?> names_AdministrativeArealType = ["Undefined", "Country", "Voivodeship", "County", "Municipality", "Subdivision"];
+
+            // Nullable: the null type, and null last among the values so the name arrays stay aligned with the integers.
+            OpenApiSchema? openApiSchema_Level = openApiSchema.Properties[nameof(EnumSerializableObjectFixture.Level)] as OpenApiSchema;
+            Assert.NotNull(openApiSchema_Level);
+            Assert.Equal(JsonSchemaType.Integer | JsonSchemaType.Null, openApiSchema_Level.Type);
+            Assert.NotNull(openApiSchema_Level.Enum);
+            Assert.Null(openApiSchema_Level.Enum[^1]);
+            Assert.Equal(values_AdministrativeArealType, openApiSchema_Level.Enum.Take(openApiSchema_Level.Enum.Count - 1).Select(jsonNode => jsonNode?.GetValue<int>()));
+            Assert.Equal(names_AdministrativeArealType, SchemaGeneratorFixture_ExtensionStrings(openApiSchema_Level, "x-enum-varnames"));
+            Assert.NotNull(openApiSchema_Level.Description);
+            Assert.Contains("Gets the administrative level of the fixture", openApiSchema_Level.Description);
+
+            StringWriter stringWriter = new();
+            openApiSchema_Level.SerializeAsV3(new OpenApiJsonWriter(stringWriter));
+            JsonObject? jsonObject_Level = JsonNode.Parse(stringWriter.ToString()) as JsonObject;
+            Assert.NotNull(jsonObject_Level);
+            Assert.Equal("integer", jsonObject_Level["type"]?.GetValue<string>());
+            Assert.True(jsonObject_Level["nullable"]?.GetValue<bool>());
+            Assert.False(jsonObject_Level.ContainsKey("allOf"), stringWriter.ToString());
+            JsonArray? jsonArray_Level = jsonObject_Level["enum"] as JsonArray;
+            Assert.NotNull(jsonArray_Level);
+            Assert.Null(jsonArray_Level[^1]);
+
+            // List and dictionary: the element schema is the inline integer one.
+            IOpenApiSchema openApiSchema_Levels = openApiSchema.Properties[nameof(EnumSerializableObjectFixture.Levels)];
+            Assert.Equal(JsonSchemaType.Array, openApiSchema_Levels.Type & ~JsonSchemaType.Null);
+            OpenApiSchema? openApiSchema_Levels_Item = openApiSchema_Levels.Items as OpenApiSchema;
+            Assert.NotNull(openApiSchema_Levels_Item);
+            Assert.Equal(JsonSchemaType.Integer, openApiSchema_Levels_Item.Type);
+            Assert.NotNull(openApiSchema_Levels_Item.Enum);
+            Assert.Equal(values_AdministrativeArealType, openApiSchema_Levels_Item.Enum.Select(jsonNode => jsonNode?.GetValue<int>()));
+
+            IOpenApiSchema openApiSchema_LevelsByCode = openApiSchema.Properties[nameof(EnumSerializableObjectFixture.LevelsByCode)];
+            OpenApiSchema? openApiSchema_LevelsByCode_Value = openApiSchema_LevelsByCode.AdditionalProperties as OpenApiSchema;
+            Assert.NotNull(openApiSchema_LevelsByCode_Value);
+            Assert.Equal(JsonSchemaType.Integer, openApiSchema_LevelsByCode_Value.Type);
+            Assert.NotNull(openApiSchema_LevelsByCode_Value.Enum);
+            Assert.Equal(values_AdministrativeArealType, openApiSchema_LevelsByCode_Value.Enum.Select(jsonNode => jsonNode?.GetValue<int>()));
+
+            // [Flags]: no value list, which the combined 3 would fail; the bits are in the description.
+            OpenApiSchema? openApiSchema_Flags = openApiSchema.Properties[nameof(EnumSerializableObjectFixture.Flags)] as OpenApiSchema;
+            Assert.NotNull(openApiSchema_Flags);
+            Assert.Equal(JsonSchemaType.Integer, openApiSchema_Flags.Type);
+            Assert.True(openApiSchema_Flags.Enum is null || openApiSchema_Flags.Enum.Count == 0);
+            Assert.Null(SchemaGeneratorFixture_ExtensionStrings(openApiSchema_Flags, "x-enum-varnames"));
+            Assert.NotNull(openApiSchema_Flags.Description);
+            Assert.Contains("Read = 1", openApiSchema_Flags.Description);
+            Assert.Contains("Write = 2", openApiSchema_Flags.Description);
+            Assert.Contains("Execute = 4", openApiSchema_Flags.Description);
+
+            // Long-backed: int64, and a value beyond the int32 range listed exactly.
+            OpenApiSchema? openApiSchema_Long = openApiSchema.Properties[nameof(EnumSerializableObjectFixture.Long)] as OpenApiSchema;
+            Assert.NotNull(openApiSchema_Long);
+            Assert.Equal(JsonSchemaType.Integer, openApiSchema_Long.Type);
+            Assert.Equal("int64", openApiSchema_Long.Format);
+            Assert.NotNull(openApiSchema_Long.Enum);
+            Assert.Equal([(long)LongEnumFixture.Small, (long)LongEnumFixture.Large], openApiSchema_Long.Enum.Select(jsonNode => jsonNode?.GetValue<long>()));
+        }
+
+        /// <summary>
+        /// Reproduces the document-level half of ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6 on a whole document generated through the host's configuration from <see cref="EnumControllerFixture"/>.
+        /// <para>An enum query parameter keeps its string component, which is accurate for binding (names and integers both bind), and its description gains the integer values and the advice to send them (<c>Coding - WebAPI Contracts.md</c>, "Send enum values as integers"). An enum component that only DiGi payload members used is removed once those members are declared inline, because left behind it would still advertise the string form; the one the parameter references stays. No enum component is referenced from inside the DiGi payload schema any more - the detector for an enum shape the payload rewrite does not cover.</para>
+        /// </summary>
+        [Fact]
+        public void ConfigureSchemaGeneration_Document()
+        {
+            OpenApiDocument openApiDocument = SchemaGeneratorFixture_Document();
+
+            Assert.NotNull(openApiDocument.Paths);
+            Assert.True(openApiDocument.Paths.TryGetValue("/fixture/item", out IOpenApiPathItem? openApiPathItem));
+            Assert.NotNull(openApiPathItem.Operations);
+            Assert.True(openApiPathItem.Operations.TryGetValue(HttpMethod.Get, out OpenApiOperation? openApiOperation));
+            Assert.NotNull(openApiOperation.Parameters);
+
+            IOpenApiParameter openApiParameter = Assert.Single(openApiOperation.Parameters);
+            Assert.Equal("administrativearealtype", openApiParameter.Name);
+
+            OpenApiSchemaReference? openApiSchemaReference_Parameter = openApiParameter.Schema as OpenApiSchemaReference;
+            Assert.NotNull(openApiSchemaReference_Parameter);
+            Assert.Equal(nameof(AdministrativeArealType), openApiSchemaReference_Parameter.Reference.Id);
+
+            // The parameter's own XML description is kept and the integer values are appended to it.
+            Assert.NotNull(openApiParameter.Description);
+            Assert.Contains("The administrative level to return.", openApiParameter.Description);
+            Assert.Contains("Undefined = -1", openApiParameter.Description);
+            Assert.Contains("County = 2", openApiParameter.Description);
+
+            Assert.NotNull(openApiDocument.Components?.Schemas);
+            IDictionary<string, IOpenApiSchema> schemas = openApiDocument.Components.Schemas;
+
+            Assert.True(schemas.TryGetValue(nameof(AdministrativeArealType), out IOpenApiSchema? openApiSchema_AdministrativeArealType));
+            Assert.Equal(JsonSchemaType.String, openApiSchema_AdministrativeArealType.Type);
+
+            Assert.True(schemas.ContainsKey(nameof(EnumSerializableObjectFixture)));
+            Assert.False(schemas.ContainsKey(nameof(FlagsEnumFixture)), "An enum component no longer referenced by anything was left in the document.");
+            Assert.False(schemas.ContainsKey(nameof(LongEnumFixture)), "An enum component no longer referenced by anything was left in the document.");
+
+            // Detector: no $ref to an enum component inside the DiGi payload schema.
+            StringWriter stringWriter = new();
+            schemas[nameof(EnumSerializableObjectFixture)].SerializeAsV3(new OpenApiJsonWriter(stringWriter));
+            string json_Payload = stringWriter.ToString();
+            foreach (KeyValuePair<string, IOpenApiSchema> keyValuePair in schemas.Where(keyValuePair => keyValuePair.Value.Enum is not null && keyValuePair.Value.Enum.Count != 0))
+            {
+                Assert.DoesNotContain($"#/components/schemas/{keyValuePair.Key}\"", json_Payload);
+            }
         }
 
         /// <summary>
