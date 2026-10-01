@@ -38,7 +38,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
         // A background job with a fake calculation, so the queue, the gate and the states are tested without geometry.
         private static SolarJob SolarJobFixture_Job(Func<List<SurfaceSolarRadiationResult>?> calculation, long buildingModelId = 7)
         {
-            return new SolarJob(Guid.NewGuid(), buildingModelId, 1465, Constants.Default.SolarSurroundingRadius, 5, null, null, calculation);
+            return new SolarJob(Guid.NewGuid(), buildingModelId, 1465, Constants.Default.SolarSurroundingRadius, 5, null, null, null, calculation);
         }
 
         // Polls a job until its view satisfies the condition, failing the fact after the timeout.

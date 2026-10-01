@@ -12,7 +12,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests the states of a background solar radiation job: Queued when queued, Running while its calculation runs, Completed with the calculated results; Failed with the exception type and message when the calculation throws, and Failed with a message when it gives no result. A finished job has released its calculation, and a failed one its building and neighbours too, which only a completed job's scene needs.
+        /// Tests the states of a background solar radiation job: Queued when queued, Running while its calculation runs, Completed with the calculated results; Failed with the exception type and message when the calculation throws, and Failed with a message when it gives no result. A finished job has released its calculation, and a failed one its building too, which only a completed job's view needs.
         /// </summary>
         [Fact]
         public async Task Modify_SolveAsync_Status()
@@ -48,7 +48,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
 
             // A throwing calculation: Failed, with the exception, and the gate released.
             BuildingModel buildingModel = SolarFixture_Box();
-            SolarJob solarJob_Throw = new(Guid.NewGuid(), 7, 1465, Constants.Default.SolarSurroundingRadius, 5, buildingModel, [buildingModel], () => throw new InvalidOperationException("Shading model has no receivers."));
+            SolarJob solarJob_Throw = new(Guid.NewGuid(), 7, 1465, Constants.Default.SolarSurroundingRadius, 5, buildingModel, null, null, () => throw new InvalidOperationException("Shading model has no receivers."));
             Assert.True(solarJobQueue.TryEnqueue(solarJob_Throw));
             await solarJobQueue.SolveAsync(solarJob_Throw, semaphoreSlim);
 
@@ -58,7 +58,6 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Null(solarJob_Throw.SurfaceSolarRadiationResults);
             Assert.Null(solarJob_Throw.Calculation);
             Assert.Null(solarJob_Throw.BuildingModel);
-            Assert.Null(solarJob_Throw.BuildingModels_Surrounding);
             Assert.Equal(1, semaphoreSlim.CurrentCount);
 
             // No result: Failed, with a message naming the building.

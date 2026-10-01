@@ -64,7 +64,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Null(solarJob_Running.SurfaceSolarRadiationResults);
             Assert.NotNull(solarJob_Running.FinishedAt);
             SolarController_AssertStatus(solarController.GetJobResult(solarJob_Running.Id), StatusCodes.Status409Conflict);
-            SolarController_AssertStatus(solarController.GetJobGLB(solarJob_Running.Id), StatusCodes.Status409Conflict);
+            SolarController_AssertStatus(solarController.GetJobView(solarJob_Running.Id), StatusCodes.Status409Conflict);
 
             // Unknown.
             SolarController_AssertStatus(solarController.DeleteJob(Guid.NewGuid()), StatusCodes.Status404NotFound);

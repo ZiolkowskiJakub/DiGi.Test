@@ -89,6 +89,9 @@
     <Reference Include="DiGi.GLTF">
       <HintPath>..\..\DiGi.GLTF\bin\DiGi.GLTF.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.GLTF.Analytical">
+      <HintPath>..\..\DiGi.GLTF.Analytical\bin\DiGi.GLTF.Analytical.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.PostgreSQL.Table">
       <HintPath>..\..\DiGi.PostgreSQL\bin\DiGi.PostgreSQL.Table.dll</HintPath>
     </Reference>

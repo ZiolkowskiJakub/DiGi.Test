@@ -14,7 +14,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests a background solar radiation job end to end on a scripted GIS Web API and the real calculation: before it runs, its results and scene answer 409; once its consumer has run it, the results are the JSON the synchronous route answers for the same building, and the scene is a binary glTF built from them without solving again. An unknown job answers 404.
+        /// Tests a background solar radiation job end to end on a scripted GIS Web API and the real calculation: before it runs, its results and view answer 409; once its consumer has run it, the results are the JSON the synchronous route answers for the same building, and the view - built from them without solving again - matches the synchronous view route surface by surface and names the weather station. An unknown job answers 404.
         /// </summary>
         [Fact]
         public async Task SolarController_GetJobResult()
@@ -29,7 +29,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Guid id = Guid.Parse(Assert.IsType<SolarJobViewModel>(acceptedResult.Value).JobId);
 
             SolarController_AssertStatus(solarController.GetJobResult(id), StatusCodes.Status409Conflict);
-            SolarController_AssertStatus(solarController.GetJobGLB(id), StatusCodes.Status409Conflict);
+            SolarController_AssertStatus(solarController.GetJobView(id), StatusCodes.Status409Conflict);
 
             SolarJob solarJob = Assert.IsType<SolarJob>(solarJobQueue.SolarJob(id));
             await solarJobQueue.SolveAsync(solarJob, semaphoreSlim);
@@ -52,20 +52,32 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
                 Assert.Equal(surfaceSolarRadiationResults_Synchronous[i].Irradiation, surfaceSolarRadiationResults[i].Irradiation, 9);
             }
 
-            // The scene, from the stored results: no further upstream request is sent for it.
+            // The view, from the stored results: no further upstream request is sent for it.
             int count = scriptedWebApi.Requests.Count;
-            FileContentResult fileContentResult = Assert.IsType<FileContentResult>(solarController.GetJobGLB(id));
-            Assert.Equal("model/gltf-binary", fileContentResult.ContentType);
-            Assert.True(fileContentResult.FileContents.Length > 0);
+            SolarRadiationViewModel solarRadiationViewModel = Assert.IsType<SolarRadiationViewModel>(Assert.IsType<OkObjectResult>(solarController.GetJobView(id)).Value);
             Assert.Equal(count, scriptedWebApi.Requests.Count);
+            Assert.Equal(20, solarRadiationViewModel.Radius);
+            Assert.False(string.IsNullOrWhiteSpace(solarRadiationViewModel.StationName));
+            Assert.StartsWith("/epwfile/item?x=", solarRadiationViewModel.StationUrl);
 
-            // The calculation and its inputs are released; the building and neighbours are kept for the scene.
+            SolarRadiationViewModel solarRadiationViewModel_Synchronous = Assert.IsType<SolarRadiationViewModel>(Assert.IsType<OkObjectResult>(await solarController.GetViewByBuildingModelIdAsync(7, 1465, 20)).Value);
+            Assert.Equal(5, solarRadiationViewModel.Surfaces.Count);
+            Assert.Equal(solarRadiationViewModel_Synchronous.Surfaces.Count, solarRadiationViewModel.Surfaces.Count);
+            for (int i = 0; i < solarRadiationViewModel.Surfaces.Count; i++)
+            {
+                Assert.Equal(solarRadiationViewModel_Synchronous.Surfaces[i].Reference, solarRadiationViewModel.Surfaces[i].Reference);
+                Assert.Equal(solarRadiationViewModel_Synchronous.Surfaces[i].Color, solarRadiationViewModel.Surfaces[i].Color);
+            }
+
+            Assert.Equal(solarRadiationViewModel_Synchronous.StationName, solarRadiationViewModel.StationName);
+            Assert.Equal(solarRadiationViewModel_Synchronous.StationUrl, solarRadiationViewModel.StationUrl);
+
+            // The calculation and its inputs are released; the building is kept for the view.
             Assert.Null(solarJob.Calculation);
             Assert.NotNull(solarJob.BuildingModel);
-            Assert.NotNull(solarJob.BuildingModels_Surrounding);
 
             SolarController_AssertStatus(solarController.GetJobResult(Guid.NewGuid()), StatusCodes.Status404NotFound);
-            SolarController_AssertStatus(solarController.GetJobGLB(Guid.NewGuid()), StatusCodes.Status404NotFound);
+            SolarController_AssertStatus(solarController.GetJobView(Guid.NewGuid()), StatusCodes.Status404NotFound);
         }
     }
 }

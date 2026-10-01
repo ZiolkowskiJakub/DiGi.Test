@@ -14,7 +14,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests the queue limit of the background solar radiation jobs: with no consumer running, <see cref="Constants.Default.SolarJobQueueLengthMax"/> posts are accepted with 202, a <c>Location</c> and increasing queue positions; the next is refused with a 503 and a <c>Retry-After</c> of <see cref="Constants.Default.SolarJobRetryAfterSeconds"/> before any upstream request is sent; cancelling a queued job frees its place at once and releases its models.
+        /// Tests the queue limit of the background solar radiation jobs: with no consumer running, <see cref="Constants.Default.SolarJobQueueLengthMax"/> posts are accepted with 202, a <c>Location</c> and increasing queue positions; the next is refused with a 503 and a <c>Retry-After</c> of <see cref="Constants.Default.SolarJobRetryAfterSeconds"/> before any upstream request is sent; cancelling a queued job frees its place at once and releases its building.
         /// </summary>
         [Fact]
         public async Task SolarController_PostJobAsync_QueueFull()
@@ -48,7 +48,6 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             Assert.Equal(1, solarJobQueue.QueuePosition(ids[1]));
             SolarJob solarJob_Cancelled = Assert.IsType<SolarJob>(solarJobQueue.SolarJob(ids[0]));
             Assert.Null(solarJob_Cancelled.BuildingModel);
-            Assert.Null(solarJob_Cancelled.BuildingModels_Surrounding);
             Assert.IsType<AcceptedResult>(await SolarController_Controller(scriptedWebApi, null, solarJobQueue).PostJobAsync(7, 1465, null));
         }
     }
