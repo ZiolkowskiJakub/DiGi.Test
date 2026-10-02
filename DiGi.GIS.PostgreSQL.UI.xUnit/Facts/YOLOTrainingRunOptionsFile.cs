@@ -7,7 +7,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
     {
         /// <summary>
         /// Verifies that a tray training run's options file never overwrites an earlier one (ZiolkowskiJakub/DiGi.GIS.PostgreSQL.UI#20).
-        /// <para>The file is the record of what a run was asked to do. A validation-only or evaluation-only run started with the previous run name still in the dialog used to write <c>&lt;RunName&gt;.YOLOTrainingRunOptions.json</c> again and replace the training run's record without a word.</para>
+        /// <para>The file is the record of what a run was asked to do. A validation-only or evaluation-only run started with the previous run name still in the dialog used to write <c>&lt;RunName&gt;.YOLOTrainingRunOptions.json</c> again and replace the training run's record without a word. A resume writes <c>&lt;RunName&gt;.resume-&lt;timestamp&gt;.YOLOTrainingRunOptions.json</c> for the same reason, leaving the original run's file byte-identical.</para>
         /// </summary>
         [Fact]
         public void YOLOTrainingRunOptionsFile()
@@ -36,10 +36,21 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 Assert.Equal(Path.Combine(directory, "20260930_140507_2" + Constants.FileName.YOLOTrainingRunOptionsSuffix), path_Evaluate2);
                 Assert.Equal("evaluate", File.ReadAllText(path_Evaluate!));
 
+                // A resume writes a file of its own and leaves the original run's file byte-identical.
+                string? path_Resume = Create.YOLOTrainingRunOptionsFile(directory, "run1", true, "resume", dateTimeOffset, true);
+                Assert.Equal(Path.Combine(directory, "run1.resume-20260930_140507" + Constants.FileName.YOLOTrainingRunOptionsSuffix), path_Resume);
+                Assert.Equal(bytes, File.ReadAllBytes(path_Train!));
+                Assert.Equal("resume", File.ReadAllText(path_Resume!));
+
+                // A second resume in the same second gets a suffix rather than replacing the first.
+                string? path_Resume2 = Create.YOLOTrainingRunOptionsFile(directory, "run1", true, "resume2", dateTimeOffset, true);
+                Assert.Equal(Path.Combine(directory, "run1.resume-20260930_140507_2" + Constants.FileName.YOLOTrainingRunOptionsSuffix), path_Resume2);
+                Assert.Equal("resume", File.ReadAllText(path_Resume!));
+
                 // A training run whose file exists anyway is refused rather than written under another name.
                 Assert.Null(Create.YOLOTrainingRunOptionsFile(directory, "run1", true, "again", dateTimeOffset));
                 Assert.Equal(bytes, File.ReadAllBytes(path_Train!));
-                Assert.Equal(3, Directory.GetFiles(directory).Length);
+                Assert.Equal(5, Directory.GetFiles(directory).Length);
             }
             finally
             {

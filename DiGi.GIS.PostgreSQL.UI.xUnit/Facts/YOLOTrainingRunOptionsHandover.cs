@@ -30,6 +30,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 Device = "0",
                 PythonPath = @"C:\Python\python.exe",
                 WorkingDirectory = @"C:\YOLO\working",
+                ResumeTraining = true,
                 Steps = [YOLOTrainingStep.LabelCheck, YOLOTrainingStep.Train, YOLOTrainingStep.Evaluate],
                 DatasetOptions = new YOLOTrainingDatasetOptions()
                 {
@@ -74,6 +75,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 Assert.Equal("0", yOLOTrainingRunOptions_Read.Device);
                 Assert.Equal(@"C:\Python\python.exe", yOLOTrainingRunOptions_Read.PythonPath);
                 Assert.Equal(@"C:\YOLO\working", yOLOTrainingRunOptions_Read.WorkingDirectory);
+                Assert.True(yOLOTrainingRunOptions_Read.ResumeTraining);
                 Assert.Equal<IEnumerable<YOLOTrainingStep>>([YOLOTrainingStep.LabelCheck, YOLOTrainingStep.Train, YOLOTrainingStep.Evaluate], yOLOTrainingRunOptions_Read.Steps!);
 
                 YOLOTrainingDatasetOptions? yOLOTrainingDatasetOptions_Read = yOLOTrainingRunOptions_Read.DatasetOptions;
