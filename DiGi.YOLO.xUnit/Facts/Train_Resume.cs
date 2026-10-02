@@ -212,7 +212,7 @@ namespace DiGi.YOLO.xUnit
 
         /// <summary>
         /// Continues a real interrupted training run through <see cref="Modify.Train(Classes.YOLOTrainingOptions?, System.Threading.CancellationToken)"/>: a 2-epoch run with save_period is cut back to its first per-epoch checkpoint, read by <see cref="Query.YOLOCheckpointInformation(string?, string?, string?, System.Threading.CancellationToken)"/>, and resumed, on a synthetic dataset.
-        /// <para>The interpreter and start checkpoint are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf and the fact returns without asserting when either is absent. It needs a GPU to finish in reasonable time and is meant to be run on its own. The frozen model.pt is hashed before and after: no run may change it.</para>
+        /// <para>The interpreter and start checkpoint are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf and the fact returns without asserting when either is absent. It needs a GPU to finish in reasonable time and is meant to be run on its own: it returns without asserting when a python process is already computing on the GPU. The frozen model.pt is hashed before and after: no run may change it.</para>
         /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
         [LongFact]
@@ -225,6 +225,11 @@ namespace DiGi.YOLO.xUnit
             settings.TryGetValue("ModelPath", out string? path_Model);
 
             if (string.IsNullOrWhiteSpace(path_Python) || !File.Exists(path_Python) || string.IsNullOrWhiteSpace(path_Model) || !File.Exists(path_Model))
+            {
+                return;
+            }
+
+            if (GPUBusyWithPython(assembly))
             {
                 return;
             }

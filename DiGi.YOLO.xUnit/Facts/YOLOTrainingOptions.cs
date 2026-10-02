@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace DiGi.YOLO.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Classes.YOLOTrainingOptions"/> keeps the values it is given, carries the train8 defaults, survives the round trip through its string form, and clones identically.
+        /// Verifies that <see cref="Classes.YOLOTrainingOptions"/> keeps the values it is given, carries the train8 defaults, survives the round trip through its string form, and clones identically - the copy constructor directly, because the clone behind SerializationCheck is a JSON round trip that never runs it.
         /// </summary>
         [Fact]
         public void YOLOTrainingOptions()
@@ -16,6 +17,7 @@ namespace DiGi.YOLO.xUnit
             Assert.Equal(16, yOLOTrainingOptions_Default.Batch);
             Assert.Equal(150, yOLOTrainingOptions_Default.Epochs);
             Assert.Equal(640, yOLOTrainingOptions_Default.ImageSize);
+            Assert.Equal(TimeSpan.FromMinutes(15), yOLOTrainingOptions_Default.InactivityTimeout);
             Assert.Equal(50, yOLOTrainingOptions_Default.Patience);
             Assert.Equal(0, yOLOTrainingOptions_Default.Seed);
             Assert.Null(yOLOTrainingOptions_Default.Device);
@@ -30,6 +32,7 @@ namespace DiGi.YOLO.xUnit
                 Device = "0",
                 Epochs = 300,
                 ImageSize = 640,
+                InactivityTimeout = TimeSpan.FromMinutes(7),
                 ModelPath = @"C:\YOLO\models\base\yolo26x.pt",
                 Name = "train9_fresh",
                 Patience = 75,
@@ -48,11 +51,18 @@ namespace DiGi.YOLO.xUnit
             Assert.False(yOLOTrainingOptions_Actual!.Amp);
             Assert.Equal(8, yOLOTrainingOptions_Actual.Batch);
             Assert.Equal("train9_fresh", yOLOTrainingOptions_Actual.Name);
+            Assert.Equal(TimeSpan.FromMinutes(7), yOLOTrainingOptions_Actual.InactivityTimeout);
             Assert.Equal(75, yOLOTrainingOptions_Actual.Patience);
             Assert.Equal(3, yOLOTrainingOptions_Actual.Seed);
             Assert.Equal(@"C:\YOLO\runs\detect\train9\weights\last.pt", yOLOTrainingOptions_Actual.ResumePath);
 
             Core.xUnit.Query.SerializationCheck(yOLOTrainingOptions);
+
+            Classes.YOLOTrainingOptions yOLOTrainingOptions_Copy = new(yOLOTrainingOptions);
+            Assert.Equal(TimeSpan.FromMinutes(7), yOLOTrainingOptions_Copy.InactivityTimeout);
+            Assert.Equal(300, yOLOTrainingOptions_Copy.Epochs);
+            Assert.Equal("train9_fresh", yOLOTrainingOptions_Copy.Name);
+            Assert.Equal(@"C:\YOLO\training", yOLOTrainingOptions_Copy.WorkingDirectory);
         }
 
         /// <summary>

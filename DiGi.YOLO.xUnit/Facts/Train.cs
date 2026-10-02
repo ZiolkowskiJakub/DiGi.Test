@@ -226,6 +226,79 @@ namespace DiGi.YOLO.xUnit
         }
 
         /// <summary>
+        /// Verifies that <see cref="Modify.Train(Classes.YOLOTrainingOptions?, System.Threading.CancellationToken)"/> ends a training that stops producing output once <see cref="Classes.YOLOTrainingOptions.InactivityTimeout"/> is exceeded, against a stand-in ultralytics package that prints one line and then sleeps: the run is reported as stalled, does not succeed, writes no weights, and carries the reason in the standard error tail.
+        /// <para>Medium test (3 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
+        /// </summary>
+        [MediumFact]
+        public void Train_Mock_Stall()
+        {
+            string? pythonPath = PythonPath_Runnable();
+            if (string.IsNullOrWhiteSpace(pythonPath))
+            {
+                return;
+            }
+
+            string directory = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Test_" + Path.GetRandomFileName(), "working dir");
+
+            try
+            {
+                Directory.CreateDirectory(directory);
+
+                string path_Definition = Path.Combine(directory, "yolo26x.yaml");
+                File.WriteAllText(path_Definition, "nc: 1");
+
+                string path_Configuration = Path.Combine(directory, "conf.yaml");
+                File.WriteAllText(path_Configuration, "path: .\nnames:\n  0: Building");
+
+                //The stand-in prints one flushed line and then goes silent for far longer than the limit, the shape of a deadlocked training
+                string directory_MockUltralytics = Path.Combine(directory, "ultralytics");
+                Directory.CreateDirectory(directory_MockUltralytics);
+                File.WriteAllLines(Path.Combine(directory_MockUltralytics, "__init__.py"),
+                [
+                    "import time",
+                    "",
+                    "class _Trainer:",
+                    "    pass",
+                    "",
+                    "class YOLO:",
+                    "    def __init__(self, model):",
+                    "        self.model = model",
+                    "        self.trainer = None",
+                    "",
+                    "    def train(self, **kwargs):",
+                    "        print('mock training started', flush=True)",
+                    "        time.sleep(600)",
+                ]);
+
+                Classes.YOLOTrainingOptions? yOLOTrainingOptions = Create.YOLOTrainingOptions(pythonPath, path_Definition, path_Configuration);
+                Assert.NotNull(yOLOTrainingOptions);
+
+                yOLOTrainingOptions!.InactivityTimeout = TimeSpan.FromSeconds(2);
+                yOLOTrainingOptions.Name = "stalled";
+
+                Classes.YOLOTrainingResult? yOLOTrainingResult = Modify.Train(yOLOTrainingOptions);
+
+                Assert.NotNull(yOLOTrainingResult);
+                Assert.True(yOLOTrainingResult!.Stalled);
+                Assert.False(yOLOTrainingResult.Succeeded);
+                Assert.NotEqual(0, yOLOTrainingResult.ExitCode);
+                Assert.Null(yOLOTrainingResult.WeightsPath);
+                Assert.Contains(yOLOTrainingResult.StandardError ?? [], line => line.StartsWith("Ended after", StringComparison.Ordinal));
+
+                //A stalled run writes no weights
+                Assert.False(File.Exists(Path.Combine(directory, "runs", "detect", "stalled", "weights", "best.pt")));
+            }
+            finally
+            {
+                string? directory_Root = Path.GetDirectoryName(directory);
+                if (directory_Root != null && Directory.Exists(directory_Root))
+                {
+                    Directory.Delete(directory_Root, true);
+                }
+            }
+        }
+
+        /// <summary>
         /// Verifies that <see cref="Modify.Validate(Classes.YOLOValidationOptions?, System.Threading.CancellationToken)"/> refuses a run that cannot happen before any interpreter is started: missing options, a training split, a .yaml definition, and a missing conf.yaml.
         /// </summary>
         [Fact]
@@ -283,7 +356,7 @@ namespace DiGi.YOLO.xUnit
 
         /// <summary>
         /// Runs a real 1-epoch training through <see cref="Modify.Train(Classes.YOLOTrainingOptions?, System.Threading.CancellationToken)"/> from the frozen model.pt and from the base checkpoint yolo26x.pt, then validates the continued weights with <see cref="Modify.Validate(Classes.YOLOValidationOptions?, System.Threading.CancellationToken)"/>, on a small synthetic dataset written by <see cref="Modify.Write(Classes.YOLOModel?)"/>.
-        /// <para>The interpreter and both checkpoints are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf (PythonPath, ModelPath, BaseModelPath) and the fact returns without asserting when any is absent. It needs a GPU to finish in reasonable time and is meant to be run on its own. The images - a light rectangle on noise, labelled "Building" - are generated with Pillow, which ultralytics depends on. The frozen model.pt is hashed before and after: no run may change it.</para>
+        /// <para>The interpreter and both checkpoints are machine specific, so they are read from the git-ignored DiGi.YOLO_Preflight.conf (PythonPath, ModelPath, BaseModelPath) and the fact returns without asserting when any is absent. It needs a GPU to finish in reasonable time and is meant to be run on its own: it returns without asserting when a python process is already computing on the GPU, because the two runs of that shape observed so far both hung. The images - a light rectangle on noise, labelled "Building" - are generated with Pillow, which ultralytics depends on. The frozen model.pt is hashed before and after: no run may change it.</para>
         /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
         [LongFact]
@@ -297,6 +370,11 @@ namespace DiGi.YOLO.xUnit
             settings.TryGetValue("BaseModelPath", out string? path_BaseModel);
 
             if (string.IsNullOrWhiteSpace(path_Python) || !File.Exists(path_Python) || string.IsNullOrWhiteSpace(path_Model) || !File.Exists(path_Model) || string.IsNullOrWhiteSpace(path_BaseModel) || !File.Exists(path_BaseModel))
+            {
+                return;
+            }
+
+            if (GPUBusyWithPython(assembly))
             {
                 return;
             }
@@ -394,6 +472,37 @@ namespace DiGi.YOLO.xUnit
             Assert.InRange(yOLOValidationResult.MAP50!.Value, 0, 1);
             Assert.InRange(yOLOValidationResult.MAP50_95!.Value, 0, yOLOValidationResult.MAP50.Value);
             Assert.Equal(yOLOTrainingResult_Continue.SHA256, yOLOValidationResult.ModelSHA256);
+        }
+
+        /// <summary>
+        /// Determines whether a python process is already computing on the GPU, so a training fact can return without asserting instead of starting beside it.
+        /// <para>A smoke training launched while a production training held the GPU left both processes hung (ZiolkowskiJakub/DiGi.YOLO#22). nvidia-smi absent - no NVIDIA driver, or not on PATH - answers false: the git-ignored preflight conf already limits these facts to the GPU machine. When the answer is true, the reason is appended to a GPU_Busy.log line in the reports directory.</para>
+        /// </summary>
+        /// <param name="assembly">The test assembly whose reports directory receives the skip reason.</param>
+        /// <returns>True when nvidia-smi lists a python process among the GPU compute apps.</returns>
+        private static bool GPUBusyWithPython(Assembly assembly)
+        {
+            (int exitCode, List<string> standardOutput, _) = Query.ExecuteProcess("nvidia-smi", "--query-compute-apps=pid,process_name --format=csv,noheader", Path.GetTempPath());
+            if (exitCode != 0)
+            {
+                return false;
+            }
+
+            foreach (string line in standardOutput)
+            {
+                if (line.Contains("python", StringComparison.OrdinalIgnoreCase))
+                {
+                    string? directory_Reports = Core.xUnit.Query.ReportsDirectory(assembly);
+                    if (!string.IsNullOrWhiteSpace(directory_Reports))
+                    {
+                        File.AppendAllText(Path.Combine(directory_Reports!, "GPU_Busy.log"), string.Format(CultureInfo.InvariantCulture, "{0:u} skipped a GPU training fact: {1}{2}", DateTimeOffset.Now, line, Environment.NewLine));
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

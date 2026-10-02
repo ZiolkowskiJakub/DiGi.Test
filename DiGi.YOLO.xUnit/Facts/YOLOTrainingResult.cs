@@ -6,7 +6,7 @@ namespace DiGi.YOLO.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Classes.YOLOTrainingResult"/> keeps the start and output weights identities it is given, succeeds only with a confirmed output digest, survives the round trip through its string form, and clones identically.
+        /// Verifies that <see cref="Classes.YOLOTrainingResult"/> keeps the start and output weights identities and the resume and stall flags it is given, succeeds only with a confirmed output digest, survives the round trip through its string form, and clones identically.
         /// </summary>
         [Fact]
         public void YOLOTrainingResult()
@@ -62,6 +62,23 @@ namespace DiGi.YOLO.xUnit
             Assert.Equal(2, yOLOTrainingResult_ResumedActual.ResumedFromEpoch);
 
             Core.xUnit.Query.SerializationCheck(yOLOTrainingResult_Resumed);
+
+            //A stalled run keeps its flag through the round trip and the copy constructor, and never succeeds
+            Classes.YOLOTrainingResult yOLOTrainingResult_Stalled = new(-1, @"C:\YOLO\runs\detect\train9\weights\last.pt", "9fdd44a31c504547ffb81d2c6d9e6dac3493c8eaa8b0398d3f43fae6c7003e92", Enums.ModelKind.Checkpoint, null, null, null, null, null, ["Ended after 00:02:00 without output (last output at 2026-10-02 09:59:41 +02:00)"], start, end, stalled: true);
+
+            Assert.True(yOLOTrainingResult_Stalled.Stalled);
+            Assert.False(yOLOTrainingResult_Stalled.Succeeded);
+
+            string? json_Stalled = Core.Convert.ToSystem_String(yOLOTrainingResult_Stalled);
+            Classes.YOLOTrainingResult? yOLOTrainingResult_StalledActual = Core.Convert.ToDiGi<Classes.YOLOTrainingResult>(json_Stalled)?.FirstOrDefault();
+            Assert.NotNull(yOLOTrainingResult_StalledActual);
+            Assert.True(yOLOTrainingResult_StalledActual!.Stalled);
+
+            Core.xUnit.Query.SerializationCheck(yOLOTrainingResult_Stalled);
+
+            Classes.YOLOTrainingResult yOLOTrainingResult_StalledCopy = new(yOLOTrainingResult_Stalled);
+            Assert.True(yOLOTrainingResult_StalledCopy.Stalled);
+            Assert.False(yOLOTrainingResult_StalledCopy.Succeeded);
 
             //A run that wrote weights whose digest could not be confirmed does not succeed
             Classes.YOLOTrainingResult yOLOTrainingResult_Unconfirmed = new(0, null, null, Enums.ModelKind.Definition, @"C:\best.pt", 10, null, null, null, ["mismatch"], start, end);
