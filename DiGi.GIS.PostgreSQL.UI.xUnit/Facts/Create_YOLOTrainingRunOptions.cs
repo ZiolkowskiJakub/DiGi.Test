@@ -36,6 +36,8 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 Assert.Equal(640, yOLOTrainingRunOptions_Retrain.ImageSize);
                 Assert.Equal(16, yOLOTrainingRunOptions_Retrain.Batch);
                 Assert.Equal(0, yOLOTrainingRunOptions_Retrain.Seed);
+                Assert.Equal(3, yOLOTrainingRunOptions_Retrain.AutoResumeCount);
+                Assert.Null(yOLOTrainingRunOptions_Retrain.InactivityTimeout);
                 Assert.NotNull(yOLOTrainingRunOptions_Retrain.DatasetOptions);
                 Assert.True(yOLOTrainingRunOptions_Retrain.DatasetOptions!.Resume);
                 Assert.False(yOLOTrainingRunOptions_Retrain.DatasetOptions.CountOnly);
@@ -64,6 +66,8 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                     PythonPath = @"C:\Python\python.exe",
                     Epochs = 12,
                     StartWeightsPath = @"C:\YOLO\previous.pt",
+                    AutoResumeCount = 7,
+                    InactivityTimeout = TimeSpan.FromMinutes(5),
                     Steps = [],
                     DatasetOptions = new YOLOTrainingDatasetOptions()
                     {
@@ -85,6 +89,8 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                     Assert.Equal("train9", yOLOTrainingRunOptions_Switched.RunName);
                     Assert.Equal("cpu", yOLOTrainingRunOptions_Switched.Device);
                     Assert.Equal(@"C:\Python\python.exe", yOLOTrainingRunOptions_Switched.PythonPath);
+                    Assert.Equal(7, yOLOTrainingRunOptions_Switched.AutoResumeCount);
+                    Assert.Equal(TimeSpan.FromMinutes(5), yOLOTrainingRunOptions_Switched.InactivityTimeout);
                     Assert.Equal<IEnumerable<int>>([4816], yOLOTrainingRunOptions_Switched.DatasetOptions!.CountyIds!);
                     Assert.Equal(@"C:\YOLO\dataset", yOLOTrainingRunOptions_Switched.DatasetOptions.OutputDirectory);
                     Assert.Equal<IEnumerable<string>>([@"C:\YOLO\gate.pt"], yOLOTrainingRunOptions_Switched.DatasetOptions.WeightsPaths!);
@@ -97,6 +103,8 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
                 // The options handed in are the previous run's, and a cancelled dialog must leave them as they were.
                 Assert.Equal(12, yOLOTrainingRunOptions_Previous.Epochs);
                 Assert.Equal(@"C:\YOLO\previous.pt", yOLOTrainingRunOptions_Previous.StartWeightsPath);
+                Assert.Equal(7, yOLOTrainingRunOptions_Previous.AutoResumeCount);
+                Assert.Equal(TimeSpan.FromMinutes(5), yOLOTrainingRunOptions_Previous.InactivityTimeout);
                 Assert.Empty(yOLOTrainingRunOptions_Previous.Steps!);
                 Assert.True(yOLOTrainingRunOptions_Previous.DatasetOptions!.CountOnly);
             }
