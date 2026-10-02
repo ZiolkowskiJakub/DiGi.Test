@@ -1,4 +1,5 @@
 using DiGi.GIS.YOLO.UI.Enums;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,11 +19,13 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         {
             Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions = new()
             {
+                AutoResumeCount = 4,
                 Batch = 8,
                 DatasetOptions = new Classes.YOLOTrainingDatasetOptions() { CountyIds = [73485], OutputDirectory = @"C:\YOLO\dataset", Seed = 3 },
                 Device = "0",
                 Epochs = 3,
                 ImageSize = 320,
+                InactivityTimeout = TimeSpan.FromMinutes(7),
                 Patience = 7,
                 ProjectDirectory = @"C:\YOLO\runs",
                 PythonPath = @"C:\Python\python.exe",
@@ -37,7 +40,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             void AssertMembers(Classes.YOLOTrainingRunOptions? yOLOTrainingRunOptions_Actual)
             {
                 Assert.NotNull(yOLOTrainingRunOptions_Actual);
-                Assert.Equal(yOLOTrainingRunOptions.Batch, yOLOTrainingRunOptions_Actual!.Batch);
+                Assert.Equal(yOLOTrainingRunOptions.AutoResumeCount, yOLOTrainingRunOptions_Actual!.AutoResumeCount);
+                Assert.Equal(yOLOTrainingRunOptions.Batch, yOLOTrainingRunOptions_Actual.Batch);
                 Assert.NotNull(yOLOTrainingRunOptions_Actual.DatasetOptions);
                 Assert.Equal(yOLOTrainingRunOptions.DatasetOptions!.OutputDirectory, yOLOTrainingRunOptions_Actual.DatasetOptions!.OutputDirectory);
                 Assert.Equal(yOLOTrainingRunOptions.DatasetOptions.Seed, yOLOTrainingRunOptions_Actual.DatasetOptions.Seed);
@@ -45,6 +49,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Assert.Equal(yOLOTrainingRunOptions.Device, yOLOTrainingRunOptions_Actual.Device);
                 Assert.Equal(yOLOTrainingRunOptions.Epochs, yOLOTrainingRunOptions_Actual.Epochs);
                 Assert.Equal(yOLOTrainingRunOptions.ImageSize, yOLOTrainingRunOptions_Actual.ImageSize);
+                Assert.Equal(yOLOTrainingRunOptions.InactivityTimeout, yOLOTrainingRunOptions_Actual.InactivityTimeout);
                 Assert.Equal(yOLOTrainingRunOptions.Patience, yOLOTrainingRunOptions_Actual.Patience);
                 Assert.Equal(yOLOTrainingRunOptions.ProjectDirectory, yOLOTrainingRunOptions_Actual.ProjectDirectory);
                 Assert.Equal(yOLOTrainingRunOptions.PythonPath, yOLOTrainingRunOptions_Actual.PythonPath);
@@ -74,6 +79,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             // The defaults are the hyper-parameters of the DiGi.YOLO README, and nothing that names a file or a folder has one.
             Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_Default = new();
+            Assert.Equal(0, yOLOTrainingRunOptions_Default.AutoResumeCount);
+            Assert.Null(yOLOTrainingRunOptions_Default.InactivityTimeout);
             Assert.Equal(150, yOLOTrainingRunOptions_Default.Epochs);
             Assert.Equal(50, yOLOTrainingRunOptions_Default.Patience);
             Assert.Equal(640, yOLOTrainingRunOptions_Default.ImageSize);

@@ -7,7 +7,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that YOLOTrainingRunResult keeps every value it is given, survives its string form, clones identically and that its copy constructor copies every member.
+        /// Verifies that YOLOTrainingRunResult keeps every value it is given, survives its string form, clones identically and that its copy constructor copies every member, the automatic-resume list included.
         /// <para>The digests are strings and the counts are plain numbers, so the round trip through text is exact; a numeric member held as <c>object</c> would not be.</para>
         /// </summary>
         [Fact]
@@ -15,10 +15,12 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         {
             DateTimeOffset start = new(2026, 9, 30, 8, 0, 0, TimeSpan.FromHours(2));
             DateTimeOffset end = start.AddHours(3);
+            DateTimeOffset time = new(2026, 10, 2, 14, 30, 15, TimeSpan.FromHours(2));
 
             Classes.YOLODetectorEvaluation yOLODetectorEvaluation = new(@"C:\YOLO\runs\train9_fresh\train9_fresh.pt", new string('b', 64), Enums.YOLODetectorEvaluationSubset.Clean, 120, 1.5, 2.25, 0.4);
+            Classes.YOLOTrainingAutoResume yOLOTrainingAutoResume = new("Stalled", 33, time, "last_autoresume1_20261002_143015.pt");
 
-            Classes.YOLOTrainingRunResult yOLOTrainingRunResult = new("train9_fresh", @"C:\YOLO\models\model.pt", new string('a', 64), @"C:\YOLO\runs\train9_fresh\train9_fresh.pt", new string('b', 64), 0.75, 0.5, [yOLODetectorEvaluation], false, ["YOLOTrainingStep.Validate"], ["a note"], start, end, true, 7);
+            Classes.YOLOTrainingRunResult yOLOTrainingRunResult = new("train9_fresh", @"C:\YOLO\models\model.pt", new string('a', 64), @"C:\YOLO\runs\train9_fresh\train9_fresh.pt", new string('b', 64), 0.75, 0.5, [yOLODetectorEvaluation], false, ["YOLOTrainingStep.Validate"], ["a note"], start, end, true, 7, [yOLOTrainingAutoResume]);
 
             void AssertMembers(Classes.YOLOTrainingRunResult? yOLOTrainingRunResult_Actual)
             {
@@ -33,6 +35,11 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Assert.False(yOLOTrainingRunResult_Actual.Cancelled);
                 Assert.True(yOLOTrainingRunResult_Actual.Resumed);
                 Assert.Equal(7, yOLOTrainingRunResult_Actual.ResumedFromEpoch);
+                Assert.Single(yOLOTrainingRunResult_Actual.AutoResumes);
+                Assert.Equal("Stalled", yOLOTrainingRunResult_Actual.AutoResumes[0].Reason);
+                Assert.Equal(33, yOLOTrainingRunResult_Actual.AutoResumes[0].Epoch);
+                Assert.Equal(time, yOLOTrainingRunResult_Actual.AutoResumes[0].Time);
+                Assert.Equal("last_autoresume1_20261002_143015.pt", yOLOTrainingRunResult_Actual.AutoResumes[0].BackupFileName);
                 Assert.Equal(["YOLOTrainingStep.Validate"], yOLOTrainingRunResult_Actual.FailedStepNames);
                 Assert.Equal(["a note"], yOLOTrainingRunResult_Actual.Messages);
                 Assert.Equal(start, yOLOTrainingRunResult_Actual.Start);
