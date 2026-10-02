@@ -1,6 +1,7 @@
 using DiGi.GIS.WebAPI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
@@ -58,6 +59,19 @@ namespace DiGi.GIS.WebAPI.xUnit
                 (typeof(YearBuiltDataController), nameof(YearBuiltDataController.GetReferenceDuplicatesAsync), "commandTimeout", 0, false),
                 (typeof(YearBuiltDataController), nameof(YearBuiltDataController.GetCountyPartMismatchesAsync), "commandTimeout", 0, false),
 
+                // the eleven endpoints of #48 - each grew a commandTimeout < 0 guard and its floor with it.
+                (typeof(BuildingDataController), nameof(BuildingDataController.UpdateItemsByCountyIdsAsync), "commandTimeout", 0, false),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetEstimatedCoverageFactorAsync), "commandTimeout", 0, false),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetEstimatedCoverageFactorsAsync), "commandTimeout", 0, false),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetSummariesByCountyIdsAsync), "commandTimeout", 0, false),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetQueueSummariesByCountyIdsAsync), "commandTimeout", 0, false),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetSubdivisionLinksByCountyIdAsync), "commandTimeout", 0, false),
+                (typeof(OrtoDatasController), nameof(OrtoDatasController.NextBuilding2DReferencesAsync), "commandTimeout", 0, false),
+                (typeof(TerrainController), nameof(TerrainController.GetSummariesByCountyIdsAsync), "commandTimeout", 0, false),
+                (typeof(TerrainController), nameof(TerrainController.GetDensitiesByCountyIdsAsync), "commandTimeout", 0, false),
+                (typeof(TerrainController), nameof(TerrainController.GetCoverageByCountyIdAsync), "commandTimeout", 0, false),
+                (typeof(TerrainController), nameof(TerrainController.GetGapsByBoundingBoxAsync), "commandTimeout", 0, false),
+
                 // limit: floor 1 - the duplicates endpoints guard limit <= 0.
                 (typeof(Building2DController), nameof(Building2DController.GetReferenceDuplicatesAsync), "limit", 1, false),
                 (typeof(BuildingDataController), nameof(BuildingDataController.GetDuplicateReferencesAsync), "limit", 1, false),
@@ -108,27 +122,59 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
+        /// Asserts every <c>commandTimeout</c> parameter on every action of every gis controller carries <see cref="MinimumAttribute"/>(0), and that there are exactly fifty of them.
+        /// <para>Derived from the assembly rather than from a named list, so a controller added later is swept in instead of left out: the named facts pin the endpoints ZiolkowskiJakub/DiGi.GIS.WebAPI#48 changed, while this one fails on the fifty-first - a new action whose timeout could reach the database negative, with no floor and no recorded decision to omit one. The count is a tripwire, not a target: it is what forces a decision either way (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).</para>
+        /// </summary>
+        [Fact]
+        public void GisControllers_CommandTimeoutParameters_AllFloored()
+        {
+            Assembly assembly = typeof(BuildingController).Assembly;
+
+            List<Type> types = [];
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(DiGi.WebAPI.Classes.WebAPIController)))
+                {
+                    types.Add(type);
+                }
+            }
+
+            Assert.NotEmpty(types);
+
+            int count = 0;
+            foreach (Type type in types)
+            {
+                foreach (MethodInfo methodInfo in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                {
+                    foreach (ParameterInfo parameterInfo in methodInfo.GetParameters())
+                    {
+                        if (!string.Equals(parameterInfo.Name, "commandTimeout", StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+
+                        count++;
+
+                        MinimumAttribute? minimumAttribute = parameterInfo.GetCustomAttribute<MinimumAttribute>();
+                        Assert.True(minimumAttribute is not null, $"Missing [Minimum] on {type.Name}.{methodInfo.Name}(commandTimeout).");
+                        Assert.Equal(0, minimumAttribute!.Minimum);
+                        Assert.False(minimumAttribute.Exclusive);
+                    }
+                }
+            }
+
+            Assert.Equal(50, count);
+        }
+
+        /// <summary>
         /// Asserts the query parameters that look floored but are not stay without <see cref="MinimumAttribute"/>, so the attribute never claims a guard the action does not keep.
-        /// <para>Named explicitly rather than derived, because the classification is a per-endpoint decision: an unguarded <c>commandTimeout</c> flows to the database as it is, and a selector whose unknown key is answered by a lookup rather than by a domain check - an id of 0 is a lookup miss, not an out-of-domain value - must stay unbounded in the document (ZiolkowskiJakub/DiGi.GIS.WebAPI#47).</para>
+        /// <para>Named explicitly rather than derived, because the classification is a per-endpoint decision: a selector whose unknown key is answered by a lookup rather than by a domain check - an id of 0 is a lookup miss, not an out-of-domain value - must stay unbounded in the document (ZiolkowskiJakub/DiGi.GIS.WebAPI#47). No <c>commandTimeout</c> sits here any more: ZiolkowskiJakub/DiGi.GIS.WebAPI#48 gave all fifty a guard, so every one moved to the floored fact.</para>
         /// </summary>
         [Fact]
         public void GisControllers_UnflooredQueryParameters_DoNotCarryMinimum()
         {
             (Type Type, string Method, string Parameter)[] parameters =
             [
-                // commandTimeout with no action guard - a floor here would be a behaviour change, not a description of one.
-                (typeof(BuildingDataController), nameof(BuildingDataController.UpdateItemsByCountyIdsAsync), "commandTimeout"),
-                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetEstimatedCoverageFactorAsync), "commandTimeout"),
-                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetEstimatedCoverageFactorsAsync), "commandTimeout"),
-                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetSummariesByCountyIdsAsync), "commandTimeout"),
-                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetSubdivisionLinksByCountyIdAsync), "commandTimeout"),
-                (typeof(OrtoDatasController), nameof(OrtoDatasController.GetQueueSummariesByCountyIdsAsync), "commandTimeout"),
-                (typeof(OrtoDatasController), nameof(OrtoDatasController.NextBuilding2DReferencesAsync), "commandTimeout"),
-                (typeof(TerrainController), nameof(TerrainController.GetSummariesByCountyIdsAsync), "commandTimeout"),
-                (typeof(TerrainController), nameof(TerrainController.GetDensitiesByCountyIdsAsync), "commandTimeout"),
-                (typeof(TerrainController), nameof(TerrainController.GetCoverageByCountyIdAsync), "commandTimeout"),
-                (typeof(TerrainController), nameof(TerrainController.GetGapsByBoundingBoxAsync), "commandTimeout"),
-
                 // Selectors answered by lookup, not by domain: an unknown or non-positive key is a miss (404 or empty) or a converter null check, not a range refusal.
                 (typeof(BuildingController), nameof(BuildingController.GetCountAsync), "countyId"),
                 (typeof(BuildingDataController), nameof(BuildingDataController.GetCountByCountyIdAsync), "countyId"),

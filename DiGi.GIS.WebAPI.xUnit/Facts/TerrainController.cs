@@ -36,5 +36,35 @@ namespace DiGi.GIS.WebAPI.xUnit
                 System.IO.File.Delete(path);
             }
         }
+
+        /// <summary>
+        /// Asserts the commandTimeout boundary on the four Terrain actions that gained a guard (DiGi.GIS.WebAPI#48): -1 is refused before the lattice, extent and county-count validation can answer, and 0 - the value that disables the timeout - passes.
+        /// <para>Nothing here reaches a database: the converters carry no connection data, so past the guard each call answers 404 or 500. Every -1 row uses arguments valid on every other axis, so its BadRequest can only come from the guard, and every 0 row would answer 400 instead if the guard refused 0 too.</para>
+        /// </summary>
+        [Fact]
+        public async Task TerrainController_Validation_CommandTimeoutBoundaries()
+        {
+            string path = ConfigurationFilePath();
+
+            try
+            {
+                TerrainController controller = new(new PostgreSQL.Classes.TerrainPointPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+
+                Assert.IsType<BadRequestResult>(await controller.GetSummariesByCountyIdsAsync(null, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetDensitiesByCountyIdsAsync([1], null, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetCoverageByCountyIdAsync(1, 100, 0, 0, null, 1000, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetGapsByBoundingBoxAsync(0, 0, 1000, 1000, 100, 0, 0, null, 1000, -1));
+
+                Assert.IsNotType<BadRequestResult>(await controller.GetSummariesByCountyIdsAsync(null, 0));
+                Assert.IsNotType<BadRequestResult>(await controller.GetDensitiesByCountyIdsAsync([1], null, 0));
+                Assert.IsNotType<BadRequestResult>(await controller.GetCoverageByCountyIdAsync(1, 100, 0, 0, null, 1000, 0));
+                Assert.IsNotType<BadRequestResult>(await controller.GetGapsByBoundingBoxAsync(0, 0, 1000, 1000, 100, 0, 0, null, 1000, 0));
+            }
+            finally
+            {
+                System.IO.File.Delete(path);
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="BuildingDataController"/> write endpoints return BadRequest when provided invalid parameters.
+        /// Verifies that <see cref="BuildingDataController"/> write endpoints return BadRequest when provided invalid parameters, and that the commandTimeout guard refuses a negative value while accepting 0 (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).
         /// </summary>
         [Fact]
         public async Task BuildingDataController_Validation_AnswersBadRequest()
@@ -24,6 +24,11 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 Assert.IsType<BadRequestResult>(await controller.UpdateItemsByCountyIdsAsync(new JsonObject(), null));
                 Assert.IsType<BadRequestResult>(await controller.UpdateItemsByCountyIdsAsync(new JsonObject(), []));
+
+                // commandTimeout: -1 is refused by the guard ahead of the countyIds and body checks, while
+                // 0 disables the timeout and runs on to the empty body's NoContent (DiGi.GIS.WebAPI#48).
+                Assert.IsType<BadRequestResult>(await controller.UpdateItemsByCountyIdsAsync(new JsonObject(), [1], -1));
+                Assert.IsType<NoContentResult>(await controller.UpdateItemsByCountyIdsAsync(null, [1], 0));
             }
             finally
             {

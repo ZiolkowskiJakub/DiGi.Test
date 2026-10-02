@@ -1,6 +1,7 @@
 using DiGi.GIS.WebAPI.Classes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 using System.Threading.Tasks;
 
 namespace DiGi.GIS.WebAPI.xUnit
@@ -8,7 +9,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that the read endpoints added for verifying the subdivision links reject what they cannot act on, without touching a database.
+        /// Verifies that the read endpoints added for verifying the subdivision links reject what they cannot act on, without touching a database - and that each action with a commandTimeout guard refuses a negative value (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).
         /// <para>Each of the ceilings is asserted from both sides of its boundary, because a limit that is off by one either refuses a legitimate request or admits the one it exists to stop.</para>
         /// </summary>
         [Fact]
@@ -57,6 +58,15 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorAsync(-1));
                 Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorsAsync(null!, null));
                 Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorsAsync([], null));
+
+                // commandTimeout: a negative value is refused by every action's own guard, ahead of the
+                // lookup or the ceiling that guard precedes (DiGi.GIS.WebAPI#48).
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorAsync(1, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorsAsync([1], null, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetSummariesByCountyIdsAsync(null, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetQueueSummariesByCountyIdsAsync(null, -1));
+                Assert.IsType<BadRequestResult>(await controller.GetSubdivisionLinksByCountyIdAsync(55417, 20, -1));
+                Assert.IsType<BadRequestResult>(await controller.NextBuilding2DReferencesAsync(1, 1, 5, -1));
             }
             finally
             {
@@ -65,7 +75,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Verifies that a sample count and a county count sitting exactly on their ceilings are not refused by the guards.
+        /// Verifies that a sample count and a county count sitting exactly on their ceilings, and a commandTimeout of 0 - the value that disables the timeout - are not refused by the guards (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).
         /// <para>Nothing here reaches a database - the converters have no connection data, so each call answers 404 or 500 once past validation. What is being asserted is only that the guard let it through.</para>
         /// </summary>
         [Fact]
@@ -89,7 +99,42 @@ namespace DiGi.GIS.WebAPI.xUnit
                 // and must be accepted. Pre-fix this line does not compile - the signature is the defect.
                 Assert.IsNotType<BadRequestObjectResult>(await controller.NextBuilding2DReferencesAsync(1, 1, 600));
 
+                // commandTimeout: 0 disables the timeout and passes the same guards - the other side of
+                // every boundary asserted above (DiGi.GIS.WebAPI#48). Past the guard these answer 404 or
+                // 204; a guard that refused 0 would answer the guard's plain 400 instead.
+                Assert.IsNotType<BadRequestResult>(await controller.GetSummariesByCountyIdsAsync(null, 0));
+                Assert.IsNotType<BadRequestResult>(await controller.GetQueueSummariesByCountyIdsAsync(null, 0));
+                Assert.IsNotType<BadRequestResult>(await controller.GetSubdivisionLinksByCountyIdAsync(55417, 20, 0));
+                Assert.IsNotType<BadRequestResult>(await controller.NextBuilding2DReferencesAsync(1, 1, 5, 0));
+
                 Assert.Equal(500, Constants.OrtoDatas.MaximumCoverageCountyCount);
+            }
+            finally
+            {
+                System.IO.File.Delete(path);
+            }
+        }
+
+        /// <summary>
+        /// Asserts the commandTimeout boundary on the two estimated-coverage actions, whose lookup miss answers BadRequest as well - so a status comparison alone cannot tell the guard's refusal from the miss it precedes.
+        /// <para>Driven against a dead loopback host, the two sides separate: -1 is refused by the guard before a connection is opened, while 0 runs past it into the lookup, where OpenAsync throws a genuine NpgsqlException. A guard that refused 0 - or one placed after the lookup - would answer BadRequest instead of throwing, so neither half passes vacuously (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).</para>
+        /// </summary>
+        [Fact]
+        public async Task OrtoDatasController_CoverageEstimate_CommandTimeoutBoundaries()
+        {
+            string path = ConfigurationFilePath();
+
+            try
+            {
+                using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
+                DiGi.PostgreSQL.Classes.ConnectionData connectionData = new("127.0.0.1", "user", "pass", "db", 1);
+                OrtoDatasController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(connectionData), new PostgreSQL.Classes.Building2DPostgreSQLConverter(connectionData), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(connectionData));
+
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorAsync(1, -1));
+                await Assert.ThrowsAnyAsync<NpgsqlException>(() => controller.GetEstimatedCoverageFactorAsync(1, 0));
+
+                Assert.IsType<BadRequestResult>(await controller.GetEstimatedCoverageFactorsAsync([1], null, -1));
+                await Assert.ThrowsAnyAsync<NpgsqlException>(() => controller.GetEstimatedCoverageFactorsAsync([1], null, 0));
             }
             finally
             {
