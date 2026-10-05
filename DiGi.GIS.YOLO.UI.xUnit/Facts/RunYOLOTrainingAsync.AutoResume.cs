@@ -1,5 +1,6 @@
 using DiGi.GIS.YOLO.UI.Enums;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies the automatic-resume loop of <c>Modify.RunYOLOTrainingAsync</c>: a stalled attempt whose checkpoint is unfinished is resumed from <c>weights\last.pt</c> after the checkpoint is copied aside, up to <c>AutoResumeCount</c> times, and the run then completes its unchanged tail; a stall with no retries left fails, a finished checkpoint after a crash is never resumed, and a cancellation is never resumed.
+        /// Verifies the automatic-resume loop of <c>Modify.RunYOLOTrainingAsync</c>: a stalled attempt whose checkpoint is unfinished is resumed from <c>weights\last.pt</c> after the checkpoint is copied aside, up to <c>AutoResumeCount</c> times, and the run then completes its unchanged tail; a stall with no retries left fails, a finished checkpoint after a crash is never resumed, and a cancellation is never resumed. A crash with an unfinished checkpoint is resumed too, its log line names the epoch it interrupted, and the attempt's traceback is reported before the resume.
         /// <para>The training is stand-in torch and ultralytics modules written into the working directory: the fresh attempt leaves a resumable checkpoint behind and goes silent, ended by the two-second inactivity limit, and the resumed attempt writes <c>best.pt</c>. No real ultralytics or GPU is needed. The interpreter is machine specific, so the fact returns without asserting when none is installed.</para>
         /// <para>Medium test (17 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
@@ -154,6 +155,35 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                     Assert.NotNull(yOLOTrainingRunResult);
                     Assert.Empty(yOLOTrainingRunResult!.AutoResumes);
                 }
+
+                // 6. A crash with an unfinished checkpoint is resumed; its log line names the epoch it interrupted, and the
+                // attempt's error output - the traceback, its only record - is reported before the resume.
+                {
+                    string projectDirectory = Path.Combine(directory, "scenario", "crash_once");
+                    WriteMockCheckpoints(directory, MockCheckpoint(0, 6, path_Configuration, projectDirectory, "train9", true));
+                    SetMode("crash_once");
+                    ResetAttempts();
+
+                    ReportedLines reportedLines = new();
+                    Classes.YOLOTrainingRunResult? yOLOTrainingRunResult = await Modify.RunYOLOTrainingAsync(null, Options(projectDirectory, 2, TimeSpan.FromSeconds(30)), information: reportedLines);
+                    Assert.NotNull(yOLOTrainingRunResult);
+                    Assert.Empty(yOLOTrainingRunResult!.FailedStepNames);
+                    Assert.Single(yOLOTrainingRunResult.AutoResumes);
+                    Assert.Equal("Exited with code 1", yOLOTrainingRunResult.AutoResumes[0].Reason);
+                    Assert.Equal(2, Attempts());
+
+                    List<string> values = reportedLines.Values;
+                    int index_Resume = values.FindIndex(x => x == "Training exited with code 1 at epoch 2 - automatic resume 1 of 2");
+                    Assert.True(index_Resume > 0, string.Join(Environment.NewLine, values));
+
+                    int index_Header = values.FindIndex(x => x.StartsWith("Error output of the attempt that exited with code 1 (last ", StringComparison.Ordinal));
+                    Assert.True(index_Header >= 0 && index_Header < index_Resume, string.Join(Environment.NewLine, values));
+
+                    List<string> values_ErrorOutput = values.GetRange(index_Header + 1, index_Resume - index_Header - 1);
+                    Assert.All(values_ErrorOutput, x => Assert.StartsWith("  | ", x));
+                    Assert.Contains(values_ErrorOutput, x => x.Contains("Traceback", StringComparison.Ordinal));
+                    Assert.Contains(values_ErrorOutput, x => x.Contains("RuntimeError: mock DataLoader worker exited unexpectedly", StringComparison.Ordinal));
+                }
             }
             finally
             {
@@ -165,7 +195,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Writes a stand-in <c>ultralytics</c> package whose <c>YOLO</c> leaves a resumable checkpoint behind and goes silent on a fresh attempt, and completes or stalls on a resume according to <c>mock_mode.txt</c>: <c>stall_once</c> resumes to completion, <c>stall_always</c> never does, and <c>crash</c> exits non-zero on the fresh attempt.
+        /// Writes a stand-in <c>ultralytics</c> package whose <c>YOLO</c> leaves a resumable checkpoint behind and goes silent on a fresh attempt, and completes or stalls on a resume according to <c>mock_mode.txt</c>: <c>stall_once</c> resumes to completion, <c>stall_always</c> never does, <c>crash</c> exits non-zero on the fresh attempt, and <c>crash_once</c> raises an uncaught exception on the fresh attempt - exit code 1 with a traceback on standard error, as a torch data-loader worker crash does - and resumes to completion.
         /// <para>Each attempt appends one line to <c>attempts.log</c> beside the package, so a fact can count how many times the runner tried.</para>
         /// </summary>
         /// <param name="directory">The working directory the scripts run in.</param>
@@ -217,6 +247,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 "            return",
                 "        if mode == 'crash':",
                 "            raise SystemExit(3)",
+                "        if mode == 'crash_once':",
+                "            raise RuntimeError('mock DataLoader worker exited unexpectedly')",
                 "        print('mock training started', flush=True)",
                 "        time.sleep(120)",
             ]);
