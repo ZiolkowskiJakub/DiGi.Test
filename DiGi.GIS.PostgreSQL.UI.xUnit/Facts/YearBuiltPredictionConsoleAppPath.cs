@@ -103,7 +103,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
         /// <summary>
         /// Verifies that the resolver finds the runner in the extensions folder inside this application's own output, which is the layout the deployment now ships.
         /// <para>The runner is assembled into this application's build output under <c>extensions</c>, in a folder of its own, before the deployment copies that output to the host - so a workspace checkout and a deployed machine resolve it identically, and a machine that will never score a building is deployed without the folder at all.</para>
-        /// <para>The folder name is a contract with <c>DiGi.Maintenance/Scripts/SyncDirectories.ps1</c>, which creates it, and nothing checks the two against each other at compile time. A rename on either side would leave the task quietly unoffered on every host, which is why the expected layout is stated here rather than only in the script.</para>
+        /// <para>The folder name is a contract with <c>DiGi.Maintenance/Scripts/Deploy.ps1</c>, which creates it, and nothing checks the two against each other at compile time. A rename on either side would leave the task quietly unoffered on every host, which is why the expected layout is stated here rather than only in the script.</para>
         /// </summary>
         [Fact]
         public void YearBuiltPredictionConsoleAppPath_ExtensionFolder()
