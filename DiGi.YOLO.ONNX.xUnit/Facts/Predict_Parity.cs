@@ -16,7 +16,7 @@ namespace DiGi.YOLO.ONNX.xUnit
         /// Verifies that the in-process ONNX path reproduces the detections the CPython path finds on the same images, within a stated tolerance.
         /// <para>This is the acceptance measure the whole in-process path exists to meet. The detector is frozen, so the ONNX graph is not allowed to be a slightly different detector - it has to be the same one, reached without an interpreter. Both paths are pointed at one directory of held images and their two result files are compared detection by detection.</para>
         /// <para>The tolerance is not zero and cannot be. One path runs an fp32 CUDA graph through torch and the other an fp32 CPU graph through ONNX Runtime, so the last bits of every number differ. A detection whose confidence sits on the reporting threshold therefore legitimately appears on one side and not the other, which is why detections inside a guard band around the threshold are left out of the count comparison instead of being counted as disagreements.</para>
-        /// <para>Coordinates are bounded at a percentile rather than at a maximum, which is the one part of this worth reading carefully. YOLOv8 regresses each box edge as a softmax expectation over sixteen bins measured in units of the feature stride, and that expectation is far more sensitive to the last bits than the single sigmoid the class score comes from - so a handful of detections move by whole pixels while their confidence agrees to five decimal places. Bounding the maximum would mean stating a tolerance loose enough to swallow those, and a tolerance that loose would no longer notice a real coordinate regression. Every individual detection is instead guarded by the overlap of its matched pair, which stays high however the edges wander.</para>
+        /// <para>Coordinates are bounded at a percentile rather than at a maximum, which is the one part of this worth reading carefully. A box edge is regressed in units of the feature stride, so its last bits are magnified far more than those of the single sigmoid the class score comes from - a handful of detections move by whole pixels while their confidence agrees to five decimal places. YOLOv8 makes that worse by taking each edge as a softmax expectation over sixteen bins; YOLO26, which regresses one distance per edge, shows the same tail, only shorter. Bounding the maximum would mean stating a tolerance loose enough to swallow those, and a tolerance that loose would no longer notice a real coordinate regression. Every individual detection is instead guarded by the overlap of its matched pair, which stays high however the edges wander.</para>
         /// <para>Nothing here runs unless the machine is set up for it. The 130 MB checkpoint, its ONNX export, a CPython carrying ultralytics and a directory of held images are all named in a git-ignored conf beside the test assets; without that file the fact returns, because requiring any of those on every machine running the suite is not reasonable.</para>
         /// <para>Medium test (12.9 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
@@ -29,14 +29,16 @@ namespace DiGi.YOLO.ONNX.xUnit
             //held images: the median deviation is 0.004 px and the 99th percentile 0.034 px, but 2 of 1 639 matched
             //detections move more than a pixel and the worst moves 3.3 px - with its confidence agreeing to five
             //decimal places and exactly one detection on each side, so it is neither a suppression tie nor a
-            //systematic shift. The likely mechanism, not proven here: YOLOv8 regresses each box edge as a softmax
-            //expectation over sixteen bins in units of the feature stride, and that expectation is far more
-            //sensitive to the last bits than the single sigmoid behind the class score. A maximum would therefore
-            //have to be widened to about 4 px to pass, and a 4 px bound would no longer notice a real coordinate
-            //regression against a 0.004 px median.
+            //systematic shift. The likely mechanism, not proven here: a box edge is regressed in units of the feature
+            //stride, which magnifies its last bits far more than the single sigmoid behind the class score, and
+            //YOLOv8's softmax expectation over sixteen bins (DFL) amplifies that further. The retrained YOLO26x
+            //train9_fresh has no DFL (reg_max = 1) and over the same 2 000 images still moves 2 of 1 633 matched
+            //detections by more than a pixel, the worst by 1.9 px, at a 0.047 px 99th percentile - the same tail,
+            //shorter. A maximum would therefore have to be widened to about 4 px to pass, and a 4 px bound would no
+            //longer notice a real coordinate regression against a 0.004 px median.
             //
             //What guards every single detection instead is the overlap bound below: however the edges move, a matched
-            //pair has to remain the same building. The worst observed was 0.970.
+            //pair has to remain the same building. The worst observed was 0.970 (train8) and 0.977 (train9_fresh).
             const double tolerance_BoxPercentile = 0.1;
             const double tolerance_Confidence = 0.01;
             const double iou_Minimum_Required = 0.95;
