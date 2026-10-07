@@ -10,7 +10,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies the automatic-resume loop of <c>Modify.RunYOLOTrainingAsync</c>: a stalled attempt whose checkpoint is unfinished is resumed from <c>weights\last.pt</c> after the checkpoint is copied aside, up to <c>AutoResumeCount</c> times, and the run then completes its unchanged tail; a stall with no retries left fails, a finished checkpoint after a crash is never resumed, and a cancellation is never resumed. A crash with an unfinished checkpoint is resumed too, its log line names the epoch it interrupted, and the attempt's traceback is reported before the resume.
+        /// Verifies the automatic-resume loop of <c>Modify.RunYOLOTrainingAsync</c>: a stalled attempt whose checkpoint is unfinished is resumed from <c>weights\last.pt</c> after the checkpoint is copied aside, up to <c>AutoResumeCount</c> times, and the run then completes its unchanged tail; a stall with no retries left fails, a finished checkpoint after a crash is never resumed, and a cancellation is never resumed. A crash with an unfinished checkpoint is resumed too, its log line names the epoch it interrupted, and the attempt's traceback is reported before the resume; a crash that wrote nothing says so instead of listing nothing. The attempt that ends a run, with no resume left or with automatic resume off, names its own cause and epoch in the result's messages.
         /// <para>The training is stand-in torch and ultralytics modules written into the working directory: the fresh attempt leaves a resumable checkpoint behind and goes silent, ended by the two-second inactivity limit, and the resumed attempt writes <c>best.pt</c>. No real ultralytics or GPU is needed. The interpreter is machine specific, so the fact returns without asserting when none is installed.</para>
         /// <para>Medium test (17 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
@@ -112,6 +112,9 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                     Assert.Contains(Query.YOLOTrainingStepName(YOLOTrainingStep.Train), yOLOTrainingRunResult!.FailedStepNames);
                     Assert.Equal(2, yOLOTrainingRunResult.AutoResumes.Count);
                     Assert.Equal(3, Attempts());
+
+                    // The attempt that ended the run names its own cause and epoch, not only the resumes before it.
+                    Assert.Contains(yOLOTrainingRunResult.Messages, x => x.StartsWith("Training stalled at epoch 2", StringComparison.Ordinal) && x.EndsWith("- no automatic resume left (2 of 2 used)", StringComparison.Ordinal));
                 }
 
                 // 3. AutoResumeCount = 0 keeps today's behaviour: the stall fails at once.
@@ -126,6 +129,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                     Assert.Empty(yOLOTrainingRunResult!.AutoResumes);
                     Assert.Contains(Query.YOLOTrainingStepName(YOLOTrainingStep.Train), yOLOTrainingRunResult.FailedStepNames);
                     Assert.Equal(1, Attempts());
+                    Assert.Contains(yOLOTrainingRunResult.Messages, x => x.StartsWith("Training stalled at epoch 2", StringComparison.Ordinal) && x.EndsWith("- automatic resume is off (AutoResumeCount 0)", StringComparison.Ordinal));
                 }
 
                 // 4. A crash that leaves a finished checkpoint is not resumed.
@@ -183,6 +187,26 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                     Assert.All(values_ErrorOutput, x => Assert.StartsWith("  | ", x));
                     Assert.Contains(values_ErrorOutput, x => x.Contains("Traceback", StringComparison.Ordinal));
                     Assert.Contains(values_ErrorOutput, x => x.Contains("RuntimeError: mock DataLoader worker exited unexpectedly", StringComparison.Ordinal));
+                }
+
+                // 7. A crash that wrote no error output (a process ended from outside writes none) says so instead of
+                // listing nothing, and with automatic resume off the failure still names the cause and the epoch.
+                {
+                    string projectDirectory = Path.Combine(directory, "scenario", "crash_silent");
+                    WriteMockCheckpoints(directory, MockCheckpoint(0, 6, path_Configuration, projectDirectory, "train9", true));
+                    SetMode("crash");
+                    ResetAttempts();
+
+                    ReportedLines reportedLines = new();
+                    Classes.YOLOTrainingRunResult? yOLOTrainingRunResult = await Modify.RunYOLOTrainingAsync(null, Options(projectDirectory, 0, TimeSpan.FromSeconds(30)), information: reportedLines);
+                    Assert.NotNull(yOLOTrainingRunResult);
+                    Assert.Empty(yOLOTrainingRunResult!.AutoResumes);
+                    Assert.Contains(Query.YOLOTrainingStepName(YOLOTrainingStep.Train), yOLOTrainingRunResult.FailedStepNames);
+                    Assert.Contains("Training exited with code 3 at epoch 2 - automatic resume is off (AutoResumeCount 0)", yOLOTrainingRunResult.Messages);
+
+                    List<string> values = reportedLines.Values;
+                    Assert.Contains("The attempt that exited with code 3 wrote no error output - it was ended from outside, or exited without a message.", values);
+                    Assert.DoesNotContain(values, x => x.StartsWith("Error output of the attempt", StringComparison.Ordinal));
                 }
             }
             finally
