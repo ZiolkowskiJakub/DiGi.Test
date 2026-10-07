@@ -32,6 +32,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
             // A dataset split named in a failure is a dataset problem, not a failed training.
             Assert.Equal(Enums.YearBuiltPredictionExitCode.Configuration, Query.YOLOTrainingRunExitCode(Result(false, nameof(DiGi.YOLO.Enums.Category.Train), Query.YOLOTrainingStepName(YOLOTrainingStep.Evaluate))));
+            Assert.Equal(Enums.YearBuiltPredictionExitCode.Configuration, Query.YOLOTrainingRunExitCode(Result(false, nameof(DiGi.YOLO.Enums.Category.Validate))));
         }
 
         /// <summary>
@@ -159,6 +160,66 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Assert.NotNull(yOLOTrainingRunResult_Cancelled);
                 Assert.True(yOLOTrainingRunResult_Cancelled!.Cancelled);
                 Assert.Equal(Enums.YearBuiltPredictionExitCode.Cancelled, Query.YOLOTrainingRunExitCode(yOLOTrainingRunResult_Cancelled));
+            }
+            finally
+            {
+                Directory.Delete(directory, true);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that a Train step on a dataset whose Validate split is empty is refused before the interpreter is probed, and the message names the split and the remedy.
+        /// <para>The dataset holds one Train image and an empty val folder, and the interpreter is a file that is not an interpreter: a run that passed the refusal would fail as an environment problem, so the refusal is the empty split. A dataset that holds one Validate image passes the refusal and fails there instead.</para>
+        /// </summary>
+        [Fact]
+        public async Task RunYOLOTrainingAsync_EmptyValidateSplit()
+        {
+            string directory = Path.Combine(Path.GetTempPath(), "DiGi.GIS.YOLO.UI.xUnit." + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(directory);
+
+            try
+            {
+                string directory_Dataset = Path.Combine(directory, "dataset");
+                Directory.CreateDirectory(Path.Combine(directory_Dataset, "images", "train"));
+                Directory.CreateDirectory(Path.Combine(directory_Dataset, "images", "val"));
+                File.WriteAllText(Path.Combine(directory_Dataset, "images", "train", "a_2020.jpeg"), "image");
+                File.WriteAllText(Path.Combine(directory_Dataset, "conf.yaml"), "path: .\ntrain: images/train\nval: images/val\ntest: images/test\nnames:\n   0: Building");
+
+                string path_Start = Path.Combine(directory, "start.pt");
+                File.WriteAllText(path_Start, "not weights");
+                string path_Python = Path.Combine(directory, "python.exe");
+                File.WriteAllText(path_Python, "not an interpreter");
+                string directory_Runs = Path.Combine(directory, "runs");
+
+                Classes.YOLOTrainingRunOptions Options()
+                {
+                    return new Classes.YOLOTrainingRunOptions()
+                    {
+                        DatasetOptions = new Classes.YOLOTrainingDatasetOptions() { OutputDirectory = directory_Dataset },
+                        ProjectDirectory = directory_Runs,
+                        PythonPath = path_Python,
+                        RunName = "train9",
+                        StartWeightsPath = path_Start,
+                        Steps = [YOLOTrainingStep.Train]
+                    };
+                }
+
+                // An empty Validate split is refused before the interpreter is probed, and the message names the split and the remedy.
+                Classes.YOLOTrainingRunResult? yOLOTrainingRunResult = await Modify.RunYOLOTrainingAsync(null, Options());
+                Assert.NotNull(yOLOTrainingRunResult);
+                Assert.Contains(nameof(DiGi.YOLO.Enums.Category.Validate), yOLOTrainingRunResult!.FailedStepNames);
+                Assert.DoesNotContain(nameof(DiGi.YOLO.Query.YOLOEnvironmentResult), yOLOTrainingRunResult.FailedStepNames);
+                Assert.Equal(Enums.YearBuiltPredictionExitCode.Configuration, Query.YOLOTrainingRunExitCode(yOLOTrainingRunResult));
+                Assert.Contains(yOLOTrainingRunResult.Messages, m => m.Contains("The Validate split") && m.Contains("empty (0 images)") && m.Contains("16 non-Test building(s)"));
+                Assert.False(File.Exists(Path.Combine(directory_Runs, "train9", "train9.pt")));
+
+                // A dataset that holds one Validate image passes the refusal and fails where the mock interpreter cannot run.
+                File.WriteAllText(Path.Combine(directory_Dataset, "images", "val", "v_2020.jpeg"), "image");
+                Classes.YOLOTrainingRunResult? yOLOTrainingRunResult_Passes = await Modify.RunYOLOTrainingAsync(null, Options());
+                Assert.NotNull(yOLOTrainingRunResult_Passes);
+                Assert.DoesNotContain(nameof(DiGi.YOLO.Enums.Category.Validate), yOLOTrainingRunResult_Passes!.FailedStepNames);
+                Assert.Contains(nameof(DiGi.YOLO.Query.YOLOEnvironmentResult), yOLOTrainingRunResult_Passes.FailedStepNames);
+                Assert.Equal(Enums.YearBuiltPredictionExitCode.Environment, Query.YOLOTrainingRunExitCode(yOLOTrainingRunResult_Passes));
             }
             finally
             {
