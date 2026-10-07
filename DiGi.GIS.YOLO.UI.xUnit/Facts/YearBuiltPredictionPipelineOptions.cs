@@ -24,6 +24,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 ModelPath = @"C:\YOLO\models\model.pt",
                 PythonPath = @"C:\Python\python.exe",
                 ReferenceBatchSize = 5000,
+                ReferencesFilePath = @"D:\YOLO\train9_dataset\dataset_references.tsv",
                 Resume = false,
                 RunPrediction = false,
                 ScratchDirectory = @"C:\YOLO\scratch",
@@ -58,6 +59,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //Set against its default, so a member the copy constructor or the serializer forgot reads back as true rather than as what was asked for
             Assert.False(yearBuiltPredictionPipelineOptions_Actual.CleanScratchDirectory);
             Assert.Null(yearBuiltPredictionPipelineOptions_Actual.WorkingDirectory);
+            Assert.Equal(yearBuiltPredictionPipelineOptions.ReferencesFilePath, yearBuiltPredictionPipelineOptions_Actual.ReferencesFilePath);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual.CountyIds);
             Assert.Contains(73485, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
             Assert.Contains(73482, yearBuiltPredictionPipelineOptions_Actual.CountyIds!);
@@ -73,6 +75,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //window works on, so the run would be scoped from a projection the operator never chose.
             YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Clone = new(yearBuiltPredictionPipelineOptions);
             Assert.False(yearBuiltPredictionPipelineOptions_Clone.CleanScratchDirectory);
+            Assert.Equal(yearBuiltPredictionPipelineOptions.ReferencesFilePath, yearBuiltPredictionPipelineOptions_Clone.ReferencesFilePath);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotSame(yearBuiltPredictionPipelineOptions.CountyIds, yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.Years);
@@ -101,6 +104,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Null(yearBuiltPredictionPipelineOptions.CountyIds);
             Assert.Null(yearBuiltPredictionPipelineOptions.ScratchDirectory);
             Assert.Null(yearBuiltPredictionPipelineOptions.Years);
+            //No filter by default: a run covers whole counties unless a manifest is named
+            Assert.Null(yearBuiltPredictionPipelineOptions.ReferencesFilePath);
 
             Assert.True(yearBuiltPredictionPipelineOptions.ExportImages);
             //On by default: the scoring step rebuilds its building list from the results file on disk, so a scratch

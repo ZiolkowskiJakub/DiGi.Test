@@ -138,6 +138,43 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
+        /// Tests that <see cref="ConsoleApp.Program.Main(string[])"/> returns exit code 1 - a configuration error - when the options name a reference manifest that does not exist (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#22).
+        /// <para>The run is refused before it contacts anything, so the fact needs only a placeholder key and no network.</para>
+        /// </summary>
+        [Fact]
+        public async Task ConsoleApp_MissingReferencesFile_ReturnsExitCode1()
+        {
+            string? path_Key = Query.ConfigurationFilePath(Constants.FileName.GISWebAPIClientConfigurationFile);
+            Assert.False(string.IsNullOrWhiteSpace(path_Key));
+            Assert.False(File.Exists(path_Key), $"This fact writes a placeholder '{Constants.FileName.GISWebAPIClientConfigurationFile}' beside the test assembly and one is already there, at '{path_Key}'.");
+
+            string tempFilePath = Path.Combine(Path.GetTempPath(), $"options_test_{System.Guid.NewGuid()}.json");
+            try
+            {
+                File.WriteAllText(path_Key!, "Key=\"references-fact-placeholder\"");
+
+                string json = "{\"CountyIds\":[73485],\"ScratchDirectory\":\"scratch\",\"ReferencesFilePath\":\"C:\\\\non_existent_dataset_references.tsv\",\"RunPrediction\":false,\"ExportImages\":true,\"Score\":false,\"UpdateDetections\":true,\"UpdateYearBuiltData\":false,\"UpdatePredictedYearBuilt\":false}";
+                File.WriteAllText(tempFilePath, json);
+
+                string[] args = [tempFilePath];
+                int exitCode = await ConsoleApp.Program.Main(args);
+                Assert.Equal(1, exitCode);
+            }
+            finally
+            {
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+
+                if (File.Exists(path_Key))
+                {
+                    File.Delete(path_Key!);
+                }
+            }
+        }
+
+        /// <summary>
         /// Tests that <see cref="Query.Key(string?)"/> returns null when the configuration file does not exist.
         /// </summary>
         [Fact]
