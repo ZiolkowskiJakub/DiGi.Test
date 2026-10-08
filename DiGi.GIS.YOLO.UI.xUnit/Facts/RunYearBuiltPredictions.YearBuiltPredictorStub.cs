@@ -15,6 +15,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             private readonly bool runnable;
             private readonly DiGi.Core.Classes.Range<int>? years;
             private readonly List<double>? radiuses;
+            private readonly string? modelId;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="YearBuiltPredictorStub"/> class.
@@ -23,12 +24,14 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             /// <param name="runnable">Whether the readiness probe reports this predictor can score.</param>
             /// <param name="years">The year range the predictor's readiness reports it was trained on, or null when it states no contract.</param>
             /// <param name="radiuses">The radiuses the predictor's readiness reports it was trained on, or null when it states no contract.</param>
-            public YearBuiltPredictorStub(short year, bool runnable = true, DiGi.Core.Classes.Range<int>? years = null, List<double>? radiuses = null)
+            /// <param name="modelId">The model identity the predictor's readiness reports, or null when it states none.</param>
+            public YearBuiltPredictorStub(short year, bool runnable = true, DiGi.Core.Classes.Range<int>? years = null, List<double>? radiuses = null, string? modelId = null)
             {
                 this.year = year;
                 this.runnable = runnable;
                 this.years = years;
                 this.radiuses = radiuses;
+                this.modelId = modelId;
             }
 
             /// <summary>
@@ -39,7 +42,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             {
                 if (this.runnable)
                 {
-                    return new IO.Classes.YearBuiltPredictorReadiness(true, years: this.years, radiuses: this.radiuses);
+                    return new IO.Classes.YearBuiltPredictorReadiness(true, years: this.years, radiuses: this.radiuses, modelId: this.modelId);
                 }
 
                 return new IO.Classes.YearBuiltPredictorReadiness(false, ["the year built model is missing (stub)"], years: this.years, radiuses: this.radiuses);

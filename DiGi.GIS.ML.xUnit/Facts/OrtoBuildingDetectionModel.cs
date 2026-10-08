@@ -59,6 +59,23 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Equal(OrtoBuildingDetectionModel.TrainedYears, yearBuiltPredictorReadiness.Years);
             Assert.Equal(OrtoBuildingDetectionModel.TrainedRadiuses, yearBuiltPredictorReadiness.Radiuses);
 
+            // And it must identify the model it scores with - the SHA-256 of the very file it loads, lowercase hex, the form the
+            // provenance file records - because the runner stamps it on every stored prediction (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26).
+            if (OrtoBuildingDetectionModel.IsModelAvailable)
+            {
+                Assert.True(yearBuiltPredictorReadiness.Runnable);
+
+                byte[] bytes = System.IO.File.ReadAllBytes(OrtoBuildingDetectionModel.ResolvedModelPath);
+                string sHA256 = System.Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant();
+
+                Assert.Equal(sHA256, yearBuiltPredictorReadiness.ModelId);
+                Assert.Matches("^[0-9a-f]{64}$", yearBuiltPredictorReadiness.ModelId);
+            }
+            else
+            {
+                Assert.Null(yearBuiltPredictorReadiness.ModelId);
+            }
+
             // The pipeline's own output must not be readable as a feature from either side.
             foreach (Column column in IO.Query.YearBuiltPredictionOutputColumns())
             {
