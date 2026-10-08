@@ -111,6 +111,82 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
+        /// Verifies that the buildings named through the references parameter are emitted whatever their history holds, so pushing the table clears the columns of a building whose history no longer has a value.
+        /// <para>Covers a named building with no stored record, a named building whose only record is empty, a named building whose row the table already held with stale values, and a named building that still has a value - and that leaving the parameter out keeps the old output.</para>
+        /// </summary>
+        [Fact]
+        public void Update_Building2D_YearBuilt_References()
+        {
+            int countyId = 2212;
+
+            YearBuiltData yearBuiltData_Value = new("b_ref_value");
+            yearBuiltData_Value.SetPredictedYearBuilt(new DateTime(2026, 6, 1), 1990);
+
+            //An object emptied by a removal: still stored, no entry left
+            YearBuiltData yearBuiltData_Empty = new("b_ref_empty");
+
+            Table table = new();
+
+            Column? column_Reference = table.AddColumn(IO.Constants.Column.Reference);
+            Column? column_CountyId = table.AddColumn(IO.Constants.Column.CountyId);
+            Column? column_PredictedYearBuilt = table.AddColumn(IO.Constants.Column.PredictedYearBuilt);
+            Column? column_UserYearBuilt = table.AddColumn(IO.Constants.Column.UserYearBuilt);
+            Column? column_CalculatedYearBuilt = table.AddColumn(IO.Constants.Column.CalculatedYearBuilt);
+            Assert.NotNull(column_Reference);
+            Assert.NotNull(column_CountyId);
+            Assert.NotNull(column_PredictedYearBuilt);
+            Assert.NotNull(column_UserYearBuilt);
+            Assert.NotNull(column_CalculatedYearBuilt);
+
+            //b_ref_stale: the table already holds the row with the values of a prediction run that has since been removed
+            Row row_Stale = table.AddRow();
+            IO.Modify.SetValue(row_Stale, column_Reference, "b_ref_stale");
+            IO.Modify.SetValue(row_Stale, column_CountyId, countyId);
+            IO.Modify.SetValue(row_Stale, column_PredictedYearBuilt, (ushort)1955);
+            IO.Modify.SetValue(row_Stale, column_CalculatedYearBuilt, (ushort)1955);
+            table.AddRow(row_Stale, false);
+
+            int count = IO.Modify.Update_Building2D_YearBuilt(table, countyId, [yearBuiltData_Value, yearBuiltData_Empty], ["b_ref_value", "b_ref_empty", "b_ref_missing", "b_ref_stale"]);
+
+            //Only b_ref_value is given a value
+            Assert.Equal(1, count);
+            Assert.Equal(4, table.RowCount);
+
+            Dictionary<string, Row> dictionary = [];
+            for (int i = 0; i < table.RowCount; i++)
+            {
+                Row? row = table.GetRow(i);
+                Assert.NotNull(row);
+                Assert.True(row.TryGetValue(column_Reference.Index, out string? reference));
+                Assert.NotNull(reference);
+                dictionary[reference!] = row;
+            }
+
+            Assert.True(dictionary["b_ref_value"].TryGetValue(column_PredictedYearBuilt.Index, out ushort year_Value));
+            Assert.Equal((ushort)1990, year_Value);
+
+            foreach (string reference in new string[] { "b_ref_empty", "b_ref_missing", "b_ref_stale" })
+            {
+                Assert.False(dictionary[reference].TryGetValue(column_PredictedYearBuilt.Index, out ushort _), reference);
+                Assert.False(dictionary[reference].TryGetValue(column_UserYearBuilt.Index, out ushort _), reference);
+                Assert.False(dictionary[reference].TryGetValue(column_CalculatedYearBuilt.Index, out ushort _), reference);
+                Assert.True(dictionary[reference].TryGetValue(column_CountyId.Index, out int countyId_Row), reference);
+                Assert.Equal(countyId, countyId_Row);
+            }
+
+            //Without the parameter an empty history still leaves no row and no columns behind
+            Table table_Default = new();
+            Assert.Equal(0, IO.Modify.Update_Building2D_YearBuilt(table_Default, countyId, [yearBuiltData_Empty]));
+            Assert.Equal(0, table_Default.RowCount);
+
+            //Named buildings alone are enough: the three columns are added even with no history at all
+            Table table_NoHistory = new();
+            Assert.Equal(0, IO.Modify.Update_Building2D_YearBuilt(table_NoHistory, countyId, null, ["b_ref_missing"]));
+            Assert.Equal(1, table_NoHistory.RowCount);
+            Assert.NotNull(table_NoHistory.Columns?.FirstOrDefault(x => x.Name == IO.Constants.Column.CalculatedYearBuilt.Name));
+        }
+
+        /// <summary>
         /// Pins the defect that made the stored predicted year built branch of PostgreSQLBuildingDataUpdateTask unable to write anything.
         /// <para>The branch projected stored records through ToDiGi, which yields IYearBuiltData, and then filtered them with OfType&lt;Building2DYearBuiltPredictions&gt;. Building2DYearBuiltPredictions does not implement IYearBuiltData, so the filter compiled and evaluated to nothing on every call. YearBuiltData is the type such a projection actually yields.</para>
         /// </summary>

@@ -50,7 +50,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         public async Task SetUserYearBuilt_Anonymous_Answers401()
         {
             using GISWebAPIConfigurationFileWatcher watcher = new(ConfigurationFilePath());
-            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null));
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
 
             Classes.Parameter.UserYearBuiltParameter parameter = new() { CountyId = 1, Reference = "reference", Year = 2000 };
@@ -138,7 +138,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             DefaultHttpContext httpContext = new();
             httpContext.Request.Headers.Authorization = "Bearer " + token;
 
-            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
+            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
             controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             Classes.Parameter.UserYearBuiltParameter parameter = new() { CountyId = 1, Reference = "reference", Year = 2000 };
@@ -164,7 +164,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             DefaultHttpContext httpContext = new();
             httpContext.Request.Headers.Authorization = "Bearer " + token;
 
-            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
+            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
             controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             Classes.Parameter.UserYearBuiltParameter parameter = new() { Reference = "reference", Year = 2000 };   // CountyId omitted
@@ -188,7 +188,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             DefaultHttpContext httpContext = new();
             httpContext.Request.Headers.Authorization = "Bearer " + token;
 
-            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
+            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
             controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             Classes.Parameter.UserYearBuiltParameter parameter = new() { CountyId = 1, Reference = "  ", Year = 2000 };   // blank
@@ -213,7 +213,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             DefaultHttpContext httpContext = new();
             httpContext.Request.Headers.Authorization = "Bearer " + token;
 
-            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
+            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
             controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             Classes.Parameter.UserYearBuiltParameter parameter = new() { CountyId = 1, Reference = "reference" };   // Year omitted
@@ -239,7 +239,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             DefaultHttpContext httpContext = new();
             httpContext.Request.Headers.Authorization = "Bearer " + token;
 
-            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
+            YearBuiltDataController controller = new(watcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), securityKeyManager, tokenRevocationStore);
             controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             Classes.Parameter.UserYearBuiltParameter parameter = new() { CountyId = 1, Reference = "reference", Year = 2000, Relation = 99 };   // not a YearBuiltRelation member

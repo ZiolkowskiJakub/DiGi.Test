@@ -60,7 +60,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 // never reaches it, and an empty map must not send the batch to the fallback instead.
                 AssertLookupNotRun(await buildingController.UpdateItemsByCountyIdsAsync(JsonArray(Building()), [1, 2]));
 
-                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null));
                 AssertInternalServerError(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.YearBuiltData("reference")), [1]));
                 AssertLookupNotRun(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(JsonArray(new GIS.Classes.YearBuiltData("reference")), [1]));
 
@@ -115,7 +115,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 OrtoDatasController ortoDatasController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.OrtoDatasPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await ortoDatasController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
-                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                YearBuiltDataController yearBuiltDataController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null));
                 Assert.IsType<NoContentResult>(await yearBuiltDataController.UpdateItemsByCountyIdsAsync(jsonArray, [1]));
 
                 BuildingModelController buildingModelController = new(GISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.BuildingModelPostgreSQLConverter(null, BuildingModelDetailLevel.Component), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
@@ -185,6 +185,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateOccupancyData)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateOrtoDatas)}=true",
                 $"{nameof(GISWebAPIConfigurationFileWatcher.AllowUpdateYearBuiltData)}=true",
+                $"{nameof(GISWebAPIConfigurationFileWatcher.AllowDeleteYearBuiltData)}=true",
             ]);
 
             return result;

@@ -40,7 +40,8 @@ namespace DiGi.GIS.WebAPI.xUnit
                     gISWebAPIConfigurationFileWatcher,
                     new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null),
                     new PostgreSQL.Classes.Building2DPostgreSQLConverter(null),
-                    new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                    new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null),
+                    new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null));
 
                 Assert.IsType<BadRequestResult>(await controller.GetReferencesByCountyIdAsync(0));
                 Assert.IsType<BadRequestResult>(await controller.GetReferencesByCountyIdAsync(-1));
@@ -73,9 +74,10 @@ namespace DiGi.GIS.WebAPI.xUnit
 
                 Assert.IsType<BadRequestResult>(await controller.GetCountyPartMismatchesAsync(commandTimeout: -1));
 
-                // A converter built on null connection data cannot reach the database, so a valid request answers NotFound rather than 500.
-                Assert.IsType<NotFoundResult>(await controller.GetReferenceDuplicatesAsync());
-                Assert.IsType<NotFoundResult>(await controller.GetCountyPartMismatchesAsync());
+                // A converter built on null connection data cannot run the query; that is a failure (500), never "none found" -
+                // a 404 here could not be told from a missing route (DiGi.GIS.WebAPI#49).
+                Assert.Equal(500, Assert.IsType<ObjectResult>(await controller.GetReferenceDuplicatesAsync()).StatusCode);
+                Assert.Equal(500, Assert.IsType<ObjectResult>(await controller.GetCountyPartMismatchesAsync()).StatusCode);
             }
             finally
             {
@@ -115,7 +117,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             try
             {
                 using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
-                YearBuiltDataController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(new DiGi.PostgreSQL.Classes.ConnectionData("127.0.0.1", "user", "pass", "db", 1)), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                YearBuiltDataController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(new DiGi.PostgreSQL.Classes.ConnectionData("127.0.0.1", "user", "pass", "db", 1)), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null), new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null));
                 controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
 
                 AssertTransient503(controller, await controller.GetReferencesByCountyIdAsync(1));

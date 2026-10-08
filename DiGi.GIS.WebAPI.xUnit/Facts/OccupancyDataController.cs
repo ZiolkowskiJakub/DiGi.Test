@@ -124,7 +124,8 @@ namespace DiGi.GIS.WebAPI.xUnit
                     gISWebAPIConfigurationFileWatcher,
                     new PostgreSQL.Classes.YearBuiltDataPostgreSQLConverter(null),
                     new PostgreSQL.Classes.Building2DPostgreSQLConverter(null),
-                    new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+                    new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null),
+                    new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null));
 
                 Assert.IsType<NoContentResult>(await yearBuiltDataController.UpdateItemsAsync([], "code"));
             }

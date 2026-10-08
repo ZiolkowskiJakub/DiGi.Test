@@ -122,8 +122,8 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Asserts every <c>commandTimeout</c> parameter on every action of every gis controller carries <see cref="MinimumAttribute"/>(0), and that there are exactly fifty of them.
-        /// <para>Derived from the assembly rather than from a named list, so a controller added later is swept in instead of left out: the named facts pin the endpoints ZiolkowskiJakub/DiGi.GIS.WebAPI#48 changed, while this one fails on the fifty-first - a new action whose timeout could reach the database negative, with no floor and no recorded decision to omit one. The count is a tripwire, not a target: it is what forces a decision either way (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).</para>
+        /// Asserts every <c>commandTimeout</c> parameter on every action of every gis controller carries <see cref="MinimumAttribute"/>(0), and that there are exactly fifty-five of them - fifty after ZiolkowskiJakub/DiGi.GIS.WebAPI#48, and the five year built maintenance actions of ZiolkowskiJakub/DiGi.GIS.WebAPI#50, each floored.
+        /// <para>Derived from the assembly rather than from a named list, so a controller added later is swept in instead of left out: the named facts pin the endpoints ZiolkowskiJakub/DiGi.GIS.WebAPI#48 changed, while this one fails on the next one added - a new action whose timeout could reach the database negative, with no floor and no recorded decision to omit one. The count is a tripwire, not a target: it is what forces a decision either way (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).</para>
         /// </summary>
         [Fact]
         public void GisControllers_CommandTimeoutParameters_AllFloored()
@@ -163,7 +163,7 @@ namespace DiGi.GIS.WebAPI.xUnit
                 }
             }
 
-            Assert.Equal(50, count);
+            Assert.Equal(55, count);
         }
 
         /// <summary>
