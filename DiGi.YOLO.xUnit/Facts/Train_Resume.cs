@@ -183,7 +183,7 @@ namespace DiGi.YOLO.xUnit
                 return;
             }
 
-            //model.pt is the frozen train8 checkpoint: finished, its train_args the only surviving record of the run
+            //ModelPath names the frozen train8 checkpoint (model_train8.pt since 2026-10-08): finished, its train_args the only surviving record of the run
             Classes.YOLOCheckpointInformation? yOLOCheckpointInformation = Query.YOLOCheckpointInformation(path_Model, path_Python);
             Assert.NotNull(yOLOCheckpointInformation);
             Assert.True(yOLOCheckpointInformation!.Finished);
