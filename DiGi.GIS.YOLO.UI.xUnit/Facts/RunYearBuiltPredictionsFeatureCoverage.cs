@@ -22,7 +22,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         public async Task RunYearBuiltPredictions_FeatureCoverage_Refused()
         {
             YearBuiltPredictorStub yearBuiltPredictorStub = new(1965);
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await RunWithStubbedFeatures(nameof(RunYearBuiltPredictions_FeatureCoverage_Refused), false, yearBuiltPredictorStub);
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await RunWithStubbedFeatures(nameof(RunYearBuiltPredictions_FeatureCoverage_Refused), [IO.Constants.YearBuiltPredictionFeatureGroup.Detection, IO.Constants.YearBuiltPredictionFeatureGroup.Population], yearBuiltPredictorStub);
 
             Assert.NotNull(yearBuiltPredictionResult);
 
@@ -47,7 +47,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         public async Task RunYearBuiltPredictions_FeatureCoverage_Scored()
         {
             YearBuiltPredictorStub yearBuiltPredictorStub = new(1965);
-            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await RunWithStubbedFeatures(nameof(RunYearBuiltPredictions_FeatureCoverage_Scored), true, yearBuiltPredictorStub);
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await RunWithStubbedFeatures(nameof(RunYearBuiltPredictions_FeatureCoverage_Scored), [], yearBuiltPredictorStub);
 
             Assert.NotNull(yearBuiltPredictionResult);
             Assert.Equal(2, yearBuiltPredictionResult!.BuildingCount);
@@ -60,13 +60,35 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
+        /// Verifies that a county whose detection features are present but whose population columns are empty is scored, not refused, when the predictor states it requires only the detection group.
+        /// <para>This is the fix for the guard drifting from the predictor (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#27): the first-detection heuristic reads the detection confidence columns and nothing else, so an empty population group - a county with no Statistical update yet - warns rather than refusing. The historical default, where the guard still requires the population group, is exercised by <see cref="RunYearBuiltPredictions_FeatureCoverage_Refused"/>.</para>
+        /// </summary>
+        [Fact]
+        public async Task RunYearBuiltPredictions_FeatureCoverage_PopulationAbsent_Scored()
+        {
+            YearBuiltPredictorStub yearBuiltPredictorStub = new(1965, requiredFeatureGroups: [IO.Constants.YearBuiltPredictionFeatureGroup.Detection]);
+            Classes.YearBuiltPredictionResult? yearBuiltPredictionResult = await RunWithStubbedFeatures(nameof(RunYearBuiltPredictions_FeatureCoverage_PopulationAbsent_Scored), [IO.Constants.YearBuiltPredictionFeatureGroup.Population], yearBuiltPredictorStub);
+
+            Assert.NotNull(yearBuiltPredictionResult);
+            Assert.Equal(2, yearBuiltPredictionResult!.BuildingCount);
+
+            //Not refused: the group the predictor requires (detection) is present, so the empty population group only warns.
+            Assert.DoesNotContain(nameof(IO.Query.UnpopulatedColumnNames), yearBuiltPredictionResult.FailedStepNames);
+
+            //Scored: the predictor was reached and produced a prediction for every building it fired on.
+            Assert.Equal(1, yearBuiltPredictorStub.CallCount);
+            Assert.Equal(2, yearBuiltPredictionResult.FeatureRowCount);
+            Assert.Equal(2, yearBuiltPredictionResult.PredictionCount);
+        }
+
+        /// <summary>
         /// Drives the orchestrator over the stored detection fixture with the feature read stubbed, so the coverage check can be exercised without a database.
         /// </summary>
-        /// <param name="name">The name of the calling fact, used as the scratch directory so the two runs cannot share state.</param>
-        /// <param name="populated">When true the stubbed feature table carries a value in every column; when false its detection and population columns are the type default in every row.</param>
+        /// <param name="name">The name of the calling fact, used as the scratch directory so the runs cannot share state.</param>
+        /// <param name="emptyGroups">The feature-group names whose columns the stubbed feature table leaves at the type default; every other column carries a value.</param>
         /// <param name="yearBuiltPredictorStub">The predictor handed to the run, so the caller can assert whether it was reached.</param>
         /// <returns>A task returning the result of the run.</returns>
-        private static async Task<Classes.YearBuiltPredictionResult?> RunWithStubbedFeatures(string name, bool populated, YearBuiltPredictorStub yearBuiltPredictorStub)
+        private static async Task<Classes.YearBuiltPredictionResult?> RunWithStubbedFeatures(string name, IEnumerable<string> emptyGroups, YearBuiltPredictorStub yearBuiltPredictorStub)
         {
             int countyId = 73485;
 
@@ -81,7 +103,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Directory.CreateDirectory(Path.Combine(directory_County, Constants.DirectoryName.PredictionImages));
             File.Copy(path_Fixture!, Path.Combine(directory_County, Constants.FileName.PredictionResults), true);
 
-            string json_Table = FeatureTableJson(["0207", "0209"], populated);
+            string json_Table = FeatureTableJson(["0207", "0209"], emptyGroups);
 
             StubHttpClientFactory stubHttpClientFactory = new(httpRequestMessage =>
             {
@@ -121,21 +143,18 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         /// Builds the JSON a stubbed feature read answers with, carrying the reference column and the whole input allow-list.
         /// </summary>
         /// <param name="references">The building references to write one row each for.</param>
-        /// <param name="populated">When true every column carries a value; when false the detection and population columns carry the type default.</param>
+        /// <param name="emptyGroups">The feature-group names whose columns carry the type default in every row; every other column carries a value.</param>
         /// <returns>The serialized table, in the form the endpoint returns it.</returns>
-        private static string FeatureTableJson(IEnumerable<string> references, bool populated)
+        private static string FeatureTableJson(IEnumerable<string> references, IEnumerable<string> emptyGroups)
         {
             Dictionary<string, List<Column>> columns_ByGroup = IO.Query.YearBuiltPredictionFeatureGroups();
 
             HashSet<string> names_Empty = [];
-            if (!populated)
+            foreach (string name_Group in emptyGroups)
             {
-                foreach (string name_Group in new string[] { IO.Constants.YearBuiltPredictionFeatureGroup.Detection, IO.Constants.YearBuiltPredictionFeatureGroup.Population })
+                foreach (Column column in columns_ByGroup[name_Group])
                 {
-                    foreach (Column column in columns_ByGroup[name_Group])
-                    {
-                        names_Empty.Add(column.Name!);
-                    }
+                    names_Empty.Add(column.Name!);
                 }
             }
 

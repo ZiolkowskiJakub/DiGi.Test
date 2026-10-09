@@ -187,7 +187,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(0, yearBuiltPredictorStub.CallCount);
             Assert.Equal(0, yearBuiltPredictionResult.FeatureRowCount);
 
-            Assert.Contains("Regressor SHA-256: 2e120f495e830f0917cace33ad21c5c4c7bb0c4e8f1711a363682932b7c0b7fa", yearBuiltPredictionResult.Messages);
+            Assert.Contains("Year built predictor: 2e120f495e830f0917cace33ad21c5c4c7bb0c4e8f1711a363682932b7c0b7fa", yearBuiltPredictionResult.Messages);
         }
 
         /// <summary>

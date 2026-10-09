@@ -79,6 +79,12 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Equal(2008, yearBuiltPredictorReadiness.Years!.Min);
             Assert.Equal(2025, yearBuiltPredictorReadiness.Years.Max);
             Assert.Null(yearBuiltPredictorReadiness.Radiuses);
+
+            // The feature group the heuristic requires: only the detection columns it reads, so an empty population group
+            // warns rather than refusing (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#27).
+            Assert.NotNull(yearBuiltPredictorReadiness.RequiredFeatureGroups);
+            Assert.Single(yearBuiltPredictorReadiness.RequiredFeatureGroups);
+            Assert.Equal(IO.Constants.YearBuiltPredictionFeatureGroup.Detection, yearBuiltPredictorReadiness.RequiredFeatureGroups![0]);
         }
     }
 }

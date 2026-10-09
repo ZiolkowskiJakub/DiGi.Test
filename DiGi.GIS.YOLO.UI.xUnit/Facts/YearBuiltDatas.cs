@@ -357,7 +357,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Directory.CreateDirectory(Path.Combine(directory_County, Constants.DirectoryName.PredictionImages));
             File.Copy(path_Fixture!, Path.Combine(directory_County, Constants.FileName.PredictionResults), true);
 
-            string json_Table = FeatureTableJson(["0207", "0209"], true);
+            string json_Table = FeatureTableJson(["0207", "0209"], []);
 
             StubHttpClientFactory stubHttpClientFactory = new(httpRequestMessage =>
             {
