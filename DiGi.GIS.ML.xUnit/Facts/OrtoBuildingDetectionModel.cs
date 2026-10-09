@@ -1,10 +1,8 @@
-using DiGi.Core.IO.DelimitedData.Enums;
 using DiGi.Core.IO.Table.Classes;
 using DiGi.GIS.ML;
 using DiGi_GIS_ML;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace DiGi.GIS.ML.xUnit
 {
@@ -12,7 +10,7 @@ namespace DiGi.GIS.ML.xUnit
     {
         /// <summary>
         /// Verifies that the generated ModelInput and the feature allow-list describe exactly the same features.
-        /// <para>These two are regenerated and maintained apart - ModelInput by the trainer, the allow-list by hand in DiGi.GIS.IO - and nothing at runtime notices when they disagree. A feature dropped from one side is read as its type default by the other, which produces plausible predictions from a model that is being shown a distribution it was never fitted on. Comparing the sets is the only cheap way to catch that.</para>
+        /// <para>Since ZiolkowskiJakub/DiGi.GIS.ML#15 the regressor no longer predicts in production - the first-detection heuristic does - but it stays in the repository as the baseline a feature redesign is measured from, scored by the evaluation app. Its contract with the allow-list still has to hold for that measurement to mean anything: a feature dropped from one side is read as its type default by the other, which produces plausible scores from a model shown a distribution it was never fitted on.</para>
         /// <para>The label is a member of ModelInput but is not a feature, so it is excluded from the comparison rather than expected in the allow-list - the allow-list carrying it would be the leak the pipeline exists to prevent.</para>
         /// </summary>
         [Fact]
@@ -54,28 +52,6 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Empty(names_Model.Except(names_Contract));
             Assert.Empty(names_Contract.Except(names_Model));
 
-            // And the predictor's readiness must state that same contract, so the orchestrator checks the options against the right range.
-            IO.Classes.YearBuiltPredictorReadiness yearBuiltPredictorReadiness = new Classes.YearBuiltPredictor().YearBuiltPredictorReadiness();
-            Assert.Equal(OrtoBuildingDetectionModel.TrainedYears, yearBuiltPredictorReadiness.Years);
-            Assert.Equal(OrtoBuildingDetectionModel.TrainedRadiuses, yearBuiltPredictorReadiness.Radiuses);
-
-            // And it must identify the model it scores with - the SHA-256 of the very file it loads, lowercase hex, the form the
-            // provenance file records - because the runner stamps it on every stored prediction (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26).
-            if (OrtoBuildingDetectionModel.IsModelAvailable)
-            {
-                Assert.True(yearBuiltPredictorReadiness.Runnable);
-
-                byte[] bytes = System.IO.File.ReadAllBytes(OrtoBuildingDetectionModel.ResolvedModelPath);
-                string sHA256 = System.Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant();
-
-                Assert.Equal(sHA256, yearBuiltPredictorReadiness.ModelId);
-                Assert.Matches("^[0-9a-f]{64}$", yearBuiltPredictorReadiness.ModelId);
-            }
-            else
-            {
-                Assert.Null(yearBuiltPredictorReadiness.ModelId);
-            }
-
             // The pipeline's own output must not be readable as a feature from either side.
             foreach (Column column in IO.Query.YearBuiltPredictionOutputColumns())
             {
@@ -84,75 +60,25 @@ namespace DiGi.GIS.ML.xUnit
         }
 
         /// <summary>
-        /// Verifies that the deployed scoring path reads a real feature table and returns one plausible year per building, deterministically.
-        /// <para>Runs against a committed sample of the assembled training table, so it exercises the binding by column slug and by display name against the shapes those columns actually have - which is what caught the model being handed content hashes instead of stored column identifiers.</para>
-        /// <para>Medium test (1.5 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
+        /// Verifies that the predictor behind the runner's seam is always runnable, identifies itself as the first-detection heuristic, and states the detection years it reads as its contract.
+        /// <para>The runner stamps the identity on every stored prediction (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26). It names the rule and its threshold rather than a model file's SHA-256, because since ZiolkowskiJakub/DiGi.GIS.ML#15 there is no model file in the scoring path - so readiness must not depend on one being present either.</para>
         /// </summary>
-        [MediumFact]
-        public void OrtoBuildingDetectionModel_Predict()
+        [Fact]
+        public void YearBuiltPredictor_Readiness()
         {
-            string? path = Core.xUnit.Query.FilePath(Assembly.GetExecutingAssembly(), "YearBuiltPrediction_Sample.tsv");
-            Assert.False(string.IsNullOrWhiteSpace(path));
+            IO.Classes.YearBuiltPredictorReadiness yearBuiltPredictorReadiness = new Classes.YearBuiltPredictor().YearBuiltPredictorReadiness();
 
-            Table? table = Core.IO.DelimitedData.Create.Table(path, DelimitedDataSeparator.Tab);
-            Assert.NotNull(table);
-            Assert.True(table!.RowCount > 0);
+            Assert.True(yearBuiltPredictorReadiness.Runnable);
+            Assert.Empty(yearBuiltPredictorReadiness.Messages);
 
-            Table? table_Predictions = table.PredictedYearBuilts();
-            Assert.NotNull(table_Predictions);
-            Assert.Equal(table.RowCount, table_Predictions!.RowCount);
+            Assert.Equal(Constants.Heuristic.Id, yearBuiltPredictorReadiness.ModelId);
+            Assert.Equal("first-confident-detection@0.5", yearBuiltPredictorReadiness.ModelId);
 
-            int index_Reference = table_Predictions.GetColumnIndex(IO.Constants.Column.Reference.Name);
-            int index_Year = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
-            Assert.True(index_Reference >= 0);
-            Assert.True(index_Year >= 0);
-
-            List<ushort> years = [];
-            for (int i = 0; i < table_Predictions.RowCount; i++)
-            {
-                Assert.False(string.IsNullOrWhiteSpace(table_Predictions.GetValue<string>(i, index_Reference)));
-                Assert.True(table_Predictions.TryGetValue(i, index_Year, out ushort year));
-
-                Assert.InRange(year, (ushort)1900, (ushort)2100);
-                years.Add(year);
-            }
-
-            // Same rows, same answers. A prediction engine that drifted between calls would make every
-            // stored year depend on when the pipeline happened to run.
-            Table? table_Repeat = table.PredictedYearBuilts();
-            Assert.NotNull(table_Repeat);
-            for (int i = 0; i < table_Repeat!.RowCount; i++)
-            {
-                Assert.True(table_Repeat.TryGetValue(i, index_Year, out ushort year));
-                Assert.Equal(years[i], year);
-            }
-
-            // The features have to be reaching the model, and a range check does not establish that: a row
-            // carrying nothing but a reference still scores 2012, comfortably inside any plausible range.
-            // Scoring the same references stripped of every feature has to give a different answer, or the
-            // binding is silently reading defaults - which is exactly how the deployed path came to score
-            // an RSquared of -1.771 while failing at nothing.
-            Table table_Stripped = new();
-            table_Stripped.AddColumn(IO.Constants.Column.Reference);
-            for (int i = 0; i < table.RowCount; i++)
-            {
-                table_Stripped.AddRow([table.GetValue<string>(i, table.GetColumnIndex(IO.Constants.Column.Reference.Name))]);
-            }
-
-            Table? table_StrippedPredictions = table_Stripped.PredictedYearBuilts();
-            Assert.NotNull(table_StrippedPredictions);
-
-            bool differs = false;
-            for (int i = 0; i < table_StrippedPredictions!.RowCount; i++)
-            {
-                if (table_StrippedPredictions.TryGetValue(i, index_Year, out ushort year_Stripped) && year_Stripped != years[i])
-                {
-                    differs = true;
-                    break;
-                }
-            }
-
-            Assert.True(differs, "Stripping every feature changed no prediction - the scorer is not reading features.");
+            // The detection years the heuristic reads: a run narrowing them would hide a building's first detection.
+            Assert.NotNull(yearBuiltPredictorReadiness.Years);
+            Assert.Equal(2008, yearBuiltPredictorReadiness.Years!.Min);
+            Assert.Equal(2025, yearBuiltPredictorReadiness.Years.Max);
+            Assert.Null(yearBuiltPredictorReadiness.Radiuses);
         }
     }
 }

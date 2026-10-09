@@ -32,7 +32,8 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
-        /// Verifies that PredictedYearBuilts correctly scores rows from an input table carrying canonical features and returns predicted construction years.
+        /// Verifies that PredictedYearBuilts dates each row of an input table carrying canonical features by its first confident detection, and that YearBuiltPredictor returns the same.
+        /// <para>Since ZiolkowskiJakub/DiGi.GIS.ML#15 the prediction is the first-detection heuristic: the first year with confidence at or above 0.5, so a weak earlier detection does not date the building.</para>
         /// </summary>
         [Fact]
         public void PredictedYearBuilts_Scoring()
@@ -43,9 +44,11 @@ namespace DiGi.GIS.xUnit
             table.AddColumn(IO.Constants.Column.FloorArea);
             table.AddColumn(IO.Constants.Column.InternalPointX);
             table.AddColumn(IO.Constants.Column.InternalPointY);
+            table.AddColumn(IO.Create.Column_PredictionYearBuit(IO.Constants.ColumnNamePrefix.PredictionConfidence, 2008));
+            table.AddColumn(IO.Create.Column_PredictionYearBuit(IO.Constants.ColumnNamePrefix.PredictionConfidence, 2012));
 
-            table.AddRow(["PL.PZGiK.338.2415.B1", (ushort)2, 120.5, 500000.0, 600000.0]);
-            table.AddRow(["PL.PZGiK.338.2415.B2", (ushort)1, 85.0, 500100.0, 600100.0]);
+            table.AddRow(["PL.PZGiK.338.2415.B1", (ushort)2, 120.5, 500000.0, 600000.0, 0.9F, 0.9F]);
+            table.AddRow(["PL.PZGiK.338.2415.B2", (ushort)1, 85.0, 500100.0, 600100.0, 0.2F, 0.7F]);
 
             Table? table_Predictions = table.PredictedYearBuilts();
             Assert.NotNull(table_Predictions);
@@ -62,13 +65,13 @@ namespace DiGi.GIS.xUnit
             Assert.Equal("PL.PZGiK.338.2415.B1", ref1);
 
             Assert.True(table_Predictions.TryGetValue(0, index_PredictedYear, out ushort year1));
-            Assert.True(year1 >= 1900 && year1 <= 2030);
+            Assert.Equal((ushort)2008, year1);
 
             string? ref2 = table_Predictions.GetValue<string>(1, index_Reference);
             Assert.Equal("PL.PZGiK.338.2415.B2", ref2);
 
             Assert.True(table_Predictions.TryGetValue(1, index_PredictedYear, out ushort year2));
-            Assert.True(year2 >= 1900 && year2 <= 2030);
+            Assert.Equal((ushort)2012, year2);
 
             // Verify YearBuiltPredictor yields identical results
             YearBuiltPredictor predictor = new();
@@ -80,7 +83,7 @@ namespace DiGi.GIS.xUnit
         }
 
         /// <summary>
-        /// Verifies that presence of the PredictedYearBuilt output column in the input table does not cause target leakage or fail the prediction.
+        /// Verifies that presence of the PredictedYearBuilt output column in the input table does not cause target leakage or fail the prediction: the year comes from the detection, never from the previous answer.
         /// </summary>
         [Fact]
         public void PredictedYearBuilts_TargetLeakageProtection()
@@ -90,8 +93,9 @@ namespace DiGi.GIS.xUnit
             table.AddColumn(IO.Constants.Column.Storeys);
             table.AddColumn(IO.Constants.Column.FloorArea);
             table.AddColumn(IO.Constants.Column.PredictedYearBuilt);
+            table.AddColumn(IO.Create.Column_PredictionYearBuit(IO.Constants.ColumnNamePrefix.PredictionConfidence, 2015));
 
-            table.AddRow(["PL.PZGiK.338.2415.B1", (ushort)2, 120.5, (ushort)1950]);
+            table.AddRow(["PL.PZGiK.338.2415.B1", (ushort)2, 120.5, (ushort)1950, 0.8F]);
 
             Table? table_Predictions = table.PredictedYearBuilts();
             Assert.NotNull(table_Predictions);
@@ -99,14 +103,15 @@ namespace DiGi.GIS.xUnit
 
             int index_PredictedYear = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
             Assert.True(table_Predictions.TryGetValue(0, index_PredictedYear, out ushort predictedYear));
-            Assert.True(predictedYear >= 1900);
+            Assert.Equal((ushort)2015, predictedYear);
         }
 
         /// <summary>
-        /// Verifies that legacy alternative display names (such as Location X and Polpulation) are correctly resolved as fallbacks.
+        /// Verifies that a building with no detection - here a table carrying only legacy display names such as Location X and Polpulation, and no detection column - is left out of the result rather than dated by a default.
+        /// <para>IYearBuiltPredictor.Predict allows a row the implementation cannot score to be left out. A building the imagery never saw has nothing to be dated by (ZiolkowskiJakub/DiGi.GIS.ML#15).</para>
         /// </summary>
         [Fact]
-        public void PredictedYearBuilts_AlternativeNameFallback()
+        public void PredictedYearBuilts_UndetectedLeftOut()
         {
             Table table = new();
             table.AddColumn("Reference", typeof(string));
@@ -118,11 +123,8 @@ namespace DiGi.GIS.xUnit
 
             Table? table_Predictions = table.PredictedYearBuilts();
             Assert.NotNull(table_Predictions);
-            Assert.Equal(1, table_Predictions.RowCount);
-
-            int index_PredictedYear = table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name);
-            Assert.True(table_Predictions.TryGetValue(0, index_PredictedYear, out ushort year));
-            Assert.True(year >= 1900 && year <= 2030);
+            Assert.Equal(0, table_Predictions.RowCount);
+            Assert.True(table_Predictions.GetColumnIndex(IO.Constants.Column.PredictedYearBuilt.Name) >= 0);
         }
 
         /// <summary>
