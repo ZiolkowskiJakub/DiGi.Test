@@ -117,6 +117,42 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
+        /// Verifies that DetectSeparatorAsync samples a non-text integer column without throwing and answers the default comma separator, since a numeric text form contains no separator.
+        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#11: the unmodified DetectSeparatorAsync ran length()/replace() on the raw column, so an integer column threw; casting the sampled column to text makes it answer the default separator.</para>
+        /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SkippableFact]
+        public async Task DetectSeparatorAsync_NonTextColumn_ReturnsDefaultComma()
+        {
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            {
+                return;
+            }
+
+            BaseTablePostgreSQLConverter testTablePostgreSQLConverter = new(connectionData);
+
+            await SeedMultivalueColumnTableAsync(connectionData, testTablePostgreSQLConverter, "value", typeof(int), [1, 2, 2, 3, 3, 3]);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                string separator = await testTablePostgreSQLConverter.DetectSeparatorAsync(npgsqlConnection, "value");
+                Assert.Equal(",", separator);
+            }
+            finally
+            {
+                await UnseedMultivalueColumnTableAsync(connectionData, testTablePostgreSQLConverter);
+            }
+        }
+
+        /// <summary>
         /// Creates the basetable scratch table (an int primary key plus a string multi-value column) and seeds the supplied separator values, dropping any leftovers first so every fact starts from the same state.
         /// </summary>
         /// <param name="connectionData">The connection data for the development database.</param>
