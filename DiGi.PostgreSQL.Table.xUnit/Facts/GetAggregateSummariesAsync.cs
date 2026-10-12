@@ -239,6 +239,63 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
+        /// Verifies the partition scope of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): a supplied partition value aggregates only that partition, and a null partition value spans all partitions — matching the partition semantics of the other partition-scoped reads of the converter.
+        /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SkippableFact]
+        public async Task GetAggregateSummariesAsync_PartitionValue_OnlyThatPartition()
+        {
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            {
+                return;
+            }
+
+            HistogramPartitionTablePostgreSQLConverter testConverter = new(connectionData);
+
+            // County 1 holds two rows (one of them NULL-valued), county 2 holds three: a partition-scoped aggregate must see only its own rows.
+            await SeedHistogramPartitionTableAsync(connectionData, testConverter, [(1, 10.0), (1, null), (2, 20.0), (2, 30.0), (2, 40.0)]);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                List<DiGi.PostgreSQL.Table.Classes.AggregateMeasure> measures =
+                [
+                    new DiGi.PostgreSQL.Table.Classes.AggregateMeasure("value", DiGi.PostgreSQL.Table.Enums.SinglevalueAggregateFunction.Avg),
+                    new DiGi.PostgreSQL.Table.Classes.AggregateMeasure("value", DiGi.PostgreSQL.Table.Enums.SinglevalueAggregateFunction.Count)
+                ];
+
+                // County 1: AVG(10.0) = 10, COUNT = 1 (the NULL-valued row is skipped by both).
+                System.Text.Json.Nodes.JsonArray? jsonArray_County1 = await testConverter.GetAggregateSummariesAsync(npgsqlConnection, measures, partitionValue: 1) as System.Text.Json.Nodes.JsonArray;
+                Assert.NotNull(jsonArray_County1);
+                Assert.Equal(10.0, jsonArray_County1[0]?.GetValue<double>() ?? -1.0);
+                Assert.Equal(1L, jsonArray_County1[1]?.GetValue<long>() ?? -1L);
+
+                // County 2: AVG(20.0, 30.0, 40.0) = 30, COUNT = 3.
+                System.Text.Json.Nodes.JsonArray? jsonArray_County2 = await testConverter.GetAggregateSummariesAsync(npgsqlConnection, measures, partitionValue: 2) as System.Text.Json.Nodes.JsonArray;
+                Assert.NotNull(jsonArray_County2);
+                Assert.Equal(30.0, jsonArray_County2[0]?.GetValue<double>() ?? -1.0);
+                Assert.Equal(3L, jsonArray_County2[1]?.GetValue<long>() ?? -1L);
+
+                // All partitions: AVG(10.0, 20.0, 30.0, 40.0) = 25, COUNT = 4.
+                System.Text.Json.Nodes.JsonArray? jsonArray_All = await testConverter.GetAggregateSummariesAsync(npgsqlConnection, measures) as System.Text.Json.Nodes.JsonArray;
+                Assert.NotNull(jsonArray_All);
+                Assert.Equal(25.0, jsonArray_All[0]?.GetValue<double>() ?? -1.0);
+                Assert.Equal(4L, jsonArray_All[1]?.GetValue<long>() ?? -1L);
+            }
+            finally
+            {
+                await UnseedHistogramPartitionTableAsync(connectionData, testConverter);
+            }
+        }
+
+        /// <summary>
         /// Creates the basetable scratch table (an int primary key plus the <c>value_a</c> int and <c>value_b</c> double columns under test) and seeds the supplied values, dropping any leftovers first so every fact starts from the same state.
         /// </summary>
         /// <param name="connectionData">The connection data for the development database.</param>
