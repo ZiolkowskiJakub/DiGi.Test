@@ -1,5 +1,6 @@
 using DiGi.Core.IO.Table.Interfaces;
 using DiGi.PostgreSQL.Table.Classes;
+using DiGi.PostgreSQL.Table.Enums;
 using Npgsql;
 using NpgsqlTypes;
 using System.Text;
@@ -129,19 +130,24 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// An <c>In</c> whose value is a JSON object (neither a scalar nor an array) degrades cleanly to <c>1=0</c> with no bound parameter — it must never throw, and must not become a raw-text <c>= @p</c> scalar. On the unmodified code this is red (a text column matched the literal object text).
+        /// An <c>In</c> whose value is a JSON object (neither a scalar nor a list) is a request-level failure: it throws <see cref="InvalidFilterException"/> naming the column, instead of degrading to <c>1=0</c> (a plausible-looking zero) or becoming a raw-text <c>= @p</c> scalar.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the test.</returns>
         [Fact]
-        public void TryBuildFilterGroupSql_In_JsonObject_NoThrow()
+        public void TryBuildFilterGroupSql_In_JsonObject_Throws()
         {
             FilterGroup filterGroup = FilterGroup_FromJson("""{"filterConditions":[{"columnUniqueId":"municipality_name","filterOperator":6,"value":{"a":1}}]}""");
             Column column = new(0, "municipality_name", typeof(string));
+            List<IColumn> columns = [column];
 
-            (string sql, NpgsqlParameterCollection parameters) = BuildFilterSql(filterGroup, column);
+            StringBuilder sqlBuilder = new();
+            NpgsqlParameterCollection parameters = new NpgsqlCommand().Parameters;
+            int parameterIndex = 0;
 
-            Assert.Contains("1=0", sql);
-            Assert.DoesNotContain("@filterParam_0", sql);
+            InvalidFilterException exception = Assert.Throws<InvalidFilterException>(() => filterGroup.TryBuildFilterGroupSql(columns, sqlBuilder, parameters, ref parameterIndex));
+
+            Assert.Equal("municipality_name", exception.ColumnUniqueId);
+            Assert.Equal(FilterOperator.In, exception.FilterOperator);
             Assert.Empty(parameters);
         }
 

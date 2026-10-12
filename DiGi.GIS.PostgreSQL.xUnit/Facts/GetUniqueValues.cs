@@ -1,4 +1,5 @@
 using DiGi.GIS.PostgreSQL.Classes;
+using DiGi.PostgreSQL.Table.Classes;
 using Npgsql;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -50,16 +51,16 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             Assert.NotNull(values_Known);
 
             // The same identifier, with and without a county, has to be rejected the same way.
-            IEnumerable<object?>? values_Unknown_NoCounty = await buildingDataPostgreSQLConverter.GetUniqueValuesAsync<object?>("no_such_column");
-            Assert.Null(values_Unknown_NoCounty);
+            InvalidFilterException exception_NoCounty = await Assert.ThrowsAsync<InvalidFilterException>(() => buildingDataPostgreSQLConverter.GetUniqueValuesAsync<object?>("no_such_column"));
+            Assert.Equal("no_such_column", exception_NoCounty.ColumnUniqueId);
 
-            IEnumerable<object?>? values_Unknown_County = await buildingDataPostgreSQLConverter.GetUniqueValuesAsync<object?>("no_such_column", countyId);
-            Assert.Null(values_Unknown_County);
+            InvalidFilterException exception_County = await Assert.ThrowsAsync<InvalidFilterException>(() => buildingDataPostgreSQLConverter.GetUniqueValuesAsync<object?>("no_such_column", countyId));
+            Assert.Equal("no_such_column", exception_County.ColumnUniqueId);
 
             // An identifier carrying SQL punctuation is not a column name, so it is rejected on the list rather
             // than escaped. Kept read-only on purpose - the assertion is that nothing reaches the database.
-            IEnumerable<object?>? values_Punctuation = await buildingDataPostgreSQLConverter.GetUniqueValuesAsync<object?>("county_name\" FROM building_data --", countyId);
-            Assert.Null(values_Punctuation);
+            InvalidFilterException exception_Punctuation = await Assert.ThrowsAsync<InvalidFilterException>(() => buildingDataPostgreSQLConverter.GetUniqueValuesAsync<object?>("county_name\" FROM building_data --", countyId));
+            Assert.Equal("county_name\" FROM building_data --", exception_Punctuation.ColumnUniqueId);
         }
     }
 }

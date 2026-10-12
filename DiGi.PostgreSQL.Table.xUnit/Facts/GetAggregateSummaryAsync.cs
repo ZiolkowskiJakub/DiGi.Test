@@ -54,6 +54,44 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
+        /// A target column the stored table does not hold is a typed failure naming the column, distinct from a valid empty result (ZiolkowskiJakub/DiGi.PostgreSQL#12). On the unmodified code the same call answered <c>null</c>, indistinguishable from an empty partition.
+        /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SkippableFact]
+        public async Task GetAggregateSummaryAsync_UnknownTargetColumn_Throws()
+        {
+            if (!PostgreSQL.xUnit.Create.IsAvailable(PostgreSQL.Enums.StorageMethod.Table, out ConnectionData? connectionData))
+            {
+                return;
+            }
+
+            BaseTablePostgreSQLConverter testConverter = new(connectionData);
+
+            // A scratch table with its column metadata exists (so the stored-column whitelist can be consulted); the requested column is simply not on it.
+            await SeedHistogramTableAsync(connectionData, testConverter, [1.0]);
+            try
+            {
+                await using NpgsqlConnection? npgsqlConnection = PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection is null)
+                {
+                    return;
+                }
+
+                await npgsqlConnection.OpenAsync();
+
+                DiGi.PostgreSQL.Table.Classes.InvalidFilterException exception = await Assert.ThrowsAsync<DiGi.PostgreSQL.Table.Classes.InvalidFilterException>(() => testConverter.GetAggregateSummaryAsync<Core.IO.Table.Classes.Column>(npgsqlConnection, "no_such_column", PostgreSQL.Table.Enums.SinglevalueAggregateFunction.Count));
+
+                Assert.Equal("no_such_column", exception.ColumnUniqueId);
+                Assert.Null(exception.FilterOperator);
+            }
+            finally
+            {
+                await UnseedHistogramTableAsync(connectionData, testConverter);
+            }
+        }
+
+        /// <summary>
         /// Verifies that MultivalueAggregateFunction.SplitValueDistribution groups a non-text integer column by its own value and counts the occurrences of each distinct value, instead of failing.
         /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#11: the unmodified SplitValueDistribution ran string_to_array on the raw column, so an integer column threw and the caller answered 500; casting the column to text makes the endpoint work for every column type.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
