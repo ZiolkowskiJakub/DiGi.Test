@@ -113,6 +113,11 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             OpenApiOperation openApiOperation_BuildingDataUpdateItems = GisDocument_Operation(openApiDocument, "/gis/buildingdata/updateitemsbycountyids", HttpMethod.Post);
             Assert.Equal("0", GisDocument_Minimum(openApiOperation_BuildingDataUpdateItems, "commandtimeout"));
 
+            // the year built run summary of #50 - a public query endpoint beside #50's four hidden maintenance ones, so it carries the same floor 0.
+            OpenApiOperation openApiOperation_PredictedYearBuiltRuns = GisDocument_Operation(openApiDocument, "/gis/yearbuiltdata/predictedyearbuiltruns", HttpMethod.Get);
+            Assert.Equal("0", GisDocument_Minimum(openApiOperation_PredictedYearBuiltRuns, "commandtimeout"));
+            Assert.Null(GisDocument_Maximum(openApiOperation_PredictedYearBuiltRuns, "commandtimeout"));
+
             // limit: floor 1 on the duplicates endpoints, floor 0 on the lattice endpoints.
             OpenApiOperation openApiOperation_ReferenceDuplicates = GisDocument_Operation(openApiDocument, "/gis/building2d/referenceduplicates", HttpMethod.Get);
             Assert.Equal("1", GisDocument_Minimum(openApiOperation_ReferenceDuplicates, "limit"));
@@ -180,10 +185,13 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.Equal(DiGi.GIS.WebAPI.Constants.OrtoDatas.MaximumSampleCount.ToString(CultureInfo.InvariantCulture), GisDocument_Maximum(openApiOperation_SubdivisionLinks, "samplecount"));
             Assert.Equal("0", GisDocument_Minimum(openApiOperation_SubdivisionLinks, "commandtimeout"));
 
-            // The exhaustive form of the assertions above: every commandtimeout the document carries,
-            // floored at 0 with no maximum - fifty of them, pairing with the reflection sweep's fifty
-            // in the attribute itself, so an endpoint dropped from the document or stripped of its
-            // floor by the filter fails here instead of passing unasserted (DiGi.GIS.WebAPI#48).
+            // The exhaustive form of the assertions above: every commandtimeout the public document carries,
+            // floored at 0 with no maximum - fifty-one of them. The fifty of #48 plus predictedyearbuiltruns of
+            // #50, whose four sibling maintenance endpoints are key-gated and hidden (IgnoreApi inherited) and so
+            // never reach the public document. That is why this served count trails the reflection sweep's
+            // fifty-five (the whole assembly, hidden endpoints included) - a tripwire, not a target: an endpoint
+            // added to the public document or stripped of its floor fails here instead of passing unasserted
+            // (DiGi.GIS.WebAPI#48, #50).
             int commandTimeouts = 0;
             foreach (IOpenApiPathItem openApiPathItem in openApiDocument.Paths.Values)
             {
@@ -217,7 +225,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
                 }
             }
 
-            Assert.Equal(50, commandTimeouts);
+            Assert.Equal(51, commandTimeouts);
         }
 
         private static OpenApiOperation GisDocument_Operation(OpenApiDocument openApiDocument, string path, HttpMethod httpMethod)
