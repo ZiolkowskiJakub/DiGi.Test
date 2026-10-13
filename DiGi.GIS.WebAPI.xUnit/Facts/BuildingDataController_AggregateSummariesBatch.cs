@@ -55,6 +55,38 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
+        /// Pins the request-body binding of ZiolkowskiJakub/DiGi.GIS.WebAPI#56: the <c>Measures</c> list of <see cref="AggregateMeasure"/>
+        /// round-trips through System.Text.Json with the web defaults the host's input formatter uses, so the action's parameter binds
+        /// what a client actually sends - each measure keeping its column, its function and its position.
+        /// <para>The controller facts build the parameter in code and never exercise the wire shape; this fact does, with no database.</para>
+        /// </summary>
+        [Fact]
+        public void AggregateSummariesRequestParameter_JsonRoundTrip_PreservesMeasures()
+        {
+            AggregateSummariesRequestParameter parameter_Source = new()
+            {
+                CountyId = 10365,
+                Measures =
+                [
+                    new AggregateMeasure("floor_area", SinglevalueAggregateFunction.Avg),
+                    new AggregateMeasure("reference", SinglevalueAggregateFunction.DistinctCount),
+                ],
+            };
+
+            string json = System.Text.Json.JsonSerializer.Serialize(parameter_Source, System.Text.Json.JsonSerializerOptions.Web);
+            AggregateSummariesRequestParameter? parameter_RoundTrip = System.Text.Json.JsonSerializer.Deserialize<AggregateSummariesRequestParameter>(json, System.Text.Json.JsonSerializerOptions.Web);
+
+            Assert.NotNull(parameter_RoundTrip);
+            Assert.Equal(10365, parameter_RoundTrip!.CountyId);
+            List<AggregateMeasure> measures_RoundTrip = parameter_RoundTrip.Measures;
+            Assert.Equal(2, measures_RoundTrip.Count);
+            Assert.Equal("floor_area", measures_RoundTrip[0].ColumnUniqueId);
+            Assert.Equal(SinglevalueAggregateFunction.Avg, measures_RoundTrip[0].SinglevalueAggregateFunction);
+            Assert.Equal("reference", measures_RoundTrip[1].ColumnUniqueId);
+            Assert.Equal(SinglevalueAggregateFunction.DistinctCount, measures_RoundTrip[1].SinglevalueAggregateFunction);
+        }
+
+        /// <summary>
         /// Pins the parity contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#56: three single-value measures over one scratch partition
         /// answer the same values as the three equivalent <c>aggregatesummary/singlevalue</c> calls, in request order, as one
         /// JSON array whose length equals the measure count.
