@@ -1,5 +1,9 @@
 using DiGi.Core.IO.Table.Classes;
 using DiGi.GIS.PostgreSQL.Classes;
+using DiGi.GIS.PostgreSQL.xUnit.Classes;
+using DiGi.PostgreSQL.Classes;
+using DiGi.PostgreSQL.Table.Enums;
+using Npgsql;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -125,5 +129,101 @@ namespace DiGi.GIS.PostgreSQL.xUnit
                 Assert.Contains(countyId, countyIds);
             }
         }
+        /// <summary>
+        /// Verifies the filtered <c>COUNT(*)</c> of ZiolkowskiJakub/DiGi.GIS.WebAPI#52 through the building-data converter, on a scratch table under the converter's own primary key and county partitioning: a null filter group answers the partition's row count, a filter matching two of three rows answers 2, a filter matching nothing answers 0 (not null, not an error), and the no-filter count equals the partition's direct <c>COUNT(*)</c> - the figure <c>countbycountyid</c> returns on a partitioned deployment.
+        /// <para>Database fact that needs no data of its own: it pushes its own three rows into the scratch table and returns without asserting when the local test database configuration is absent.</para>
+        /// </summary>
+        [Fact]
+        public async Task BuildingDataPostgreSQLConverter_GetCountAsync_Filtered_CountsRows()
+        {
+            ConnectionData? connectionData = Create.GISPostgreSQLConverterManager()?.GetPostgreSQLConverter<BuildingDataPostgreSQLConverter>()?.ConnectionData;
+            if (connectionData is null)
+            {
+                return;
+            }
+
+            ScratchBuildingDataPostgreSQLConverter converter = new(connectionData);
+
+            // Declared by name, as the other building data facts do, so that this project need not reference DiGi.GIS.IO.
+            Column column_CountyId = new ExtendedColumn("County Id", typeof(int), null, null);
+            Column column_Reference = new ExtendedColumn("Reference", typeof(string), null, null);
+            Column column_Value = new ExtendedColumn("value", typeof(double), null, null);
+
+            const int countyId = 999999;
+
+            Table table = new();
+            table.AddColumn(column_CountyId);
+            table.AddColumn(column_Reference);
+            table.AddColumn(column_Value);
+            table.AddRow([countyId, "XUNIT-COUNT-1", 10.0]);
+            table.AddRow([countyId, "XUNIT-COUNT-2", null]);
+            table.AddRow([countyId, "XUNIT-COUNT-3", 30.0]);
+            Assert.True(await converter.PushAsync(table));
+
+            try
+            {
+                // A null filter group counts the whole partition: three rows, one of them NULL-valued.
+                long? count_NoFilter = await converter.GetCountByFilterGroupAsync((DiGi.PostgreSQL.Table.Classes.FilterGroup?)null, countyId);
+                Assert.NotNull(count_NoFilter);
+                Assert.Equal(3L, count_NoFilter.Value);
+
+                // A filter matching two rows (value IS NOT NULL) answers 2 - the NULL row is not counted away.
+                DiGi.PostgreSQL.Table.Classes.FilterGroup filterGroup_NotNull = new()
+                {
+                    FilterConditions =
+                    [
+                        new DiGi.PostgreSQL.Table.Classes.FilterCondition
+                        {
+                            ColumnUniqueId = "value",
+                            FilterOperator = FilterOperator.IsNotNull
+                        }
+                    ]
+                };
+                long? count_NotNull = await converter.GetCountByFilterGroupAsync(filterGroup_NotNull, countyId);
+                Assert.NotNull(count_NotNull);
+                Assert.Equal(2L, count_NotNull.Value);
+
+                // A filter matching nothing answers 0 - not null, not an error status.
+                DiGi.PostgreSQL.Table.Classes.FilterGroup filterGroup_None = new()
+                {
+                    FilterConditions =
+                    [
+                        new DiGi.PostgreSQL.Table.Classes.FilterCondition
+                        {
+                            ColumnUniqueId = "value",
+                            FilterOperator = FilterOperator.GreaterThan,
+                            Value = 1000.0
+                        }
+                    ]
+                };
+                long? count_None = await converter.GetCountByFilterGroupAsync(filterGroup_None, countyId);
+                Assert.NotNull(count_None);
+                Assert.Equal(0L, count_None.Value);
+
+                // The no-filter count equals the partition's direct row count, the figure countbycountyid returns on a partitioned deployment.
+                // The physical column is the normalized slug county_id (UniqueId), not the display name "County Id" - PushAsync names columns by their slug.
+                await using NpgsqlConnection? npgsqlConnection = DiGi.PostgreSQL.Create.NpgsqlConnection(connectionData);
+                Assert.NotNull(npgsqlConnection);
+                await npgsqlConnection.OpenAsync();
+                await using NpgsqlCommand npgsqlCommand = new($"SELECT COUNT(*) FROM \"{converter.TableName}\" WHERE \"county_id\" = {countyId}", npgsqlConnection);
+                object? resultValue = await npgsqlCommand.ExecuteScalarAsync();
+                Assert.NotNull(resultValue);
+                Assert.Equal(System.Convert.ToInt64(resultValue), count_NoFilter!.Value);
+            }
+            finally
+            {
+                await DiGi.PostgreSQL.Modify.RemoveTableAsync(connectionData, converter.TableName);
+
+                await using NpgsqlConnection? npgsqlConnection_Cleanup = DiGi.PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection_Cleanup is not null)
+                {
+                    await npgsqlConnection_Cleanup.OpenAsync();
+                    await using NpgsqlCommand npgsqlCommand = new($"DELETE FROM \"{DiGi.PostgreSQL.Table.Constants.TableName.Columns}\" WHERE table_name = @tableName", npgsqlConnection_Cleanup);
+                    npgsqlCommand.Parameters.AddWithValue("tableName", converter.TableName);
+                    await npgsqlCommand.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
     }
 }

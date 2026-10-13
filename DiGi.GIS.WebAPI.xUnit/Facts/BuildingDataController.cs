@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace DiGi.GIS.WebAPI.xUnit
 {
@@ -173,5 +174,62 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.NotNull(omitted);
             Assert.Equal(DiGi.PostgreSQL.Table.Enums.HistogramBucketing.EqualWidth, omitted.HistogramBucketing);
         }
+        /// <summary>
+        /// Pins the <c>countbyfiltergroup</c> contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#52: the action is a thin filtered <c>COUNT(*)</c> over the converter, so a negative <c>commandtimeout</c> is refused with 400 before any database work, and with no connection to build (null connection data) the converter returns null and the action answers 404 rather than a 5xx - for both an absent filter group and a present one.
+        /// </summary>
+        [Fact]
+        public async Task BuildingDataController_CountByFilterGroup_GuardsAndNoConnection()
+        {
+            string path = ConfigurationFilePath();
+            try
+            {
+                using GISWebAPIConfigurationFileWatcher gISWebAPIConfigurationFileWatcher = new(path);
+                BuildingDataController controller = new(gISWebAPIConfigurationFileWatcher, new PostgreSQL.Classes.BuildingDataPostgreSQLConverter(null), new PostgreSQL.Classes.Building2DPostgreSQLConverter(null), new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
+
+                BuildingDataCountByFilterGroupParameter parameter = new() { CountyId = 10365 };
+
+                // commandtimeout: -1 is refused by the guard ahead of the database read.
+                Assert.IsType<BadRequestResult>(await controller.GetCountByFilterGroupAsync(parameter, -1));
+
+                // No connection to build: the converter returns null, so the action answers NotFound - with an absent filter group...
+                Assert.IsType<NotFoundResult>(await controller.GetCountByFilterGroupAsync(parameter, 600));
+
+                // ...and with a present (empty) filter group alike.
+                BuildingDataCountByFilterGroupParameter parameterWithGroup = new() { CountyId = 10365, FilterGroup = new DiGi.PostgreSQL.Table.Classes.FilterGroup() };
+                Assert.IsType<NotFoundResult>(await controller.GetCountByFilterGroupAsync(parameterWithGroup, 600));
+            }
+            finally
+            {
+                System.IO.File.Delete(path);
+            }
+        }
+
+        /// <summary>
+        /// Pins the <c>countbyfiltergroup</c> route and success response type of ZiolkowskiJakub/DiGi.GIS.WebAPI#52: it is a <c>POST</c> to <c>countbyfiltergroup</c>, and the 200 response is documented as a bare <c>long</c> integer.
+        /// </summary>
+        [Fact]
+        public void BuildingDataController_CountByFilterGroup_RouteAndResponseType()
+        {
+            System.Reflection.MethodInfo method = typeof(BuildingDataController).GetMethod(nameof(BuildingDataController.GetCountByFilterGroupAsync))!;
+            Assert.NotNull(method);
+
+            HttpPostAttribute? httpPost = method.GetCustomAttribute<HttpPostAttribute>();
+            Assert.NotNull(httpPost);
+            Assert.Equal("countbyfiltergroup", httpPost.Template);
+
+            ProducesResponseTypeAttribute? produces = null;
+            foreach (ProducesResponseTypeAttribute attribute in method.GetCustomAttributes<ProducesResponseTypeAttribute>())
+            {
+                if (attribute.StatusCode == 200)
+                {
+                    produces = attribute;
+                    break;
+                }
+            }
+
+            Assert.NotNull(produces);
+            Assert.Equal(typeof(long), produces.Type);
+        }
+
     }
 }
