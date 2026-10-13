@@ -289,7 +289,8 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// Pushes a scratch building-data table (reference, county, numeric measure) into the local test database and
         /// hands back a live <see cref="BuildingDataController"/> wired to it, so the ZiolkowskiJakub/DiGi.GIS.WebAPI#54
         /// 400 contract is exercised through the real action over the real converter. Returns <c>null</c> — and the fact
-        /// returns without asserting — when the conf is absent or the local test database is unreachable.
+        /// returns without asserting — when the conf is absent or the local test database is unreachable, in which case
+        /// nothing was written. A push that fails after the table exists cleans up what it wrote and fails loudly.
         /// <para>Removes the scratch table and its column metadata on disposal, so the base is left as found.</para>
         /// </summary>
         private sealed class InvalidFilterFixture : System.IAsyncDisposable
@@ -362,19 +363,6 @@ namespace DiGi.GIS.WebAPI.xUnit
                 }
 
                 string path_Watcher = ConfigurationFilePath();
-                try
-                {
-                    if (!await scratchBuildingDataPostgreSQLConverter.PushAsync(table))
-                    {
-                        return null;
-                    }
-                }
-                catch
-                {
-                    File.Delete(path_Watcher);
-                    throw;
-                }
-
                 GISWebAPIConfigurationFileWatcher watcher = new(path_Watcher);
                 BuildingDataController controller = new(
                     watcher,
@@ -382,7 +370,23 @@ namespace DiGi.GIS.WebAPI.xUnit
                     new PostgreSQL.Classes.Building2DPostgreSQLConverter(null),
                     new PostgreSQL.Classes.AdministrativeAreal2DPostgreSQLConverter(null));
 
-                return new InvalidFilterFixture(connectionData, path_Watcher, scratchBuildingDataPostgreSQLConverter.TableName, watcher, controller);
+                // The fixture is live before the push, so a push that fails after the table exists still cleans up
+                // what it wrote (and the fact fails loudly rather than skipping over a half-written base).
+                InvalidFilterFixture fixture = new(connectionData, path_Watcher, scratchBuildingDataPostgreSQLConverter.TableName, watcher, controller);
+                try
+                {
+                    if (!await scratchBuildingDataPostgreSQLConverter.PushAsync(table))
+                    {
+                        throw new System.InvalidOperationException($"PushAsync did not complete for the scratch table {scratchBuildingDataPostgreSQLConverter.TableName}.");
+                    }
+                }
+                catch
+                {
+                    await fixture.DisposeAsync();
+                    throw;
+                }
+
+                return fixture;
             }
 
             /// <summary>
