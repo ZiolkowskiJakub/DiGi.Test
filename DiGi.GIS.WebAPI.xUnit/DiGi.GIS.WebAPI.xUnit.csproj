@@ -109,4 +109,14 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- The invalid-filter facts resolve their local test database conf in 'bin/user files' (Core.xUnit.Query.UserFilesDirectory),
+       which this target materializes from the DiGi.Test 'user files' folder after each build. -->
+  <Target Name="CopyUserFiles" AfterTargets="Build">
+    <ItemGroup>
+      <_UserFiles Include="$(ProjectDir)../user files/**/*.*" />
+    </ItemGroup>
+    <Message Text="Copying all user files from directory..." Importance="high" />
+    <Copy SourceFiles="@(_UserFiles)" DestinationFiles="@(_UserFiles-&gt;'$(MSBuildThisFileDirectory)../../bin/user files/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
