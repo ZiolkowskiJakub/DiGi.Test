@@ -34,6 +34,10 @@ namespace DiGi.GIS.WebAPI.xUnit
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferencePathsByNameParameterAsync(new AdministrativeAreal2DReferencePathsByNameParameter(" ")));
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferencesByNameParameterAsync(null!));
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferencesByNameParameterAsync(new AdministrativeAreal2DReferencesByNameParameter(" ")));
+                Assert.IsType<BadRequestResult>(await controller.GetReferencePathsByNameAsync(string.Empty));
+                Assert.IsType<BadRequestResult>(await controller.GetReferencePathsByNameAsync(" ")); 
+                Assert.IsType<BadRequestResult>(await controller.GetReferencesByNameAsync(string.Empty));
+                Assert.IsType<BadRequestResult>(await controller.GetReferencesByNameAsync(" ")); 
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.Undefined, null, null));
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County, 0, null));
                 Assert.IsType<BadRequestResult>(await controller.GetAdministrativeAreal2DReferencesByAdministrativeArealTypeAsync(AdministrativeArealType.County, -1, null));

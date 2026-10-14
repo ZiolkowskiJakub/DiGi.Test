@@ -27,6 +27,8 @@ namespace DiGi.GIS.WebAPI.xUnit
                 (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetIdsByAdministrativeArealTypeAsync), "administrativeArealType"),
                 (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetIdsByCodeAsync), "code"),
                 (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetSubCodesAsync), "code"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetReferencePathsByNameAsync), "text"),
+                (typeof(AdministrativeAreal2DController), nameof(AdministrativeAreal2DController.GetReferencesByNameAsync), "text"),
                 (typeof(BuildingController), nameof(BuildingController.GetItemByReferenceAsync), "reference"),
                 (typeof(BuildingController), nameof(BuildingController.GetItemByReferenceAsync), "countyId"),
                 (typeof(BuildingController), nameof(BuildingController.GetItemsByReferenceAsync), "reference"),
