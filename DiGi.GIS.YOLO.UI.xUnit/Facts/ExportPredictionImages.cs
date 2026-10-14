@@ -18,7 +18,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Modify.ExportPredictionImagesAsync"/> properly validates input parameters and returns false when handed invalid arguments.
+        /// Verifies that <see cref="Modify.ExportPredictionImagesAsync(DiGi.GIS.WebAPI.Classes.GISWebAPIManager?, int, string?, int, bool, System.Collections.Generic.IEnumerable{string}?, System.Threading.CancellationToken)"/> properly validates input parameters and returns false when handed invalid arguments.
         /// </summary>
         [Fact]
         public async Task ExportPredictionImages_Validation()
@@ -36,7 +36,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync"/>) and file-based prediction image export (<see cref="GIS.UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
+        /// Verifies that database-sourced prediction image export (<see cref="Modify.ExportPredictionImagesAsync(DiGi.GIS.WebAPI.Classes.GISWebAPIManager?, int, string?, int, bool, System.Collections.Generic.IEnumerable{string}?, System.Threading.CancellationToken)"/>) and file-based prediction image export (<see cref="GIS.UI.Modify.WriteImages(DiGi.GIS.Classes.OrtoDatas?, string?, bool, List{DiGi.Geometry.Planar.Classes.Point2D}?, List{DiGi.Geometry.Planar.Classes.Point2D}?)"/>) produce byte-identical JPEG outputs when processing real orthophoto payloads loaded from test fixtures.
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]

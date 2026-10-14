@@ -16,6 +16,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions = new()
             {
                 BatchSize = 2500,
+                ChunkSize = 1234,
                 CleanScratchDirectory = false,
                 Confidence = 0.35,
                 CountyIds = [73485, 73482],
@@ -38,6 +39,8 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             };
 
             Assert.Equal(2500, yearBuiltPredictionPipelineOptions.BatchSize);
+            Assert.Equal(1234, yearBuiltPredictionPipelineOptions.ChunkSize);
+            Assert.Equal(5000, new YearBuiltPredictionPipelineOptions().ChunkSize);
             Assert.Equal(0.35, yearBuiltPredictionPipelineOptions.Confidence);
             Assert.NotNull(yearBuiltPredictionPipelineOptions.CountyIds);
             Assert.Equal(2, yearBuiltPredictionPipelineOptions.CountyIds!.Count);
@@ -54,6 +57,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             YearBuiltPredictionPipelineOptions? yearBuiltPredictionPipelineOptions_Actual = Core.Convert.ToDiGi<YearBuiltPredictionPipelineOptions>(json)?.FirstOrDefault();
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Actual);
             Assert.Equal(yearBuiltPredictionPipelineOptions.BatchSize, yearBuiltPredictionPipelineOptions_Actual!.BatchSize);
+            Assert.Equal(1234, yearBuiltPredictionPipelineOptions_Actual.ChunkSize);
             Assert.Equal(yearBuiltPredictionPipelineOptions.Confidence, yearBuiltPredictionPipelineOptions_Actual.Confidence);
             Assert.Equal(yearBuiltPredictionPipelineOptions.ScratchDirectory, yearBuiltPredictionPipelineOptions_Actual.ScratchDirectory);
             //Set against its default, so a member the copy constructor or the serializer forgot reads back as true rather than as what was asked for
@@ -75,6 +79,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             //window works on, so the run would be scoped from a projection the operator never chose.
             YearBuiltPredictionPipelineOptions yearBuiltPredictionPipelineOptions_Clone = new(yearBuiltPredictionPipelineOptions);
             Assert.False(yearBuiltPredictionPipelineOptions_Clone.CleanScratchDirectory);
+            Assert.Equal(1234, yearBuiltPredictionPipelineOptions_Clone.ChunkSize);
             Assert.Equal(yearBuiltPredictionPipelineOptions.ReferencesFilePath, yearBuiltPredictionPipelineOptions_Clone.ReferencesFilePath);
             Assert.NotNull(yearBuiltPredictionPipelineOptions_Clone.CountyIds);
             Assert.NotSame(yearBuiltPredictionPipelineOptions.CountyIds, yearBuiltPredictionPipelineOptions_Clone.CountyIds);
