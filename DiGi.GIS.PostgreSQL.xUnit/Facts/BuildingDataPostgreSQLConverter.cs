@@ -225,5 +225,73 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             }
         }
 
+        /// <summary>
+        /// Pins DiGi-Organization/DiGi.GIS.WebAPI#59: the GIS multivalue override forwards maxGroups to the base, so a
+        /// <see cref="MultivalueAggregateFunction.SplitValueDistribution"/> over a column with more than maxGroups distinct values
+        /// answers maxGroups + 1 groups (the extra row being the truncation marker), while
+        /// <see cref="MultivalueAggregateFunction.SplitDistinctCount"/> ignores the cap and keeps its full count.
+        /// <para>Database fact that seeds its own scratch partition through <see cref="ScratchBuildingDataPostgreSQLConverter"/> and
+        /// returns without asserting when the local test database configuration is absent.</para>
+        /// </summary>
+        [Fact]
+        public async Task BuildingDataPostgreSQLConverter_GetAggregateSummary_Multivalue_MaxGroups_CapsDistribution()
+        {
+            ConnectionData? connectionData = Create.GISPostgreSQLConverterManager()?.GetPostgreSQLConverter<BuildingDataPostgreSQLConverter>()?.ConnectionData;
+            if (connectionData is null)
+            {
+                return;
+            }
+
+            ScratchBuildingDataPostgreSQLConverter converter = new(connectionData);
+
+            // Declared by name, as the other building data facts do; the slug (unique id) is the lowercase name.
+            Column column_CountyId = new ExtendedColumn("County Id", typeof(int), null, null);
+            Column column_Reference = new ExtendedColumn("Reference", typeof(string), null, null);
+            Column column_Tags = new ExtendedColumn("tags", typeof(string), null, null);
+
+            const int countyId = 999998;
+
+            Table table = new();
+            table.AddColumn(column_CountyId);
+            table.AddColumn(column_Reference);
+            table.AddColumn(column_Tags);
+            // One row whose multivalue column splits into five distinct comma-separated values.
+            table.AddRow([countyId, "XUNIT-MAXGROUPS-1", "v1,v2,v3,v4,v5"]);
+            Assert.True(await converter.PushAsync(table));
+
+            try
+            {
+                // Capped at 2 -> 2 groups + 1 truncation marker = 3 rows (not the full five).
+                System.Text.Json.Nodes.JsonNode? distribution_Capped = await converter.GetAggregateSummaryAsync("tags", MultivalueAggregateFunction.SplitValueDistribution, countyId, ",", null, maxGroups: 2);
+                System.Text.Json.Nodes.JsonArray? distributionArray_Capped = distribution_Capped as System.Text.Json.Nodes.JsonArray;
+                Assert.NotNull(distributionArray_Capped);
+                Assert.Equal(3, distributionArray_Capped!.Count);
+
+                // No cap (default 1000) -> all five distinct values, no truncation.
+                System.Text.Json.Nodes.JsonNode? distribution_Full = await converter.GetAggregateSummaryAsync("tags", MultivalueAggregateFunction.SplitValueDistribution, countyId, ",");
+                System.Text.Json.Nodes.JsonArray? distributionArray_Full = distribution_Full as System.Text.Json.Nodes.JsonArray;
+                Assert.NotNull(distributionArray_Full);
+                Assert.Equal(5, distributionArray_Full!.Count);
+
+                // SplitDistinctCount ignores the cap -> the full distinct count either way.
+                System.Text.Json.Nodes.JsonNode? distinct_Capped = await converter.GetAggregateSummaryAsync("tags", MultivalueAggregateFunction.SplitDistinctCount, countyId, ",", null, maxGroups: 2);
+                Assert.NotNull(distinct_Capped);
+                Assert.Equal(5L, distinct_Capped!.GetValue<long>());
+            }
+            finally
+            {
+                await DiGi.PostgreSQL.Modify.RemoveTableAsync(connectionData, converter.TableName);
+
+                await using NpgsqlConnection? npgsqlConnection_Cleanup = DiGi.PostgreSQL.Create.NpgsqlConnection(connectionData);
+                if (npgsqlConnection_Cleanup is not null)
+                {
+                    await npgsqlConnection_Cleanup.OpenAsync();
+                    await using NpgsqlCommand npgsqlCommand = new($"DELETE FROM \"{DiGi.PostgreSQL.Table.Constants.TableName.Columns}\" WHERE table_name = @tableName", npgsqlConnection_Cleanup);
+                    npgsqlCommand.Parameters.AddWithValue("tableName", converter.TableName);
+                    await npgsqlCommand.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
     }
 }
