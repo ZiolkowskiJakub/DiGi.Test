@@ -11,7 +11,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
     {
         /// <summary>
         /// Generates the gis document from the real controllers through the host's own Swagger configuration and asserts that a mandatory query parameter is described as <c>required</c> and that a capped one carries its <c>maximum</c>.
-        /// <para>This is the served contract, not the attribute: Swashbuckle reads <c>[BindRequired]</c> off a controller parameter and <c>[Range]</c> off its schema, so a fact that only inspected the attributes would still pass if either mapping changed. The reference-by-code type filter and the circle tolerance are asserted optional in the same document, so over-marking is caught beside under-marking (ZiolkowskiJakub/DiGi.GIS.WebAPI#43).</para>
+        /// <para>This is the served contract, not the attribute: Swashbuckle reads <c>[BindRequired]</c> off a controller parameter and <c>[Range]</c> off its schema, so a fact that only inspected the attributes would still pass if either mapping changed. The reference-by-code type filter and the circle tolerance are asserted optional in the same document, so over-marking is caught beside under-marking (DiGi-Organization/DiGi.GIS.WebAPI#43).</para>
         /// </summary>
         [Fact]
         public void GisDocument_MandatoryAndBoundedQueryParameters()
@@ -44,8 +44,8 @@ namespace DiGi.WebAPI.WindowsService.xUnit
         }
 
         /// <summary>
-        /// Generates the gis document from the real controllers through the host's own Swagger configuration - with <c>ParameterMinimumSchemaFilter</c> registered the way the host discovers it for a loaded extension assembly - and asserts that a query parameter whose action guard already refuses a value below a floor carries that floor as <c>minimum</c>, with no <c>maximum</c>, and that a parameter without such a guard carries neither (ZiolkowskiJakub/DiGi.GIS.WebAPI#47).
-        /// <para>This is the served contract, not the attribute: the filter turns <c>[Minimum]</c> into <c>minimum</c> and <c>exclusiveMinimum</c> the way Swashbuckle turns <c>[Range]</c> into <c>maximum</c>, so a fact that only inspected the attributes would still pass if that mapping changed. Every <c>commandtimeout</c> in the document is asserted floored at 0 - eleven of them gained that floor in ZiolkowskiJakub/DiGi.GIS.WebAPI#48 - while the parameters with no guard beside them stay unbounded, so over-marking is caught beside under-marking.</para>
+        /// Generates the gis document from the real controllers through the host's own Swagger configuration - with <c>ParameterMinimumSchemaFilter</c> registered the way the host discovers it for a loaded extension assembly - and asserts that a query parameter whose action guard already refuses a value below a floor carries that floor as <c>minimum</c>, with no <c>maximum</c>, and that a parameter without such a guard carries neither (DiGi-Organization/DiGi.GIS.WebAPI#47).
+        /// <para>This is the served contract, not the attribute: the filter turns <c>[Minimum]</c> into <c>minimum</c> and <c>exclusiveMinimum</c> the way Swashbuckle turns <c>[Range]</c> into <c>maximum</c>, so a fact that only inspected the attributes would still pass if that mapping changed. Every <c>commandtimeout</c> in the document is asserted floored at 0 - eleven of them gained that floor in DiGi-Organization/DiGi.GIS.WebAPI#48 - while the parameters with no guard beside them stay unbounded, so over-marking is caught beside under-marking.</para>
         /// </summary>
         [Fact]
         public void GisDocument_FlooredQueryParameters()

@@ -9,7 +9,7 @@ namespace DiGi.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies that a pre-cancelled CancellationToken aborts ColumnNamesAsync at ExecuteReaderAsync instead of being silently dropped.
-        /// <para>This is a pin, not a reproducer: ExecuteReaderAsync already receives the token before the fix, so this fact is green both before and after the fix. The tokenless ReadAsync() in the loop of ZiolkowskiJakub/DiGi.PostgreSQL#3 is the same defect class that <see cref="PartitionsAsync_Cancellation_ReaderLoop"/> reproduces for PartitionsAsync.</para>
+        /// <para>This is a pin, not a reproducer: ExecuteReaderAsync already receives the token before the fix, so this fact is green both before and after the fix. The tokenless ReadAsync() in the loop of DiGi-Organization/DiGi.PostgreSQL#3 is the same defect class that <see cref="PartitionsAsync_Cancellation_ReaderLoop"/> reproduces for PartitionsAsync.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_PartitionReference.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

@@ -12,7 +12,7 @@ namespace DiGi.Solar.xUnit
     {
         /// <summary>
         /// Verifies that the block structure of the ComputeSharp solver does not change its results: the same model solved with an unbounded shadow record buffer, with the smallest one (a buffer of one record per caster triangle, so receiver blocks are split and the buffer regrows from its initial size) and with one of three records per caster triangle gives identical shading factors for every receiver at every timestamp.
-        /// <para>Since ZiolkowskiJakub/DiGi.Solar#11 the solver appends only the shadows found, grows the record buffer up to <see cref="ComputeSharp.Classes.ShadingSolver.MaxBufferBytes"/> when a block overflows it, splits the block when it would not fit, and sorts the shadows by receiver and caster triangle before the merge, so no budget may change a single factor.
+        /// <para>Since DiGi-Organization/DiGi.Solar#11 the solver appends only the shadows found, grows the record buffer up to <see cref="ComputeSharp.Classes.ShadingSolver.MaxBufferBytes"/> when a block overflows it, splits the block when it would not fit, and sorts the shadows by receiver and caster triangle before the merge, so no budget may change a single factor.
         /// Two models are covered: a 4 x 4 grid of buildings whose walls and roofs shade each other, and horizontal panels under shading-only canopies. Each must have partially shaded samples, so the comparison is not vacuous, and the smallest-budget solve of the building grid is also compared with the CPU solver.</para>
         /// </summary>
         [Fact]
@@ -41,7 +41,7 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Solves a large model with the ComputeSharp solver and reports the time and memory of the solve.
-        /// <para>2 400 receivers under shading-only canopies (<c>CreatePerformanceShadingModel(60, 40)</c>) with 4 804 caster triangles would need 880 MB for a dense receivers x triangles buffer of <see cref="ShadowPolygon2"/> records (and the pre-ZiolkowskiJakub/DiGi.Solar#11 solver about 3.4 GB for its N x N intersection matrix); the solver allocates only the shadows found, within <see cref="ComputeSharp.Classes.ShadingSolver.MaxBufferBytes"/>.
+        /// <para>2 400 receivers under shading-only canopies (<c>CreatePerformanceShadingModel(60, 40)</c>) with 4 804 caster triangles would need 880 MB for a dense receivers x triangles buffer of <see cref="ShadowPolygon2"/> records (and the pre-DiGi-Organization/DiGi.Solar#11 solver about 3.4 GB for its N x N intersection matrix); the solver allocates only the shadows found, within <see cref="ComputeSharp.Classes.ShadingSolver.MaxBufferBytes"/>.
         /// The fact also times the 200-panel performance model at the default budget against the smallest budget (one record per caster triangle), which forces block splits.
         /// Figures are written to <c>ShadingSolver_Tiling.txt</c> in the reports directory. The thresholds are loose: this fact reports, it does not enforce a tight bound.</para>
         /// <para>Medium test (4.6 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>

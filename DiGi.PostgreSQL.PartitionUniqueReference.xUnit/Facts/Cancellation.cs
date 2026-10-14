@@ -8,7 +8,7 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that a pre-cancelled CancellationToken aborts TypeAsync at ExecuteReaderAsync instead of the commandTimeout/cancellationToken parameters added by ZiolkowskiJakub/DiGi.PostgreSQL#5 being accepted and silently dropped.
+        /// Verifies that a pre-cancelled CancellationToken aborts TypeAsync at ExecuteReaderAsync instead of the commandTimeout/cancellationToken parameters added by DiGi-Organization/DiGi.PostgreSQL#5 being accepted and silently dropped.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
@@ -35,7 +35,7 @@ namespace DiGi.PostgreSQL.PartitionUniqueReference.xUnit
         }
 
         /// <summary>
-        /// Verifies that a pre-cancelled CancellationToken aborts TypeIdAsync at ExecuteReaderAsync instead of the commandTimeout/cancellationToken parameters added by ZiolkowskiJakub/DiGi.PostgreSQL#5 being accepted and silently dropped.
+        /// Verifies that a pre-cancelled CancellationToken aborts TypeIdAsync at ExecuteReaderAsync instead of the commandTimeout/cancellationToken parameters added by DiGi-Organization/DiGi.PostgreSQL#5 being accepted and silently dropped.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]

@@ -9,7 +9,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     {
         /// <summary>
         /// Verifies that a pre-cancelled CancellationToken aborts the connection-owning GetColumnsByUniqueIdsAsync at OpenAsync instead of being silently dropped.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.GIS.WebAPI#33: the unmodified converter opens the connection and executes the query with no token, so the call completes instead of throwing.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.GIS.WebAPI#33: the unmodified converter opens the connection and executes the query with no token, so the call completes instead of throwing.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
@@ -38,7 +38,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a pre-cancelled CancellationToken aborts the NpgsqlConnection overload of GetColumnsByUniqueIdsAsync at ExecuteReaderAsync instead of being silently dropped.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.GIS.WebAPI#33: the unmodified chain reads with ExecuteReaderAsync() and ReadAsync() with no token, so the call returns rows instead of throwing.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.GIS.WebAPI#33: the unmodified chain reads with ExecuteReaderAsync() and ReadAsync() with no token, so the call returns rows instead of throwing.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SkippableFact]
@@ -75,7 +75,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a caller-supplied commandTimeout reaches the command: while a second connection holds an ACCESS EXCLUSIVE lock on the columns table, a one second commandTimeout must abort the blocked query (Npgsql 10 surfaces it as an NpgsqlException wrapping a TimeoutException) instead of waiting out the 30 second Npgsql default.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.GIS.WebAPI#33: the unmodified chain never assigns npgsqlCommand.CommandTimeout, so the query completes normally once the lock is released.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.GIS.WebAPI#33: the unmodified chain never assigns npgsqlCommand.CommandTimeout, so the query completes normally once the lock is released.</para>
         /// <para>Afterwards a generous commandTimeout completes the same query and returns the seeded columns, proving that a longer timeout lets the operation finish.</para>
         /// <para>Medium test (3.2 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>

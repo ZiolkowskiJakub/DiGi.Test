@@ -12,7 +12,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#8 on a whole document generated through the host's own Swagger configuration: <see cref="AddExamplesOperationFilter"/> must leave no parameter, request body, or response schema without an example.
+        /// Reproduces DiGi-Organization/DiGi.WebAPI.WindowsService#8 on a whole document generated through the host's own Swagger configuration: <see cref="AddExamplesOperationFilter"/> must leave no parameter, request body, or response schema without an example.
         /// <para>The example is asserted on the served shape, not on the filter. A component-typed request body or response is a <c>$ref</c> in the document, so its example can only live on the component; an inline parameter or array schema carries its own. The issue's evidence is that the host did not build at 0.8.8, so no served document had ever carried one.</para>
         /// </summary>
         [Fact]

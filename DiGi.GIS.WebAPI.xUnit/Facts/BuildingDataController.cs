@@ -11,7 +11,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="BuildingDataController"/> write endpoints return BadRequest when provided invalid parameters, and that the commandTimeout guard refuses a negative value while accepting 0 (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).
+        /// Verifies that <see cref="BuildingDataController"/> write endpoints return BadRequest when provided invalid parameters, and that the commandTimeout guard refuses a negative value while accepting 0 (DiGi-Organization/DiGi.GIS.WebAPI#48).
         /// </summary>
         [Fact]
         public async Task BuildingDataController_Validation_AnswersBadRequest()
@@ -157,7 +157,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the <c>histogramsummary</c> body contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#35: <see cref="HistogramRequestParameter.HistogramBucketing"/> binds from its integer value under the web defaults the input formatter deserializes with (<c>1</c> is equal count), and a body without the property keeps equal width, so clients written against the earlier contract are unaffected.
+        /// Pins the <c>histogramsummary</c> body contract of DiGi-Organization/DiGi.GIS.WebAPI#35: <see cref="HistogramRequestParameter.HistogramBucketing"/> binds from its integer value under the web defaults the input formatter deserializes with (<c>1</c> is equal count), and a body without the property keeps equal width, so clients written against the earlier contract are unaffected.
         /// </summary>
         [Fact]
         public void HistogramRequestParameter_HistogramBucketing_BindsFromInteger()
@@ -175,7 +175,7 @@ namespace DiGi.GIS.WebAPI.xUnit
             Assert.Equal(DiGi.PostgreSQL.Table.Enums.HistogramBucketing.EqualWidth, omitted.HistogramBucketing);
         }
         /// <summary>
-        /// Pins the <c>countbyfiltergroup</c> contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#52: the action is a thin filtered <c>COUNT(*)</c> over the converter, so a negative <c>commandtimeout</c> is refused with 400 before any database work, and with no connection to build (null connection data) the converter returns null and the action answers 404 rather than a 5xx - for both an absent filter group and a present one.
+        /// Pins the <c>countbyfiltergroup</c> contract of DiGi-Organization/DiGi.GIS.WebAPI#52: the action is a thin filtered <c>COUNT(*)</c> over the converter, so a negative <c>commandtimeout</c> is refused with 400 before any database work, and with no connection to build (null connection data) the converter returns null and the action answers 404 rather than a 5xx - for both an absent filter group and a present one.
         /// </summary>
         [Fact]
         public async Task BuildingDataController_CountByFilterGroup_GuardsAndNoConnection()
@@ -205,7 +205,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the <c>countbyfiltergroup</c> route and success response type of ZiolkowskiJakub/DiGi.GIS.WebAPI#52: it is a <c>POST</c> to <c>countbyfiltergroup</c>, and the 200 response is documented as a bare <c>long</c> integer.
+        /// Pins the <c>countbyfiltergroup</c> route and success response type of DiGi-Organization/DiGi.GIS.WebAPI#52: it is a <c>POST</c> to <c>countbyfiltergroup</c>, and the 200 response is documented as a bare <c>long</c> integer.
         /// </summary>
         [Fact]
         public void BuildingDataController_CountByFilterGroup_RouteAndResponseType()

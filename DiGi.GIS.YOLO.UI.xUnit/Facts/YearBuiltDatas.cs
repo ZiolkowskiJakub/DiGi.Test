@@ -249,7 +249,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
             Assert.Equal(runTimestamp.UtcDateTime, latest!.DateTime);
             Assert.Equal(1975, latest.Year);
 
-            // Every prediction of the run carries the regressor that produced it (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26).
+            // Every prediction of the run carries the regressor that produced it (DiGi-Organization/DiGi.GIS.YOLO.UI#26).
             Assert.Equal(modelId_Regressor_Test, latest.ModelId);
         }
 
@@ -259,7 +259,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         private const string modelId_Regressor_Test = "2e120f495e830f0917cace33ad21c5c4c7bb0c4e8f1711a363682932b7c0b7fa";
 
         /// <summary>
-        /// Verifies that a run storing no history still stamps the regressor on every fresh prediction, and that a predictor stating no identity stores predictions with none - the behaviour before ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26, kept for stubs and third-party predictors.
+        /// Verifies that a run storing no history still stamps the regressor on every fresh prediction, and that a predictor stating no identity stores predictions with none - the behaviour before DiGi-Organization/DiGi.GIS.YOLO.UI#26, kept for stubs and third-party predictors.
         /// <para>Nothing is read when history is not stored, so no request is expected at all.</para>
         /// </summary>
         [Fact]

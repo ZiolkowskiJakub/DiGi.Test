@@ -61,7 +61,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
 
         /// <summary>
         /// Verifies that a county whose detection features are present but whose population columns are empty is scored, not refused, when the predictor states it requires only the detection group.
-        /// <para>This is the fix for the guard drifting from the predictor (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#27): the first-detection heuristic reads the detection confidence columns and nothing else, so an empty population group - a county with no Statistical update yet - warns rather than refusing. The historical default, where the guard still requires the population group, is exercised by <see cref="RunYearBuiltPredictions_FeatureCoverage_Refused"/>.</para>
+        /// <para>This is the fix for the guard drifting from the predictor (DiGi-Organization/DiGi.GIS.YOLO.UI#27): the first-detection heuristic reads the detection confidence columns and nothing else, so an empty population group - a county with no Statistical update yet - warns rather than refusing. The historical default, where the guard still requires the population group, is exercised by <see cref="RunYearBuiltPredictions_FeatureCoverage_Refused"/>.</para>
         /// </summary>
         [Fact]
         public async Task RunYearBuiltPredictions_FeatureCoverage_PopulationAbsent_Scored()

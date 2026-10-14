@@ -6,7 +6,7 @@ namespace DiGi.Core.xUnit
     {
         /// <summary>
         /// Pins how a bare <see cref="object"/> member holding a value survives the clone leg (no text parse) versus the
-        /// text leg, the surface of ZiolkowskiJakub/DiGi.Core#6. The clone leg must keep the exact CLR type it was
+        /// text leg, the surface of DiGi-Organization/DiGi.Core#6. The clone leg must keep the exact CLR type it was
         /// handed (an int stays an int), and the text leg must canonicalize a JSON number to the narrowest CLR type that
         /// round-trips, so a whole number reads back as an int rather than a double.
         /// <para>Per value this states which CLR type each leg hands back: int and long stay whole-numbered, double and a

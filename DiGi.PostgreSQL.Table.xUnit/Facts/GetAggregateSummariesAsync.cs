@@ -7,7 +7,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Pins the extracted single-value aggregate expression map (ZiolkowskiJakub/DiGi.PostgreSQL#15): every <see cref="DiGi.PostgreSQL.Table.Enums.SinglevalueAggregateFunction"/> value produces its exact SQL expression, and an unmapped value is rejected. The single-measure and the batch paths share this one map, so this fact is the regression guard for both.
+        /// Pins the extracted single-value aggregate expression map (DiGi-Organization/DiGi.PostgreSQL#15): every <see cref="DiGi.PostgreSQL.Table.Enums.SinglevalueAggregateFunction"/> value produces its exact SQL expression, and an unmapped value is rejected. The single-measure and the batch paths share this one map, so this fact is the regression guard for both.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [Fact]
@@ -24,7 +24,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the batch SELECT list (ZiolkowskiJakub/DiGi.PostgreSQL#15): one <c>SELECT</c> carries every requested measure's expression, each exactly once, in request order — the measures are requested out of alphabetical column order on purpose.
+        /// Verifies the batch SELECT list (DiGi-Organization/DiGi.PostgreSQL#15): one <c>SELECT</c> carries every requested measure's expression, each exactly once, in request order — the measures are requested out of alphabetical column order on purpose.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [Fact]
@@ -43,7 +43,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the request validation of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): a null measure list and an empty one are rejected with typed exceptions before any database access — distinct from a <c>null</c> result, which in this layer means a declined read.
+        /// Verifies the request validation of the batch aggregate (DiGi-Organization/DiGi.PostgreSQL#15): a null measure list and an empty one are rejected with typed exceptions before any database access — distinct from a <c>null</c> result, which in this layer means a declined read.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [Fact]
@@ -57,7 +57,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the measure-count cap of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): more than the named maximum measures in one call is rejected with <see cref="ArgumentOutOfRangeException"/> before any database access.
+        /// Verifies the measure-count cap of the batch aggregate (DiGi-Organization/DiGi.PostgreSQL#15): more than the named maximum measures in one call is rejected with <see cref="ArgumentOutOfRangeException"/> before any database access.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [Fact]
@@ -80,7 +80,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the core contract of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): one call returns all requested measures, with values identical to the equivalent single-measure calls, in request order — the measures are requested out of alphabetical column order on purpose.
+        /// Verifies the core contract of the batch aggregate (DiGi-Organization/DiGi.PostgreSQL#15): one call returns all requested measures, with values identical to the equivalent single-measure calls, in request order — the measures are requested out of alphabetical column order on purpose.
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -134,7 +134,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the whitelist contract of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): a measure naming a column the stored table does not hold fails the whole call with the typed <see cref="DiGi.PostgreSQL.Table.Classes.InvalidFilterException"/> naming that column — no partial result, even when the other measures are valid.
+        /// Verifies the whitelist contract of the batch aggregate (DiGi-Organization/DiGi.PostgreSQL#15): a measure naming a column the stored table does not hold fails the whole call with the typed <see cref="DiGi.PostgreSQL.Table.Classes.InvalidFilterException"/> naming that column — no partial result, even when the other measures are valid.
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -177,7 +177,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the null-preservation contract of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): over a scope with zero matching rows, <c>AVG</c> is JSON <c>null</c> while <c>COUNT</c> is 0 — each measure keeps its own empty-set semantics inside one shared array.
+        /// Verifies the null-preservation contract of the batch aggregate (DiGi-Organization/DiGi.PostgreSQL#15): over a scope with zero matching rows, <c>AVG</c> is JSON <c>null</c> while <c>COUNT</c> is 0 — each measure keeps its own empty-set semantics inside one shared array.
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -239,7 +239,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the partition scope of the batch aggregate (ZiolkowskiJakub/DiGi.PostgreSQL#15): a supplied partition value aggregates only that partition, and a null partition value spans all partitions — matching the partition semantics of the other partition-scoped reads of the converter.
+        /// Verifies the partition scope of the batch aggregate (DiGi-Organization/DiGi.PostgreSQL#15): a supplied partition value aggregates only that partition, and a null partition value spans all partitions — matching the partition semantics of the other partition-scoped reads of the converter.
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

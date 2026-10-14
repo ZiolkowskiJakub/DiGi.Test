@@ -189,7 +189,7 @@ namespace DiGi.Geometry.xUnit
 
         /// <summary>
         /// Verifies that <see cref="Query.Union(IEnumerable{IPolygonalFace2D}?, double)"/> recovers with its snap-rounding fallback when NetTopologySuite throws a <c>TopologyException</c>, instead of returning <c>null</c>.
-        /// <para>The fixture is the input reported in ZiolkowskiJakub/DiGi.Geometry#8: the 190 shadow polygons (as WKT) of the east wall (plane origin (64, 18, 0)) of the 12 x 12 benchmark building grid at 2026-06-26 04:00, whose union fails in <c>UnaryUnionOp</c> with a robustness error and succeeds at 112.402 m^2 under snap-rounding.</para>
+        /// <para>The fixture is the input reported in DiGi-Organization/DiGi.Geometry#8: the 190 shadow polygons (as WKT) of the east wall (plane origin (64, 18, 0)) of the 12 x 12 benchmark building grid at 2026-06-26 04:00, whose union fails in <c>UnaryUnionOp</c> with a robustness error and succeeds at 112.402 m^2 under snap-rounding.</para>
         /// </summary>
         [Fact]
         public void Union_TopologyException()

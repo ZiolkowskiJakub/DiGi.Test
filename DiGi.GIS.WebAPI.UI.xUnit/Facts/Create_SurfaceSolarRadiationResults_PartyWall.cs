@@ -9,7 +9,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that a wall fully covered by an adjacent building receives no solar radiation - no beam, no sky diffuse, no ground-reflected - while the building's other surfaces are unaffected (ZiolkowskiJakub/DiGi.GIS.WebAPI.UI#61).
+        /// Tests that a wall fully covered by an adjacent building receives no solar radiation - no beam, no sky diffuse, no ground-reflected - while the building's other surfaces are unaffected (DiGi-Organization/DiGi.GIS.WebAPI.UI#61).
         /// <para>The 10 m box is solved twice: alone, and with an identical neighbour building to its west whose east wall lies on the box's west wall. Before #61 the covered wall kept its full diffuse and ground-reflected radiation (on gis.digiproject.uk, 436.5 of 445.0 kWh/m² for such a wall), because only the beam was shaded.</para>
         /// <para>The neighbour lies in or behind the planes of the east, north and south walls and below the roof's plane, so those surfaces must give identical results and keep an open view. The covered wall keeps its open-sky irradiation.</para>
         /// <para>Medium test (5.9 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>

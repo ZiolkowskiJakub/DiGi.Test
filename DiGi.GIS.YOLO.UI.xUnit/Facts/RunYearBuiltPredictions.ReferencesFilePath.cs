@@ -20,7 +20,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that a reference manifest that does not read refuses the run before a single request is sent (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#22).
+        /// Verifies that a reference manifest that does not read refuses the run before a single request is sent (DiGi-Organization/DiGi.GIS.YOLO.UI#22).
         /// <para>A filter that quietly read as no filter would export, detect and write whole counties where a few buildings were asked for, so a missing file, a file without the manifest header and a manifest with a header and no building are all refused and named by <see cref="Classes.YearBuiltPredictionPipelineOptions.ReferencesFilePath"/>.</para>
         /// </summary>
         [Fact]
@@ -77,7 +77,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Verifies the detection write of a narrowed run end to end through a stubbed endpoint: only the manifest's buildings are written, and a scored building the detector did not fire on is sent with every detection column of the range unset, so earlier weights' values on it are cleared (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#21, #22).
+        /// Verifies the detection write of a narrowed run end to end through a stubbed endpoint: only the manifest's buildings are written, and a scored building the detector did not fire on is sent with every detection column of the range unset, so earlier weights' values on it are cleared (DiGi-Organization/DiGi.GIS.YOLO.UI#21, #22).
         /// <para>The fixture's folder holds three buildings: <c>0207</c> and <c>0209</c> were detected, <c>0208</c> was not. The manifest names <c>0207</c> and <c>0208</c>, so <c>0209</c> - imagery a wider run left behind - is scored by the detector but not written.</para>
         /// </summary>
         [Fact]

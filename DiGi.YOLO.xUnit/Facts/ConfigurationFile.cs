@@ -68,7 +68,7 @@ namespace DiGi.YOLO.xUnit
 
         /// <summary>
         /// Verifies that <see cref="Create.ConfigurationFile(string?)"/> reads a hand-edited ultralytics conf.yaml without throwing: a blank line and a comment inside the label block, a trailing comment on a value, quoted names, and keys after the label block.
-        /// <para>Before ZiolkowskiJakub/DiGi.YOLO#16 a blank line or any line without a colon after "names:" reached <c>Substring(0, -1)</c> and threw, and a file with no "names:" at all started the label loop at index -1 and threw.</para>
+        /// <para>Before DiGi-Organization/DiGi.YOLO#16 a blank line or any line without a colon after "names:" reached <c>Substring(0, -1)</c> and threw, and a file with no "names:" at all started the label loop at index -1 and threw.</para>
         /// </summary>
         [Fact]
         public void ConfigurationFile_Robust()
@@ -129,7 +129,7 @@ namespace DiGi.YOLO.xUnit
 
         /// <summary>
         /// Verifies that the "path:" of a conf.yaml is resolved against the directory of the file, and that a path which does not exist falls back to that directory with a message rather than yielding an empty dataset silently.
-        /// <para>Also verifies that a path with spaces round-trips unencoded: ultralytics hands the value to the file system as it is, so the "%20" written before ZiolkowskiJakub/DiGi.YOLO#16 named a directory that did not exist.</para>
+        /// <para>Also verifies that a path with spaces round-trips unencoded: ultralytics hands the value to the file system as it is, so the "%20" written before DiGi-Organization/DiGi.YOLO#16 named a directory that did not exist.</para>
         /// </summary>
         [Fact]
         public void ConfigurationFile_Path()

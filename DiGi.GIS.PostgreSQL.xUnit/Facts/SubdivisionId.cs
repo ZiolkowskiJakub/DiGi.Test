@@ -6,7 +6,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies the write-side attribution rule, <see cref="Query.SubdivisionId(IEnumerable{System.ValueTuple{int, double, double}}, double)"/>: a building wholly inside a neighbourhood, its district and its city - three candidates with the same overlap, the building's own area - is filed under the smallest of them, whatever their identifiers.
-        /// <para>The candidates are given in the order Warsaw's ids produce them: the city (55489) below the district (55626) below the neighbourhood (55599 is lower than the district but higher than the city). The previous lowest-identifier tie-break answered 55489 here and filed 57 551 Warsaw buildings under the city row (<see href="https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/77">DiGi.GIS.PostgreSQL#77</see>).</para>
+        /// <para>The candidates are given in the order Warsaw's ids produce them: the city (55489) below the district (55626) below the neighbourhood (55599 is lower than the district but higher than the city). The previous lowest-identifier tie-break answered 55489 here and filed 57 551 Warsaw buildings under the city row (<see href="https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/77">DiGi.GIS.PostgreSQL#77</see>).</para>
         /// </summary>
         [Fact]
         public void SubdivisionId_NestedContainers_SmallestWins()

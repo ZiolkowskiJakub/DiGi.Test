@@ -9,7 +9,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// The served document describes which JSON shape <see cref="FilterCondition.Value"/> takes per operator and which column ids it accepts, so a client author does not have to read the SQL builder to learn the contract (ZiolkowskiJakub/DiGi.PostgreSQL#13).
+        /// The served document describes which JSON shape <see cref="FilterCondition.Value"/> takes per operator and which column ids it accepts, so a client author does not have to read the SQL builder to learn the contract (DiGi-Organization/DiGi.PostgreSQL#13).
         /// <para>Generates the schema through the host's own <c>ConfigureSchemaGeneration</c> and <c>IncludeAssemblyXmlComments</c> - the same path the served <c>/swagger/gis/swagger.json</c> uses - and asserts the <c>value</c> and <c>columnUniqueId</c> property descriptions carry the contract: a scalar for the comparison operators, a JSON array for <c>In</c>/<c>NotIn</c>, a case-insensitive string for <c>Contains</c>, an ignored value for <c>IsNull</c>/<c>IsNotNull</c>, and the two failure modes (an unconvertible value throws <c>InvalidFilterException</c>; a null or empty value degrades to no match instead of an error).</para>
         /// </summary>
         [Fact]

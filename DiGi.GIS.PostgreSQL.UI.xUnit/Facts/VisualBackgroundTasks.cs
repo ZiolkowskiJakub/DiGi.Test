@@ -51,7 +51,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
 
         /// <summary>
         /// Tests that the Year Built prediction task, and the YOLO training task hosted by the same runner, are offered where they can actually run, and nowhere else.
-        /// <para>The task reads the county rows the dialog is scoped from over the Web API, so a null manager has to leave it out rather than produce a row that throws when it is clicked - the failure ZiolkowskiJakub/DiGi.GIS.PostgreSQL.UI#1 was about. It belongs to the client side for the same reason: it holds no PostgreSQL converter and reaches the estate only through the API.</para>
+        /// <para>The task reads the county rows the dialog is scoped from over the Web API, so a null manager has to leave it out rather than produce a row that throws when it is clicked - the failure DiGi-Organization/DiGi.GIS.PostgreSQL.UI#1 was about. It belongs to the client side for the same reason: it holds no PostgreSQL converter and reaches the estate only through the API.</para>
         /// <para>It is registered rather than constructed here, because constructing it proves nothing - the registration is what decides whether the row appears at all, and a task added under the wrong mode builds and tests green while being invisible in the tab an operator opens.</para>
         /// <para>The runner it hands the run to is an optional part of the deployment, so the row is gated on that being present too. A machine that will never score a building must not be offered a task whose only possible outcome is that it found no executable - which would be discovered after the counties had been chosen and the imagery scoped.</para>
         /// </summary>

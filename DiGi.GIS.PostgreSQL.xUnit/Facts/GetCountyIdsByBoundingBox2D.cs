@@ -11,7 +11,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies that the county identifiers a spatial query prunes to include every polygon part of a county, not only the parts overlapping the box.
-        /// <para>A county whose territory is disconnected is one row per part, each with its own identifier, and <c>building_2d</c> is partitioned by that identifier. A building is filed under one part and need not be filed under the part whose polygon covers it, so pruning to the overlapping parts alone answers nothing at all in those counties - silently, because an empty result reads exactly like an area holding no buildings. See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/64.</para>
+        /// <para>A county whose territory is disconnected is one row per part, each with its own identifier, and <c>building_2d</c> is partitioned by that identifier. A building is filed under one part and need not be filed under the part whose polygon covers it, so pruning to the overlapping parts alone answers nothing at all in those counties - silently, because an empty result reads exactly like an area holding no buildings. See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/64.</para>
         /// <para>Asserted against the bounding box of one part of a multi-part county: the answer has to name every sibling part of that county.</para>
         /// <para>Skipped by default: it queries a populated database.</para>
         /// </summary>

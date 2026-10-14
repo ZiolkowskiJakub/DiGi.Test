@@ -38,9 +38,9 @@ namespace DiGi.Solar.xUnit
         }
 
         /// <summary>
-        /// Verifies that a receiver with the sun behind it (sun direction · normal ≥ 0) is reported fully shaded by both solvers (ZiolkowskiJakub/DiGi.Solar#9).
+        /// Verifies that a receiver with the sun behind it (sun direction · normal ≥ 0) is reported fully shaded by both solvers (DiGi-Organization/DiGi.Solar#9).
         /// <para>Geometry: one 10 x 10 x 12 m box (<c>CreateBuildingGridShadingModel(1, false)</c>) on 2026-06-26, hourly, at (50.0, 20.0). Each wall with the sun behind it lies wholly in the shadow of the rest of the box, so its factor is 1.
-        /// The ComputeSharp solver used to decide per receiver triangle from the centroid of each intersection piece and reported 0.5 to 0.93 on such samples; since ZiolkowskiJakub/DiGi.Solar#11 it clips and projects every caster exactly as the CPU solver does.</para>
+        /// The ComputeSharp solver used to decide per receiver triangle from the centroid of each intersection piece and reported 0.5 to 0.93 on such samples; since DiGi-Organization/DiGi.Solar#11 it clips and projects every caster exactly as the CPU solver does.</para>
         /// </summary>
         /// <param name="computeSharp">True to solve with the ComputeSharp solver; false for the CPU solver.</param>
         [Theory]
@@ -103,7 +103,7 @@ namespace DiGi.Solar.xUnit
         /// <para>Geometry: a 10 x 10 m horizontal receiver at z = 0 and a shading-only wall in the plane y = 5, spanning x in [2, 8] and z in [-3, 3], so it pierces the receiver.
         /// At noon on 2026-06-26 at (50.0, 20.0) only its upper half (z in [0, 3]) is between the sun and the receiver; its shadow is a parallelogram of area 6 * 3 * |v.Y / v.Z| north of the wall.
         /// Counting the lower half as well would double it.</para>
-        /// <para>Both solvers clip the caster the same way since ZiolkowskiJakub/DiGi.Solar#11; before it the ComputeSharp solver decided per intersection piece from its centroid.</para>
+        /// <para>Both solvers clip the caster the same way since DiGi-Organization/DiGi.Solar#11; before it the ComputeSharp solver decided per intersection piece from its centroid.</para>
         /// </summary>
         /// <param name="computeSharp">True to solve with the ComputeSharp solver; false for the CPU solver.</param>
         [Theory]
@@ -156,14 +156,14 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Verifies the device selection of the ComputeSharp solver: the WARP software device is never selected, <see cref="ComputeDeviceType.Hardware"/> selects a hardware-accelerated device,
         /// and a solve forced onto the hardware device matches the CPU solver.
-        /// <para>WARP loses shadows cast between buildings and needs about 16 minutes to create its pipeline (ZiolkowskiJakub/DiGi.Solar#10), so the obsolete <c>ComputeDeviceType.Software</c> gets no device
+        /// <para>WARP loses shadows cast between buildings and needs about 16 minutes to create its pipeline (DiGi-Organization/DiGi.Solar#10), so the obsolete <c>ComputeDeviceType.Software</c> gets no device
         /// and its solve returns false without assigning results, while <see cref="ComputeDeviceType.Default"/> gets no device rather than WARP on a machine without a hardware adapter.</para>
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
         public void ShadingSolver_ComputeDeviceType()
         {
-#pragma warning disable CS0618 // ComputeDeviceType.Software is obsolete; this fact verifies it is withdrawn (ZiolkowskiJakub/DiGi.Solar#10).
+#pragma warning disable CS0618 // ComputeDeviceType.Software is obsolete; this fact verifies it is withdrawn (DiGi-Organization/DiGi.Solar#10).
             ComputeDeviceType computeDeviceType_Software = ComputeDeviceType.Software;
 #pragma warning restore CS0618
 
@@ -209,7 +209,7 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Largest allowed <see cref="ShadingSolverParityPercentile"/> of the per-sample |CPU - other| shading factor differences, asserted once at least <see cref="ShadingSolverParityMinimumCount"/> samples are compared.
-        /// <para>Measured for ZiolkowskiJakub/DiGi.Solar#11 on an RTX 5090 over every parity comparison of the suite, the benchmark grids of 5 to 720 surfaces included (up to 11 520 samples, 40 % of them back-facing): 96 to 100 % of the samples are exactly equal, the p99 is 1.1e-16 and the maximum 2.2e-16.
+        /// <para>Measured for DiGi-Organization/DiGi.Solar#11 on an RTX 5090 over every parity comparison of the suite, the benchmark grids of 5 to 720 surfaces included (up to 11 520 samples, 40 % of them back-facing): 96 to 100 % of the samples are exactly equal, the p99 is 1.1e-16 and the maximum 2.2e-16.
         /// The bound leaves four orders of magnitude for other devices and drivers and still fails on any error in the geometry.</para>
         /// </summary>
         private const double ShadingSolverParityPercentileBound = 1e-12;
@@ -254,9 +254,9 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Asserts that two solved copies of the same model give every receiver the same shading factor at every daytime timestamp, back-facing samples (sun direction · normal ≥ 0) included.
-        /// <para>Since ZiolkowskiJakub/DiGi.Solar#11 both solvers clip and project the same shadows and merge them with the same <see cref="Query.ShadedFaces(PolygonalFace2D?, IEnumerable{PolygonalFace2D}?)"/>, so they differ by floating point round-off only (fused multiply-add on the GPU).
+        /// <para>Since DiGi-Organization/DiGi.Solar#11 both solvers clip and project the same shadows and merge them with the same <see cref="Query.ShadedFaces(PolygonalFace2D?, IEnumerable{PolygonalFace2D}?)"/>, so they differ by floating point round-off only (fused multiply-add on the GPU).
         /// The bulk agreement is bounded by a percentile (<see cref="ShadingSolverParityPercentileBound"/>) and every sample by <see cref="ShadingSolverParitySampleBound"/>; both solvers must also agree on which samples have a factor, and every factor lies in [0, 1].</para>
-        /// <para>A dropped shadow is a sample in which the other engine reports factor 0 while the CPU solver reports shade, and a phantom shadow the reverse. A dropped shadow was the signature of a shadow union that failed and was reported as full sun: one east wall of the 720-surface benchmark grid at a 3 degree sun read 0 against 0.9367 on the CPU solver and on the nine walls of its row with the same neighbour to the east. It was fixed in ZiolkowskiJakub/DiGi.Geometry#8 (the union now retries with snap-rounding) and ZiolkowskiJakub/DiGi.Solar#8 (a union that still fails falls back to the unmerged shadows), so the count is expected to stay at 0.</para>
+        /// <para>A dropped shadow is a sample in which the other engine reports factor 0 while the CPU solver reports shade, and a phantom shadow the reverse. A dropped shadow was the signature of a shadow union that failed and was reported as full sun: one east wall of the 720-surface benchmark grid at a 3 degree sun read 0 against 0.9367 on the CPU solver and on the nine walls of its row with the same neighbour to the east. It was fixed in DiGi-Organization/DiGi.Geometry#8 (the union now retries with snap-rounding) and DiGi-Organization/DiGi.Solar#8 (a union that still fails falls back to the unmerged shadows), so the count is expected to stay at 0.</para>
         /// <para>Dropped shadows are counted separately from the factor differences because losing a shadow and disagreeing about one are different failures; <paramref name="droppedFraction"/> bounds the first, a phantom shadow always fails, and every other disagreement fails on the bounds.</para>
         /// </summary>
         /// <param name="shadingModel_CPU">The model solved by the CPU solver.</param>

@@ -8,7 +8,7 @@ namespace DiGi.ComputeSharp.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that the public overloads which take no <see cref="GraphicsDevice"/> leave the shared ComputeSharp default device alive (ZiolkowskiJakub/DiGi.ComputeSharp#2).
+        /// Verifies that the public overloads which take no <see cref="GraphicsDevice"/> leave the shared ComputeSharp default device alive (DiGi-Organization/DiGi.ComputeSharp#2).
         /// <para>A device obtained from <see cref="GraphicsDevice.GetDefault"/> before the calls must still allocate buffers afterwards, and <see cref="GraphicsDevice.GetDefault"/> must still return the same instance.
         /// Disposing the default device resets ComputeSharp's cache, so a disposing overload fails this with <see cref="ObjectDisposedException"/>.</para>
         /// </summary>

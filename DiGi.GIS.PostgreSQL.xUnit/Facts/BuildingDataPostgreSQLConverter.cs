@@ -130,7 +130,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
             }
         }
         /// <summary>
-        /// Verifies the filtered <c>COUNT(*)</c> of ZiolkowskiJakub/DiGi.GIS.WebAPI#52 through the building-data converter, on a scratch table under the converter's own primary key and county partitioning: a null filter group answers the partition's row count, a filter matching two of three rows answers 2, a filter matching nothing answers 0 (not null, not an error), and the no-filter count equals the partition's direct <c>COUNT(*)</c> - the figure <c>countbycountyid</c> returns on a partitioned deployment.
+        /// Verifies the filtered <c>COUNT(*)</c> of DiGi-Organization/DiGi.GIS.WebAPI#52 through the building-data converter, on a scratch table under the converter's own primary key and county partitioning: a null filter group answers the partition's row count, a filter matching two of three rows answers 2, a filter matching nothing answers 0 (not null, not an error), and the no-filter count equals the partition's direct <c>COUNT(*)</c> - the figure <c>countbycountyid</c> returns on a partitioned deployment.
         /// <para>Database fact that needs no data of its own: it pushes its own three rows into the scratch table and returns without asserting when the local test database configuration is absent.</para>
         /// </summary>
         [Fact]

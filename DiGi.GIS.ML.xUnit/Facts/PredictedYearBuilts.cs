@@ -13,7 +13,7 @@ namespace DiGi.GIS.ML.xUnit
     {
         /// <summary>
         /// Verifies that the deployed scoring path dates every building by the first year the imagery confidently saw it, falls back to the first weaker detection, never dates a building after its first confident detection, and leaves out a building that was never detected.
-        /// <para>This is the first-detection heuristic that replaced the regressor (ZiolkowskiJakub/DiGi.GIS.ML#15). The regressor dated buildings the 2008 orthophoto shows to 2013-2014 (ZiolkowskiJakub/DiGi.GIS.ML#14); here a confident 2008 detection is 2008 exactly. A weak earlier detection does not date a building that is confidently seen later, which is what the confidence threshold is for.</para>
+        /// <para>This is the first-detection heuristic that replaced the regressor (DiGi-Organization/DiGi.GIS.ML#15). The regressor dated buildings the 2008 orthophoto shows to 2013-2014 (DiGi-Organization/DiGi.GIS.ML#14); here a confident 2008 detection is 2008 exactly. A weak earlier detection does not date a building that is confidently seen later, which is what the confidence threshold is for.</para>
         /// <para>Short test: no model is loaded.</para>
         /// </summary>
         [Fact]

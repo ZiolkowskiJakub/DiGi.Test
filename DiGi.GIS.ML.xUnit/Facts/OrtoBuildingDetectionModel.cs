@@ -10,7 +10,7 @@ namespace DiGi.GIS.ML.xUnit
     {
         /// <summary>
         /// Verifies that the generated ModelInput and the feature allow-list describe exactly the same features.
-        /// <para>Since ZiolkowskiJakub/DiGi.GIS.ML#15 the regressor no longer predicts in production - the first-detection heuristic does - but it stays in the repository as the baseline a feature redesign is measured from, scored by the evaluation app. Its contract with the allow-list still has to hold for that measurement to mean anything: a feature dropped from one side is read as its type default by the other, which produces plausible scores from a model shown a distribution it was never fitted on.</para>
+        /// <para>Since DiGi-Organization/DiGi.GIS.ML#15 the regressor no longer predicts in production - the first-detection heuristic does - but it stays in the repository as the baseline a feature redesign is measured from, scored by the evaluation app. Its contract with the allow-list still has to hold for that measurement to mean anything: a feature dropped from one side is read as its type default by the other, which produces plausible scores from a model shown a distribution it was never fitted on.</para>
         /// <para>The label is a member of ModelInput but is not a feature, so it is excluded from the comparison rather than expected in the allow-list - the allow-list carrying it would be the leak the pipeline exists to prevent.</para>
         /// </summary>
         [Fact]
@@ -61,7 +61,7 @@ namespace DiGi.GIS.ML.xUnit
 
         /// <summary>
         /// Verifies that the predictor behind the runner's seam is always runnable, identifies itself as the first-detection heuristic, and states the detection years it reads as its contract.
-        /// <para>The runner stamps the identity on every stored prediction (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26). It names the rule and its threshold rather than a model file's SHA-256, because since ZiolkowskiJakub/DiGi.GIS.ML#15 there is no model file in the scoring path - so readiness must not depend on one being present either.</para>
+        /// <para>The runner stamps the identity on every stored prediction (DiGi-Organization/DiGi.GIS.YOLO.UI#26). It names the rule and its threshold rather than a model file's SHA-256, because since DiGi-Organization/DiGi.GIS.ML#15 there is no model file in the scoring path - so readiness must not depend on one being present either.</para>
         /// </summary>
         [Fact]
         public void YearBuiltPredictor_Readiness()
@@ -81,7 +81,7 @@ namespace DiGi.GIS.ML.xUnit
             Assert.Null(yearBuiltPredictorReadiness.Radiuses);
 
             // The feature group the heuristic requires: only the detection columns it reads, so an empty population group
-            // warns rather than refusing (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#27).
+            // warns rather than refusing (DiGi-Organization/DiGi.GIS.YOLO.UI#27).
             Assert.NotNull(yearBuiltPredictorReadiness.RequiredFeatureGroups);
             Assert.Single(yearBuiltPredictorReadiness.RequiredFeatureGroups);
             Assert.Equal(IO.Constants.YearBuiltPredictionFeatureGroup.Detection, yearBuiltPredictorReadiness.RequiredFeatureGroups![0]);

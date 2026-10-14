@@ -256,7 +256,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies that <see cref="PolygonalFace2D.InRange(Point2D, double)"/> reports a point on the external ring as in range when the face has a hole - the hole loop used to overwrite the external-ring answer, so such a point was out of range only on faces with holes (ZiolkowskiJakub/DiGi.Geometry#5).
+        /// Verifies that <see cref="PolygonalFace2D.InRange(Point2D, double)"/> reports a point on the external ring as in range when the face has a hole - the hole loop used to overwrite the external-ring answer, so such a point was out of range only on faces with holes (DiGi-Organization/DiGi.Geometry#5).
         /// </summary>
         [Fact]
         public void PolygonalFace2D_InRange_OnOutlineWithHole()

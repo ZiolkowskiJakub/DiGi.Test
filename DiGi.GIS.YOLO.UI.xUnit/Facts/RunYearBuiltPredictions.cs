@@ -146,7 +146,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         /// <summary>
         /// Verifies that a predictor is accepted and the run then reaches the feature read, which is the first step that cannot be satisfied without a server.
         /// <para>What this pins is that the predictor guard passes and the failure moves on to the read, so a stub predictor is enough to exercise the sequence up to the point a database is genuinely needed.</para>
-        /// <para>The model identity the predictor's readiness states is reported in the result before any county is read - the value every prediction of the run is stamped with (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#26).</para>
+        /// <para>The model identity the predictor's readiness states is reported in the result before any county is read - the value every prediction of the run is stamped with (DiGi-Organization/DiGi.GIS.YOLO.UI#26).</para>
         /// </summary>
         [Fact]
         public async Task RunYearBuiltPredictions_StubPredictor()

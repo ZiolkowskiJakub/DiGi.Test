@@ -19,7 +19,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Pins the 400 contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#56 on <c>POST gis/buildingdata/aggregatesummary/batch</c>:
+        /// Pins the 400 contract of DiGi-Organization/DiGi.GIS.WebAPI#56 on <c>POST gis/buildingdata/aggregatesummary/batch</c>:
         /// an empty <c>Measures</c> list, a list above <see cref="Constants.BuildingData.MaximumAggregateSummariesMeasureCount"/>, and a
         /// negative <c>commandtimeout</c> are all client errors. No database is needed - the guards run before the converter.
         /// </summary>
@@ -55,7 +55,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the request-body binding of ZiolkowskiJakub/DiGi.GIS.WebAPI#56: the <c>Measures</c> list of <see cref="AggregateMeasure"/>
+        /// Pins the request-body binding of DiGi-Organization/DiGi.GIS.WebAPI#56: the <c>Measures</c> list of <see cref="AggregateMeasure"/>
         /// round-trips through System.Text.Json with the web defaults the host's input formatter uses, so the action's parameter binds
         /// what a client actually sends - each measure keeping its column, its function and its position.
         /// <para>The controller facts build the parameter in code and never exercise the wire shape; this fact does, with no database.</para>
@@ -87,7 +87,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the parity contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#56: three single-value measures over one scratch partition
+        /// Pins the parity contract of DiGi-Organization/DiGi.GIS.WebAPI#56: three single-value measures over one scratch partition
         /// answer the same values as the three equivalent <c>aggregatesummary/singlevalue</c> calls, in request order, as one
         /// JSON array whose length equals the measure count.
         /// <para>Scratch table on the local test database; returns without asserting when the conf is absent or the database unreachable.</para>
@@ -151,7 +151,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the single-connection (and with it single-command) guarantee of ZiolkowskiJakub/DiGi.GIS.WebAPI#56: the batch opens
+        /// Pins the single-connection (and with it single-command) guarantee of DiGi-Organization/DiGi.GIS.WebAPI#56: the batch opens
         /// exactly one database connection per request, where three equivalent single-value calls open three.
         /// <para><c>ConnectionData.ToString()</c> is called from exactly one site in the codebase - <c>DiGi.PostgreSQL.Create.NpgsqlConnection</c>,
         /// the connection factory - so a <see cref="CountingConnectionData"/> override counts created connections exactly. The control
@@ -159,7 +159,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// call would read three, not one.</para>
         /// <para>The connection count is the command count in this architecture: every converter call opens exactly one connection and
         /// executes exactly one SQL command (the wrapper pattern), so a batch answered from several converter calls would show up as
-        /// several connections. One connection therefore proves the measures were served by one command (ZiolkowskiJakub/DiGi.PostgreSQL#15's
+        /// several connections. One connection therefore proves the measures were served by one command (DiGi-Organization/DiGi.PostgreSQL#15's
         /// single <c>SELECT</c> carrying all aggregate expressions).</para>
         /// <para>Scratch table on the local test database; returns without asserting when the conf is absent or the database unreachable.</para>
         /// </summary>
@@ -205,9 +205,9 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the no-partial-result contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#56: a <c>Measures</c> list mixing a valid measure
+        /// Pins the no-partial-result contract of DiGi-Organization/DiGi.GIS.WebAPI#56: a <c>Measures</c> list mixing a valid measure
         /// with one naming a column the stored table does not hold is refused with 400 naming the offending column - the whole
-        /// request fails, never a partial array (ZiolkowskiJakub/DiGi.PostgreSQL#12).
+        /// request fails, never a partial array (DiGi-Organization/DiGi.PostgreSQL#12).
         /// <para>Scratch table on the local test database; returns without asserting when the conf is absent or the database unreachable.</para>
         /// </summary>
         [Fact]
@@ -239,7 +239,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins that the transient failure mapping of ZiolkowskiJakub/DiGi.GIS.WebAPI#56 follows the house pattern on the batch:
+        /// Pins that the transient failure mapping of DiGi-Organization/DiGi.GIS.WebAPI#56 follows the house pattern on the batch:
         /// a dead loopback host makes the converter's OpenAsync throw a genuine transient NpgsqlException, which must answer 503
         /// with the Retry-After header.
         /// <para>Medium test: runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long; the sibling dead-host fact
@@ -279,7 +279,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         /// A <see cref="ConnectionData"/> whose <c>ToString()</c> counts its own calls. The connection factory
         /// (<c>DiGi.PostgreSQL.Create.NpgsqlConnection</c>) is the only site in the codebase that reads the connection string, so
         /// the count is the number of connections the converter created - the single-connection guarantee of
-        /// ZiolkowskiJakub/DiGi.GIS.WebAPI#56 made observable.
+        /// DiGi-Organization/DiGi.GIS.WebAPI#56 made observable.
         /// </summary>
         private sealed class CountingConnectionData : ConnectionData
         {
@@ -321,7 +321,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Pushes a scratch building-data table (county, reference, numeric measure, three rows in one partition) into the local
-        /// test database and hands back a live <see cref="BuildingDataController"/> wired to it, so the ZiolkowskiJakub/DiGi.GIS.WebAPI#56
+        /// test database and hands back a live <see cref="BuildingDataController"/> wired to it, so the DiGi-Organization/DiGi.GIS.WebAPI#56
         /// batch contract is exercised through the real action over the real converter. Returns <c>null</c> - and the fact returns
         /// without asserting - when the conf is absent or the local test database is unreachable, in which case nothing was written.
         /// <para>A fact can build the fixture on a <see cref="CountingConnectionData"/> and keep its own reference to observe connection

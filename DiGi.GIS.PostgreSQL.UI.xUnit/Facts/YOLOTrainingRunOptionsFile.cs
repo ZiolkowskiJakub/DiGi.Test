@@ -6,7 +6,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that a tray training run's options file never overwrites an earlier one (ZiolkowskiJakub/DiGi.GIS.PostgreSQL.UI#20).
+        /// Verifies that a tray training run's options file never overwrites an earlier one (DiGi-Organization/DiGi.GIS.PostgreSQL.UI#20).
         /// <para>The file is the record of what a run was asked to do. A validation-only or evaluation-only run started with the previous run name still in the dialog used to write <c>&lt;RunName&gt;.YOLOTrainingRunOptions.json</c> again and replace the training run's record without a word. A resume writes <c>&lt;RunName&gt;.resume-&lt;timestamp&gt;.YOLOTrainingRunOptions.json</c> for the same reason, leaving the original run's file byte-identical.</para>
         /// </summary>
         [Fact]

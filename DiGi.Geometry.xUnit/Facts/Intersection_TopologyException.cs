@@ -7,8 +7,8 @@ namespace DiGi.Geometry.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Query.Intersection(PolygonalFace2D?, PolygonalFace2D?)"/> recovers with its <c>OverlayNGRobust</c> retry when NetTopologySuite's overlay throws a <c>TopologyException</c> on valid input, instead of returning <c>null</c> (ZiolkowskiJakub/DiGi.Geometry#9).
-        /// <para>The fixture <c>IntersectionTopologyException.json</c> holds, in this order, a 31.787 m² receiver face and the 22 shadows that cover it: a gable wall of building 11043814 (county 55417) fully hidden by the adjacent building, lit from one sky patch (ZiolkowskiJakub/DiGi.GIS.WebAPI.UI#61).
+        /// Verifies that <see cref="Query.Intersection(PolygonalFace2D?, PolygonalFace2D?)"/> recovers with its <c>OverlayNGRobust</c> retry when NetTopologySuite's overlay throws a <c>TopologyException</c> on valid input, instead of returning <c>null</c> (DiGi-Organization/DiGi.Geometry#9).
+        /// <para>The fixture <c>IntersectionTopologyException.json</c> holds, in this order, a 31.787 m² receiver face and the 22 shadows that cover it: a gable wall of building 11043814 (county 55417) fully hidden by the adjacent building, lit from one sky patch (DiGi-Organization/DiGi.GIS.WebAPI.UI#61).
         /// Their union is one valid 107.5 m² face with zero-area sliver holes, and the classic overlay of that face with the receiver throws "found non-noded intersection". The fact first proves the fixture still triggers the exception, then that the intersection covers the receiver except for about 0.02 m².</para>
         /// </summary>
         [Fact]

@@ -13,10 +13,10 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <para>91 rows used to store a null chain: 87 subdivisions of Poznan (<c>3064</c>), whose county holds no municipality feature in
         /// BDOT10k at all, and 4 settlements in <c>2412</c> / <c>3003</c> / <c>3015</c> whose sample point lands in a gap between
         /// municipality polygons. The four keep a real municipality, so they are asserted separately. See
-        /// https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/14.</para>
+        /// https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/14.</para>
         /// <para>A further 36 rows stored a parent chain that was simply wrong - 26 of Poznan's filed under county <c>3021</c>, and 10
         /// elsewhere including one in the wrong voivodeship - which a null check cannot see. Every subdivision's county must therefore
-        /// carry the code its own code starts with. See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/15.</para>
+        /// carry the code its own code starts with. See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/15.</para>
         /// <para>Skipped by default: it queries a populated database and only means anything after a refresh run against it.</para>
         /// </summary>
         [Fact(Skip = "Executes an integration query. Point GIS_PostgreSQL_Main.conf at a refreshed database before running.")]

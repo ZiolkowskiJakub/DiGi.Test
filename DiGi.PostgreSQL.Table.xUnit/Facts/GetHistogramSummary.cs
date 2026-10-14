@@ -9,7 +9,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     {
         /// <summary>
         /// Verifies that GetHistogramSummaryAsync answers null (the empty-result contract the controller maps to 404 NotFound) when the column is entirely NULL in the scope, instead of throwing on the NULL bucket.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#6: the unmodified reader read the NULL bucket with an unguarded GetInt32(0), which the endpoint surfaced as a 500. A fully-populated control proves the column is actually resolved, so this null is the empty-scope answer and not a whitelist rejection.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#6: the unmodified reader read the NULL bucket with an unguarded GetInt32(0), which the endpoint surfaced as a 500. A fully-populated control proves the column is actually resolved, so this null is the empty-scope answer and not a whitelist rejection.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -121,7 +121,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies the partition-scope path: a partition whose column is entirely NULL answers null (the 404 contract) while a sibling partition with data answers buckets, proving the county filter and the empty-scope answer work together.
-        /// <para>Mirrors ZiolkowskiJakub/DiGi.PostgreSQL#6, whose reproduction is a county part (partition) whose <c>predicted_year_built</c> is all NULL.</para>
+        /// <para>Mirrors DiGi-Organization/DiGi.PostgreSQL#6, whose reproduction is a county part (partition) whose <c>predicted_year_built</c> is all NULL.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -161,7 +161,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// Verifies the equal-count bucketing (ZiolkowskiJakub/DiGi.PostgreSQL#7): 25 skewed values asked for 5 buckets answer exactly 5 buckets of 5 rows each, numbered 1 to 5, ascending and non-overlapping, with the actual minimum and maximum of each bucket's rows - and the equal-width control on the same seed files 21 of the 25 rows into its first bucket, proving the two rules differ where a skewed column needs them to.
+        /// Verifies the equal-count bucketing (DiGi-Organization/DiGi.PostgreSQL#7): 25 skewed values asked for 5 buckets answer exactly 5 buckets of 5 rows each, numbered 1 to 5, ascending and non-overlapping, with the actual minimum and maximum of each bucket's rows - and the equal-width control on the same seed files 21 of the 25 rows into its first bucket, proving the two rules differ where a skewed column needs them to.
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

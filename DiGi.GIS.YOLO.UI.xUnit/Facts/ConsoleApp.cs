@@ -138,7 +138,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Tests that <see cref="ConsoleApp.Program.Main(string[])"/> returns exit code 1 - a configuration error - when the options name a reference manifest that does not exist (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#22).
+        /// Tests that <see cref="ConsoleApp.Program.Main(string[])"/> returns exit code 1 - a configuration error - when the options name a reference manifest that does not exist (DiGi-Organization/DiGi.GIS.YOLO.UI#22).
         /// <para>The run is refused before it contacts anything, so the fact needs only a placeholder key and no network.</para>
         /// </summary>
         [Fact]

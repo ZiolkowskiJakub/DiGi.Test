@@ -8,7 +8,7 @@ namespace DiGi.GIS.ML.xUnit
     {
         /// <summary>
         /// Verifies that the first confident detection year is the first year at or above the confidence threshold, that a detection below it does not count, that a row with no confident detection is null rather than a default year, and that a threshold of 0 finds the first detection at all.
-        /// <para>This is the year the first-detection heuristic predicts and the bound the evaluation app judges a prediction against (ZiolkowskiJakub/DiGi.GIS.ML#14, #15). A default year would count a never-confident row as evidence, so the null is asserted explicitly.</para>
+        /// <para>This is the year the first-detection heuristic predicts and the bound the evaluation app judges a prediction against (DiGi-Organization/DiGi.GIS.ML#14, #15). A default year would count a never-confident row as evidence, so the null is asserted explicitly.</para>
         /// </summary>
         [Fact]
         public void FirstConfidentDetectionYears()

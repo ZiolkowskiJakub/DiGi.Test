@@ -11,7 +11,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies that a bounding box read returns the buildings standing inside it in a county whose territory is held as several polygon parts.
-        /// <para>The partitions to read used to come from the <c>county_id</c> the subdivisions in the box carry, and that column names one part. Where the buildings sit under a sibling part the read answered nothing whatsoever, which is what left twelve multi-part counties with no radial ratios, or with zeros, after a national run that reported success - the ratios are measured against whatever this read returns, and an empty answer is written as a zero rather than raised. See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/64.</para>
+        /// <para>The partitions to read used to come from the <c>county_id</c> the subdivisions in the box carry, and that column names one part. Where the buildings sit under a sibling part the read answered nothing whatsoever, which is what left twelve multi-part counties with no radial ratios, or with zeros, after a national run that reported success - the ratios are measured against whatever this read returns, and an empty answer is written as a zero rather than raised. See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/64.</para>
         /// <para>A building is picked out of a multi-part county and looked for in a box drawn around its own outline, which it cannot fail to be inside.</para>
         /// <para>Skipped by default: it queries a populated database.</para>
         /// </summary>

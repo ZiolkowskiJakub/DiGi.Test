@@ -10,7 +10,7 @@ using Column = DiGi.Core.IO.Table.Classes.Column;
 namespace DiGi.PostgreSQL.Table.xUnit
 {
     /// <summary>
-    /// Facts for <see cref="Query.TryBuildFilterGroupSql{TColumn}"/> (ZiolkowskiJakub/DiGi.PostgreSQL#10).
+    /// Facts for <see cref="Query.TryBuildFilterGroupSql{TColumn}"/> (DiGi-Organization/DiGi.PostgreSQL#10).
     /// <para>The <c>In</c>/<c>NotIn</c> value arrives over HTTP as a <see cref="System.Text.Json.JsonElement"/> (a JSON array), not an <c>IEnumerable</c>. The list branch must still be reached so the filter builds <c>= ANY(@p)</c>/<c>!= ALL(@p)</c> over the array's elements, instead of comparing the whole array as one scalar (text columns silently match nothing; the old int path answered 500).</para>
     /// <para>Each fact feeds a <see cref="FilterGroup"/> deserialized exactly as ASP.NET Core MVC binds the body (camelCase, <c>Value</c> bound to a <see cref="System.Text.Json.JsonElement"/>), then asserts on the produced SQL text and <see cref="NpgsqlParameterCollection"/>.</para>
     /// </summary>

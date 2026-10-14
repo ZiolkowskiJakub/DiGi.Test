@@ -35,7 +35,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// Verifies the Poznan (3064) shape, where BDOT10k holds no municipality feature inside the city at all.
         /// <para>The neighbouring municipality shares a border with the destination but does not cover it, so the municipality level must
         /// report no parent - that is what lets the caller walk one level up - and the county level must then resolve it, leaving
-        /// <c>MunicipalityId</c> null. See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/14.</para>
+        /// <c>MunicipalityId</c> null. See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/14.</para>
         /// </summary>
         [Fact]
         public void UpdateIds_AncestorFallback()

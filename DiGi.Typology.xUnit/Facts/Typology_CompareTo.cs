@@ -7,7 +7,7 @@ namespace DiGi.Typology.xUnit
         /// <summary>
         /// Tests the ordering contract of <see cref="Typology.Classes.Typology"/>: the primary path ordering
         /// and the tie-breakers on name, description, reference set and sub-typologies.
-        /// <para>Regression guard for ZiolkowskiJakub/DiGi.Typology#13: ordering and equality must not split,
+        /// <para>Regression guard for DiGi-Organization/DiGi.Typology#13: ordering and equality must not split,
         /// so CompareTo returns zero exactly when Equals returns true.</para>
         /// </summary>
         [Fact]

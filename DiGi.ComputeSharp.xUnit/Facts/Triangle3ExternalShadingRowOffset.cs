@@ -21,7 +21,7 @@ namespace DiGi.ComputeSharp.xUnit
         /// (block slicing, row stride and offset indexing) from the intersection computation. Separately, the full dispatch
         /// must equal <see cref="Triangle3ExternalShadingComputeShader"/> cell for cell for an axis-aligned and an oblique
         /// direction and two tolerances: the row-offset struct has its own constant buffer layout, and a layout the driver
-        /// mishandles corrupts the results without failing (ZiolkowskiJakub/DiGi.ComputeSharp#3).</para>
+        /// mishandles corrupts the results without failing (DiGi-Organization/DiGi.ComputeSharp#3).</para>
         /// Handles UnsupportedDoubleOperationException gracefully for FP64 unsupported GPUs.
         /// </summary>
         [Fact]

@@ -99,7 +99,7 @@ namespace DiGi.Core.xUnit
         /// <summary>
         /// Tests that Create.Table(path) releases the file after reading: writes a temp TSV, reads it with the path overload,
         /// asserts the content, and deletes the file in finally without an IOException.
-        /// <para>Regression guard for ZiolkowskiJakub/DiGi.Core#11 — before the fix the DelimitedDataReader created by the path overloads was never disposed, so the file stayed open and File.Delete threw an IOException on Windows.</para>
+        /// <para>Regression guard for DiGi-Organization/DiGi.Core#11 — before the fix the DelimitedDataReader created by the path overloads was never disposed, so the file stayed open and File.Delete threw an IOException on Windows.</para>
         /// </summary>
         [Fact]
         public void CreateTable_ReadsFileAndReleasesIt()

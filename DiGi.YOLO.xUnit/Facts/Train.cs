@@ -476,7 +476,7 @@ namespace DiGi.YOLO.xUnit
 
         /// <summary>
         /// Determines whether a python process is already computing on the GPU, so a training fact can return without asserting instead of starting beside it.
-        /// <para>A smoke training launched while a production training held the GPU left both processes hung (ZiolkowskiJakub/DiGi.YOLO#22). nvidia-smi absent - no NVIDIA driver, or not on PATH - answers false: the git-ignored preflight conf already limits these facts to the GPU machine. When the answer is true, the reason is appended to a GPU_Busy.log line in the reports directory.</para>
+        /// <para>A smoke training launched while a production training held the GPU left both processes hung (DiGi-Organization/DiGi.YOLO#22). nvidia-smi absent - no NVIDIA driver, or not on PATH - answers false: the git-ignored preflight conf already limits these facts to the GPU machine. When the answer is true, the reason is appended to a GPU_Busy.log line in the reports directory.</para>
         /// </summary>
         /// <param name="assembly">The test assembly whose reports directory receives the skip reason.</param>
         /// <returns>True when nvidia-smi lists a python process among the GPU compute apps.</returns>

@@ -15,7 +15,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Pins the 400 contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#54 on <c>GET gis/buildingdata/uniquevalues</c>:
+        /// Pins the 400 contract of DiGi-Organization/DiGi.GIS.WebAPI#54 on <c>GET gis/buildingdata/uniquevalues</c>:
         /// a blank <c>columnuniqueid</c> is a client error, and the converter throws <see cref="DiGi.PostgreSQL.Table.Classes.InvalidFilterException"/>
         /// before any connection is created, so the action must answer 400 with a ProblemDetails body rather than the
         /// generic 500 it answered before the mapping existed. No database is needed for this path.
@@ -48,7 +48,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the 400 contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#54 on the aggregate and unique-values reads:
+        /// Pins the 400 contract of DiGi-Organization/DiGi.GIS.WebAPI#54 on the aggregate and unique-values reads:
         /// a target <c>ColumnUniqueId</c> the stored table does not hold is a client error, so each of
         /// <c>aggregatesummary/singlevalue</c>, <c>aggregatesummary/multivalue</c>, <c>histogramsummary</c> and
         /// <c>uniquevalues</c> must answer 400 with a ProblemDetails body naming the column, not the generic 500
@@ -98,7 +98,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the 400 contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#54 on the filtered reads: a <c>FilterGroup</c>
+        /// Pins the 400 contract of DiGi-Organization/DiGi.GIS.WebAPI#54 on the filtered reads: a <c>FilterGroup</c>
         /// condition on a column the stored table does not hold is a client error, so <c>aggregatesummary/singlevalue</c>,
         /// <c>tablebyfiltergroup</c> and <c>uniquevaluesbycolumnuniqueidparameter</c> must answer 400 with a ProblemDetails
         /// body naming the column and the operator, not the generic 500 they answered before the mapping existed.
@@ -146,7 +146,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the 400 contract of ZiolkowskiJakub/DiGi.GIS.WebAPI#54 for an unconvertible filter value:
+        /// Pins the 400 contract of DiGi-Organization/DiGi.GIS.WebAPI#54 for an unconvertible filter value:
         /// <c>Equals</c> with the string <c>"abc"</c> on the numeric <c>floor_area</c> column is a client error, so
         /// <c>aggregatesummary/singlevalue</c> must answer 400 with a ProblemDetails body naming the column and the
         /// operator, not the generic 500 it answered before the mapping existed (and not the silent <c>0</c> the deployed
@@ -183,7 +183,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Pins that a valid filter over an empty partition keeps its documented answer and is never confused with the
-        /// 400 client error of ZiolkowskiJakub/DiGi.GIS.WebAPI#54: <c>aggregatesummary/singlevalue</c> (<c>Count</c>) answers
+        /// 400 client error of DiGi-Organization/DiGi.GIS.WebAPI#54: <c>aggregatesummary/singlevalue</c> (<c>Count</c>) answers
         /// 200 with <c>0</c>, and <c>uniquevalues</c> answers the documented 404 empty answer for a scope that holds nothing.
         /// <para>Scratch table on the local test database; returns without asserting when the conf is absent or the database is unreachable.</para>
         /// </summary>
@@ -224,7 +224,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins that the transient failure mapping is untouched by the 400 mapping of ZiolkowskiJakub/DiGi.GIS.WebAPI#54:
+        /// Pins that the transient failure mapping is untouched by the 400 mapping of DiGi-Organization/DiGi.GIS.WebAPI#54:
         /// a dead loopback host makes the converter's OpenAsync throw a genuine transient NpgsqlException on
         /// <c>histogramsummary</c>, which must still answer 503 with the Retry-After header — the catch order keeps
         /// the transient branch ahead of both the invalid-filter and the generic branches.
@@ -264,7 +264,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
 
         /// <summary>
-        /// Asserts the ZiolkowskiJakub/DiGi.GIS.WebAPI#54 400 contract: a ProblemDetails body whose detail names the
+        /// Asserts the DiGi-Organization/DiGi.GIS.WebAPI#54 400 contract: a ProblemDetails body whose detail names the
         /// offending column — and the operator, where the case carries one.
         /// </summary>
         /// <param name="actionResult">The action result to assert.</param>
@@ -287,7 +287,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Pushes a scratch building-data table (reference, county, numeric measure) into the local test database and
-        /// hands back a live <see cref="BuildingDataController"/> wired to it, so the ZiolkowskiJakub/DiGi.GIS.WebAPI#54
+        /// hands back a live <see cref="BuildingDataController"/> wired to it, so the DiGi-Organization/DiGi.GIS.WebAPI#54
         /// 400 contract is exercised through the real action over the real converter. Returns <c>null</c> — and the fact
         /// returns without asserting — when the conf is absent or the local test database is unreachable, in which case
         /// nothing was written. A push that fails after the table exists cleans up what it wrote and fails loudly.

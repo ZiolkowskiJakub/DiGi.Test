@@ -323,7 +323,7 @@ namespace DiGi.Communication.xUnit
 
         /// <summary>
         /// Verifies that the ComputeSharp <see cref="ScatteringSolver"/> returns <c>false</c> instead of running when no supported graphics device is available
-        /// (ZiolkowskiJakub/DiGi.Communication#2).
+        /// (DiGi-Organization/DiGi.Communication#2).
         /// <para>A model with at least one scatterable triangle must not run the shaders on a machine whose default device is the WARP software renderer or lacks double precision.
         /// On a supported machine the branch cannot be exercised, so the fact reports a warning and returns, mirroring the DiGi.ComputeSharp.xUnit Create_GraphicsDevice gate.</para>
         /// </summary>
@@ -366,7 +366,7 @@ namespace DiGi.Communication.xUnit
         }
 
         /// <summary>
-        /// Verifies that the ComputeSharp <see cref="ScatteringSolver"/> leaves the shared ComputeSharp default device alive (ZiolkowskiJakub/DiGi.Communication#2).
+        /// Verifies that the ComputeSharp <see cref="ScatteringSolver"/> leaves the shared ComputeSharp default device alive (DiGi-Organization/DiGi.Communication#2).
         /// <para>A device obtained from <see cref="GraphicsDevice.GetDefault"/> before Solve() must still be the cached default afterwards and must still allocate buffers.
         /// Disposing the default device resets ComputeSharp's cache, so a disposing implementation fails this with an identity change or <see cref="ObjectDisposedException"/>.</para>
         /// <para>This is a regression guard for the disposal half of the defect class, not a repro: the unmodified solver already passes it.</para>
@@ -425,7 +425,7 @@ namespace DiGi.Communication.xUnit
         /// <summary>
         /// Determines whether the DiGi.ComputeSharp shaders can run on the current machine: the ComputeSharp default device must be hardware-accelerated and support double precision
         /// (<c>DiGi.ComputeSharp.Core.Create.GraphicsDevice</c>). Writes a warning to the test output helper if not supported.
-        /// <para>The default device is shared by ComputeSharp and is never disposed here: disposing it would invalidate the device held by every other fact running in parallel (ZiolkowskiJakub/DiGi.ComputeSharp#2).</para>
+        /// <para>The default device is shared by ComputeSharp and is never disposed here: disposing it would invalidate the device held by every other fact running in parallel (DiGi-Organization/DiGi.ComputeSharp#2).</para>
         /// </summary>
         /// <param name="testOutputHelper">The test output helper to write warning messages to.</param>
         /// <returns>True if ComputeSharp is supported; otherwise, false.</returns>

@@ -11,7 +11,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     {
         /// <summary>
         /// Asserts every query parameter whose action guard already refuses a value below a floor carries <see cref="MinimumAttribute"/> with exactly that floor.
-        /// <para>The attribute is what moves the guard's decision to binding - a violation is a model-state error that <c>[ApiController]</c> answers with HTTP 400 before the action runs - and what <c>ParameterMinimumSchemaFilter</c> reads into the served document's <c>minimum</c>. A floor of 0 mirrors a <c>&lt; 0</c> guard and a floor of 1 a <c>&lt;= 0</c> guard, so the attribute never rejects a value the action accepts nor accepts one it rejects (ZiolkowskiJakub/DiGi.GIS.WebAPI#47).</para>
+        /// <para>The attribute is what moves the guard's decision to binding - a violation is a model-state error that <c>[ApiController]</c> answers with HTTP 400 before the action runs - and what <c>ParameterMinimumSchemaFilter</c> reads into the served document's <c>minimum</c>. A floor of 0 mirrors a <c>&lt; 0</c> guard and a floor of 1 a <c>&lt;= 0</c> guard, so the attribute never rejects a value the action accepts nor accepts one it rejects (DiGi-Organization/DiGi.GIS.WebAPI#47).</para>
         /// </summary>
         [Fact]
         public void GisControllers_FlooredQueryParameters_CarryMinimum()
@@ -122,8 +122,8 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Asserts every <c>commandTimeout</c> parameter on every action of every gis controller carries <see cref="MinimumAttribute"/>(0), and that there are exactly fifty-eight of them - fifty after ZiolkowskiJakub/DiGi.GIS.WebAPI#48, the five year built maintenance actions of ZiolkowskiJakub/DiGi.GIS.WebAPI#50, the filtered row count of ZiolkowskiJakub/DiGi.GIS.WebAPI#52, the area row count of ZiolkowskiJakub/DiGi.GIS.WebAPI#53, and the aggregate summaries batch of ZiolkowskiJakub/DiGi.GIS.WebAPI#56, each floored.
-        /// <para>Derived from the assembly rather than from a named list, so a controller added later is swept in instead of left out: the named facts pin the endpoints ZiolkowskiJakub/DiGi.GIS.WebAPI#48 changed, while this one fails on the next one added - a new action whose timeout could reach the database negative, with no floor and no recorded decision to omit one. The count is a tripwire, not a target: it is what forces a decision either way (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).</para>
+        /// Asserts every <c>commandTimeout</c> parameter on every action of every gis controller carries <see cref="MinimumAttribute"/>(0), and that there are exactly fifty-eight of them - fifty after DiGi-Organization/DiGi.GIS.WebAPI#48, the five year built maintenance actions of DiGi-Organization/DiGi.GIS.WebAPI#50, the filtered row count of DiGi-Organization/DiGi.GIS.WebAPI#52, the area row count of DiGi-Organization/DiGi.GIS.WebAPI#53, and the aggregate summaries batch of DiGi-Organization/DiGi.GIS.WebAPI#56, each floored.
+        /// <para>Derived from the assembly rather than from a named list, so a controller added later is swept in instead of left out: the named facts pin the endpoints DiGi-Organization/DiGi.GIS.WebAPI#48 changed, while this one fails on the next one added - a new action whose timeout could reach the database negative, with no floor and no recorded decision to omit one. The count is a tripwire, not a target: it is what forces a decision either way (DiGi-Organization/DiGi.GIS.WebAPI#48).</para>
         /// </summary>
         [Fact]
         public void GisControllers_CommandTimeoutParameters_AllFloored()
@@ -168,7 +168,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Asserts the query parameters that look floored but are not stay without <see cref="MinimumAttribute"/>, so the attribute never claims a guard the action does not keep.
-        /// <para>Named explicitly rather than derived, because the classification is a per-endpoint decision: a selector whose unknown key is answered by a lookup rather than by a domain check - an id of 0 is a lookup miss, not an out-of-domain value - must stay unbounded in the document (ZiolkowskiJakub/DiGi.GIS.WebAPI#47). No <c>commandTimeout</c> sits here any more: ZiolkowskiJakub/DiGi.GIS.WebAPI#48 gave all fifty a guard, so every one moved to the floored fact.</para>
+        /// <para>Named explicitly rather than derived, because the classification is a per-endpoint decision: a selector whose unknown key is answered by a lookup rather than by a domain check - an id of 0 is a lookup miss, not an out-of-domain value - must stay unbounded in the document (DiGi-Organization/DiGi.GIS.WebAPI#47). No <c>commandTimeout</c> sits here any more: DiGi-Organization/DiGi.GIS.WebAPI#48 gave all fifty a guard, so every one moved to the floored fact.</para>
         /// </summary>
         [Fact]
         public void GisControllers_UnflooredQueryParameters_DoNotCarryMinimum()
@@ -218,7 +218,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Tests <see cref="MinimumAttribute"/> at its boundaries: the floor itself passes inclusively (or fails exclusively), a value just below fails, null passes, and <see cref="double.NaN"/> fails.
-        /// <para>Constructed as a failing guard rather than a passing range: each invalid case was first observed to return a <see cref="ValidationResult"/> before the valid cases were asserted beside it, so the assertion cannot be decoration (ZiolkowskiJakub/DiGi.GIS.WebAPI#47).</para>
+        /// <para>Constructed as a failing guard rather than a passing range: each invalid case was first observed to return a <see cref="ValidationResult"/> before the valid cases were asserted beside it, so the assertion cannot be decoration (DiGi-Organization/DiGi.GIS.WebAPI#47).</para>
         /// </summary>
         [Fact]
         public void MinimumAttribute_Boundaries()

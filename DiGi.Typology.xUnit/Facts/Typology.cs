@@ -125,7 +125,7 @@ namespace DiGi.Typology.xUnit
 
         /// <summary>
         /// Verifies that the first auto-indexed child of a pathless Update lands at index [0],
-        /// not [1] - the regression tracked in ZiolkowskiJakub/DiGi.Typology#12.
+        /// not [1] - the regression tracked in DiGi-Organization/DiGi.Typology#12.
         /// </summary>
         [Fact]
         public void Typology_Update_FirstChildIndex()

@@ -6,7 +6,7 @@ namespace DiGi.Solar.xUnit
     {
         /// <summary>
         /// Verifies that <see cref="ComputeSharp.Query.IsSupported(global::ComputeSharp.GraphicsDevice?)"/> rejects the WARP software device, which the ComputeSharp default device falls back to on a machine without a hardware adapter.
-        /// <para>Differential: WARP passes the double-precision check that alone used to gate the device selection, so the fact first asserts that check admits it and then that the full gate does not (ZiolkowskiJakub/DiGi.Solar#10).
+        /// <para>Differential: WARP passes the double-precision check that alone used to gate the device selection, so the fact first asserts that check admits it and then that the full gate does not (DiGi-Organization/DiGi.Solar#10).
         /// A hardware device with double precision, when present, must still be accepted, and a null device is rejected.</para>
         /// </summary>
         [Fact]

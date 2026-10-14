@@ -16,7 +16,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// Verifies that the <see cref="Building2DPostgreSQLConverter.RefreshAsync(PostgreSQLBuilding2DRefreshOptions, System.IProgress{long}, int, System.Threading.CancellationToken)"/> walk is per county polygon part: the union of the parts' visits covers every row of the scoped parts, each building lands on the smallest subdivision containing it, and the <c>StartId</c> anchor is evaluated within each part - a part skips its rows at or below the anchor and visits the rest.
         /// <para>Two county parts of one code hold four buildings under a nested subdivision layer. A full walk re-derives all four onto their smallest container; clearing one building of its subdivision and restarting the walk at the middle of its part's identifiers then admits no row at all, while a restart from zero admits exactly that one.</para>
         /// <para>Skipped by default: it writes to a database, and it also writes the two county parts and their subdivisions into <c>administrative_areal_2d</c>. Point <c>GIS_PostgreSQL_Main.conf</c> at a scratch database before running it.</para>
-        /// <para>See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/87.</para>
+        /// <para>See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/87.</para>
         /// </summary>
         [Fact(Skip = "Writes to a database. Point GIS_PostgreSQL_Main.conf at a scratch database before running.")]
         public async Task Building2DRefreshAsync_PerPartWalk()

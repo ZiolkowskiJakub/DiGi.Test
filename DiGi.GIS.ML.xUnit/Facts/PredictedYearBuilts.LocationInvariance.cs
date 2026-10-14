@@ -12,7 +12,7 @@ namespace DiGi.GIS.ML.xUnit
     {
         /// <summary>
         /// Verifies that the deployed scoring path does not move a single prediction when a building's absolute location and administrative identity are replaced by another county's.
-        /// <para>ZiolkowskiJakub/DiGi.GIS.ML#14 found the regressor keyed on location: re-scoring county 80328 with county-8956-like coordinates moved the buildings first confidently detected in 2008 and predicted after 2009 from 1.7 % to 100 %. On the 2026-10-08 model (SHA-256 2e120f49...) this probe moved 12 of 24 raw predictions of the committed sample. ZiolkowskiJakub/DiGi.GIS.ML#15 replaced the regressor by the first-detection heuristic; this keeps any future predictor from keying on where a building is again.</para>
+        /// <para>DiGi-Organization/DiGi.GIS.ML#14 found the regressor keyed on location: re-scoring county 80328 with county-8956-like coordinates moved the buildings first confidently detected in 2008 and predicted after 2009 from 1.7 % to 100 %. On the 2026-10-08 model (SHA-256 2e120f49...) this probe moved 12 of 24 raw predictions of the committed sample. DiGi-Organization/DiGi.GIS.ML#15 replaced the regressor by the first-detection heuristic; this keeps any future predictor from keying on where a building is again.</para>
         /// </summary>
         [Fact]
         public void PredictedYearBuilts_LocationInvariance()

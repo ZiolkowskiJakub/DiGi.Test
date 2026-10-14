@@ -83,13 +83,13 @@ namespace DiGi.YOLO.xUnit
                 //check.py must state its own intent rather than inheriting torch.load's weights_only default from the ultralytics
                 //monkeypatch: torch 2.6 flipped the default to weights_only=True, which refuses the ultralytics classes a checkpoint
                 //carries. A model whose header cannot be parsed is a warning, not a refusal, so it must surface in the warnings array
-                //and leave runnable true - see ZiolkowskiJakub/DiGi.YOLO#15
+                //and leave runnable true - see DiGi-Organization/DiGi.YOLO#15
                 string checkContent = File.ReadAllText(checkPath);
                 Assert.Contains("weights_only=False", checkContent);
                 Assert.Contains("warnings.append", checkContent);
                 Assert.Contains("\"warnings\": warnings", checkContent);
 
-                //The detector is frozen, so ultralytics is pinned exactly: 8.4.165 was adopted in ZiolkowskiJakub/DiGi.YOLO#17
+                //The detector is frozen, so ultralytics is pinned exactly: 8.4.165 was adopted in DiGi-Organization/DiGi.YOLO#17
                 //only after reproducing the 8.3.130 checkpoint's detections on 1000 held images, and a different ultralytics
                 //can be a different detector
                 string requirementsContent = File.ReadAllText(requirementsPath);

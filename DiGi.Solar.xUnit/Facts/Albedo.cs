@@ -37,7 +37,7 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Tests the albedo resolution of the Warsaw IWEC file hour by hour, month by month, so the snow regression cannot return silently.
-        /// <para>POL_Warsaw.123750_IWEC.epw reports a constant 3.0 cm of lying snow for every hour from April to November, a filler value rather than a measurement (ZiolkowskiJakub/DiGi.Solar#2). Its snow-depth column is therefore not a reliable indicator of lying snow, the caller's decision for this file is no snow cover, and no month may resolve to the snow reflectance. The filler value itself is pinned as the anchor the regression was measured against.</para>
+        /// <para>POL_Warsaw.123750_IWEC.epw reports a constant 3.0 cm of lying snow for every hour from April to November, a filler value rather than a measurement (DiGi-Organization/DiGi.Solar#2). Its snow-depth column is therefore not a reliable indicator of lying snow, the caller's decision for this file is no snow cover, and no month may resolve to the snow reflectance. The filler value itself is pinned as the anchor the regression was measured against.</para>
         /// </summary>
         [Fact]
         public void Albedo_WarsawEpw()

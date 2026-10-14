@@ -7,7 +7,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// A target column the stored table does not hold is a typed failure naming the column in <c>GetUniqueValuesAsync</c> too, distinct from a valid empty result (ZiolkowskiJakub/DiGi.PostgreSQL#12). On the unmodified code the same call answered <c>null</c>, indistinguishable from an empty partition.
+        /// A target column the stored table does not hold is a typed failure naming the column in <c>GetUniqueValuesAsync</c> too, distinct from a valid empty result (DiGi-Organization/DiGi.PostgreSQL#12). On the unmodified code the same call answered <c>null</c>, indistinguishable from an empty partition.
         /// <para>A blank column name is likewise an invalid request: both overloads throw <c>InvalidFilterException</c> instead of folding it into the connection check.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>

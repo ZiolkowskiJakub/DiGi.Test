@@ -11,7 +11,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that naming the scored references turns the detection write into a replacement of each scored building's detection columns (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#21).
+        /// Verifies that naming the scored references turns the detection write into a replacement of each scored building's detection columns (DiGi-Organization/DiGi.GIS.YOLO.UI#21).
         /// <para>A scored building the detector did not fire on gets a row with every detection column of the range unset, a detected building's undetected years are unset, and a year no building of the batch was detected in is still a column - so the endpoint, which writes an unset cell as NULL and leaves a row or column it is not sent alone, clears what earlier weights left. The table is also carried through the wire form the endpoint parses, so the empty columns and the row with nothing but its identity survive the trip.</para>
         /// <para>Without references the table is the one the detection write has always sent.</para>
         /// </summary>

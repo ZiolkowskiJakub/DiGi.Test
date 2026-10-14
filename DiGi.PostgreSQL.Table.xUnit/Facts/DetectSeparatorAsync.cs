@@ -9,7 +9,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     {
         /// <summary>
         /// Verifies that a caller-supplied commandTimeout reaches the DetectSeparatorAsync command: while a second connection holds an ACCESS EXCLUSIVE lock on the basetable, a one second commandTimeout must abort the blocked separator query (Npgsql 10 surfaces it as an NpgsqlException wrapping a TimeoutException) instead of waiting out the 30 second Npgsql default.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#4: the unmodified DetectSeparatorAsync never assigns npgsqlCommand.CommandTimeout, so with the lock released after 3 seconds the query completes normally instead of throwing at one second. The control leg then shows a generous commandTimeout completes the same query and returns a detected separator.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#4: the unmodified DetectSeparatorAsync never assigns npgsqlCommand.CommandTimeout, so with the lock released after 3 seconds the query completes normally instead of throwing at one second. The control leg then shows a generous commandTimeout completes the same query and returns a detected separator.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// <para>Medium test (3.3 s): runs when DIGI_TEST_MAX_DURATION is Medium (the default) or Long.</para>
         /// </summary>
@@ -118,7 +118,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that DetectSeparatorAsync samples a non-text integer column without throwing and answers the default comma separator, since a numeric text form contains no separator.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#11: the unmodified DetectSeparatorAsync ran length()/replace() on the raw column, so an integer column threw; casting the sampled column to text makes it answer the default separator.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#11: the unmodified DetectSeparatorAsync ran length()/replace() on the raw column, so an integer column threw; casting the sampled column to text makes it answer the default separator.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

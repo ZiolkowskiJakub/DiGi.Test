@@ -14,7 +14,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Reproduces ZiolkowskiJakub/DiGi.GIS.WebAPI.UI#33: the terrain node created for a single building scene must cover the whole display circle, and therefore the building's own bounding envelope with its margin, when the county is sampled on a coarse 100 m lattice.
+        /// Reproduces DiGi-Organization/DiGi.GIS.WebAPI.UI#33: the terrain node created for a single building scene must cover the whole display circle, and therefore the building's own bounding envelope with its margin, when the county is sampled on a coarse 100 m lattice.
         /// <para>The terrain service is stood in for by a handler that answers exactly as the deployed one does: it triangulates the lattice points found inside the query circle with the service's own <see cref="HeightFieldPointCloud3DMeshSolver"/> and nothing else, so the returned surface stops short of the query radius by up to one lattice diagonal. The building is the reported one (county 53477, id 10595050): a 52 x 82 m envelope whose display circle is the 100 m minimum.</para>
         /// <para>On the unmodified code the query radius is 115 m, the service answers the single 100 x 100 m cell around the centre, and the clipped surface reaches only about 17 m from the centre while the building envelope starts 24 m further south than the cell.</para>
         /// </summary>

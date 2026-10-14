@@ -8,7 +8,7 @@ namespace DiGi.Typology.xUnit
         /// Tests deep value equality of <see cref="Typology.Classes.Typology"/> - the typology item, the
         /// reference set and the whole sub-typology tree - together with the equality operators, the hash
         /// contract and a clone round-trip.
-        /// <para>Regression guard for ZiolkowskiJakub/DiGi.Typology#13: the class carried no equality
+        /// <para>Regression guard for DiGi-Organization/DiGi.Typology#13: the class carried no equality
         /// members, so every comparison silently fell back to System.Object identity.</para>
         /// </summary>
         [Fact]

@@ -14,7 +14,7 @@ namespace DiGi.ComputeSharp.xUnit
         /// <para>On NVIDIA RTX 5090 (driver 617.14) a shader whose 32-bit root constant count (<c>ConstantBufferSize / 4</c>)
         /// and resource count (shader resource views plus unordered access views) are both odd returns silently wrong
         /// double-precision results, although its DXIL is identical to a working shader apart from the constant buffer size
-        /// (ZiolkowskiJakub/DiGi.ComputeSharp#3). Either count being even avoids it.</para>
+        /// (DiGi-Organization/DiGi.ComputeSharp#3). Either count being even avoids it.</para>
         /// <para>The pinned table makes every layout change and every new shader fail this fact until its entry is added,
         /// so the change is made deliberately and its parity with a proven layout is checked. The layout is read from the
         /// generated shader descriptors, so no graphics device is needed.</para>
@@ -55,7 +55,7 @@ namespace DiGi.ComputeSharp.xUnit
 
                 testOutputHelper.WriteLine($"{type.Name}: {constantBufferSize} B, {constantCount} root constants, {resourceCount} resources");
 
-                Assert.False(constantCount % 2 == 1 && resourceCount % 2 == 1, $"{type.Name} has {constantCount} root constants and {resourceCount} resources; an odd count of both returns wrong results on NVIDIA RTX 5090 (ZiolkowskiJakub/DiGi.ComputeSharp#3). Reorder or pad its fields to an even root constant count.");
+                Assert.False(constantCount % 2 == 1 && resourceCount % 2 == 1, $"{type.Name} has {constantCount} root constants and {resourceCount} resources; an odd count of both returns wrong results on NVIDIA RTX 5090 (DiGi-Organization/DiGi.ComputeSharp#3). Reorder or pad its fields to an even root constant count.");
 
                 (int ConstantBufferSize, int ResourceCount) layout = layouts[type.Name];
                 Assert.True(layout.ConstantBufferSize == constantBufferSize && layout.ResourceCount == resourceCount, $"{type.Name} layout changed: expected {layout.ConstantBufferSize} B and {layout.ResourceCount} resources, found {constantBufferSize} B and {resourceCount} resources. Check parity with the previous layout, then update the pinned table.");

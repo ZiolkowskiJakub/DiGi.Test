@@ -19,7 +19,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that a never-detected building's stored predicted year is cleared when the detection and the predicted year writes are both on (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#28).
+        /// Verifies that a never-detected building's stored predicted year is cleared when the detection and the predicted year writes are both on (DiGi-Organization/DiGi.GIS.YOLO.UI#28).
         /// <para>The fixture's folder holds three buildings: <c>0207</c> and <c>0209</c> were detected, <c>0208</c> was not. With no manifest, all three are scored. The detection write covers all three (clearing <c>0208</c>'s columns), and the new predicted year clear covers only <c>0208</c> - the building the detector never fired on - leaving its predicted year NULL while the two detected buildings keep theirs.</para>
         /// </summary>
         [Fact]
@@ -114,7 +114,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Verifies that the predicted year clear is gated on both write flags: with the predicted year write off, or with the detection write off, a never-detected building's stored predicted year is left untouched (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#28).
+        /// Verifies that the predicted year clear is gated on both write flags: with the predicted year write off, or with the detection write off, a never-detected building's stored predicted year is left untouched (DiGi-Organization/DiGi.GIS.YOLO.UI#28).
         /// </summary>
         [Fact]
         [SupportedOSPlatform("windows")]
@@ -154,7 +154,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         }
 
         /// <summary>
-        /// Verifies that a manifest-narrowed run clears only its own buildings: a never-detected building outside the manifest is left untouched (ZiolkowskiJakub/DiGi.GIS.YOLO.UI#28).
+        /// Verifies that a manifest-narrowed run clears only its own buildings: a never-detected building outside the manifest is left untouched (DiGi-Organization/DiGi.GIS.YOLO.UI#28).
         /// <para>The fixture's folder holds <c>0207</c>, <c>0208</c> and <c>0209</c>; <c>0208</c> is the one the detector never fired on. The manifest names <c>0207</c> and <c>0209</c>, so <c>0208</c> is outside the run and its stored predicted year is not cleared.</para>
         /// </summary>
         [Fact]

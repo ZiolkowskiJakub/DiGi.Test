@@ -78,8 +78,8 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Determines whether ComputeSharp is supported on the current machine and graphics device.
         /// <para>The shared ComputeSharp default device is never disposed here: disposing it would reset ComputeSharp's default device cache
-        /// and invalidate the device held by every other caller in the process (ZiolkowskiJakub/DiGi.ComputeSharp#2), which <see cref="ShadingSolver_IsComputeSharpSupported_KeepsDefaultDevice"/> guards.</para>
-        /// <para>The WARP software device is rejected even though it reports double precision as available, aligning the test gate with <see cref="ComputeSharp.Query.IsSupported(global::ComputeSharp.GraphicsDevice?)"/> (ZiolkowskiJakub/DiGi.Solar#10).</para>
+        /// and invalidate the device held by every other caller in the process (DiGi-Organization/DiGi.ComputeSharp#2), which <see cref="ShadingSolver_IsComputeSharpSupported_KeepsDefaultDevice"/> guards.</para>
+        /// <para>The WARP software device is rejected even though it reports double precision as available, aligning the test gate with <see cref="ComputeSharp.Query.IsSupported(global::ComputeSharp.GraphicsDevice?)"/> (DiGi-Organization/DiGi.Solar#10).</para>
         /// </summary>
         /// <param name="testOutputHelper">The test output helper to write warning messages to.</param>
         /// <returns>True if ComputeSharp is supported; otherwise, false.</returns>
@@ -117,7 +117,7 @@ namespace DiGi.Solar.xUnit
         }
 
         /// <summary>
-        /// Verifies that IsComputeSharpSupported leaves the shared ComputeSharp default device alive (ZiolkowskiJakub/DiGi.ComputeSharp#2).
+        /// Verifies that IsComputeSharpSupported leaves the shared ComputeSharp default device alive (DiGi-Organization/DiGi.ComputeSharp#2).
         /// <para>A device obtained via GraphicsDevice.GetDefault before the call must still be the cached default afterwards and must still be able to allocate buffers.
         /// Disposing the default device resets ComputeSharp's cache, so a disposing implementation fails this with an identity change or ObjectDisposedException.</para>
         /// </summary>
@@ -154,7 +154,7 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Verifies on both solvers that a receiver standing between two shading-only walls never reads fully sunlit while it is shaded, and never reads covered by more than its own area.
         /// <para>Geometry: a 4 x 4 m horizontal receiver at z = 0 with a shading-only wall at x = 6 and one at x = -2 (both spanning y in [-2, 6], 12 m high), so one of them shadows the receiver for most of the day. The two walls' shadows overlap on the receiver, which is exactly the shape the shadow union collapses, so the sample counts are compared between the solvers rather than each factor.</para>
-        /// <para>A solver that loses the merged shadow (see ZiolkowskiJakub/DiGi.Solar#8) reads factor 0 on those samples and fails the count assertion; one that double-counts them reads factor above 1 and fails the per-sample bound.</para>
+        /// <para>A solver that loses the merged shadow (see DiGi-Organization/DiGi.Solar#8) reads factor 0 on those samples and fails the count assertion; one that double-counts them reads factor above 1 and fails the per-sample bound.</para>
         /// </summary>
         /// <param name="computeSharp">True to solve with the ComputeSharp solver; false for the CPU solver.</param>
         [Theory]

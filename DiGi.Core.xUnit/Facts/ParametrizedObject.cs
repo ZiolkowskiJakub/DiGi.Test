@@ -32,7 +32,7 @@ namespace DiGi.Core.xUnit
         }
 
         /// <summary>
-        /// Pins ZiolkowskiJakub/DiGi.Core#6 for the public API: a <c>Double</c>-typed parameter holding a whole number reloads as an
+        /// Pins DiGi-Organization/DiGi.Core#6 for the public API: a <c>Double</c>-typed parameter holding a whole number reloads as an
         /// <c>int</c> raw value on the text leg (Scope-B canonicalization), yet <c>GetValue&lt;double&gt;</c> still returns the expected
         /// <c>double</c>.
         /// </summary>

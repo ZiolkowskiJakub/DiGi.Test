@@ -7,7 +7,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies <see cref="Query.ContainerIds(IReadOnlyDictionary{int, PolygonalFace2D}, double)"/> on a nested layer shaped like Warsaw's: a city holding a district holding a neighbourhood, a second district sharing the city's outer edge, and a flat area off to the side.
-        /// <para>The neighbourhood lists its district first and the city last (smallest first); each district lists the city alone, including the one whose box touches the city's box on two sides - a strict box test would miss it, and every Warsaw district touches the city boundary somewhere; the city and the flat area are top level. Without this the municipality roll-up sums the city, its districts and its neighbourhoods together, which wrote Warsaw as 4.6 million against a city of 1 622 594 (<see href="https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/77">DiGi.GIS.PostgreSQL#77</see>).</para>
+        /// <para>The neighbourhood lists its district first and the city last (smallest first); each district lists the city alone, including the one whose box touches the city's box on two sides - a strict box test would miss it, and every Warsaw district touches the city boundary somewhere; the city and the flat area are top level. Without this the municipality roll-up sums the city, its districts and its neighbourhoods together, which wrote Warsaw as 4.6 million against a city of 1 622 594 (<see href="https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/77">DiGi.GIS.PostgreSQL#77</see>).</para>
         /// </summary>
         [Fact]
         public void ContainerIds_NestedLayer()

@@ -25,9 +25,9 @@ namespace DiGi.WebAPI.WindowsService.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#3 on the payload it was reported with: the schema of <see cref="AdministrativeAreal2DReference"/> must name exactly the properties the DiGi serializer writes (PascalCase, <c>_type</c> included), require all of them because the serializer always writes every member (<c>null</c> explicitly), keep a nullable member nullable, and give <c>_type</c> the serialized type name as its example.
+        /// Reproduces DiGi-Organization/DiGi.WebAPI.WindowsService#3 on the payload it was reported with: the schema of <see cref="AdministrativeAreal2DReference"/> must name exactly the properties the DiGi serializer writes (PascalCase, <c>_type</c> included), require all of them because the serializer always writes every member (<c>null</c> explicitly), keep a nullable member nullable, and give <c>_type</c> the serialized type name as its example.
         /// <para>The expected names come from serializing a real instance, and the wire itself is pinned against the response quoted in the issue, so the fact cannot pass because the schema and the serializer drifted together.</para>
-        /// <para>Also reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6 on the same payload: its <see cref="AdministrativeArealType"/> travels as an integer, so the property must be an inline integer schema listing the values in numeric order, naming them for code generators and keeping the member's own description - while the shared component stays the string schema query parameters bind against.</para>
+        /// <para>Also reproduces DiGi-Organization/DiGi.WebAPI.WindowsService#6 on the same payload: its <see cref="AdministrativeArealType"/> travels as an integer, so the property must be an inline integer schema listing the values in numeric order, naming them for code generators and keeping the member's own description - while the shared component stays the string schema query parameters bind against.</para>
         /// </summary>
         [Fact]
         public void ConfigureSchemaGeneration_SerializableObject()
@@ -61,7 +61,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.Equal(JsonSchemaType.Null, openApiSchema.Properties["CountyId"].Type & JsonSchemaType.Null);
             Assert.NotEqual(JsonSchemaType.Null, openApiSchema.Properties["Id"].Type & JsonSchemaType.Null);
 
-            // ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6: the serializer writes the enum as its underlying integer, as in the
+            // DiGi-Organization/DiGi.WebAPI.WindowsService#6: the serializer writes the enum as its underlying integer, as in the
             // response quoted there ("AdministrativeArealType": 2), so the property declares exactly those integers.
             JsonNode? jsonNode_AdministrativeArealType = Core.Convert.ToJson(new AdministrativeAreal2DReference() { AdministrativeArealType = AdministrativeArealType.County })?["AdministrativeArealType"];
             Assert.NotNull(jsonNode_AdministrativeArealType);
@@ -163,7 +163,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
         }
 
         /// <summary>
-        /// Reproduces ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6 on every enum shape a DiGi payload can carry, each of which the DiGi serializer writes as integers: a nullable enum, a list and a dictionary of enums, a <c>[Flags]</c> enum and a long-backed enum.
+        /// Reproduces DiGi-Organization/DiGi.WebAPI.WindowsService#6 on every enum shape a DiGi payload can carry, each of which the DiGi serializer writes as integers: a nullable enum, a list and a dictionary of enums, a <c>[Flags]</c> enum and a long-backed enum.
         /// <para>A nullable enum lists <c>null</c> among its values, because OpenAPI 3.0's <c>nullable</c> widens <c>type</c> only and an <c>enum</c> without <c>null</c> still rejects the explicit <c>null</c> the serializer writes; the rendered 3.0 form is asserted for that reason. A <c>[Flags]</c> enum lists no values, because a combined value (<c>Read | Write = 3</c>) is in no member list, and describes its bits instead.</para>
         /// </summary>
         [Fact]
@@ -245,7 +245,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
         }
 
         /// <summary>
-        /// Reproduces the document-level half of ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6 on a whole document generated through the host's configuration from <see cref="EnumControllerFixture"/>.
+        /// Reproduces the document-level half of DiGi-Organization/DiGi.WebAPI.WindowsService#6 on a whole document generated through the host's configuration from <see cref="EnumControllerFixture"/>.
         /// <para>An enum query parameter keeps its string component, which is accurate for binding (names and integers both bind), and its description gains the integer values and the advice to send them (<c>Coding - WebAPI Contracts.md</c>, "Send enum values as integers"). An enum component that only DiGi payload members used is removed once those members are declared inline, because left behind it would still advertise the string form; the one the parameter references stays. No enum component is referenced from inside the DiGi payload schema any more - the detector for an enum shape the payload rewrite does not cover.</para>
         /// </summary>
         [Fact]
@@ -387,7 +387,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
 
         /// <summary>
         /// Control: a payload written by the MVC formatter (<c>Ok(...)</c>) keeps a schema naming exactly what the MVC formatter writes - camelCase, no <c>_type</c> - and its enum stays a string component (<c>{"reason":"Undefined"}</c>).
-        /// <para>The expected names come from serializing an instance with the host's own MVC options. <see cref="MvcPayloadFixture"/> carries a PascalCase <c>[JsonPropertyName]</c>, which the host writes camelCase while Swashbuckle alone would document it as spelled, so the camelCase rename of non-DiGi schemas is load-bearing. Enum declaration on DiGi payloads is ZiolkowskiJakub/DiGi.WebAPI.WindowsService#6; this fact pins the MVC side it must not break.</para>
+        /// <para>The expected names come from serializing an instance with the host's own MVC options. <see cref="MvcPayloadFixture"/> carries a PascalCase <c>[JsonPropertyName]</c>, which the host writes camelCase while Swashbuckle alone would document it as spelled, so the camelCase rename of non-DiGi schemas is load-bearing. Enum declaration on DiGi payloads is DiGi-Organization/DiGi.WebAPI.WindowsService#6; this fact pins the MVC side it must not break.</para>
         /// </summary>
         [Fact]
         public void ConfigureSchemaGeneration_MvcPayload()

@@ -15,7 +15,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Tests that the schema the host generates for a Core.IO table through the extension's <see cref="TableWireFormatSchemaFilter"/> describes the wire format <c>Core.IO.Table.Convert.ToSystem_String</c> writes: an object requiring exactly <c>Columns</c> and <c>Rows</c> with no root <c>_type</c>, open column objects discriminated by <c>_type</c>, and rows as positional arrays (ZiolkowskiJakub/DiGi.GIS.WebAPI#44).
+        /// Tests that the schema the host generates for a Core.IO table through the extension's <see cref="TableWireFormatSchemaFilter"/> describes the wire format <c>Core.IO.Table.Convert.ToSystem_String</c> writes: an object requiring exactly <c>Columns</c> and <c>Rows</c> with no root <c>_type</c>, open column objects discriminated by <c>_type</c>, and rows as positional arrays (DiGi-Organization/DiGi.GIS.WebAPI#44).
         /// </summary>
         [Fact]
         public void TableWireFormatSchemaFilter()

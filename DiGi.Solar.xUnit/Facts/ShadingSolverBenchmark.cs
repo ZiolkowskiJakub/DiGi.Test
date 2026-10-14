@@ -22,7 +22,7 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Largest allowed fraction of compared samples in which a ComputeSharp engine drops a shadow the CPU solver finds (see the parity helper in <c>ShadingSolverCPU.cs</c>).
-        /// <para>It is 0. The tolerance of 0.001 covered the failed shadow union of ZiolkowskiJakub/DiGi.Solar#8, fixed there and in ZiolkowskiJakub/DiGi.Geometry#8; the dropped count is still reported as a column, so a drop that comes back is seen rather than absorbed.</para>
+        /// <para>It is 0. The tolerance of 0.001 covered the failed shadow union of DiGi-Organization/DiGi.Solar#8, fixed there and in DiGi-Organization/DiGi.Geometry#8; the dropped count is still reported as a column, so a drop that comes back is seen rather than absorbed.</para>
         /// </summary>
         private const double ShadingSolverBenchmarkDroppedFraction = 0;
 
@@ -34,7 +34,7 @@ namespace DiGi.Solar.xUnit
         /// <summary>
         /// Benchmarks the shading solvers on a grid of buildings in which every surface is a receiver, so the buildings shade each other.
         /// <para>Compares the CPU <see cref="ShadingSolver"/> with the ComputeSharp solver on a hardware GPU (<see cref="ComputeDeviceType.Hardware"/>) for grids of 1 to 144 buildings (5 to 720 surfaces).
-        /// WARP is not measured: it was withdrawn in ZiolkowskiJakub/DiGi.Solar#10. Results are written to <c>ShadingSolver_Benchmark_Receivers.txt</c> in the reports directory.</para>
+        /// WARP is not measured: it was withdrawn in DiGi-Organization/DiGi.Solar#10. Results are written to <c>ShadingSolver_Benchmark_Receivers.txt</c> in the reports directory.</para>
         /// <para>Long test (> 30 s): runs when DIGI_TEST_MAX_DURATION is Long.</para>
         /// </summary>
         [LongFact]

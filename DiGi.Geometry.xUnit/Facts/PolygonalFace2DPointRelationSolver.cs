@@ -90,7 +90,7 @@ namespace DiGi.Geometry.xUnit
         }
 
         /// <summary>
-        /// Verifies that the solver stays cheap on a large outline: a 4 000-vertex ring against 100 000 points classifies in well under a second after a warm-up, where <see cref="PolygonalFace2D.Inside(Point2D, double)"/> walks every vertex per point, and that both agree on every point (ZiolkowskiJakub/DiGi.Geometry#5).
+        /// Verifies that the solver stays cheap on a large outline: a 4 000-vertex ring against 100 000 points classifies in well under a second after a warm-up, where <see cref="PolygonalFace2D.Inside(Point2D, double)"/> walks every vertex per point, and that both agree on every point (DiGi-Organization/DiGi.Geometry#5).
         /// </summary>
         [Fact]
         public void PolygonalFace2DPointRelationSolver_LargeOutline()

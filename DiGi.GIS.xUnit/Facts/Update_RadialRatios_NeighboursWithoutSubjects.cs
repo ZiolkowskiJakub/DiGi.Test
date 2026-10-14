@@ -12,7 +12,7 @@ namespace DiGi.GIS.xUnit
         /// <summary>
         /// Pins what <see cref="IO.Modify.Update_RadialRatios(Table, IEnumerable{double}, int, IEnumerable{Building2D}, IEnumerable{Building2D}, double)"/> does when the surroundings it is handed do not contain the buildings it is measuring.
         /// <para>The surroundings are read separately from the subjects, so a read that misses the partition the subjects are filed under hands this method a set the subjects are not in. Neither outcome is an error: an empty set adds no radial column at all, leaving the stored values untouched, and a set holding only distant buildings writes zeros. Both look like data afterwards, which is how twelve multi-part counties came to read as partly filled with zeros while the run that wrote them reported success.</para>
-        /// <para>This is documented behaviour rather than a defect to fix here - the caller is what must not hand over surroundings the subjects are missing from, and <c>PostgreSQLBuildingDataUpdateTask</c> now counts it. See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/64.</para>
+        /// <para>This is documented behaviour rather than a defect to fix here - the caller is what must not hand over surroundings the subjects are missing from, and <c>PostgreSQLBuildingDataUpdateTask</c> now counts it. See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/64.</para>
         /// </summary>
         [Fact]
         public void Update_RadialRatios_NeighboursWithoutSubjects()

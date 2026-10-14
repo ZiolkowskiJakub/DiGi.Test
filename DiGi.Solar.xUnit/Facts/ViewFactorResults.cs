@@ -32,7 +32,7 @@ namespace DiGi.Solar.xUnit
         }
 
         /// <summary>
-        /// Tests that a wall fully covered by a touching neighbour (a party wall) sees neither sky nor ground (ZiolkowskiJakub/DiGi.GIS.WebAPI.UI#61).
+        /// Tests that a wall fully covered by a touching neighbour (a party wall) sees neither sky nor ground (DiGi-Organization/DiGi.GIS.WebAPI.UI#61).
         /// <para>The neighbour is a closed shading-only 10 m box in front of the wall. The box's face on the wall's plane casts nothing, but every ray reaching the wall passes through the rest of the box: the roof for the sky, the floor slab for the ground.</para>
         /// <para>The same wall solved with its stored normal pointing away from the neighbour (no outward normal supplied) looks into the empty half-space and is fully open, which is why the outward normal is an input.</para>
         /// </summary>

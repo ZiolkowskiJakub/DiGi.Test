@@ -8,7 +8,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     {
         /// <summary>
         /// Verifies that SinglevalueAggregateFunction.Count answers the number of non-null cells of the requested column instead of the scope's row count, on a partially-NULL column where the two answers differ.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#9: the singlevalue switch built COUNT(*), so a sparse column reported the row count of the scope and every requested column answered the same number.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#9: the singlevalue switch built COUNT(*), so a sparse column reported the row count of the scope and every requested column answered the same number.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -54,7 +54,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
         }
 
         /// <summary>
-        /// A target column the stored table does not hold is a typed failure naming the column, distinct from a valid empty result (ZiolkowskiJakub/DiGi.PostgreSQL#12). On the unmodified code the same call answered <c>null</c>, indistinguishable from an empty partition.
+        /// A target column the stored table does not hold is a typed failure naming the column, distinct from a valid empty result (DiGi-Organization/DiGi.PostgreSQL#12). On the unmodified code the same call answered <c>null</c>, indistinguishable from an empty partition.
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -93,7 +93,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that MultivalueAggregateFunction.SplitValueDistribution groups a non-text integer column by its own value and counts the occurrences of each distinct value, instead of failing.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#11: the unmodified SplitValueDistribution ran string_to_array on the raw column, so an integer column threw and the caller answered 500; casting the column to text makes the endpoint work for every column type.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#11: the unmodified SplitValueDistribution ran string_to_array on the raw column, so an integer column threw and the caller answered 500; casting the column to text makes the endpoint work for every column type.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -131,7 +131,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that MultivalueAggregateFunction.SplitValueDistribution groups a non-text boolean column by its own value and counts the occurrences of each distinct value, instead of failing.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#11: the unmodified SplitValueDistribution ran string_to_array on the raw column, so a boolean column threw and the caller answered 500; casting the column to text makes the endpoint work for every column type.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#11: the unmodified SplitValueDistribution ran string_to_array on the raw column, so a boolean column threw and the caller answered 500; casting the column to text makes the endpoint work for every column type.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -168,7 +168,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that MultivalueAggregateFunction.SplitValueDistribution on a text column still answers the group-by count of its values, unchanged by the non-text fix (the ::text cast is a no-op on text).
-        /// <para>Regression guard for ZiolkowskiJakub/DiGi.PostgreSQL#11: a single-value text column such as municipality_name groups by its own value; the cast must leave the text-column document byte-identical to the pre-change output.</para>
+        /// <para>Regression guard for DiGi-Organization/DiGi.PostgreSQL#11: a single-value text column such as municipality_name groups by its own value; the cast must leave the text-column document byte-identical to the pre-change output.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -206,7 +206,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that MultivalueAggregateFunction.SplitDistinctCount counts the distinct values of a non-text integer column, instead of failing.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#11 on the sibling SplitDistinctCount branch: the unmodified branch ran string_to_array on the raw column, so an integer column threw and the caller answered 500; casting the column to text makes it work for every column type.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#11 on the sibling SplitDistinctCount branch: the unmodified branch ran string_to_array on the raw column, so an integer column threw and the caller answered 500; casting the column to text makes it work for every column type.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -245,7 +245,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that <see cref="PostgreSQL.Table.Enums.MultivalueAggregateFunction.SplitValueDistribution"/> is bounded by construction: a scope holding more distinct values than <c>maxGroups</c> returns exactly <c>maxGroups + 1</c> groups - the top <c>maxGroups</c> by count plus one overflow marker row - so the caller detects truncation by the result being longer than <c>maxGroups</c> and drops the last element.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#16: before the cap a high-cardinality column returned one row per distinct value with no bound. The five distinct values carry distinct counts (5, 4, 3, 2, 1), so the <c>ORDER BY count DESC</c> order and the overflow row are deterministic.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#16: before the cap a high-cardinality column returned one row per distinct value with no bound. The five distinct values carry distinct counts (5, 4, 3, 2, 1), so the <c>ORDER BY count DESC</c> order and the overflow row are deterministic.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -291,7 +291,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a distribution with fewer distinct values than <c>maxGroups</c> is returned in full and unchanged - no overflow marker, no reordering - so a cap that is not reached leaves the response byte-identical to today.
-        /// <para>Regression guard for ZiolkowskiJakub/DiGi.PostgreSQL#16: the bound must never truncate a distribution that already fits under it.</para>
+        /// <para>Regression guard for DiGi-Organization/DiGi.PostgreSQL#16: the bound must never truncate a distribution that already fits under it.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -332,7 +332,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies the floor of the documented range: <c>maxGroups</c> of 1 is accepted and, on a scope with more than one distinct value, returns exactly 1 + 1 groups - the single most-frequent value plus the overflow marker - so the truncation signal still fires at the minimum.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#16 at the lower bound of the documented range.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#16 at the lower bound of the documented range.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -372,7 +372,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a <c>maxGroups</c> outside the documented range [1, 1000] is a typed failure naming the parameter, distinct from a valid result - 0 below the floor and 1001 above the ceiling both throw <see cref="ArgumentOutOfRangeException"/>.
-        /// <para>Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#16: the ceiling is a hard bound the caller cannot raise, and the floor is enforced by the same guard as the neighbouring caps.</para>
+        /// <para>Reproduces DiGi-Organization/DiGi.PostgreSQL#16: the ceiling is a hard bound the caller cannot raise, and the floor is enforced by the same guard as the neighbouring caps.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -412,7 +412,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that <see cref="PostgreSQL.Table.Enums.MultivalueAggregateFunction.SplitDistinctCount"/> - the scalar sibling of <c>SplitValueDistribution</c> - is unaffected by <c>maxGroups</c>: the parameter is accepted but ignored, and the distinct count is answered as before.
-        /// <para>Regression guard for ZiolkowskiJakub/DiGi.PostgreSQL#16: the cap must not leak into the sibling branch that returns a single value.</para>
+        /// <para>Regression guard for DiGi-Organization/DiGi.PostgreSQL#16: the cap must not leak into the sibling branch that returns a single value.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

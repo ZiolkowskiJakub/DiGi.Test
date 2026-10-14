@@ -14,7 +14,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         /// <para>m. Poznan (<c>3064</c>) holds no <c>gmina</c> feature in BDOT10k, so the Municipality level answers nothing anywhere
         /// inside the city. While that ended the search, a box over the middle of Poznan returned no subdivision at all - and, through
         /// <see cref="Building2DPostgreSQLConverter"/>, no building either, in a city holding 82 075 of them. A box over Krakow, whose
-        /// gmina row does exist, always worked. See https://github.com/ZiolkowskiJakub/DiGi.GIS.PostgreSQL/issues/15.</para>
+        /// gmina row does exist, always worked. See https://github.com/DiGi-Organization/DiGi.GIS.PostgreSQL/issues/15.</para>
         /// <para>Municipality is still expected to come back empty for Poznan - there genuinely is no gmina there - so only the
         /// Subdivision level is asserted.</para>
         /// <para>Skipped by default: it queries a populated database, and the subdivisions only carry a county after a refresh run.</para>

@@ -11,7 +11,7 @@ namespace DiGi.GIS.PostgreSQL.UI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies a refusal before launch names its reason on the task row instead of the generic "reported failure without an exception" text - the symptom of ZiolkowskiJakub/DiGi.GIS.PostgreSQL.UI#26.
+        /// Verifies a refusal before launch names its reason on the task row instead of the generic "reported failure without an exception" text - the symptom of DiGi-Organization/DiGi.GIS.PostgreSQL.UI#26.
         /// <para>The fact drives the real task rather than a helper, because the check it exercises runs first: the runner is resolved before the window, the counties or anything else, so no WPF application, no HTTP request and no database is needed to reach it. The precondition pins that under a test run no runner candidate resolves, so the refusal it reaches is always the runner one; on unmodified code the same run ends in a bare <c>false</c> and the row carries the generic text, which is exactly what this fact fails on.</para>
         /// <para>Logging is a no-op in the test host (no logger manager is configured), so nothing is written anywhere by the run.</para>
         /// </summary>

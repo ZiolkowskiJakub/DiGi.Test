@@ -33,7 +33,7 @@ namespace DiGi.GIS.xUnit
 
         /// <summary>
         /// Verifies that PredictedYearBuilts dates each row of an input table carrying canonical features by its first confident detection, and that YearBuiltPredictor returns the same.
-        /// <para>Since ZiolkowskiJakub/DiGi.GIS.ML#15 the prediction is the first-detection heuristic: the first year with confidence at or above 0.5, so a weak earlier detection does not date the building.</para>
+        /// <para>Since DiGi-Organization/DiGi.GIS.ML#15 the prediction is the first-detection heuristic: the first year with confidence at or above 0.5, so a weak earlier detection does not date the building.</para>
         /// </summary>
         [Fact]
         public void PredictedYearBuilts_Scoring()
@@ -108,7 +108,7 @@ namespace DiGi.GIS.xUnit
 
         /// <summary>
         /// Verifies that a building with no detection - here a table carrying only legacy display names such as Location X and Polpulation, and no detection column - is left out of the result rather than dated by a default.
-        /// <para>IYearBuiltPredictor.Predict allows a row the implementation cannot score to be left out. A building the imagery never saw has nothing to be dated by (ZiolkowskiJakub/DiGi.GIS.ML#15).</para>
+        /// <para>IYearBuiltPredictor.Predict allows a row the implementation cannot score to be left out. A building the imagery never saw has nothing to be dated by (DiGi-Organization/DiGi.GIS.ML#15).</para>
         /// </summary>
         [Fact]
         public void PredictedYearBuilts_UndetectedLeftOut()

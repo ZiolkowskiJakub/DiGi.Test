@@ -84,8 +84,8 @@ namespace DiGi.Solar.xUnit
 
         /// <summary>
         /// Tests the null handling: without a receiver face there is nothing to clip against, so the caller gets null and emits no result rather than a factor it cannot bound.
-        /// <para>The fallback taken when the union fails (ZiolkowskiJakub/DiGi.Solar#8) is <see cref="Query.ShadowFaces(PolygonalFace2D?, IEnumerable{PolygonalFace2D})"/>, covered by the <c>ShadowFaces_*</c> facts. No input found reaches it through <see cref="Query.ShadedFaces(PolygonalFace2D?, IEnumerable{PolygonalFace2D}?)"/>:
-        /// since the snap-rounding retry of ZiolkowskiJakub/DiGi.Geometry#8, a bow-tie, a NaN, an infinite and a 1e300 coordinate all merge without failing (probed for ZiolkowskiJakub/DiGi.Solar#11).</para>
+        /// <para>The fallback taken when the union fails (DiGi-Organization/DiGi.Solar#8) is <see cref="Query.ShadowFaces(PolygonalFace2D?, IEnumerable{PolygonalFace2D})"/>, covered by the <c>ShadowFaces_*</c> facts. No input found reaches it through <see cref="Query.ShadedFaces(PolygonalFace2D?, IEnumerable{PolygonalFace2D}?)"/>:
+        /// since the snap-rounding retry of DiGi-Organization/DiGi.Geometry#8, a bow-tie, a NaN, an infinite and a 1e300 coordinate all merge without failing (probed for DiGi-Organization/DiGi.Solar#11).</para>
         /// </summary>
         [Fact]
         public void ShadedFaces_NullReceiver_ReturnsNull()

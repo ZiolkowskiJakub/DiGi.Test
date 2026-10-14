@@ -8,7 +8,7 @@ namespace DiGi.ComputeSharp.xUnit
         /// <summary>
         /// Determines whether the DiGi.ComputeSharp shaders can run on the current machine: the ComputeSharp default device must be hardware-accelerated and support double precision
         /// (<see cref="Core.Create.GraphicsDevice"/>). Writes a warning to the test output helper if not supported.
-        /// <para>The default device is shared by ComputeSharp and is never disposed here: disposing it would invalidate the device held by every other fact running in parallel (ZiolkowskiJakub/DiGi.ComputeSharp#2).</para>
+        /// <para>The default device is shared by ComputeSharp and is never disposed here: disposing it would invalidate the device held by every other fact running in parallel (DiGi-Organization/DiGi.ComputeSharp#2).</para>
         /// </summary>
         /// <param name="testOutputHelper">The test output helper to write warning messages to.</param>
         /// <returns>True if ComputeSharp is supported; otherwise, false.</returns>

@@ -8,7 +8,7 @@ namespace DiGi.GIS.ML.xUnit
     {
         /// <summary>
         /// Verifies that the input table carries every building - labelled or not - under the fixed allow-list schema without a label, and that the training table is exactly its labelled rows with the label appended.
-        /// <para>A county with no labels is scored and judged from this table (ZiolkowskiJakub/DiGi.GIS.ML#15), so it must show the model exactly what a training row of the same building carries. Comparing the two cell by cell is what pins that, rather than trusting two projections to stay alike.</para>
+        /// <para>A county with no labels is scored and judged from this table (DiGi-Organization/DiGi.GIS.ML#15), so it must show the model exactly what a training row of the same building carries. Comparing the two cell by cell is what pins that, rather than trusting two projections to stay alike.</para>
         /// </summary>
         [Fact]
         public void YearBuiltPredictionInputTable()

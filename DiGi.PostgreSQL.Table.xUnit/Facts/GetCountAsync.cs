@@ -8,7 +8,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
     {
         /// <summary>
         /// Verifies that a row count without a filter answers the scope's row count — the same figure a direct <c>COUNT(*)</c> gives — with no column involved at all.
-        /// <para>Implements ZiolkowskiJakub/DiGi.PostgreSQL#14: a filtered row count is a first-class converter method instead of a hand-rolled <c>COUNT("reference")</c> through the aggregate enum.</para>
+        /// <para>Implements DiGi-Organization/DiGi.PostgreSQL#14: a filtered row count is a first-class converter method instead of a hand-rolled <c>COUNT("reference")</c> through the aggregate enum.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -54,7 +54,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a supplied partition value counts only that partition, while a null partition value counts across all partitions.
-        /// <para>Implements ZiolkowskiJakub/DiGi.PostgreSQL#14: the partition semantics match the other partition-scoped reads of the converter.</para>
+        /// <para>Implements DiGi-Organization/DiGi.PostgreSQL#14: the partition semantics match the other partition-scoped reads of the converter.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -99,7 +99,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a filter matching every row answers the same count as the no-filter call.
-        /// <para>Implements ZiolkowskiJakub/DiGi.PostgreSQL#14: a valid <c>FilterGroup</c> composes with the partition scope exactly like on the other filtered reads.</para>
+        /// <para>Implements DiGi-Organization/DiGi.PostgreSQL#14: a valid <c>FilterGroup</c> composes with the partition scope exactly like on the other filtered reads.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -153,7 +153,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a filter matching no row answers <c>0</c> — an empty match is an answer, not a failure.
-        /// <para>Implements ZiolkowskiJakub/DiGi.PostgreSQL#14: <c>0</c> is never <c>null</c>, so the caller can distinguish "no rows matched" from "the count could not be determined".</para>
+        /// <para>Implements DiGi-Organization/DiGi.PostgreSQL#14: <c>0</c> is never <c>null</c>, so the caller can distinguish "no rows matched" from "the count could not be determined".</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -205,7 +205,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a filter naming a column the stored table does not hold is the same typed failure as on every other filtered read.
-        /// <para>Implements ZiolkowskiJakub/DiGi.PostgreSQL#14 on the failure side: the validation is the #12 <c>InvalidFilterException</c> naming the column, not a second mechanism and not <c>null</c>.</para>
+        /// <para>Implements DiGi-Organization/DiGi.PostgreSQL#14 on the failure side: the validation is the #12 <c>InvalidFilterException</c> naming the column, not a second mechanism and not <c>null</c>.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -257,7 +257,7 @@ namespace DiGi.PostgreSQL.Table.xUnit
 
         /// <summary>
         /// Verifies that a row with a NULL in a nullable column is still counted — the answer is <c>COUNT(*)</c>, not <c>COUNT(column)</c>.
-        /// <para>Implements ZiolkowskiJakub/DiGi.PostgreSQL#14: on the same fixture the count answers 5 while the aggregate <c>Count</c> on the nullable column answers 3, so the two APIs are provably different.</para>
+        /// <para>Implements DiGi-Organization/DiGi.PostgreSQL#14: on the same fixture the count answers 5 while the aggregate <c>Count</c> on the nullable column answers 3, so the two APIs are provably different.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_Table.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

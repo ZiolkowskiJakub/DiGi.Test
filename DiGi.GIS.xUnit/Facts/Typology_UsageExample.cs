@@ -56,7 +56,7 @@ namespace DiGi.GIS.xUnit
             //    Reading the report, note that a bucket renders as "[0, 1989]" - the closed-interval
             //    notation matching the rule's closed matching on both ends: 0 is in that bucket, and the
             //    name says so. The name is what a consumer displays. (It used to render "(0,1989>", which
-            //    looked half-open while 0 still matched - ZiolkowskiJakub/DiGi.Typology#16, now fixed.)
+            //    looked half-open while 0 still matched - DiGi-Organization/DiGi.Typology#16, now fixed.)
             //
             //    Grouping by County name rather than County Id is deliberate: an id addresses one polygon
             //    part, and 18 counties have several, so id-grouping would split a county across sibling

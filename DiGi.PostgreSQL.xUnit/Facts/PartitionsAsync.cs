@@ -11,7 +11,7 @@ namespace DiGi.PostgreSQL.xUnit
     {
         /// <summary>
         /// Verifies that a pre-cancelled CancellationToken aborts both collection overloads of PartitionsAsync at ExecuteReaderAsync instead of being silently dropped.
-        /// <para>This is a pin, not a reproducer: ExecuteReaderAsync already receives the token before the fix, so this fact is green both before and after the fix. It pins the token contract of both overloads, including the names overload whose loop stage the reproducer below does not cover. The reader-loop defect of ZiolkowskiJakub/DiGi.PostgreSQL#3 is reproduced by <see cref="PartitionsAsync_Cancellation_ReaderLoop"/>.</para>
+        /// <para>This is a pin, not a reproducer: ExecuteReaderAsync already receives the token before the fix, so this fact is green both before and after the fix. It pins the token contract of both overloads, including the names overload whose loop stage the reproducer below does not cover. The reader-loop defect of DiGi-Organization/DiGi.PostgreSQL#3 is reproduced by <see cref="PartitionsAsync_Cancellation_ReaderLoop"/>.</para>
         /// <para>Figures describe the development database resolved from <c>user files/PostgreSQL_PartitionReference.conf</c> (localhost), never production.</para>
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -40,7 +40,7 @@ namespace DiGi.PostgreSQL.xUnit
         }
 
         /// <summary>
-        /// Reproduces ZiolkowskiJakub/DiGi.PostgreSQL#3: with a token cancelled partway through a long read, PartitionsAsync must abort in the row-reading loop.
+        /// Reproduces DiGi-Organization/DiGi.PostgreSQL#3: with a token cancelled partway through a long read, PartitionsAsync must abort in the row-reading loop.
         /// <para>Before the fix the loop calls ReadAsync() with no token, so the call returns all 32 767 seeded rows instead of throwing and this fact is red; after the fix ReadAsync(cancellationToken) throws on the next row and the fact is green. The control leg with a live token proves the same request completes and returns exactly the seeded rows.</para>
         /// <para>The seed gives every name a 4096 character payload, which makes the client-side row loop dominate the read - measured warm on the development database: 126-171 ms of loop in a 132-181 ms total, the server-side reader phase only 6-14 ms - with about 10% variance between runs. The cancellation at 40% of the measured warm control total then lands inside the loop, which keeps running for well over 40% of the total, so the throw can only come from the loop honouring the token. At this cancellation point the unmodified code shape completed with all 32 767 rows on 12 of 12 runs and the fixed shape threw OperationCanceledException on 12 of 12.</para>
         /// <para>If the warm control total is under 100 ms the cancellation window is too small to attribute a throw to the loop, and the fact skips; the pin above still carries the token contract.</para>

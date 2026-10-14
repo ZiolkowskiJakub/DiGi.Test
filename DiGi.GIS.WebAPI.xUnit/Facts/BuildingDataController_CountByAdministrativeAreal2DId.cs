@@ -26,7 +26,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Pins the <c>countbyadministrativeareal2did</c> route and documented responses of ZiolkowskiJakub/DiGi.GIS.WebAPI#53: a <c>POST</c> answering a bare <c>long</c> with 204, 400, 404, 500 and 503 documented, <c>commandtimeout</c> bound from the query string and defaulting to 600, a required nullable area id and an optional filter group.
+        /// Pins the <c>countbyadministrativeareal2did</c> route and documented responses of DiGi-Organization/DiGi.GIS.WebAPI#53: a <c>POST</c> answering a bare <c>long</c> with 204, 400, 404, 500 and 503 documented, <c>commandtimeout</c> bound from the query string and defaulting to 600, a required nullable area id and an optional filter group.
         /// </summary>
         [Fact]
         public void BuildingDataController_CountByAdministrativeAreal2DId_Contract()

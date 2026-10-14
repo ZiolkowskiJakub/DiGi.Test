@@ -17,7 +17,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Pins the county scoping of ZiolkowskiJakub/DiGi.GIS.WebAPI#55 on <c>POST gis/buildingdata/tablebyfiltergroup</c>:
+        /// Pins the county scoping of DiGi-Organization/DiGi.GIS.WebAPI#55 on <c>POST gis/buildingdata/tablebyfiltergroup</c>:
         /// an omitted <c>CountyId</c> reads across all partitions (the pre-#55 behaviour, kept for existing clients); a present
         /// <c>CountyId</c> scopes the read to that county partition; a caller <c>county_id</c> condition is left as-is and the
         /// <c>CountyId</c> condition is ANDed with it, so an agreeing pair returns that county and a conflicting pair answers empty.
@@ -74,7 +74,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Pushes scratch building-data rows into two counties on the local test database and hands back a live
-        /// <see cref="BuildingDataController"/> wired to the scratch table, so the ZiolkowskiJakub/DiGi.GIS.WebAPI#55 county
+        /// <see cref="BuildingDataController"/> wired to the scratch table, so the DiGi-Organization/DiGi.GIS.WebAPI#55 county
         /// scoping of <c>tablebyfiltergroup</c> is exercised through the real action over the real converter.
         /// Returns <c>null</c> - and the fact returns without asserting - when the conf is absent or the local test database is
         /// unreachable, in which case nothing was written. A push that fails after the table exists cleans up what it wrote and

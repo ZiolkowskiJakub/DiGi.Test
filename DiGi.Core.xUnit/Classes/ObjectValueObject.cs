@@ -10,7 +10,7 @@ namespace DiGi.Core.xUnit
     /// <see cref="object"/>, so it can hold any CLR value. It exists to pin how a numeric <c>object</c> member
     /// survives the clone leg (<see cref="SerializableObject.Clone"/>, no text parse) versus the text leg
     /// (<c>Convert.ToSystem_String</c> then <c>Convert.ToDiGi</c>), which is the surface of
-    /// ZiolkowskiJakub/DiGi.Core#6.
+    /// DiGi-Organization/DiGi.Core#6.
     /// </summary>
     public class ObjectValueObject : SerializableObject, ISerializableObject
     {

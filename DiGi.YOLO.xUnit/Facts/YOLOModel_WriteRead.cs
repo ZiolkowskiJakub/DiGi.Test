@@ -8,7 +8,7 @@ namespace DiGi.YOLO.xUnit
     {
         /// <summary>
         /// Verifies that a dataset written by <see cref="Modify.Write(Classes.YOLOModel?)"/> reads back through <see cref="Modify.Read(string?)"/> with its images, categories, label 0 "Building", bounding boxes and an absolute "path:".
-        /// <para>Before ZiolkowskiJakub/DiGi.YOLO#16 Write wrote conf.yaml and then called WriteScripts, whose template conf.yaml replaced it: every dataset written this way ended up with no labels and "path: training", so training from it failed or read the wrong directory. The dataset directory sits under a folder with a space, which the old "%20" encoding also broke.</para>
+        /// <para>Before DiGi-Organization/DiGi.YOLO#16 Write wrote conf.yaml and then called WriteScripts, whose template conf.yaml replaced it: every dataset written this way ended up with no labels and "path: training", so training from it failed or read the wrong directory. The dataset directory sits under a folder with a space, which the old "%20" encoding also broke.</para>
         /// </summary>
         [Fact]
         public void YOLOModel_WriteRead()

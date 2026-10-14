@@ -9,7 +9,7 @@ namespace DiGi.GIS.WebAPI.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that the read endpoints added for verifying the subdivision links reject what they cannot act on, without touching a database - and that each action with a commandTimeout guard refuses a negative value (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).
+        /// Verifies that the read endpoints added for verifying the subdivision links reject what they cannot act on, without touching a database - and that each action with a commandTimeout guard refuses a negative value (DiGi-Organization/DiGi.GIS.WebAPI#48).
         /// <para>Each of the ceilings is asserted from both sides of its boundary, because a limit that is off by one either refuses a legitimate request or admits the one it exists to stop.</para>
         /// </summary>
         [Fact]
@@ -75,7 +75,7 @@ namespace DiGi.GIS.WebAPI.xUnit
         }
 
         /// <summary>
-        /// Verifies that a sample count and a county count sitting exactly on their ceilings, and a commandTimeout of 0 - the value that disables the timeout - are not refused by the guards (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).
+        /// Verifies that a sample count and a county count sitting exactly on their ceilings, and a commandTimeout of 0 - the value that disables the timeout - are not refused by the guards (DiGi-Organization/DiGi.GIS.WebAPI#48).
         /// <para>Nothing here reaches a database - the converters have no connection data, so each call answers 404 or 500 once past validation. What is being asserted is only that the guard let it through.</para>
         /// </summary>
         [Fact]
@@ -117,7 +117,7 @@ namespace DiGi.GIS.WebAPI.xUnit
 
         /// <summary>
         /// Asserts the commandTimeout boundary on the two estimated-coverage actions, whose lookup miss answers BadRequest as well - so a status comparison alone cannot tell the guard's refusal from the miss it precedes.
-        /// <para>Driven against a dead loopback host, the two sides separate: -1 is refused by the guard before a connection is opened, while 0 runs past it into the lookup, where OpenAsync throws a genuine NpgsqlException. A guard that refused 0 - or one placed after the lookup - would answer BadRequest instead of throwing, so neither half passes vacuously (ZiolkowskiJakub/DiGi.GIS.WebAPI#48).</para>
+        /// <para>Driven against a dead loopback host, the two sides separate: -1 is refused by the guard before a connection is opened, while 0 runs past it into the lookup, where OpenAsync throws a genuine NpgsqlException. A guard that refused 0 - or one placed after the lookup - would answer BadRequest instead of throwing, so neither half passes vacuously (DiGi-Organization/DiGi.GIS.WebAPI#48).</para>
         /// </summary>
         [Fact]
         public async Task OrtoDatasController_CoverageEstimate_CommandTimeoutBoundaries()

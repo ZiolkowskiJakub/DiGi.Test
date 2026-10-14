@@ -9,7 +9,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Reproduces the document-level half of ZiolkowskiJakub/DiGi.WebAPI.WindowsService#8 for the two operation filters ported with <c>AddExamplesOperationFilter</c>: every 4xx and 5xx response of the real controllers points at the <c>ProblemDetails</c> component (<see cref="ProblemDetailsResponseOperationFilter"/>), and every operation that declares a 401 carries the <c>apiKey</c> security requirement (<see cref="SecurityRequirementOperationFilter"/>).
+        /// Reproduces the document-level half of DiGi-Organization/DiGi.WebAPI.WindowsService#8 for the two operation filters ported with <c>AddExamplesOperationFilter</c>: every 4xx and 5xx response of the real controllers points at the <c>ProblemDetails</c> component (<see cref="ProblemDetailsResponseOperationFilter"/>), and every operation that declares a 401 carries the <c>apiKey</c> security requirement (<see cref="SecurityRequirementOperationFilter"/>).
         /// <para>Neither filter had a served document to be checked against while the host did not build. The 401 side is asserted over the whole document rather than a single route: the filters attach by response code, so a route-specific assertion would miss an operation the requirement was dropped from.</para>
         /// <para><see cref="BuildingDataController"/> is the controller whose update operations declare a 401 and stay visible to ApiExplorer - the base <c>WebAPIController</c> is <c>[ApiExplorerSettings(IgnoreApi = true)]</c>, so an update action that does not opt back in (as <c>AdministrativeAreal2DController</c>'s do not) never reaches the document.</para>
         /// </summary>
