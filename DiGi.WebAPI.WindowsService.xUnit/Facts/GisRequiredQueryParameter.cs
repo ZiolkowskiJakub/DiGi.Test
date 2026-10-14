@@ -186,13 +186,13 @@ namespace DiGi.WebAPI.WindowsService.xUnit
             Assert.Equal("0", GisDocument_Minimum(openApiOperation_SubdivisionLinks, "commandtimeout"));
 
             // The exhaustive form of the assertions above: every commandtimeout the public document carries,
-            // floored at 0 with no maximum - fifty-three of them. The fifty of #48 plus predictedyearbuiltruns of
-            // #50, plus countbyfiltergroup of #52 and countbyadministrativeareal2did of #53; the four sibling
+            // floored at 0 with no maximum - fifty-four of them. The fifty of #48 plus predictedyearbuiltruns of
+            // #50, plus countbyfiltergroup of #52, countbyadministrativeareal2did of #53, and aggregate summaries (batch) of #56; the four sibling
             // maintenance endpoints of #50 are key-gated and hidden (IgnoreApi inherited) and so never reach the
-            // public document. That is why this served count trails the reflection sweep's fifty-seven (the whole
+            // public document. That is why this served count trails the reflection sweep's fifty-eight (the whole
             // assembly, hidden endpoints included) - a tripwire, not a target: an endpoint added to the public
             // document or stripped of its floor fails here instead of passing unasserted
-            // (DiGi.GIS.WebAPI#48, #50, #52, #53).
+            // (DiGi.GIS.WebAPI#48, #50, #52, #53, #56).
             int commandTimeouts = 0;
             foreach (IOpenApiPathItem openApiPathItem in openApiDocument.Paths.Values)
             {
@@ -226,7 +226,7 @@ namespace DiGi.WebAPI.WindowsService.xUnit
                 }
             }
 
-            Assert.Equal(53, commandTimeouts);
+            Assert.Equal(54, commandTimeouts);
         }
 
         private static OpenApiOperation GisDocument_Operation(OpenApiDocument openApiDocument, string path, HttpMethod httpMethod)
