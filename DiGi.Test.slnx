@@ -315,6 +315,18 @@
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
   </Folder>
+  <Folder Name="/Laya/">
+    <Project Path="../DiGi.Laya/DiGi.Laya/DiGi.Laya.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Python/DiGi.Python/DiGi.Python.csproj" />
+    </Project>
+    <Project Path="DiGi.Laya.xUnit/DiGi.Laya.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Python/DiGi.Python/DiGi.Python.csproj" />
+      <BuildDependency Project="../DiGi.Laya/DiGi.Laya/DiGi.Laya.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
+  </Folder>
   <Folder Name="/Math/">
     <Project Path="../DiGi.Math/DiGi.Math/DiGi.Math.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
@@ -423,6 +435,16 @@
       <BuildDependency Project="../DiGi.PostgreSQL/DiGi.PostgreSQL/DiGi.PostgreSQL.csproj" />
       <BuildDependency Project="../DiGi.Typology/DiGi.Typology/DiGi.Typology.csproj" />
       <BuildDependency Project="../DiGi.Weather/DiGi.Weather/DiGi.Weather.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/Python/">
+    <Project Path="../DiGi.Python/DiGi.Python/DiGi.Python.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+    </Project>
+    <Project Path="DiGi.Python.xUnit/DiGi.Python.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Python/DiGi.Python/DiGi.Python.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
   </Folder>
   <Folder Name="/Rhino/">
