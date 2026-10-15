@@ -23,20 +23,20 @@ namespace DiGi.Analytical.xUnit
         {
             FaceFloor faceFloor = new(BuildingModelUnassign_PolygonalFace3D());
 
-            Opening opening_1 = new(BuildingModelOpening_Plane());
-            Opening opening_2 = new(BuildingModelOpening_Plane());
+            Window window_1 = new(BuildingModelOpening_Plane());
+            Window window_2 = new(BuildingModelOpening_Plane());
 
             BuildingModel buildingModel = new();
-            Assert.True(buildingModel.Assign(faceFloor, opening_1));
-            Assert.True(buildingModel.Assign(faceFloor, opening_2));
+            Assert.True(buildingModel.Assign(faceFloor, window_1));
+            Assert.True(buildingModel.Assign(faceFloor, window_2));
 
             List<IOpening>? openings = buildingModel.GetOpenings<IOpening>(faceFloor);
             Assert.NotNull(openings);
             Assert.Equal(2, openings!.Count);
-            Assert.Contains(openings, x => x.Guid == opening_1.Guid);
-            Assert.Contains(openings, x => x.Guid == opening_2.Guid);
+            Assert.Contains(openings, x => x.Guid == window_1.Guid);
+            Assert.Contains(openings, x => x.Guid == window_2.Guid);
 
-            Assert.False(buildingModel.Assign(null, opening_1));
+            Assert.False(buildingModel.Assign(null, window_1));
             Assert.False(buildingModel.Assign(faceFloor, null));
         }
 
@@ -49,12 +49,12 @@ namespace DiGi.Analytical.xUnit
             FaceFloor faceFloor_1 = new(BuildingModelUnassign_PolygonalFace3D());
             FaceFloor faceFloor_2 = new(BuildingModelUnassign_PolygonalFace3D());
 
-            Opening opening = new(BuildingModelOpening_Plane());
+            Window window = new(BuildingModelOpening_Plane());
 
             BuildingModel buildingModel = new();
-            Assert.True(buildingModel.Assign(faceFloor_1, opening));
+            Assert.True(buildingModel.Assign(faceFloor_1, window));
 
-            Assert.True(buildingModel.Assign(faceFloor_2, opening));
+            Assert.True(buildingModel.Assign(faceFloor_2, window));
 
             List<IOpening>? openings_1 = buildingModel.GetOpenings<IOpening>(faceFloor_1);
             Assert.True(openings_1 == null || openings_1.Count == 0);
@@ -62,7 +62,7 @@ namespace DiGi.Analytical.xUnit
             List<IOpening>? openings_2 = buildingModel.GetOpenings<IOpening>(faceFloor_2);
             Assert.NotNull(openings_2);
             Assert.Single(openings_2!);
-            Assert.Equal(opening.Guid, openings_2![0].Guid);
+            Assert.Equal(window.Guid, openings_2![0].Guid);
         }
 
         /// <summary>
@@ -73,12 +73,12 @@ namespace DiGi.Analytical.xUnit
         {
             FaceFloor faceFloor = new(BuildingModelUnassign_PolygonalFace3D());
 
-            Opening opening_1 = new(BuildingModelOpening_Plane());
+            Window window_1 = new(BuildingModelOpening_Plane());
 
             BuildingModel buildingModel = new();
-            Assert.True(buildingModel.Assign(faceFloor, opening_1));
+            Assert.True(buildingModel.Assign(faceFloor, window_1));
 
-            Assert.True(buildingModel.Unassign(faceFloor, opening_1));
+            Assert.True(buildingModel.Unassign(faceFloor, window_1));
 
             List<IOpening>? openings = buildingModel.GetOpenings<IOpening>(faceFloor);
             Assert.True(openings == null || openings.Count == 0);
@@ -102,19 +102,19 @@ namespace DiGi.Analytical.xUnit
         {
             FaceFloor faceFloor = new(BuildingModelUnassign_PolygonalFace3D());
 
-            Opening opening_1 = new(BuildingModelOpening_Plane());
-            Opening opening_2 = new(BuildingModelOpening_Plane());
+            Window window_1 = new(BuildingModelOpening_Plane());
+            Window window_2 = new(BuildingModelOpening_Plane());
 
             BuildingModel buildingModel = new();
-            Assert.True(buildingModel.Assign(faceFloor, opening_1));
-            Assert.True(buildingModel.Assign(faceFloor, opening_2));
+            Assert.True(buildingModel.Assign(faceFloor, window_1));
+            Assert.True(buildingModel.Assign(faceFloor, window_2));
 
-            Assert.True(buildingModel.Unassign(faceFloor, opening_2));
+            Assert.True(buildingModel.Unassign(faceFloor, window_2));
 
             List<IOpening>? openings = buildingModel.GetOpenings<IOpening>(faceFloor);
             Assert.NotNull(openings);
             Assert.Single(openings!);
-            Assert.Equal(opening_1.Guid, openings![0].Guid);
+            Assert.Equal(window_1.Guid, openings![0].Guid);
 
             OpeningRelation? openingRelation = buildingModel.GetRelation<OpeningRelation>(faceFloor);
             Assert.NotNull(openingRelation);
@@ -128,18 +128,18 @@ namespace DiGi.Analytical.xUnit
         {
             FaceFloor faceFloor = new(BuildingModelUnassign_PolygonalFace3D());
 
-            Opening opening_1 = new(BuildingModelOpening_Plane());
-            Opening opening_2 = new(BuildingModelOpening_Plane());
+            Window window_1 = new(BuildingModelOpening_Plane());
+            Window window_2 = new(BuildingModelOpening_Plane());
 
             BuildingModel buildingModel = new();
-            Assert.True(buildingModel.Assign(faceFloor, opening_1));
+            Assert.True(buildingModel.Assign(faceFloor, window_1));
 
-            Assert.False(buildingModel.Unassign(faceFloor, opening_2));
+            Assert.False(buildingModel.Unassign(faceFloor, window_2));
 
             List<IOpening>? openings = buildingModel.GetOpenings<IOpening>(faceFloor);
             Assert.NotNull(openings);
             Assert.Single(openings!);
-            Assert.Equal(opening_1.Guid, openings![0].Guid);
+            Assert.Equal(window_1.Guid, openings![0].Guid);
         }
 
         /// <summary>
@@ -150,10 +150,10 @@ namespace DiGi.Analytical.xUnit
         {
             FaceFloor faceFloor = new(BuildingModelUnassign_PolygonalFace3D());
 
-            Opening opening = new(BuildingModelOpening_Plane());
+            Window window = new(BuildingModelOpening_Plane());
 
             BuildingModel buildingModel = new();
-            Assert.True(buildingModel.Assign(faceFloor, opening));
+            Assert.True(buildingModel.Assign(faceFloor, window));
 
             List<IOpening>? openings_1 = buildingModel.GetOpenings<IOpening>(faceFloor);
             Assert.NotNull(openings_1);
