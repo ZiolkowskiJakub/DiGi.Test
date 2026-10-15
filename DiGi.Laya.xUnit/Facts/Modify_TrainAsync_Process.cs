@@ -115,6 +115,7 @@ namespace DiGi.Laya.xUnit
                 }
 
                 await AssertRefused(Options(path_MarkerInterpreter, Path.Combine(directory, "host", "Laya", "models", "run")), "Laya\\models");
+                await AssertRefused(Options(path_MarkerInterpreter, Path.Combine(directory, "Software", "DiGi.Laya", "models", "recipe_classification")), "DiGi.Laya\\models");
                 await AssertRefused(Options(path_MarkerInterpreter, directory_Output), "is not empty");
                 await AssertRefused(Options(path_MarkerInterpreter, directory_Base), "is not empty");
                 await AssertRefused(Options(path_MarkerInterpreter, Path.Combine(directory_Base, "inner")), "is the base checkpoint or inside it");
