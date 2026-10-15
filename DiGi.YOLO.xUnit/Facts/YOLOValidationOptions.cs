@@ -59,7 +59,7 @@ namespace DiGi.YOLO.xUnit
                 File.WriteAllText(path_Definition, "dummy");
                 File.WriteAllText(path_Configuration, "path: .");
 
-                string? pythonPath = Query.PythonPaths().FirstOrDefault();
+                string? pythonPath = Python.Query.PythonPaths().FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(pythonPath))
                 {
                     return;
@@ -71,7 +71,7 @@ namespace DiGi.YOLO.xUnit
 
                 Classes.YOLOValidationOptions? yOLOValidationOptions = Create.YOLOValidationOptions(pythonPath, path_Checkpoint, path_Configuration);
                 Assert.NotNull(yOLOValidationOptions);
-                Assert.Equal(Query.NormalizedPath(directory), yOLOValidationOptions!.WorkingDirectory);
+                Assert.Equal(Python.Query.NormalizedPath(directory), yOLOValidationOptions!.WorkingDirectory);
                 Assert.Equal(Enums.Category.Test, yOLOValidationOptions.Split);
             }
             finally

@@ -291,36 +291,37 @@ namespace DiGi.YOLO.xUnit
                 //Steady state: the exact process launch the runners perform - including the isolated settings directory - must print no settings notice, carry the marker-framed payload, and leave both files untouched
                 Dictionary<string, string> environmentVariables = Query.ConfigEnvironmentVariables(workingDirectory);
 
-                (int exitCode, List<string> standardOutput, List<string> standardError)[] runs =
+                Python.Classes.PythonProcessResult[] pythonProcessResults =
                 [
-                    Query.ExecuteProcess(path_Python, Quoted(path_Check), workingDirectory, environmentVariables),
-                    Query.ExecuteProcess(path_Python_Venv, Quoted(path_Check), workingDirectory, environmentVariables),
-                    Query.ExecuteProcess(path_Python, Quoted(path_Check), workingDirectory, environmentVariables),
-                    Query.ExecuteProcess(path_Python_Venv, Quoted(path_Check), workingDirectory, environmentVariables)
+                    Python.Query.ExecuteProcess(path_Python, Quoted(path_Check), workingDirectory, environmentVariables),
+                    Python.Query.ExecuteProcess(path_Python_Venv, Quoted(path_Check), workingDirectory, environmentVariables),
+                    Python.Query.ExecuteProcess(path_Python, Quoted(path_Check), workingDirectory, environmentVariables),
+                    Python.Query.ExecuteProcess(path_Python_Venv, Quoted(path_Check), workingDirectory, environmentVariables)
                 ];
 
                 string? hash_Venv_Before = Hash(path_Settings_Venv);
                 string? hash_Main_Before = Hash(path_Settings_Main);
                 string[] interpreters = [path_Python, path_Python_Venv, path_Python, path_Python_Venv];
 
-                for (int i = 0; i < runs.Length; i++)
+                for (int i = 0; i < pythonProcessResults.Length; i++)
                 {
-                    (int exitCode, List<string> standardOutput, List<string> standardError) run = runs[i];
+                    Python.Classes.PythonProcessResult pythonProcessResult = pythonProcessResults[i];
+                    List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
 
-                    List<string> report_Run = [string.Concat("Part B run ", i + 1, ": ", interpreters[i]), string.Concat("exit code ", run.exitCode.ToString()), "--stdout--"];
-                    report_Run.AddRange(run.standardOutput);
+                    List<string> report_Run = [string.Concat("Part B run ", i + 1, ": ", interpreters[i]), string.Concat("exit code ", pythonProcessResult.ExitCode.ToString()), "--stdout--"];
+                    report_Run.AddRange(standardOutput);
                     report_Run.Add("--stderr--");
-                    report_Run.AddRange(run.standardError);
+                    report_Run.AddRange(pythonProcessResult.StandardError ?? []);
                     runs_Report.Add(report_Run);
 
-                    Assert.Equal(0, run.exitCode);
+                    Assert.Equal(0, pythonProcessResult.ExitCode);
 
-                    foreach (string line in run.standardOutput)
+                    foreach (string line in standardOutput)
                     {
                         Assert.False(IsSettingsNotice(line), string.Concat("Settings notice on stdout: ", line));
                     }
 
-                    string? line_Json = Query.CheckJsonLine(run.standardOutput);
+                    string? line_Json = Python.Query.MarkedJson(standardOutput, Constants.Marker.CheckJsonBegin, Constants.Marker.CheckJsonEnd);
                     Assert.False(string.IsNullOrWhiteSpace(line_Json), "check.py printed no marker-framed JSON payload.");
 
                     System.Text.Json.Nodes.JsonNode? jsonNode = System.Text.Json.Nodes.JsonNode.Parse(line_Json!);

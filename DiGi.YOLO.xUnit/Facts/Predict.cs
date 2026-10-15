@@ -513,9 +513,9 @@ namespace DiGi.YOLO.xUnit
         /// <returns>The path of a working interpreter, or <c>null</c>.</returns>
         private static string? PythonPath_Runnable()
         {
-            foreach (string pythonPath in Query.PythonPaths())
+            foreach (string pythonPath in Python.Query.PythonPaths())
             {
-                (int exitCode, _, _) = Query.ExecuteProcess(pythonPath, "-c \"import sys\"", Path.GetTempPath());
+                int exitCode = Python.Query.ExecuteProcess(pythonPath, "-c \"import sys\"", Path.GetTempPath()).ExitCode;
                 if (exitCode == 0)
                 {
                     return pythonPath;

@@ -104,7 +104,7 @@ namespace DiGi.YOLO.xUnit
 
                 string path_Output = System.IO.Path.Combine(directory, "output", "results.bbrf");
 
-                string? pythonPath = Query.PythonPaths().FirstOrDefault();
+                string? pythonPath = Python.Query.PythonPaths().FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(pythonPath))
                 {
                     return;

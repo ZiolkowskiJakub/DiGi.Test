@@ -33,6 +33,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- DiGi.YOLO reaches DiGi.Python by HintPath, which does not carry the assembly reference on to a project referencing DiGi.YOLO, so the facts naming DiGi.Python types reach it directly. -->
+    <Reference Include="DiGi.Python">
+      <HintPath>..\..\DiGi.Python\bin\DiGi.Python.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

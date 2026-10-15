@@ -140,7 +140,7 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 // The start weights are hashed and reported under their full path.
                 Classes.YOLOTrainingRunResult yOLOTrainingRunResult_Identity = await RunAsync(Options("train9", directory_Runs, Path.Combine(directory, "nope", "python.exe"), path_Start));
                 Assert.Equal(path_Start, yOLOTrainingRunResult_Identity.StartWeightsPath);
-                Assert.Equal(DiGi.YOLO.Query.FileSHA256(path_Start), yOLOTrainingRunResult_Identity.StartWeightsSHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Start), yOLOTrainingRunResult_Identity.StartWeightsSHA256);
 
                 // The dataset step needs a Web API client.
                 Classes.YOLOTrainingRunOptions yOLOTrainingRunOptions_Dataset = Options("train9", directory_Runs, path_Python, path_Start);

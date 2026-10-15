@@ -82,12 +82,12 @@ namespace DiGi.YOLO.xUnit
                 Assert.True(yOLOTrainingResult.Resumed);
                 Assert.Equal(2, yOLOTrainingResult.ResumedFromEpoch);
                 Assert.Equal(path_Last, yOLOTrainingResult.StartModelPath);
-                Assert.Equal(Query.FileSHA256(path_Last), yOLOTrainingResult.StartModelSHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Last), yOLOTrainingResult.StartModelSHA256);
                 Assert.Equal(Enums.ModelKind.Checkpoint, yOLOTrainingResult.StartModelKind);
 
                 string path_Weights = Path.Combine(directory_Run, "weights", "best.pt");
                 Assert.Equal(path_Weights, yOLOTrainingResult.WeightsPath);
-                Assert.Equal(Query.FileSHA256(path_Weights), yOLOTrainingResult.SHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Weights), yOLOTrainingResult.SHA256);
 
                 JsonObject? jsonObject = JsonNode.Parse(File.ReadAllText(path_Weights)) as JsonObject;
                 Assert.NotNull(jsonObject);
@@ -257,7 +257,9 @@ namespace DiGi.YOLO.xUnit
                 "model.train(data=sys.argv[2], epochs=2, save_period=1, imgsz=320, batch=8, amp=False, project=sys.argv[3], name='interrupted', seed=0, workers=0)",
             ]);
 
-            (int exitCode_Interrupt, _, List<string> standardError_Interrupt) = Query.ExecuteProcess(path_Python!, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\" \"{2}\" \"{3}\"", path_Script, path_Model, path_Configuration, path_Project), directory, Query.ConfigEnvironmentVariables(directory));
+            Python.Classes.PythonProcessResult pythonProcessResult_Interrupt = Python.Query.ExecuteProcess(path_Python!, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\" \"{2}\" \"{3}\"", path_Script, path_Model, path_Configuration, path_Project), directory, Query.ConfigEnvironmentVariables(directory));
+            int exitCode_Interrupt = pythonProcessResult_Interrupt.ExitCode;
+            List<string> standardError_Interrupt = pythonProcessResult_Interrupt.StandardError ?? [];
             Assert.True(exitCode_Interrupt == 0, string.Join(Environment.NewLine, standardError_Interrupt));
 
             string directory_Weights = Path.Combine(path_Project, "interrupted", "weights");
@@ -277,9 +279,9 @@ namespace DiGi.YOLO.xUnit
             Assert.NotNull(yOLOCheckpointInformation_Finished);
             Assert.True(yOLOCheckpointInformation_Finished!.Finished);
 
-            string? sHA256_Model = Query.FileSHA256(path_Model);
+            string? sHA256_Model = Python.Query.FileSHA256(path_Model);
             //Hashed before the run: the resumed training overwrites last.pt in place, so the file no longer holds the start identity afterwards
-            string? sHA256_Last = Query.FileSHA256(path_Last);
+            string? sHA256_Last = Python.Query.FileSHA256(path_Last);
 
             Classes.YOLOTrainingOptions yOLOTrainingOptions = new()
             {
@@ -301,14 +303,14 @@ namespace DiGi.YOLO.xUnit
             Assert.Equal(path_Last, yOLOTrainingResult.StartModelPath);
             Assert.Equal(sHA256_Last, yOLOTrainingResult.StartModelSHA256);
             Assert.Equal(Path.Combine(directory_Weights, "best.pt"), yOLOTrainingResult.WeightsPath);
-            Assert.Equal(Query.FileSHA256(yOLOTrainingResult.WeightsPath), yOLOTrainingResult.SHA256);
+            Assert.Equal(Python.Query.FileSHA256(yOLOTrainingResult.WeightsPath), yOLOTrainingResult.SHA256);
 
             //The best.pt of a finished run is stripped as surely as its last.pt, so it too reports finished
             Classes.YOLOCheckpointInformation? yOLOCheckpointInformation_Best = Query.YOLOCheckpointInformation(yOLOTrainingResult.WeightsPath, path_Python);
             Assert.NotNull(yOLOCheckpointInformation_Best);
             Assert.True(yOLOCheckpointInformation_Best!.Finished);
 
-            Assert.Equal(sHA256_Model, Query.FileSHA256(path_Model));
+            Assert.Equal(sHA256_Model, Python.Query.FileSHA256(path_Model));
         }
 
         /// <summary>
@@ -436,7 +438,10 @@ namespace DiGi.YOLO.xUnit
                 "    print('%s %r %r %r %r' % (name, (x + w / 2) / 320, (y + h / 2) / 320, w / 320, h / 320))",
             ]);
 
-            (int exitCode, List<string> standardOutput, List<string> standardError) = Query.ExecuteProcess(path_Python, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\" 24", path_Script, directory_Source), directory);
+            Python.Classes.PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess(path_Python, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\" 24", path_Script, directory_Source), directory);
+            int exitCode = pythonProcessResult.ExitCode;
+            List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
+            List<string> standardError = pythonProcessResult.StandardError ?? [];
             Assert.True(exitCode == 0, string.Join(Environment.NewLine, standardError));
 
             string directory_Dataset = Path.Combine(directory, "training");

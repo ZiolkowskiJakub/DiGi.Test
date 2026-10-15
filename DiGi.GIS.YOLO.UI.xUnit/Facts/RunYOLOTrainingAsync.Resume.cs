@@ -87,12 +87,12 @@ namespace DiGi.GIS.YOLO.UI.xUnit
                 Assert.True(yOLOTrainingRunResult_Resume.Resumed);
                 Assert.Equal(2, yOLOTrainingRunResult_Resume.ResumedFromEpoch);
                 Assert.Equal(path_Last, yOLOTrainingRunResult_Resume.StartWeightsPath);
-                Assert.Equal(DiGi.YOLO.Query.FileSHA256(path_Last), yOLOTrainingRunResult_Resume.StartWeightsSHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Last), yOLOTrainingRunResult_Resume.StartWeightsSHA256);
 
                 string path_Weights = Path.Combine(directory_Run, "train9.pt");
                 Assert.Equal(path_Weights, yOLOTrainingRunResult_Resume.WeightsPath);
                 Assert.True(File.Exists(path_Weights));
-                Assert.Equal(DiGi.YOLO.Query.FileSHA256(path_Weights), yOLOTrainingRunResult_Resume.WeightsSHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Weights), yOLOTrainingRunResult_Resume.WeightsSHA256);
 
                 // The stand-in ultralytics received only resume and device; every other argument is restored from the checkpoint.
                 JsonObject? jsonObject = JsonNode.Parse(File.ReadAllText(path_Weights)) as JsonObject;
@@ -125,9 +125,9 @@ namespace DiGi.GIS.YOLO.UI.xUnit
         /// <returns>The path of a working interpreter, or <c>null</c>.</returns>
         private static string? PythonPath_Runnable()
         {
-            foreach (string pythonPath in DiGi.YOLO.Query.PythonPaths())
+            foreach (string pythonPath in Python.Query.PythonPaths())
             {
-                (int exitCode, _, _) = DiGi.YOLO.Query.ExecuteProcess(pythonPath, "-c \"import sys\"", Path.GetTempPath());
+                int exitCode = Python.Query.ExecuteProcess(pythonPath, "-c \"import sys\"", Path.GetTempPath()).ExitCode;
                 if (exitCode == 0)
                 {
                     return pythonPath;

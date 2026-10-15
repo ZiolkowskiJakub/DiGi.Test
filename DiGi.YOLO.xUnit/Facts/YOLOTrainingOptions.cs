@@ -86,7 +86,7 @@ namespace DiGi.YOLO.xUnit
                 File.WriteAllText(path_Other, "dummy");
                 File.WriteAllText(path_Configuration, "path: .");
 
-                string? pythonPath = Query.PythonPaths().FirstOrDefault();
+                string? pythonPath = Python.Query.PythonPaths().FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(pythonPath))
                 {
                     return;
@@ -108,8 +108,8 @@ namespace DiGi.YOLO.xUnit
                     Assert.NotNull(yOLOTrainingOptions);
                     Assert.Equal(path_Checkpoint, yOLOTrainingOptions!.ModelPath);
                     Assert.Equal(path_Configuration, yOLOTrainingOptions.ConfigurationFilePath);
-                    Assert.Equal(Query.NormalizedPath(directory), yOLOTrainingOptions.WorkingDirectory);
-                    Assert.Equal(Path.Combine(Query.NormalizedPath(directory)!, "runs", "detect"), yOLOTrainingOptions.Project);
+                    Assert.Equal(Python.Query.NormalizedPath(directory), yOLOTrainingOptions.WorkingDirectory);
+                    Assert.Equal(Path.Combine(Python.Query.NormalizedPath(directory)!, "runs", "detect"), yOLOTrainingOptions.Project);
                     Assert.True(Path.IsPathRooted(yOLOTrainingOptions.PythonPath));
                 }
                 finally

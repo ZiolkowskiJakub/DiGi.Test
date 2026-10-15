@@ -189,14 +189,14 @@ namespace DiGi.YOLO.xUnit
                 Assert.True(yOLOTrainingResult!.Succeeded, string.Join(Environment.NewLine, [.. yOLOTrainingResult.StandardOutput ?? [], .. yOLOTrainingResult.StandardError ?? []]));
                 Assert.Equal(0, yOLOTrainingResult.ExitCode);
                 Assert.Equal(path_Definition, yOLOTrainingResult.StartModelPath);
-                Assert.Equal(Query.FileSHA256(path_Definition), yOLOTrainingResult.StartModelSHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Definition), yOLOTrainingResult.StartModelSHA256);
                 Assert.Equal(Enums.ModelKind.Definition, yOLOTrainingResult.StartModelKind);
                 Assert.False(yOLOTrainingResult.Amp);
 
                 string path_Weights = Path.Combine(directory, "runs", "detect", "train9 fresh", "weights", "best.pt");
                 Assert.Equal(path_Weights, yOLOTrainingResult.WeightsPath);
                 Assert.Equal(new FileInfo(path_Weights).Length, yOLOTrainingResult.Bytes);
-                Assert.Equal(Query.FileSHA256(path_Weights), yOLOTrainingResult.SHA256);
+                Assert.Equal(Python.Query.FileSHA256(path_Weights), yOLOTrainingResult.SHA256);
 
                 JsonObject? jsonObject = JsonNode.Parse(File.ReadAllText(path_Weights)) as JsonObject;
                 Assert.NotNull(jsonObject);
@@ -404,7 +404,10 @@ namespace DiGi.YOLO.xUnit
                 "    print('%s %r %r %r %r' % (name, (x + w / 2) / 320, (y + h / 2) / 320, w / 320, h / 320))",
             ]);
 
-            (int exitCode_Images, List<string> standardOutput_Images, List<string> standardError_Images) = Query.ExecuteProcess(path_Python!, string.Format("\"{0}\" \"{1}\" 32", path_Script, directory_Source), directory);
+            Python.Classes.PythonProcessResult pythonProcessResult_Images = Python.Query.ExecuteProcess(path_Python!, string.Format("\"{0}\" \"{1}\" 32", path_Script, directory_Source), directory);
+            int exitCode_Images = pythonProcessResult_Images.ExitCode;
+            List<string> standardOutput_Images = pythonProcessResult_Images.StandardOutput ?? [];
+            List<string> standardError_Images = pythonProcessResult_Images.StandardError ?? [];
             Assert.True(exitCode_Images == 0, string.Join(Environment.NewLine, standardError_Images));
 
             string directory_Dataset = Path.Combine(directory, "training");
@@ -431,7 +434,7 @@ namespace DiGi.YOLO.xUnit
             Assert.True(Modify.Write(yOLOModel));
 
             string path_Configuration = Path.Combine(directory_Dataset, "conf.yaml");
-            string? sHA256_Model = Query.FileSHA256(path_Model);
+            string? sHA256_Model = Python.Query.FileSHA256(path_Model);
 
             Classes.YOLOTrainingResult Train(string modelPath, string name)
             {
@@ -447,10 +450,10 @@ namespace DiGi.YOLO.xUnit
                 Assert.NotNull(yOLOTrainingResult);
                 Assert.True(yOLOTrainingResult!.Succeeded, string.Join(Environment.NewLine, yOLOTrainingResult.StandardError ?? []));
 
-                Assert.Equal(Query.FileSHA256(modelPath), yOLOTrainingResult.StartModelSHA256);
+                Assert.Equal(Python.Query.FileSHA256(modelPath), yOLOTrainingResult.StartModelSHA256);
                 Assert.Equal(Enums.ModelKind.Checkpoint, yOLOTrainingResult.StartModelKind);
                 Assert.Equal(Path.Combine(directory_Dataset, "runs", "detect", name, "weights", "best.pt"), yOLOTrainingResult.WeightsPath);
-                Assert.Equal(Query.FileSHA256(yOLOTrainingResult.WeightsPath), yOLOTrainingResult.SHA256);
+                Assert.Equal(Python.Query.FileSHA256(yOLOTrainingResult.WeightsPath), yOLOTrainingResult.SHA256);
                 Assert.NotNull(yOLOTrainingResult.Amp);
 
                 return yOLOTrainingResult;
@@ -459,7 +462,7 @@ namespace DiGi.YOLO.xUnit
             Classes.YOLOTrainingResult yOLOTrainingResult_Continue = Train(path_Model!, "smoke_continue");
             Train(path_BaseModel!, "smoke_fresh");
 
-            Assert.Equal(sHA256_Model, Query.FileSHA256(path_Model));
+            Assert.Equal(sHA256_Model, Python.Query.FileSHA256(path_Model));
 
             Classes.YOLOValidationOptions? yOLOValidationOptions = Create.YOLOValidationOptions(path_Python, yOLOTrainingResult_Continue.WeightsPath, path_Configuration);
             Assert.NotNull(yOLOValidationOptions);
@@ -482,7 +485,9 @@ namespace DiGi.YOLO.xUnit
         /// <returns>True when nvidia-smi lists a python process among the GPU compute apps.</returns>
         private static bool GPUBusyWithPython(Assembly assembly)
         {
-            (int exitCode, List<string> standardOutput, _) = Query.ExecuteProcess("nvidia-smi", "--query-compute-apps=pid,process_name --format=csv,noheader", Path.GetTempPath());
+            Python.Classes.PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess("nvidia-smi", "--query-compute-apps=pid,process_name --format=csv,noheader", Path.GetTempPath());
+            int exitCode = pythonProcessResult.ExitCode;
+            List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
             if (exitCode != 0)
             {
                 return false;

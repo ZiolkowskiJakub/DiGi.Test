@@ -120,26 +120,5 @@ namespace DiGi.YOLO.xUnit
             (double? mAP50_Scientific, _) = Query.YOLOValidationOutput(["mAP50: 5e-05"]);
             Assert.Equal(5e-05, mAP50_Scientific);
         }
-
-        /// <summary>
-        /// Verifies that <see cref="Query.FileSHA256(string?)"/> answers the lowercase hexadecimal digest train.py and export.py print, and <c>null</c> for a missing file.
-        /// </summary>
-        [Fact]
-        public void FileSHA256()
-        {
-            string path = Path.GetTempFileName();
-            try
-            {
-                File.WriteAllText(path, "abc");
-                Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", Query.FileSHA256(path));
-            }
-            finally
-            {
-                File.Delete(path);
-            }
-
-            Assert.Null(Query.FileSHA256(path));
-            Assert.Null(Query.FileSHA256(null));
-        }
     }
 }
