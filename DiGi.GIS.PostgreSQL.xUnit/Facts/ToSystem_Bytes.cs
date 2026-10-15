@@ -50,7 +50,7 @@ namespace DiGi.GIS.PostgreSQL.xUnit
         [Fact]
         public void ToSystem_Bytes_UnknownShape_ReturnsNull()
         {
-            Assert.Null(Convert.ToSystem_Bytes(null));
+            Assert.Null(Convert.ToSystem_Bytes((JsonNode?)null));
             Assert.Null(Convert.ToSystem_Bytes(JsonNode.Parse("\"[not base64]\"")));
             Assert.Null(Convert.ToSystem_Bytes(JsonNode.Parse("[1, 256]")));
             Assert.Null(Convert.ToSystem_Bytes(JsonNode.Parse("[1, \"2\"]")));
