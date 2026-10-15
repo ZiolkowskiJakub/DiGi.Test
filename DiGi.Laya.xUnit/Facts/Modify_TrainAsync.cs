@@ -65,11 +65,16 @@ namespace DiGi.Laya.xUnit
                 Assert.False(Directory.Exists(Path.Combine(directory_Output, "checkpoint_latest")));
 
                 Classes.LayaPredictionOptions layaPredictionOptions_Trained = new(layaPredictionOptions) { ModelPath = directory_Output };
-                List<Classes.LayaClassificationResult>? layaClassificationResults = await layaItems.Take(2).ClassifyAsync(layaLabelSets, null, layaPredictionOptions_Trained);
-                Assert.NotNull(layaClassificationResults);
-                Assert.All(layaClassificationResults!, x => Assert.Empty(x.Messages!));
-                Assert.All(layaClassificationResults!, x => Assert.Equal(3, x.Scores!.Count));
-                Assert.All(layaClassificationResults!, x => Assert.Equal(layaTrainingResult.ModelSHA256, x.ModelSHA256));
+                Classes.LayaClassificationRunResult? layaClassificationRunResult = await layaItems.Take(2).ClassifyAsync(layaLabelSets, null, layaPredictionOptions_Trained);
+                Assert.NotNull(layaClassificationRunResult);
+                Assert.Equal(0, layaClassificationRunResult!.ExitCode);
+                Assert.Empty(layaClassificationRunResult.Messages!);
+                Assert.Equal(layaTrainingResult.ModelSHA256, layaClassificationRunResult.ModelSHA256);
+                List<Classes.LayaClassificationResult> layaClassificationResults = layaClassificationRunResult.Results!;
+                Assert.Equal(2, layaClassificationResults.Count);
+                Assert.All(layaClassificationResults, x => Assert.Empty(x.Messages!));
+                Assert.All(layaClassificationResults, x => Assert.Equal(3, x.Scores!.Count));
+                Assert.All(layaClassificationResults, x => Assert.Equal(layaTrainingResult.ModelSHA256, x.ModelSHA256));
             }
             finally
             {

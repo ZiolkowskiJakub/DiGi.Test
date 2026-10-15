@@ -19,7 +19,7 @@ namespace DiGi.Laya.xUnit
             Classes.LayaClassificationOptions layaClassificationOptions = new()
             {
                 MinimumConfidence = 0.8,
-                Thresholds = [new Classes.LayaLabelSetThreshold("tags", 0.65, null), new Classes.LayaLabelSetThreshold("category", null, 3)]
+                Thresholds = [new Classes.LayaLabelSetThreshold("tags", null, 0.65, null), new Classes.LayaLabelSetThreshold("category", null, null, 3)]
             };
 
             static void AssertPopulated(Classes.LayaClassificationOptions? layaClassificationOptions_Actual)

@@ -7,7 +7,7 @@ namespace DiGi.Laya.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Classes.LayaPredictionResult"/> keeps every member through a string round trip and <c>SerializationCheck</c>, nested responses with their polymorphic answers included, and that its copy constructor copies every member and clones the responses, for a completed run and for a refused one with every optional member <c>null</c>.
+        /// Verifies that <see cref="Classes.LayaPredictionResult"/> keeps every member through a string round trip and <c>SerializationCheck</c>, nested responses with their polymorphic answers and the request messages included, and that its copy constructor copies every member and clones the responses and the request messages, for a completed run and for a refused one with every optional member <c>null</c>.
         /// </summary>
         [Fact]
         public void LayaPredictionResult()
@@ -24,7 +24,8 @@ namespace DiGi.Laya.xUnit
                 false,
                 false,
                 false,
-                ["The request 'item-2' was truncated to fit the token budget and was answered from part of its input."]);
+                ["The request 'item-2' was truncated to fit the token budget and was answered from part of its input.", "predict.py exited with code 0."],
+                [new Classes.LayaRequestMessage("item-2", "The request 'item-2' was truncated to fit the token budget and was answered from part of its input.")]);
 
             static void AssertPopulated(Classes.LayaPredictionResult? layaPredictionResult_Actual)
             {
@@ -40,7 +41,10 @@ namespace DiGi.Laya.xUnit
                 Assert.False(layaPredictionResult_Actual.Stalled);
                 Assert.False(layaPredictionResult_Actual.TimedOut);
                 Assert.False(layaPredictionResult_Actual.Cancelled);
-                Assert.Single(layaPredictionResult_Actual.Messages!);
+                Assert.Equal(2, layaPredictionResult_Actual.Messages!.Count);
+                Classes.LayaRequestMessage layaRequestMessage = Assert.Single(layaPredictionResult_Actual.RequestMessages!);
+                Assert.Equal("item-2", layaRequestMessage.RequestId);
+                Assert.Equal(layaPredictionResult_Actual.Messages![0], layaRequestMessage.Message);
             }
 
             AssertPopulated(layaPredictionResult);
@@ -57,9 +61,10 @@ namespace DiGi.Laya.xUnit
             AssertPopulated(layaPredictionResult_Copy);
             Assert.NotSame(layaPredictionResult.Responses![0], layaPredictionResult_Copy.Responses![0]);
             Assert.NotSame(layaPredictionResult.Messages, layaPredictionResult_Copy.Messages);
+            Assert.NotSame(layaPredictionResult.RequestMessages![0], layaPredictionResult_Copy.RequestMessages![0]);
 
             //A run that ended on its time limit, with the flags set and no responses
-            Classes.LayaPredictionResult layaPredictionResult_Ended = new(null, null, null, null, -1, true, true, true, null);
+            Classes.LayaPredictionResult layaPredictionResult_Ended = new(null, null, null, null, -1, true, true, true, null, null);
             Core.xUnit.Query.SerializationCheck(layaPredictionResult_Ended);
 
             Classes.LayaPredictionResult layaPredictionResult_EndedCopy = new(layaPredictionResult_Ended);
@@ -72,6 +77,7 @@ namespace DiGi.Laya.xUnit
             Assert.True(layaPredictionResult_EndedCopy.TimedOut);
             Assert.True(layaPredictionResult_EndedCopy.Cancelled);
             Assert.Null(layaPredictionResult_EndedCopy.Messages);
+            Assert.Null(layaPredictionResult_EndedCopy.RequestMessages);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace DiGi.Laya.xUnit
     {
         /// <summary>
         /// Verifies what <see cref="Modify.PredictAsync(IEnumerable{Classes.LayaRequest}?, Classes.LayaPredictionOptions?, System.Threading.CancellationToken)"/> does around the process, with fake interpreters (.cmd files) standing in for CPython so no Python or laya is needed: the scripts and requests.jsonl are written (the options' token budget filled in only where a request sets none), a responses.jsonl left by an earlier run is deleted before the process starts, and a failed process is reported with its exit code and no responses.
-        /// <para>With a fake interpreter that copies a prepared responses file into place, it verifies the reading: responses are matched to requests by id and returned in request order; a request that cannot be written is left out and named while the rest still run; an error line names the refused request and is not also reported as missing; a request without a line, a line for an unknown id and a line that is not JSON are each named; a response missing an answer or truncated by Laya is kept and named.</para>
+        /// <para>With a fake interpreter that copies a prepared responses file into place, it verifies the reading: responses are matched to requests by id and returned in request order; a request that cannot be written is left out and named while the rest still run; an error line names the refused request and is not also reported as missing; a request without a line, a line for an unknown id and a line that is not JSON are each named; a response missing an answer or truncated by Laya is kept and named; and every finding about one request is also in <see cref="Classes.LayaPredictionResult.RequestMessages"/> under that request's id, while the findings naming no request of the run are not.</para>
         /// <para>Also verifies the refusals that start no process - ids used twice, a checkpoint directory that does not resolve, a calibration file that does not exist - and that no requests give an empty result while <c>null</c> requests or options give <c>null</c>.</para>
         /// </summary>
         [Fact]
@@ -96,6 +96,13 @@ namespace DiGi.Laya.xUnit
                 Assert.Contains(messages, x => x.Contains("'item-5' was truncated"));
                 Assert.DoesNotContain(messages, x => x.Contains("'item-1'"));
 
+                //Every finding about one request is also filed under its id; the line answering no request and the malformed line are not
+                List<Classes.LayaRequestMessage> layaRequestMessages = layaPredictionResult.RequestMessages!;
+                Assert.Equal(["item-4", "item-2", "item-3", "item-5", "item-5"], layaRequestMessages.Select(x => x.RequestId));
+                Assert.All(layaRequestMessages, x => Assert.Contains(x.Message, messages));
+                Assert.All(layaRequestMessages, x => Assert.Contains(string.Concat("'", x.RequestId, "'"), x.Message));
+                Assert.Equal(messages.Count - 2, layaRequestMessages.Count);
+
                 //item-4 was left out; the options' budget fills only the requests that set none
                 List<JsonObject> jsonObjects_Requests = [.. File.ReadAllLines(Path.Combine(directory_Answered, "requests.jsonl")).Select(x => (JsonObject)JsonNode.Parse(x)!)];
                 Assert.Equal(["item-1", "item-2", "item-3", "item-5"], jsonObjects_Requests.Select(x => x["id"]!.GetValue<string>()));
@@ -110,6 +117,7 @@ namespace DiGi.Laya.xUnit
                 Assert.Equal(-1, layaPredictionResult_Duplicate!.ExitCode);
                 Assert.Contains(layaPredictionResult_Duplicate.Messages!, x => x.Contains("'item-2' is used 2 times"));
                 Assert.Null(layaPredictionResult_Duplicate.Duration);
+                Assert.Empty(layaPredictionResult_Duplicate.RequestMessages!);
 
                 Classes.LayaPredictionResult? layaPredictionResult_Model = await new Classes.LayaRequest[] { layaRequest_2 }.PredictAsync(new Classes.LayaPredictionOptions() { PythonPath = path_Copy, ModelPath = "multilingual", WorkingDirectory = directory_Refused });
                 Assert.Equal(-1, layaPredictionResult_Model!.ExitCode);
