@@ -36,4 +36,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Read by the WriteScripts fact as "DiGi.Python.xUnit.Resources.Scripts.<file name>" -->
+    <EmbeddedResource Include="Resources\Scripts\*.*" />
+  </ItemGroup>
+
 </Project>
