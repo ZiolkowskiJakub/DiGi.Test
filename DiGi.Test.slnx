@@ -157,6 +157,10 @@
     <Project Path="../DiGi.Weather/DiGi.Weather/DiGi.Weather.csproj">
       <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
     </Project>
+    <Project Path="DiGi.Weather.xUnit/DiGi.Weather.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Weather/DiGi.Weather/DiGi.Weather.csproj" />
+      <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
+    </Project>
   </Folder>
   <Folder Name="/GIS/">
     <Project Path="../DiGi.GIS/DiGi.GIS/DiGi.GIS.csproj">
