@@ -1,5 +1,6 @@
 using DiGi.WebAPI.Classes;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace DiGi.WebAPI.xUnit
 {
@@ -54,6 +55,40 @@ namespace DiGi.WebAPI.xUnit
 
             Assert.True(urlBuilder.TryGetValue("countyids", out int countyId));
             Assert.Equal(73482, countyId);
+        }
+
+        /// <summary>
+        /// Tests that numeric parameters are written in the invariant culture, whatever the current culture is.
+        /// <para>ASP.NET Core binds a query string with <see cref="CultureInfo.InvariantCulture"/>, so a client running under pl-PL that wrote <c>radius=50,5</c> sent a value the server either rejects or reads differently - and an endpoint keyed by an exact <c>radius</c> then silently misses the stored row. sv-SE is checked as well because its negative sign is U+2212 rather than a hyphen-minus, which breaks a negative number the same way. The <see cref="long"/> above 2^53 guards the <c>long</c> overload: without it the argument binds to the <c>double</c> one and loses its last digit.</para>
+        /// </summary>
+        [Fact]
+        public void UrlBuilder_InvariantCulture()
+        {
+            CultureInfo cultureInfo = CultureInfo.CurrentCulture;
+            try
+            {
+                foreach (string name in (string[])["pl-PL", "sv-SE"])
+                {
+                    CultureInfo.CurrentCulture = new(name);
+
+                    UrlBuilder urlBuilder = new("gis/buildingsolarradiation/solarradiationbybuildingmodelid");
+                    urlBuilder.AddParameter("radius", 50.5);
+                    urlBuilder.AddParameter("x", -0.1 - 0.2);
+                    urlBuilder.AddParameter("y", 1e-7);
+                    urlBuilder.AddParameter("id", -12345);
+                    urlBuilder.AddParameter("ids", (IEnumerable<int>)[-1, 2]);
+                    urlBuilder.AddParameter("modelid", -9007199254740993L);
+
+                    Assert.Equal("gis/buildingsolarradiation/solarradiationbybuildingmodelid?radius=50.5&x=-0.30000000000000004&y=1E-07&id=-12345&ids=-1&ids=2&modelid=-9007199254740993", urlBuilder.Build());
+
+                    Assert.True(urlBuilder.TryGetValue("radius", out double radius));
+                    Assert.Equal(50.5, radius);
+                }
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = cultureInfo;
+            }
         }
     }
 }
