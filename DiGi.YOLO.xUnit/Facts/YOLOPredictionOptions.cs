@@ -5,7 +5,8 @@ namespace DiGi.YOLO.xUnit
     public partial class Facts
     {
         /// <summary>
-        /// Verifies that <see cref="Classes.YOLOPredictionOptions"/> keeps the values it is given, survives the round trip through its string form, and clones identically.
+        /// Verifies that <see cref="Classes.YOLOPredictionOptions"/> keeps the values it is given, survives the round trip through its string form, clones identically, and is copied whole by its copy constructor.
+        /// <para>Every member is set away from its default, because SerializationCheck only compares the members an instance populates and never runs the copy constructor.</para>
         /// </summary>
         [Fact]
         public void YOLOPredictionOptions()
@@ -14,19 +15,25 @@ namespace DiGi.YOLO.xUnit
             {
                 BatchSize = 16,
                 Confidence = 0.25,
+                HalfPrecision = true,
+                ImageSize = 320,
                 ModelPath = @"C:\YOLO\models\best.pt",
                 OutputPath = @"C:\YOLO\output\results.bbrf",
                 PythonPath = @"C:\Python\python.exe",
                 SourceDirectory = @"C:\YOLO\input",
+                Workers = 3,
                 WorkingDirectory = null
             };
 
             Assert.Equal(16, yOLOPredictionOptions.BatchSize);
             Assert.Equal(0.25, yOLOPredictionOptions.Confidence);
+            Assert.True(yOLOPredictionOptions.HalfPrecision);
+            Assert.Equal(320, yOLOPredictionOptions.ImageSize);
             Assert.Equal(@"C:\YOLO\models\best.pt", yOLOPredictionOptions.ModelPath);
             Assert.Equal(@"C:\YOLO\output\results.bbrf", yOLOPredictionOptions.OutputPath);
             Assert.Equal(@"C:\Python\python.exe", yOLOPredictionOptions.PythonPath);
             Assert.Equal(@"C:\YOLO\input", yOLOPredictionOptions.SourceDirectory);
+            Assert.Equal(3, yOLOPredictionOptions.Workers);
             Assert.Null(yOLOPredictionOptions.WorkingDirectory);
 
             string? json = Core.Convert.ToSystem_String(yOLOPredictionOptions);
@@ -36,11 +43,26 @@ namespace DiGi.YOLO.xUnit
             Assert.NotNull(yOLOPredictionOptions_Actual);
             Assert.Equal(yOLOPredictionOptions.BatchSize, yOLOPredictionOptions_Actual!.BatchSize);
             Assert.Equal(yOLOPredictionOptions.Confidence, yOLOPredictionOptions_Actual.Confidence);
+            Assert.Equal(yOLOPredictionOptions.HalfPrecision, yOLOPredictionOptions_Actual.HalfPrecision);
+            Assert.Equal(yOLOPredictionOptions.ImageSize, yOLOPredictionOptions_Actual.ImageSize);
             Assert.Equal(yOLOPredictionOptions.ModelPath, yOLOPredictionOptions_Actual.ModelPath);
             Assert.Equal(yOLOPredictionOptions.SourceDirectory, yOLOPredictionOptions_Actual.SourceDirectory);
+            Assert.Equal(yOLOPredictionOptions.Workers, yOLOPredictionOptions_Actual.Workers);
             Assert.Null(yOLOPredictionOptions_Actual.WorkingDirectory);
 
             Core.xUnit.Query.SerializationCheck(yOLOPredictionOptions);
+
+            Classes.YOLOPredictionOptions yOLOPredictionOptions_Copy = new(yOLOPredictionOptions);
+            Assert.Equal(yOLOPredictionOptions.BatchSize, yOLOPredictionOptions_Copy.BatchSize);
+            Assert.Equal(yOLOPredictionOptions.Confidence, yOLOPredictionOptions_Copy.Confidence);
+            Assert.Equal(yOLOPredictionOptions.HalfPrecision, yOLOPredictionOptions_Copy.HalfPrecision);
+            Assert.Equal(yOLOPredictionOptions.ImageSize, yOLOPredictionOptions_Copy.ImageSize);
+            Assert.Equal(yOLOPredictionOptions.ModelPath, yOLOPredictionOptions_Copy.ModelPath);
+            Assert.Equal(yOLOPredictionOptions.OutputPath, yOLOPredictionOptions_Copy.OutputPath);
+            Assert.Equal(yOLOPredictionOptions.PythonPath, yOLOPredictionOptions_Copy.PythonPath);
+            Assert.Equal(yOLOPredictionOptions.SourceDirectory, yOLOPredictionOptions_Copy.SourceDirectory);
+            Assert.Equal(yOLOPredictionOptions.Workers, yOLOPredictionOptions_Copy.Workers);
+            Assert.Equal(yOLOPredictionOptions.WorkingDirectory, yOLOPredictionOptions_Copy.WorkingDirectory);
         }
 
         /// <summary>
@@ -53,10 +75,13 @@ namespace DiGi.YOLO.xUnit
 
             Assert.Equal(32, yOLOPredictionOptions.BatchSize);
             Assert.Equal(0.1, yOLOPredictionOptions.Confidence);
+            Assert.False(yOLOPredictionOptions.HalfPrecision);
+            Assert.Null(yOLOPredictionOptions.ImageSize);
             Assert.Null(yOLOPredictionOptions.ModelPath);
             Assert.Null(yOLOPredictionOptions.OutputPath);
             Assert.Null(yOLOPredictionOptions.PythonPath);
             Assert.Null(yOLOPredictionOptions.SourceDirectory);
+            Assert.Equal(2, yOLOPredictionOptions.Workers);
             Assert.Null(yOLOPredictionOptions.WorkingDirectory);
         }
 

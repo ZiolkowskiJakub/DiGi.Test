@@ -44,6 +44,9 @@ namespace DiGi.YOLO.xUnit
                 Assert.Contains("--source", predictContent);
                 Assert.Contains("--conf", predictContent);
                 Assert.Contains("--output", predictContent);
+                Assert.Contains("--workers", predictContent);
+                Assert.Contains("--half", predictContent);
+                Assert.Contains("--imgsz", predictContent);
 
                 //export.py is the only reason the frozen checkpoint can become the ONNX graph the in-process detector scores with, and it has to be laid down by the same call that lays the rest down
                 string exportContent = File.ReadAllText(exportPath);
