@@ -318,6 +318,15 @@
       <BuildDependency Project="../DiGi.GLTF/DiGi.GLTF/DiGi.GLTF.csproj" />
       <BuildDependency Project="DiGi.Core.xUnit/DiGi.Core.xUnit.csproj" />
     </Project>
+    <Project Path="DiGi.GLTF.Analytical.xUnit/DiGi.GLTF.Analytical.xUnit.csproj">
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical/DiGi.Analytical.csproj" />
+      <BuildDependency Project="../DiGi.Analytical/DiGi.Analytical.Building/DiGi.Analytical.Building.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core/DiGi.Core.csproj" />
+      <BuildDependency Project="../DiGi.Core/DiGi.Core.Parameter/DiGi.Core.Parameter.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry.Object/DiGi.Geometry.Object.csproj" />
+      <BuildDependency Project="../DiGi.Geometry/DiGi.Geometry/DiGi.Geometry.csproj" />
+      <BuildDependency Project="../DiGi.GLTF/DiGi.GLTF/DiGi.GLTF.csproj" />
+    </Project>
   </Folder>
   <Folder Name="/Laya/">
     <Project Path="../DiGi.Laya/DiGi.Laya/DiGi.Laya.csproj">
