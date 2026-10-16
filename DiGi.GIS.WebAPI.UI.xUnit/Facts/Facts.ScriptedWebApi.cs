@@ -26,6 +26,11 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             }
 
             /// <summary>
+            /// Gets the <c>Authorization</c> header of every request received, in the order of <see cref="Requests"/>; null where a request carried none.
+            /// </summary>
+            public List<string?> Authorizations { get; } = [];
+
+            /// <summary>
             /// Gets every request received, in order, with its body as text.
             /// </summary>
             public List<(HttpMethod Method, Uri? RequestUri, string? Body)> Requests { get; } = [];
@@ -34,6 +39,7 @@ namespace DiGi.GIS.WebAPI.UI.xUnit
             {
                 string? body = request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken);
                 this.Requests.Add((request.Method, request.RequestUri, body));
+                this.Authorizations.Add(request.Headers.Authorization?.ToString());
                 return this.respond(request, body);
             }
         }
